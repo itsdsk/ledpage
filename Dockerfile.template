@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libsmbclient \
   libssh-4 \
   fbset \
+  libav-tools \
   libexpat-dev && rm -rf /var/lib/apt/lists/*
 
 RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
