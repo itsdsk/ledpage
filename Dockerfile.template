@@ -36,7 +36,6 @@ RUN apt-get update -q &&\
     uv4l \
     uv4l-xscreen \
     uv4l-raspidisp \
-    uv4l-raspidisp-extras \
     v4l-utils \
     libopencv-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
