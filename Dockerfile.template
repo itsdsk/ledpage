@@ -46,19 +46,7 @@ RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force &
 COPY ./app ./
 
 # compile and install hyperion
-RUN apt update && apt install \
-  git cmake build-essential libqt4-dev libusb-1.0-0-dev python-dev libxrender-dev python \
-  && export FIRMWARE_DIR="raspberrypi-firmware" \
-  && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
-  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
-  && export HYPERION_DIR="hyperion" \
-  && git clone --recursive https://github.com/tvdzwan/hyperion.git "$HYPERION_DIR" --depth=1 \
-  && mkdir "$HYPERION_DIR/build" \
-  && cd "$HYPERION_DIR/build" \
-  && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
-  && make -j $(nproc) \
-  && cp ./bin/hyperion-remote /usr/bin/ \
-  && cp ./bin/hyperiond /usr/bin/
+RUN wget -qO- https://raw.githubusercontent.com/hyperion-project/hyperion.ng/master/bin/compile.sh | sh
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on
