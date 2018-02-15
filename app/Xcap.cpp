@@ -1,13 +1,13 @@
-#include <opencv2/opencv.hpp>
-#include "opencv2/highgui/highgui.hpp"
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/extensions/Xrender.h>
+#include <X11/extensions/XShm.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
 #include <iostream>
 
 using namespace std;
-using namespace cv;
 
 struct ScreenShot
 {
@@ -23,7 +23,7 @@ struct ScreenShot
         init = true;
     }
 
-    void operator() (Mat& cvImg)
+    void operator() ()
     {
         if(init == true)
             init = false;
@@ -31,8 +31,13 @@ struct ScreenShot
             XDestroyImage(img);
 
         img = XGetImage(display, root, x, y, width, height, AllPlanes, ZPixmap);
-
-        cvImg = Mat(height, width, CV_8UC4, img->data);
+		
+		for(int i=0; i<144; i++){
+			XColor c;
+			c.pixel = XGetPixel(img, 912, 492);
+			XQueryColor (display, DefaultColormap(display, DefaultScreen (display)), &c);
+		    if(i==0)cout << c.red/256 << " " << c.green/256 << " " << c.blue/256 << "\n" ;
+		}
     }
 
     ~ScreenShot()
@@ -56,30 +61,14 @@ int main()
 	int screenW = 1824; int screenH = 984;
     ScreenShot screen(0,0,screenW,screenH);
 	int frame = 0;
-	Mat img;
-   	//screen(img);
-	//imwrite("savedImg.jpg", img);
+
 	int x = 912; int y = 492;
     while(1){
-		//cout << "Width: " << img.cols << endl;
-		//cout << "Height: " << img.rows << endl;
 
-    	screen(img);
-		for(int i=0; i<144; i++){
-			uchar b = img.data[img.channels()*(img.cols*y + x) + 0];    
-			uchar g = img.data[img.channels()*(img.cols*y + x) + 1];
-			uchar r = img.data[img.channels()*(img.cols*y + x) + 2];
-		}
-		//cout << "b: " << b << endl;
-		//cout << "g: " << g << endl;
-		//cout << "r: " << r << endl;
+    	screen();
 
-        //Vec3b colour = img.at<Vec3b>(Point(500, 500));
-		//cout << "val0: " << colour.val[0] << endl;
 		frame++;
 		cout << "Frame: " << frame << endl;
 	}
-    //imshow("img", img);
-    //waitKey(0);        
     return 0;
 }
