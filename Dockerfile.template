@@ -54,7 +54,7 @@ RUN apt update && apt install \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
   && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
   && export HYPERION_DIR="hyperion" \
-  && git clone --recursive https://github.com/tvdzwan/hyperion.git "$HYPERION_DIR" \
+  && git clone --recursive https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
   && mkdir "$HYPERION_DIR/build" \
   && cd "$HYPERION_DIR/build" \
   && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
