@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# arduino
+
+# check and update arduino board
+diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
+if [ "${PROGRAMMER:-}" == "1" ]; then
+  echo $PROGRAMMER
+  pushd /usr/src/app/arduino_display
+  make upload && cp arduino_display.ino /data/
+  unset PROGRAMMER
+  popd
+fi
+
+# electron
+
 # By default docker gives us 64MB of shared memory size but to display heavy
 # pages we need more.
 umount /dev/shm && mount -t tmpfs shm /dev/shm

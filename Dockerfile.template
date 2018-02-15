@@ -63,6 +63,18 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && cp ./bin/hyperion-remote /usr/bin/ \
   && cp ./bin/hyperiond /usr/bin/
 
+# install arduino deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    arduino \
+    g++ \
+    gcc \
+    usbutils \
+    make
+ENV ARDUINODIR /usr/share/arduino
+ENV BOARD uno
+# compile arduino
+RUN cd arduino_display && make
+
 ## uncomment if you want systemd
 ENV INITSYSTEM on
 
