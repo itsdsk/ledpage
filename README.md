@@ -10,7 +10,9 @@ v4l2-ctl --all -d /dev/video0
 
 g++ opencv_test.cpp -o  opencv_test -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc
 
-g++ -std=c++11 xscr.cpp -o  xscr -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -L/usr/include/X11/lib -lX11
+export DISPLAY=":0" && g++ xscr.cpp -o  xscr -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lX11
+
+export DISPLAY=":0" && g++ xscap.cpp -o  xcap -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lX11
 
 gcc -o capv4l2 capv4l2.c -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lm
 
