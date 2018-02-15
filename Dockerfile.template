@@ -45,12 +45,13 @@ RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force &
 # Move app to filesystem
 COPY ./app ./
 
-# compile and install hyperion
+# install hyperion dependencies
 RUN apt update && apt install \
     git cmake build-essential qtbase5-dev libqt5serialport5-dev \
     libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
-    libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
-  && export FIRMWARE_DIR="raspberrypi-firmware" \
+    libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev
+# clone and build hyperion
+RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
   && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
   && export HYPERION_DIR="hyperion" \
