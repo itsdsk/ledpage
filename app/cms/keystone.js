@@ -19,8 +19,6 @@ keystone.init({
 	'views': 'templates/views',
 	'view engine': 'pug',
 
-	'emails': 'templates/emails',
-
 	'auto update': true,
 	'session': true,
 	'auth': true,
@@ -48,7 +46,6 @@ keystone.set('routes', require('./routes'));
 keystone.set('nav', {
 	posts: ['posts', 'post-categories'],
 	galleries: 'galleries',
-	enquiries: 'enquiries',
 	users: 'users',
 });
 
