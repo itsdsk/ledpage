@@ -24,4 +24,7 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 # it saves you a LOT of resources avoiding full-desktops envs
 
 rm /tmp/.X0-lock &>/dev/null || true
-startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging
+startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging &
+
+# start hyperion
+/usr/bin/hyperiond /usr/src/app/hyperion.config.json
