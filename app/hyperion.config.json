@@ -8,9 +8,7 @@
 	"device" :
 	{
 		"name"       : "MyHyperionConfig",
-		"type"       : "apa102",
-		"output"     : "/dev/spidev0.0",
-		"rate"     : 1000000,
+		"type"       : "none",
 		"colorOrder" : "rgb"
 	},
 
@@ -90,10 +88,10 @@
 	// FRAME GRABBER CONFIG
 	"framegrabber" : 
 	{
-		"width" : 192,
-		"height" : 108,
+		"width" : 64,
+		"height" : 36,
 		"frequency_Hz" : 30.303030303030305,
-		"priority" : 890
+		"priority" : 50
 	},
 
 	// JSON SERVER CONFIG
