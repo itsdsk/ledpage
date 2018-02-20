@@ -12,6 +12,12 @@ if [ "${PROGRAMMER:-}" == "1" ]; then
   popd
 fi
 
+# web server/cms
+
+# start mongodb
+/docker-entrypoint.sh mongod &
+
+
 # electron
 
 # By default docker gives us 64MB of shared memory size but to display heavy
