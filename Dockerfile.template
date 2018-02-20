@@ -1,5 +1,29 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:8
 
+# install mongodb
+ADD mongodb_3_0_14_core.tar.gz /usr/bin/
+ADD mongodb_3_0_14_tools.tar.gz /usr/bin/
+RUN groupadd -r mongodb && useradd -r -g mongodb mongodb
+RUN mkdir -p \
+    /data/db \
+    /data/configdb \
+    /var/log/mongodb \
+&& chown -R mongodb:mongodb \
+    /usr/bin/mongo* \
+    /data/db \
+    /data/configdb \
+/var/log/mongodb
+COPY ./docker-entrypoint.sh /
+RUN ["chmod", "+x", "/docker-entrypoint.sh"]
+# Expose ports
+# - 27017: process
+# - 28017: http
+EXPOSE 27017
+EXPOSE 28017
+
+
+# Define mountable directories
+VOLUME /data/db /data/configdb
 # Install other apt deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-utils \
