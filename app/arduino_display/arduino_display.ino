@@ -6,14 +6,16 @@
 #define NUM_LEDS 32
 CRGB leds[NUM_LEDS];
 
+// baudrate (higher is faster refresh rate)
+#define serialRate 460800
+
 // data header
 const uint8_t header[4] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
 void setup()
 {
   // initialise serial USB communication
-  Serial.begin(9600);
-  Serial.setTimeout(50);
+  Serial.begin(serialRate);
 
   // initialise LEDs
   FastLED.addLeds<WS2812B, DATA_PIN, BRG>(leds, NUM_LEDS);
