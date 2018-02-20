@@ -1,6 +1,7 @@
 function setup() {
   // put setup code here
   createCanvas(1280, 720);
+  frameRate(30);
   colorMode(HSB, 255);
 
 }
