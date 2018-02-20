@@ -13,8 +13,8 @@ var Gallery = new keystone.List('Gallery', {
 Gallery.add({
 	name: { type: String, required: true },
 	publishedDate: { type: Date, default: Date.now },
-	heroImage: { type: Types.LocalFile },
-	images: { type: Types.LocalFiles },
+	heroImage: { type: Types.File },
+//	images: { type: Types.LocalFiles },
 });
 
 Gallery.register();
