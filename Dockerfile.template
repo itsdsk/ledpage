@@ -99,6 +99,9 @@ ENV BOARD uno
 # compile arduino
 RUN cd arduino_display && make
 
+# (CMS) Fixes kerberos issue
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libkrb5-dev
 # install web server/cms
 RUN cd /usr/src/app/cms && npm install
 
