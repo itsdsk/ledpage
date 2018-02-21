@@ -17,7 +17,7 @@ fi
 # start mongodb
 /docker-entrypoint.sh mongod &
 # start webserver/cms
-/usr/local/bin/node /usr/src/app/cms/keystone.js &
+cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js &
 
 # electron
 
