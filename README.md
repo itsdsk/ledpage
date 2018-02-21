@@ -19,3 +19,5 @@ gcc -o capv4l2 capv4l2.c -I/usr/local/include/ -lopencv_core -lopencv_highgui -l
 resin sync --source . --destination /usr/src/
 
 avconv -r 25 -s 1824x984 -f video4linux2 -i /dev/video0 udp://224.0.0.100:1234
+
+/usr/bin/hyperiond ./hyperion.config.json
