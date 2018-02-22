@@ -3,28 +3,24 @@ FROM resin/%%RESIN_MACHINE_NAME%%-node:8
 # install mongodb
 ADD mongodb_3_0_14_core.tar.gz /usr/bin/
 ADD mongodb_3_0_14_tools.tar.gz /usr/bin/
-RUN groupadd -r mongodb && useradd -r -g mongodb mongodb
-RUN mkdir -p \
-    /data/db \
-    /data/configdb \
-    /var/log/mongodb \
-&& chown -R mongodb:mongodb \
-    /usr/bin/mongo* \
-    /data/db \
-    /data/configdb \
-/var/log/mongodb
-COPY ./docker-entrypoint.sh /
-RUN ["chmod", "+x", "/docker-entrypoint.sh"]
-# Expose ports
-# - 27017: process
-# - 28017: http
-EXPOSE 27017
-EXPOSE 28017
-# Define mountable directories
+RUN groupadd -r mongodb && useradd -r -g mongodb mongodb \
+  && mkdir -p /data/db /data/configdb /var/log/mongodb \
+  && chown -R mongodb:mongodb /usr/bin/mongo* \
+  /data/db  /data/configdb /var/log/mongodb
 VOLUME /data/db /data/configdb
+EXPOSE 27017 28017
 
+# install nginx
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  nginx \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install other apt deps
+# install keystone dependency
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  libkrb5-dev \
+&& apt-get clean && rm -rf /var/lib/apt/lists/* \
+
+# install electron dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-utils \
   clang \
@@ -50,7 +46,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libssh-4 \
   fbset \
   libav-tools \
-  libexpat-dev && rm -rf /var/lib/apt/lists/*
+  libexpat-dev \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# install hyperion dependencies
+RUN apt update && apt install -y \
+  git cmake build-essential qtbase5-dev libqt5serialport5-dev \
+  libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
+  libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# install arduino deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  arduino \
+  g++ \
+  gcc \
+  usbutils \
+  make \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
   && echo "" >> /etc/X11/xinit/xserverrc \
@@ -59,22 +72,15 @@ RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
 # Move to app dir
 WORKDIR /usr/src/app
 
-# Move package.json to filesystem
+# move electron pkg.json to root and install
 COPY ./app/package.json ./
-
-# Install npm modules for the application
-RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force && \
-  rm -rf /tmp/* && node_modules/.bin/electron-rebuild
+RUN JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/* \
+&& node_modules/.bin/electron-rebuild
 
 # Move app to filesystem
 COPY ./app ./
 
-# install hyperion dependencies
-RUN apt update && apt install -y \
-    git cmake build-essential qtbase5-dev libqt5serialport5-dev \
-    libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
-    libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
 # clone and build hyperion
 RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
@@ -88,37 +94,19 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && cp ./bin/hyperion-remote /usr/bin/ \
   && cp ./bin/hyperiond /usr/bin/
 
-# install arduino deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    arduino \
-    g++ \
-    gcc \
-    usbutils \
-    make \
-	&& apt-get clean && rm -rf /var/lib/apt/lists/*
+# compile arduino
 ENV ARDUINODIR /usr/share/arduino
 ENV BOARD uno
-# compile arduino
 RUN cd arduino_display && make
 
-# (CMS) Fixes kerberos issue
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libkrb5-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
-# install web server/cms
+# install node.js servers for cms and setup
 RUN cd /usr/src/app/cms && npm install \
-    && npm cache clean --force \
-    && rm -rf /tmp/*
+  && cd /usr/src/app/d3 && npm install \
+&& npm cache clean --force && rm -rf /tmp/* \
 
-# install second web module for led layout
-RUN cd /usr/src/app/d3 && npm install \
-    && npm cache clean --force \
-    && rm -rf /tmp/*
-
-# install nginx
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx && apt-get clean && rm -rf /var/lib/apt/lists/*
-COPY ./nginx-config /etc/nginx/sites-available/default
+# nginx setup
 EXPOSE 80 443
+COPY ../nginx-config /etc/nginx/sites-available/default
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on

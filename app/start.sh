@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# arduino
+# kill all subshells and processes on exit
+trap "kill 0" SIGINT
+
 
 # check and update arduino board
 diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
@@ -12,23 +14,19 @@ if [ "${PROGRAMMER:-}" == "1" ]; then
   popd
 fi
 
-# web server/cms
-
-
 # start mongodb
-/docker-entrypoint.sh mongod &
+( mongod ) &
 
 # start webserver/cms
-cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js &
+( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
+
 # start webserver/led layout
-cd /usr/src/app/d3 && /usr/local/bin/node /usr/src/app/d3/d3server.js &
+( cd /usr/src/app/d3 && /usr/local/bin/node /usr/src/app/d3/d3server.js ) &
 
 # start nginx
-nginx -g "daemon off;" &
-
+( nginx -g "daemon off;" ) &
 
 # electron
-
 
 # By default docker gives us 64MB of shared memory size but to display heavy
 # pages we need more.
@@ -40,7 +38,9 @@ umount /dev/shm && mount -t tmpfs shm /dev/shm
 # it saves you a LOT of resources avoiding full-desktops envs
 
 rm /tmp/.X0-lock &>/dev/null || true
-startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging &
+( startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging ) &
 
 # start hyperion
-/usr/bin/hyperiond /usr/src/app/hyperion.config.json
+( /usr/bin/hyperiond /usr/src/app/hyperion.config.json ) &
+
+wait
