@@ -70,10 +70,11 @@ RUN JOBS=MAX npm install --unsafe-perm --production && npm cache clean --force &
 COPY ./app ./
 
 # install hyperion dependencies
-RUN apt update && apt install \
+RUN apt update && apt install -y \
     git cmake build-essential qtbase5-dev libqt5serialport5-dev \
     libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
-    libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev
+    libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 # clone and build hyperion
 RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
@@ -93,7 +94,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     gcc \
     usbutils \
-    make
+    make \
+	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV ARDUINODIR /usr/share/arduino
 ENV BOARD uno
 # compile arduino
@@ -101,9 +103,15 @@ RUN cd arduino_display && make
 
 # (CMS) Fixes kerberos issue
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libkrb5-dev
+    libkrb5-dev && apt-get clean && rm -rf /var/lib/apt/lists/*
 # install web server/cms
-RUN cd /usr/src/app/cms && npm install
+RUN cd /usr/src/app/cms && npm install \
+    && npm cache clean --force \
+    && rm -rf /tmp/*
+
+# install nginx
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on
