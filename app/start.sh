@@ -17,8 +17,11 @@ fi
 
 # start mongodb
 /docker-entrypoint.sh mongod &
+
 # start webserver/cms
 cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js &
+# start webserver/led layout
+cd /usr/src/app/d3 && /usr/local/bin/node /usr/src/app/d3/d3server.js &
 
 # start nginx
 nginx -g "daemon off;" &

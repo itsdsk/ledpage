@@ -109,6 +109,11 @@ RUN cd /usr/src/app/cms && npm install \
     && npm cache clean --force \
     && rm -rf /tmp/*
 
+# install second web module for led layout
+RUN cd /usr/src/app/d3 && npm install \
+    && npm cache clean --force \
+    && rm -rf /tmp/*
+
 # install nginx
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx && apt-get clean && rm -rf /var/lib/apt/lists/*
