@@ -1,0 +1,43 @@
+/* styles */
+/* called by your view template */
+
+/* You might want to try something fancier: */
+/* less: http://lesscss.org/ */
+
+
+
+#d3 svg{
+  fill:#fff;
+  border:2px solid #000;
+}
+rect {
+  cursor: crosshair;
+}
+.line{
+  stroke-width: 3px;
+  fill:none;
+  stroke: #000000;
+}
+.circle{
+  stroke-width: 1.5px;
+  cursor:pointer;
+  fill:green;
+}
+
+text {
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+
+text.id {
+  text-anchor: middle;
+  font-weight: bold;
+}
+
+#exportit {
+    background:#000;
+    cursor:pointer;
+    color:#fff;
+    width:45px;
+    padding:2px 4px;
+}
