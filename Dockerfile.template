@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # install keystone dependency
 RUN apt-get update && apt-get install -y --no-install-recommends \
   libkrb5-dev \
-&& apt-get clean && rm -rf /var/lib/apt/lists/* \
+&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # install electron dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -102,7 +102,7 @@ RUN cd arduino_display && make
 # install node.js servers for cms and setup
 RUN cd /usr/src/app/cms && npm install \
   && cd /usr/src/app/d3 && npm install \
-&& npm cache clean --force && rm -rf /tmp/* \
+&& npm cache clean --force && rm -rf /tmp/*
 
 # nginx setup
 EXPOSE 80 443
