@@ -12,7 +12,7 @@ var keystone = require('keystone');
 keystone.init({
 	'name': 'keystone-starter',
 	'brand': 'keystone-starter',
-	'port': 80,
+	'port': 8080,
 	'sass': 'public',
 	'static': 'public',
 	'favicon': 'public/favicon.ico',
