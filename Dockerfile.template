@@ -106,7 +106,7 @@ RUN cd /usr/src/app/cms && npm install \
 
 # nginx setup
 EXPOSE 80 443
-COPY ../nginx-config /etc/nginx/sites-available/default
+COPY ./nginx-config /etc/nginx/sites-available/default
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on
