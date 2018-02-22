@@ -135,6 +135,32 @@ function redrawlines() {
 
 }
 
+var loadC = loadCircles();
+        
+function loadCircles(){
+                var savedCircles = [{"x":455,"y":137.13333129882812,"radius":"10"},
+                            {"x":273,"y":261.1333312988281,"radius":"10"},
+                            {"x":107,"y":81.13333129882812,"radius":10},
+                            {"x":340,"y":99.13333129882812,"radius":10}];
+        
+      var count = svg.selectAll("circle")[0].length;
+
+    var newcircles = svg.selectAll("circle")
+      .data(savedCircles)
+      .enter()
+      .append("circle");
+
+var circleAttributes = newcircles
+    .attr("class", "circle")
+    .attr("cx", function (d) { return d.x; })
+    .attr("cy", function (d) { return d.y; })
+    .attr("r", function (d) { return d.radius; })
+    .call(drag); //drag magic - built in d3 behavior: https://github.com/mbostock/d3/wiki/Drag-Behavior#wiki-drag
+  
+
+}
+
+
 function drawcircle(d,i) {
 
   //get mouse coords
