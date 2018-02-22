@@ -14,15 +14,18 @@ fi
 
 # web server/cms
 
-# start nginx
-nginx -g "daemon off;"
 
 # start mongodb
 /docker-entrypoint.sh mongod &
 # start webserver/cms
 cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js &
 
+# start nginx
+nginx -g "daemon off;" &
+
+
 # electron
+
 
 # By default docker gives us 64MB of shared memory size but to display heavy
 # pages we need more.
