@@ -14,6 +14,9 @@ fi
 
 # web server/cms
 
+# start nginx
+nginx -g "daemon off;"
+
 # start mongodb
 /docker-entrypoint.sh mongod &
 # start webserver/cms
