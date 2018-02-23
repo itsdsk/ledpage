@@ -60,7 +60,7 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
 # clone and build hyperion
 RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
-  && mv "$FIRMWARE_DIR/hardfp/opt/*" /opt \
+  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
   && rm -rf "$FIRMWARE_DIR" \
   && export HYPERION_DIR="hyperion" \
   && git clone --recursive --depth 1 https://github.com/hyperion-project/hyperion.git "$HYPERION_DIR" \
