@@ -13,7 +13,7 @@ function draw() {
   //background(c, 255, 255);
   ellipse(50, 50, 80, 80);
   if (c >= 255)  c=0;  else  c++;
-  background(c, 255, 255);
+  background(c, 255, 128);
 
 
 }

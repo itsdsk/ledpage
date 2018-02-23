@@ -17,6 +17,9 @@ rm /tmp/.X0-lock &>/dev/null || true
 # start hyperion
 ( /usr/bin/hyperiond /usr/src/app/hyperion.config.json ) &
 
+# start webserver/cms
+( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
+
 # compile and update arduino
 cd /usr/src/app/arduino_display && make
 diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
@@ -27,9 +30,6 @@ if [ "${PROGRAMMER:-}" == "1" ]; then
   unset PROGRAMMER
   popd
 fi
-
-# start webserver/cms
-( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
 
 # start nginx
 ( nginx -g "daemon off;" ) &
