@@ -17,6 +17,7 @@ $(function() {
     numleds.forEach(function(trynumleds) {
       $('<li></li>').text(trynumleds).appendTo('ul#numleds');
     });
+  console.log('client: GET recieved');
   });
 
 
