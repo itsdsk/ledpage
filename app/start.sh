@@ -34,5 +34,8 @@ fi
 # start nginx
 ( nginx -g "daemon off;" ) &
 
+# report done
+echo "start.sh: Finished startup!"
+
 # wait for subprocesses to finish
 wait
