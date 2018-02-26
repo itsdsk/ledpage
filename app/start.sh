@@ -21,15 +21,16 @@ rm /tmp/.X0-lock &>/dev/null || true
 ( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
 
 # compile and update arduino
-cd /usr/src/app/arduino_display && make
-diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
-if [ "${PROGRAMMER:-}" == "1" ]; then
-  echo $PROGRAMMER
-  pushd /usr/src/app/arduino_display
-  make upload && cp arduino_display.ino /data/
-  unset PROGRAMMER
-  popd
-fi
+#cd /usr/src/app/arduino_display && make
+#diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
+#if [ "${PROGRAMMER:-}" == "1" ]; then
+#  echo $PROGRAMMER
+#  pushd /usr/src/app/arduino_display
+#  make upload && cp arduino_display.ino /data/
+#  unset PROGRAMMER
+#  popd
+#fi
+sleep 20
 
 # start nginx
 ( nginx -g "daemon off;" ) &
