@@ -22,8 +22,8 @@ app.get("/setup", function (request, response) {
 });
 
 app.get("/setup/count", function (request, response) {
-  console.log('GET recieved ' + numleds);
-  response.sendStatus(200);
+  console.log('server: GET recieved ' + numleds);
+  //response.sendStatus(200);
   //response.send(numleds);
 });
 
