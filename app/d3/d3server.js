@@ -17,13 +17,17 @@ app.get("/setup", function (request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/dreams", function (request, response) {
-  response.send(dreams);
+app.get("/setup/count", function (request, response) {
+  console.log('GET recieved ' + numleds);
+  response.send(numleds);
 });
 
 // could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
-app.post("/dreams", function (request, response) {
-  dreams.push(request.query.dream);
+app.post("/setup/count", function (request, response) {
+  //dreams.push(request.query.dream);
+  numleds = reqest.query.trynumleds;
+  console.log('server: POST received ' + reqest.query.trynumleds);
+  console.log('server: set numleds ' + numleds);
   response.sendStatus(200);
 });
 
@@ -31,11 +35,12 @@ app.post("/dreams", function (request, response) {
 
 
 // Simple in-memory store for now
-var dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-];
+var numleds = 32;
+//var dreams = [
+//  "Find and count some sheep",
+//  "Climb a really tall mountain",
+//  "Wash the dishes"
+//];
 
 // listen for requests :)
 var listener = app.listen(3000, function () {
