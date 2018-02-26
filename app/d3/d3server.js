@@ -5,6 +5,10 @@
 var express = require('express');
 var app = express();
 
+// run shell script
+var sys = require('sys')
+var exec = require('child_process').exec;
+
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
@@ -19,20 +23,27 @@ app.get("/setup", function (request, response) {
 
 app.get("/setup/count", function (request, response) {
   console.log('GET recieved ' + numleds);
-  response.send(numleds);
+  response.sendStatus(200);
+  //response.send(numleds);
 });
 
 // could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
 app.post("/setup/count", function (request, response) {
   //dreams.push(request.query.dream);
-  numleds = reqest.query.trynumleds;
-  console.log('server: POST received ' + reqest.query.trynumleds);
+  numleds = request.query.trynumleds;
+  console.log('server: POST received ' + request.query.trynumleds);
   console.log('server: set numleds ' + numleds);
+  exec('/usr/src/app/arduino_files/makearduino.sh ' + numleds,
+    function (error, stdout, stderr) {
+      if (error !== null) {
+        console.log(error);
+      } else {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+      }
+  });
   response.sendStatus(200);
 });
-
-//app.locals.d3 = require('d3');
-
 
 // Simple in-memory store for now
 var numleds = 32;
