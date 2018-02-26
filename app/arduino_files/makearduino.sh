@@ -2,18 +2,18 @@
 
 numleds=$1
 
-# remove existing file
-rm ./arduino_display.ino
+# report starting
+echo "makearduino.sh: Starting arduino sync!"
 
 # add first bit to file
-cat display_pt1.txt >> arduino_display.ino
+cat /usr/src/app/arduino_files/display_pt1.txt >> /usr/src/app/arduino_files/arduino_display.ino
 # add numleds
-echo "#define NUM_LEDS " $numleds >> arduino_display.ino
+echo "#define NUM_LEDS " $numleds >> /usr/src/app/arduino_files/arduino_display.ino
 # add last bit to file
-cat display_pt2.txt >> arduino_display.ino
+cat /usr/src/app/arduino_files/display_pt2.txt >> /usr/src/app/arduino_files/arduino_display.ino
 
 # copy arduino file
-cp arduino_display.ino /usr/src/app/arduino_display/arduino_display.ino
+cp /usr/src/app/arduino_files/arduino_display.ino /usr/src/app/arduino_display/arduino_display.ino
 
 # compile and update arduino
 cd /usr/src/app/arduino_display && make
@@ -25,3 +25,9 @@ if [ "${PROGRAMMER:-}" == "1" ]; then
   unset PROGRAMMER
   popd
 fi
+
+# remove file
+rm /usr/src/app/arduino_files/arduino_display.ino
+
+# report done
+echo "makearduino.sh: Finished arduino sync!"
