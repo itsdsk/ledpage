@@ -13,27 +13,26 @@ $(function() {
   //  });
   //});
 
-  $.get('/setup/count', function(numleds) {
-    numleds.forEach(function(trynumleds) {
-      $('<li></li>').text(trynumleds).appendTo('ul#numleds');
-    });
-  console.log('client: GET recieved');
-  });
+  //$.get('/setup/count', function(numleds) {
+  //  numleds.forEach(function(trynumleds) {
+  //    $('<li></li>').text(trynumleds).appendTo('ul#numleds');
+  //  });
+  //console.log('client: GET recieved');
+  //});
 
 
-  $('form').submit(function(event) {
-    event.preventDefault();
-    //var dream = $('input').val();
-    var trynumleds = $('input').val();
-    //$.post('/setup/count?' + $.param({dream: dream}), function() {
-    $.post('/setup/count?' + $.param({trynumleds: trynumleds}), function() {
-      $('<li></li>').text(trynumleds).appendTo('ul#numleds');
-      $('input').val('');
-      $('input').focus();
-      console.log('client: POST received ' + trynumleds);
-      console.log('client: set numleds ' + numleds);
-    });
-  });
+  //$('form').submit(function(event) {
+  //  event.preventDefault();
+  //  //var dream = $('input').val();
+  //  var trynumleds = $('input').val();
+  //  //$.post('/setup/count?' + $.param({dream: dream}), function() {
+  //  $.post('/setup/count?' + $.param({trynumleds: trynumleds}), function() {
+  //    $('<li></li>').text(trynumleds).appendTo('ul#numleds');
+  //    $('input').val('');
+  //    $('input').focus();
+  //    console.log('client: POST received ' + trynumleds);
+  //  });
+  //});
 
 });
 
