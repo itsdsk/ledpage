@@ -6,6 +6,7 @@ var express = require('express');
 var app = express();
 
 var d3 = require("d3");
+var fs = require("fs");
 const fileUpload = require('express-fileupload');
 // run shell script 
 var sys = require('sys') 
@@ -58,15 +59,19 @@ app.post('/setup/upload', function(req, res) {
       // get coord
       var coord = jsonleds[i];
       // add coord element for config
-      jsonconfig[i] = [];
+      //jsonconfig[0] = [];
       //
       var dHscan = { "minimum" : coord.x, "maximum" : coord.x+0.1111 };
 			var dVscan = { "minimum" : coord.y, "maximum" : coord.y+0.1111 };
       //
-      jsonconfig[i].push({"index":i, "hscan":dHscan, "vscan":dVscan});
+      jsonconfig.push({"index":i, "hscan":dHscan, "vscan":dVscan});
     }
     console.log('trying new function');
-    console.log(jsonconfig);
+    console.log(JSON.stringify(jsonconfig));
+    fs.writeFile('/usr/src/app/d3/public/samp.json', JSON.stringify(jsonconfig), function(err){
+      if(err) throw err;
+    })
+    console.log('saved new function');
   };
 
 	//console.log("data here: " + data);
