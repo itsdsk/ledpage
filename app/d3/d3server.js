@@ -48,10 +48,29 @@ app.post('/setup/upload', function(req, res) {
           console.log('arduino ready');
         }
 	  };
-	countNumLeds();
+  countNumLeds();
+  JSONCoordsToConfig();
+  function JSONCoordsToConfig(){
+    var jsonconfig = [];
+    //var minFloat = 0.0;
+    //var maxFloat = 1.0;
+    for(var i=0; i<jsonleds.length; i++){
+      // get coord
+      var coord = jsonleds[i];
+      // add coord element for config
+      jsonconfig[i] = [];
+      //
+      var dHscan = { "minimum" : coord.x, "maximum" : coord.x+0.1111 };
+			var dVscan = { "minimum" : coord.y, "maximum" : coord.y+0.1111 };
+      //
+      jsonconfig[i].push({"index":i, "hscan":dHscan, "vscan":dVscan});
+    }
+    console.log('trying new function');
+    console.log(jsonconfig);
+  };
+
 	//console.log("data here: " + data);
     });
-
   res.redirect('/setup');
   });
 
