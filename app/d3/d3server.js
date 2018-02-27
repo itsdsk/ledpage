@@ -68,9 +68,20 @@ app.post('/setup/upload', function(req, res) {
     }
     console.log('trying new function');
     console.log(JSON.stringify(jsonconfig));
-    fs.writeFile('/usr/src/app/d3/public/samp.json', JSON.stringify(jsonconfig), function(err){
+    // write leds to file
+    fs.writeFile('/usr/src/app/hyperion_config/leds.txt', JSON.stringify(jsonconfig, null, '\t'), function(err){
       if(err) throw err;
     })
+    // run script to append files to create full config
+    exec('/usr/src/app/hyperion_config/makehyperionconfig.sh', 
+            function (error, stdout, stderr) { 
+              if (error !== null) { 
+                console.log(error); 
+              } else { 
+                console.log('stdout: ' + stdout); 
+                console.log('stderr: ' + stderr); 
+              } 
+          });
     console.log('saved new function');
   };
 

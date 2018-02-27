@@ -15,21 +15,12 @@ rm /tmp/.X0-lock &>/dev/null || true
 ( cd /usr/src/app/d3 && /usr/local/bin/node /usr/src/app/d3/d3server.js ) &
 
 # start hyperion
-( /usr/bin/hyperiond /usr/src/app/hyperion.config.json ) &
+( /usr/bin/hyperiond /usr/src/app/hyperion_config/hyperion.config.json ) &
 
 # start webserver/cms
 ( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
 
-# compile and update arduino
-#cd /usr/src/app/arduino_display && make
-#diff /usr/src/app/arduino_display/arduino_display.ino /data/arduino_display.ino || PROGRAMMER=1
-#if [ "${PROGRAMMER:-}" == "1" ]; then
-#  echo $PROGRAMMER
-#  pushd /usr/src/app/arduino_display
-#  make upload && cp arduino_display.ino /data/
-#  unset PROGRAMMER
-#  popd
-#fi
+# wait
 sleep 20
 
 # start nginx
