@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to Glitch!</title>
+    <title>Welcome!</title>
     <meta name="description" content="A cool thing made with Glitch">
     <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
     <meta charset="utf-8">
@@ -27,196 +27,26 @@
 
     <main>
       <p class="bold">Oh hi,</p>
-      <p>Enter the number of LEDs connected:</p>
-      <form>
+      <p>Upload LED config:</p>
+      <!--<form>
         <input type="number" placeholder="Number of LEDs">
         <button type="submit">Submit</button>
       </form>
       <section class="numleds">
         <ul id="numleds">
         </ul>
-      </section>
+      </section> -->
+        <form ref="uploadForm"
+            id="uploadForm"
+            action="/setup/upload"
+            method="post"
+            enctype="multipart/form-data" >
+          <input type="file" accept=".json" name="sampleFile"/>
+          <input type="submit" value="Upload" />
+        </form>
     </main>
 
-    <div id="exportit">Export</div>
-    <div id="d3"></div>
-    <div id="console"></div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" type="text/JavaScript"></script>
-
- <script type="text/javascript"> 
-    //<![CDATA[ 
-      window.onload=function(){ d3.select("#exportit").on("click", generateit);
-
-function generateit(){
-
-  var data = '';
-
-  var circles = svg.selectAll("circle");
-  var json_circles = JSON.stringify(circles.data());
-  data += 'var jsonCircles = '+json_circles+';<br><br>';
-
-  var lines = svg.selectAll(".line");
-  var json_lines = JSON.stringify(lines.data());
-  data += 'var jsonLines = '+json_lines+';';
-
-  d3.select("#console").html(data);
-
-}
-
-
-var width = 500,
-    height = 500;
- 
-var svg = d3.select("#d3").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-var rect = svg.append("rect")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .on("click",drawcircle)
-
-var drag = d3.behavior.drag()
-      .origin(Object)
-      .on("drag", function(){ dragmove(this); })
-
-var line = d3.svg.line()
-   .x(function(d) { return d.x; })
-   .y(function(d) { return d.y; })
-   .interpolate("basis");
-
-
-
-function dragmove(dragged) {
-  var x = d3.select(dragged).attr("cx");
-  var y = d3.select(dragged).attr("cy");
-  var cradius = d3.select(dragged).attr("r");
-
-  var cx = Math.min(width,+x + d3.event.dx);
-  var cy = Math.min(height,+y + d3.event.dy);
-
-  var draggedCircles = [{ "x": cx, "y": cy, "radius": cradius }];
-
-  d3.select(dragged)
-    .data(draggedCircles)
-    .attr("cx", function (d) { return d.x; })
-    .attr("cy", function (d) { return d.y; });
-
-
-  //move text when other things move
-  d3.select(dragged.nextSibling)
-      .attr('x', cx)
-      .attr('y', cy+4)
-
-
-  redrawlines();
-
-}
-
-function redrawlines() {
-
-  var circles = svg.selectAll("circle");
-
-  var obj = [];
-  for (a = 0; a < circles[0].length; a++) {
-    if(a > 0){
-      var x1 = circles[0][a-1].attributes.cx.value;
-      var y1 = circles[0][a-1].attributes.cy.value;
-      var x2 = circles[0][a].attributes.cx.value;
-      var y2 = circles[0][a].attributes.cy.value;
-      var linearr = [{x:x1,y:y1},{x:x2,y:y2}];
-      obj.push(linearr);
-    }
-  }
-
-  d3.selectAll(".line")
-    .data(obj)
-    .attr("d", line);
-
-}
-
-var loadC = loadCircles();
-        
-function loadCircles(){
-                var savedCircles = [{"x":455,"y":137.13333129882812,"radius":"10"},
-                            {"x":273,"y":261.1333312988281,"radius":"10"},
-                            {"x":107,"y":81.13333129882812,"radius":10},
-                            {"x":340,"y":99.13333129882812,"radius":10}];
-        
-      var count = svg.selectAll("circle")[0].length;
-
-    var newcircles = svg.selectAll("circle")
-      .data(savedCircles)
-      .enter()
-      .append("circle");
-
-var circleAttributes = newcircles
-    .attr("class", "circle")
-    .attr("cx", function (d) { return d.x; })
-    .attr("cy", function (d) { return d.y; })
-    .attr("r", function (d) { return d.radius; })
-    .call(drag); //drag magic - built in d3 behavior: https://github.com/mbostock/d3/wiki/Drag-Behavior#wiki-drag
-  
-
-}
-
-
-function drawcircle(d,i) {
-
-  //get mouse coords
-  var x = d3.mouse(this)[0];
-  var y = d3.mouse(this)[1];
-
-
-    //lets do it with data instead of manual above
-    var jsonCircles = [{ "x": x, "y": y, "radius": 10 }];
-    
-    var count = svg.selectAll("circle")[0].length;
-
-    var g = svg.append("g");
-    
-    g.append("circle")
-        .data(jsonCircles)
-        .attr("class", "circle")
-        .attr("cx", function (d) { return d.x; })
-        .attr("cy", function (d) { return d.y; })
-        .attr("r", function (d) { return d.radius; })
-        .call(drag); //drag magic - built in d3 behavior: https://github.com/mbostock/d3/wiki/Drag-Behavior#wiki-drag
-
-    g.append('svg:text')
-      .attr('x', x)
-      .attr('y', y+4)
-      .attr('class', 'id')
-      .text(count);
-
-
-  //if this is first cicle, do not draw lines
-  var circles = svg.selectAll("circle");
-  if(circles[0].length > 1){
-
-
-    var x1 = circles[0][circles[0].length-1].attributes.cx.value;
-    var y1 = circles[0][circles[0].length-1].attributes.cy.value;
-    var x2 = circles[0][circles[0].length-2].attributes.cx.value;
-    var y2 = circles[0][circles[0].length-2].attributes.cy.value;
-
-    var linearr = [{x:x1,y:y1},{x:x2,y:y2}];
-
-    svg.append("path")
-      .data([linearr])
-      .attr("class", "line")
-      .attr("d", line); 
-
-  }
-
-}
-} 
-   //]]> 
-</script> 
     <footer>
-      <a href="https://glitch.com">
-        Remix this in Glitch
-      </a>
     </footer>
 
     <!-- Your web-app is https, so your scripts need to be too -->
