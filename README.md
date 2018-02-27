@@ -21,3 +21,26 @@ resin sync --source . --destination /usr/src/
 avconv -r 25 -s 1824x984 -f video4linux2 -i /dev/video0 udp://224.0.0.100:1234
 
 /usr/bin/hyperiond ./hyperion.config.json
+
+resin sync --source ./app/ --destination /usr/src/app/
+
+main (pm2)
+- player
+  - play sketch URI
+  - (IPC to main)
+- hardware
+  - compile
+  - upload
+  - (IPC to main)
+- remote
+  - cms web view
+	- play sketch
+	- add sketch
+  - setup web view
+    - set led num+chipset+port
+    - set positions
+	- (future?) sort/reorder
+- file-sharing
+  - download sketch
+hyperion
+mongodb
