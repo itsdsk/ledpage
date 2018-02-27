@@ -5,6 +5,7 @@
 var express = require('express');
 var app = express();
 
+var d3 = require("d3");
 const fileUpload = require('express-fileupload');
 
 // we've started you off with Express, 
@@ -15,17 +16,34 @@ app.use(fileUpload());
 app.post('/setup/upload', function(req, res) {
   if (!req.files)
     return res.status(400).send('No files were uploaded.');
- 
   // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
   let sampleFile = req.files.sampleFile;
  
   // Use the mv() method to place the file somewhere on your server
-  sampleFile.mv('/usr/src/app/d3/public/sampleFile.json', function(err) {
+  sampleFile.mv(__dirname + "/public/sampleFile.json", function(err) {
     if (err)
       return res.status(500).send(err);
- 
-    res.send('File uploaded!');
+ 	console.log(req.files.sampleFile);
+
+  // load the data
+  var jsonleds = [];
+  d3.json("http://localhost:3000/setup/sampleFile.json", function(data) {
+	function xparseJson(){
+    //alert(error);
+    //console.log('data size: ' + data[0].length);
+    //root = data[0];
+    console.log("data here: " + data);
+    jsonleds = data;
+    console.log("jsonleds here: " + jsonleds);
+    //console.log('jsonleds size: ' + jsonleds.length);
+	};
+	xparseJson();
+    //res.redirect('/setup');
   });
+
+	res.redirect('/setup');
+  });
+
 });
 
 // http://expressjs.com/en/starter/static-files.html
