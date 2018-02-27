@@ -7,6 +7,9 @@ var app = express();
 
 var d3 = require("d3");
 const fileUpload = require('express-fileupload');
+// run shell script 
+var sys = require('sys') 
+var exec = require('child_process').exec; 
 
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
@@ -23,25 +26,33 @@ app.post('/setup/upload', function(req, res) {
   sampleFile.mv(__dirname + "/public/sampleFile.json", function(err) {
     if (err)
       return res.status(500).send(err);
- 	console.log(req.files.sampleFile);
 
-  // load the data
-  var jsonleds = [];
-  d3.json("http://localhost:3000/setup/sampleFile.json", function(data) {
-	function xparseJson(){
-    //alert(error);
-    //console.log('data size: ' + data[0].length);
-    //root = data[0];
-    console.log("data here: " + data);
-    jsonleds = data;
-    console.log("jsonleds here: " + jsonleds);
-    //console.log('jsonleds size: ' + jsonleds.length);
-	};
-	xparseJson();
-    //res.redirect('/setup');
-  });
+    // load the data
+    var jsonleds = [];
+    d3.json("http://localhost:3000/setup/sampleFile.json", function(data) {
+	  function countNumLeds(){
+        jsonleds = data;
+        if(data.length != numleds) {
+          console.log("recompiling arduino: " + data.length + " != " + numleds);
+          numleds = data.length;
+	      exec('/usr/src/app/arduino_files/makearduino.sh ' + numleds, 
+            function (error, stdout, stderr) { 
+              if (error !== null) { 
+                console.log(error); 
+              } else { 
+                console.log('stdout: ' + stdout); 
+                console.log('stderr: ' + stderr); 
+              } 
+          });
+        } else {
+          console.log('arduino ready');
+        }
+	  };
+	countNumLeds();
+	//console.log("data here: " + data);
+    });
 
-	res.redirect('/setup');
+  res.redirect('/setup');
   });
 
 });
