@@ -21,6 +21,11 @@ cp /usr/src/app/arduino_files/arduino_display.ino /usr/src/app/arduino_display/a
 # compile and update arduino
 cd /usr/src/app/arduino_display && ./compileupload.sh
 
+
+# report done
+echo "makearduino.sh: Waiting for compile and upload script to complete"
+wait
+
 # remove files
 rm /usr/src/app/arduino_files/arduino_display.ino
 rm /usr/src/app/arduino_display/arduino_display.ino
