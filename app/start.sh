@@ -29,7 +29,7 @@ sleep 5
 sleep 5
 
 # start nginx
-( /usr/sbin/nginx -g "daemon off;" ) &
+( /usr/sbin/nginx -g 'daemon off;' ) &
 
 # wait
 sleep 30
