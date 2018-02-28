@@ -52,7 +52,7 @@ RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
 WORKDIR /usr/src/app
 
 # clone and build hyperion
-RUN export FIRMWARE_DIR="raspberrypi-firmware" \
+RUN export FIRMWARE_DIR="raspberrypi-firmware" && ls \
   && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
   && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
   && rm -rf "$FIRMWARE_DIR" \
