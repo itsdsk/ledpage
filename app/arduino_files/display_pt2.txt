@@ -16,15 +16,6 @@ void setup()
   // initialise randomness
   randomSeed(analogRead(0));
 
-  // initial RGB flash
-  LEDS.showColor(CRGB(255, 0, 0));
-  delay(500);
-  LEDS.showColor(CRGB(0, 255, 0));
-  delay(500);
-  LEDS.showColor(CRGB(0, 0, 255));
-  delay(500);
-  LEDS.showColor(CRGB(0, 0, 0));
-
   // initialise serial USB communication
   Serial.begin(serialRate);
   Serial.print("Ada\n"); // Send "Magic Word" string to host
