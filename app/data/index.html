@@ -1,7 +1,19 @@
 <html>
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
-    <script src="sketch.js"></script>
+    <script>
+    function setup() {
+      createCanvas(1280, 720);
+      frameRate(30);
+      colorMode(HSB, 255);
+    }
+    var c = 0;
+    function draw() {
+      ellipse(50, 50, 80, 80);
+      if (c >= 255)  c=0;  else  c++;
+      background(c, 255, 255);
+    }
+    </script>
   </head>
   <body>
   </body>
