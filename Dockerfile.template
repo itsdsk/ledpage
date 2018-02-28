@@ -57,7 +57,7 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
   && rm -rf "$FIRMWARE_DIR" \
   && export HYPERION_DIR="hyperion" \
-  && git clone --recursive --depth 1 https://github.com/hyperion-project/hyperion.git "$HYPERION_DIR" \
+  && git clone --recursive --depth 1 -b dynamic-leds https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
   && mkdir "$HYPERION_DIR/build" \
   && cd "$HYPERION_DIR/build" \
   && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
