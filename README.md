@@ -24,21 +24,29 @@ avconv -r 25 -s 1824x984 -f video4linux2 -i /dev/video0 udp://224.0.0.100:1234
 
 resin sync --source ./app/ --destination /usr/src/app/
 
+mongod --repair
+
+curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://localhost:19444
+
+curl -X POST -H "Content-Type: application/json" -d '"leds":[{"index":0,"hscan":{"minimum":0.2222,"maximum":0.3333},"vscan":{"minimum":0.1111,"maximum":0.2222}}]' http://localhost:19444
+
+curl -H "Content-Type: application/json" --data-binary @body.json http://localhost:19444
+
 main (pm2)
 - player
   - play sketch URI
   - (IPC to main)
 - hardware
-  - compile
-  - upload
+  - compile                          x
+  - upload                           x
   - (IPC to main)
 - remote
   - cms web view
 	- play sketch
 	- add sketch
   - setup web view
-    - set led num+chipset+port
-    - set positions
+    - set led num+chipset+port       
+    - set positions                  
 	- (future?) sort/reorder
 - file-sharing
   - download sketch
