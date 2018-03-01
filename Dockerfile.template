@@ -51,21 +51,6 @@ RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
 # move to app dir
 WORKDIR /usr/src/app
 
-# clone and build hyperion
-RUN export FIRMWARE_DIR="raspberrypi-firmware" && ls \
-  && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
-  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
-  && rm -rf "$FIRMWARE_DIR" \
-  && export HYPERION_DIR="hyperion" \
-  && git clone --recursive --depth 1 -b dynamic-leds https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
-  && mkdir "$HYPERION_DIR/build" \
-  && cd "$HYPERION_DIR/build" \
-  && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
-  && make -j $(nproc) \
-  && mv ./bin/hyperion-remote /usr/bin/ \
-  && mv ./bin/hyperiond /usr/bin/ \
-  && rm -rf "/usr/src/app/$HYPERION_DIR"
-
 # move electron pkg.json to root and install
 COPY ./app/package.json ./
 RUN JOBS=MAX npm install --unsafe-perm --production \
@@ -87,6 +72,21 @@ RUN cd /usr/src/app/cms && npm install \
 # nginx setup
 EXPOSE 80 443
 COPY ./nginx-config /etc/nginx/sites-available/default
+
+# clone and build hyperion
+RUN export FIRMWARE_DIR="raspberrypi-firmware" \
+  && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
+  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
+  && rm -rf "$FIRMWARE_DIR" \
+  && export HYPERION_DIR="hyperion" \
+  && git clone --recursive --depth 1 -b dynamic-leds https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
+  && mkdir "$HYPERION_DIR/build" \
+  && cd "$HYPERION_DIR/build" \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
+  && make -j $(nproc) \
+  && mv ./bin/hyperion-remote /usr/bin/ \
+  && mv ./bin/hyperiond /usr/bin/ \
+  && rm -rf "/usr/src/app/$HYPERION_DIR"
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on
