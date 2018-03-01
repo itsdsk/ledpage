@@ -1,0 +1,41 @@
+{
+    "command": "mapping",
+    "leds":
+	[
+		{
+			"index" : 0,
+			"hscan" : { "minimum" : 0.8750, "maximum" : 1.0000 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 1,
+			"hscan" : { "minimum" : 0.7500, "maximum" : 0.8750 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 2,
+			"hscan" : { "minimum" : 0.6250, "maximum" : 0.7500 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 3,
+			"hscan" : { "minimum" : 0.5000, "maximum" : 0.6250 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 4,
+			"hscan" : { "minimum" : 0.3750, "maximum" : 0.5000 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 5,
+			"hscan" : { "minimum" : 0.2500, "maximum" : 0.3750 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		},
+		{
+			"index" : 6,
+			"hscan" : { "minimum" : 0.1250, "maximum" : 0.2500 },
+			"vscan" : { "minimum" : 0.9200, "maximum" : 1.0000 }
+		}
+    ]
+}
