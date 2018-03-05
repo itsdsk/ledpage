@@ -14,12 +14,12 @@ rm /tmp/.X0-lock &>/dev/null || true
 ( startx /usr/src/app/core/dplayer/node_modules/electron/dist/electron /usr/src/app/core/dplayer --enable-logging ) &
 
 # start hyperion
-( /usr/bin/hyperiond /usr/src/app/hyperion_config/hyperion.config.json ) &
+( /usr/bin/hyperiond /usr/src/app/core/dsetup/hyperion_config/hyperion.config.json ) &
 
 sleep 5
 
 # start webserver/led layout
-( cd /usr/src/app/d3 && /usr/local/bin/node /usr/src/app/d3/d3server.js ) &
+( cd /usr/src/app/core/dsetup && /usr/local/bin/node /usr/src/app/core/dsetup/d3server.js ) &
 
 sleep 5
 

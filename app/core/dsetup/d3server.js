@@ -36,7 +36,7 @@ app.post('/setup/upload', function (req, res) {
         if (data.length != numleds) {
           console.log("recompiling arduino: " + data.length + " != " + numleds);
           numleds = data.length;
-          exec('/usr/src/app/arduino_files/makearduino.sh ' + numleds,
+          exec('/usr/src/app/core/dsetup/arduino_files/makearduino.sh ' + numleds,
             function (error, stdout, stderr) {
               if (error !== null) {
                 console.log(error);
@@ -64,11 +64,11 @@ app.post('/setup/upload', function (req, res) {
           jsonconfig.push({ "index": i, "hscan": dHscan, "vscan": dVscan });
         }
         // write leds to file
-        fs.writeFile('/usr/src/app/hyperion_config/leds.txt', JSON.stringify(jsonconfig, null, '\t'), function (err) {
+        fs.writeFile('/usr/src/app/core/dsetup/hyperion_config/leds.txt', JSON.stringify(jsonconfig, null, '\t'), function (err) {
           if (err) throw err;
         });
         // run script to append files to create full config
-        exec('/usr/src/app/hyperion_config/makehyperionconfig.sh',
+        exec('/usr/src/app/core/dsetup/hyperion_config/makehyperionconfig.sh',
           function (error, stdout, stderr) {
             if (error !== null) {
               console.log(error);
