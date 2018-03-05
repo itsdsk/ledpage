@@ -85,7 +85,7 @@ COPY /etc/systemd/system/ipfs.service /etc/systemd/system/
 COPY /etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/default
 
 # start ipfs and disable default nginx service
-RUN systemctl enable ipfs.service && systemctl disable nginx.service
+RUN systemctl disable ipfs.service && systemctl disable nginx.service
 
 # move app to filesystem
 COPY ./app ./
