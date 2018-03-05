@@ -53,3 +53,4 @@ main (pm2)
   - download sketch
 hyperion
 mongodb
+nginx
