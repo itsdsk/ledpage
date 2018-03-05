@@ -73,6 +73,9 @@ ENV BOARD uno
 EXPOSE 80 443
 COPY ./nginx-config /etc/nginx/sites-available/default
 
+# copy supervisord config files
+COPY /etc/supervisor/conf.d/* /etc/supervisor/conf.d
+
 ## uncomment if you want systemd
 ENV INITSYSTEM on
 
