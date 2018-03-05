@@ -24,33 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   arduino g++ gcc usbutils make nginx libkrb5-dev supervisor \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# install keystone dependency
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-#  libkrb5-dev \
-#  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# install electron dependencies
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-#  apt-utils clang xserver-xorg-core xserver-xorg-input-all \
-#  xserver-xorg-video-fbdev xorg libxcb-image0 libxcb-util0 \
-#  xdg-utils libdbus-1-dev libgtk2.0-dev libnotify-dev \
-#  libgnome-keyring-dev libgconf2-dev libasound2-dev \
-#  libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev \
-#  libsmbclient libssh-4 fbset libav-tools libexpat-dev \
-#  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# install hyperion dependencies
-#RUN apt update && apt install -y --no-install-recommends \
-#  git cmake build-essential qtbase5-dev libqt5serialport5-dev \
-#  libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
-#  libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
-#  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# install arduino deps
-#RUN apt-get update && apt-get install -y --no-install-recommends \
-#  arduino g++ gcc usbutils make \
-#  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
 # create script to start window manager
 RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
   && echo "" >> /etc/X11/xinit/xserverrc && echo \
@@ -77,17 +50,17 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
 
 # install deps for dplayer (electron)
 COPY ./app/core/dplayer/package.json ./core/dplayer/
-RUN cd ./core/dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
+COPY ./app/core/dremote/package.json ./core/dremote/
+COPY ./app/core/dsetup/package.json ./core/dsetup/
+
+RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/* \
+  && cd ./../dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/* \
+  && cd ./../dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm install pm2 -g \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
-# install deps for dremote (keystone)
-COPY ./app/core/dremote/package.json ./core/dremote/
-RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
-  && npm cache clean --force && rm -rf /tmp/*
-# install deps for dsetup (express+d3)
-COPY ./app/core/dsetup/package.json ./core/dsetup/
-RUN cd ./core/dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
-  && npm cache clean --force && rm -rf /tmp/*
 
 # move app to filesystem
 COPY ./app ./
