@@ -3,6 +3,7 @@ const net = require('net');
 var colorCommand = {
   command: "color",
   priority: 100,
+  duration: 360,
   color: [255, 0, 0]
 };
 
