@@ -9,5 +9,5 @@ var routes = {
 exports = module.exports = function (app) {
   app.get('/', routes.views.index)
   app.get('/add-sketch', routes.views.addSketch)
-  app.post('/api/sketch', api.sketch.post)
+  app.post('/api/sketch', routes.api.sketch.post)
 };
