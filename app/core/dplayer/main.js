@@ -82,4 +82,5 @@ app.on('ready', () => {
   });
   // the big red button, here we go
   window.loadURL(electronConfig.URL_LAUNCHER_URL);
+  console.log('electron window is resizable: ' + window.isResizable());
 });

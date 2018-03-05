@@ -11,7 +11,7 @@ sleep 15
 # start electron
 umount /dev/shm && mount -t tmpfs shm /dev/shm
 rm /tmp/.X0-lock &>/dev/null || true
-( startx /usr/src/app/node_modules/electron/dist/electron /usr/src/app --enable-logging ) &
+( startx /usr/src/app/core/dplayer/node_modules/electron/dist/electron /usr/src/app/core/dplayer --enable-logging ) &
 
 # start hyperion
 ( /usr/bin/hyperiond /usr/src/app/hyperion_config/hyperion.config.json ) &

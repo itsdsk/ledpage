@@ -1,6 +1,6 @@
 {
-  "name": "resin-electronjs",
-  "version": "1.0.0",
+  "name": "disk-one",
+  "version": "0.1.0",
   "description": "electronJS-based resin application",
   "main": "main.js",
   "scripts": {
