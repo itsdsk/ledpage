@@ -81,7 +81,7 @@ ENV BOARD uno
 
 # nginx setup
 EXPOSE 80 443
-COPY ./nginx-config /etc/nginx/sites-available/default
+COPY /etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/default
 
 # copy supervisord config files
 COPY /etc/supervisor/conf.d /etc/supervisor/conf.d/
@@ -92,6 +92,9 @@ ENV INITSYSTEM on
 # copy ipfs sevice config
 COPY /etc/systemd/system/ipfs.service /etc/systemd/system/
 RUN systemctl enable ipfs.service
+
+# disable default nginx starting
+RUN systemctl disable nginx.service
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
