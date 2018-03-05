@@ -9,7 +9,7 @@ html
 		meta(name="viewport", content="width=device-width, initial-scale=1.0")
 		meta(http-equiv="X-UA-Compatible" content="IE=edge")
 
-		title= title || 'keystone-starter'
+		title= title || 'Sketch Browser'
 		link(rel="shortcut icon", href="/favicon.ico", type="image/x-icon")
 
 		//- Customise the stylesheet for your site by editing /public/styles/site.sass
@@ -49,7 +49,7 @@ html
 							span.icon-bar
 							span.icon-bar
 							span.icon-bar
-						a.navbar-brand(href='/') Keystone Starter
+						a.navbar-brand(href='/blog/') Sketch Browser
 					.collapse.navbar-collapse
 						ul.nav.navbar-nav.navbar-left
 							each link in navLinks
@@ -60,7 +60,7 @@ html
 									li: a(href='/keystone') Open Keystone
 								li: a(href='/keystone/signout') Sign Out
 							else
-								li: a(href='/keystone/signin') Sign In
+								li: a(href='/keystone/signin') Control Panel
 
 		//- BODY
 		#body
@@ -84,7 +84,7 @@ html
 		.container: #footer
 
 			//- You don't _have_ to include a link saying your site is powered by KeystoneJS, but we appreciate it!
-			p Powered by <a href="http://keystonejs.com" target="_blank">KeystoneJS</a>.
+			//- p Powered by <a href="http://keystonejs.com" target="_blank">KeystoneJS</a>.
 
 
 		//- JAVASCRIPT

@@ -24,7 +24,7 @@ mixin post(post)
 
 block intro
 	.container
-		h1= data.category ? data.category.name : 'Blog'
+		h1= data.category ? data.category.name : 'Select a Sketch'
 
 block content
 	.container: .row
@@ -40,9 +40,9 @@ block content
 							strong #{data.posts.last}
 							|  of 
 							strong #{data.posts.total}
-							|  posts.
+							|  sketches.
 					else
-						h4.text-weight-normal Showing #{utils.plural(data.posts.results.length, '* post')}.
+						h4.text-weight-normal Showing #{utils.plural(data.posts.results.length, '* sketch')}.
 					.blog
 						each post in data.posts.results
 							+post(post)
@@ -62,9 +62,9 @@ block content
 								li.disabled: a(href='?page=' + data.posts.totalPages): span.entypo.glyphicon.glyphicon-chevron-right
 				else
 					if data.category
-						h3.text-muted There are no posts in the category #{data.category.name}.
+						h3.text-muted There are no sketches in the category #{data.category.name}.
 					else
-						h3.text-muted There are no posts yet.
+						h3.text-muted There are no sketches yet.
 		
 		if data.categories.length
 			.col-sm-4.col-md-3
