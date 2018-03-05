@@ -66,6 +66,10 @@ RUN cd ./core/dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
 
+COPY ./app/core/dremote/package.json ./core/dremote/
+RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/*
+
 # move app to filesystem
 COPY ./app ./
 

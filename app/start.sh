@@ -24,7 +24,7 @@ sleep 5
 sleep 5
 
 # start webserver/cms
-( cd /usr/src/app/cms && /usr/local/bin/node /usr/src/app/cms/keystone.js ) &
+( cd /usr/src/app/core/dremote && /usr/local/bin/node /usr/src/app/core/dremote/keystone.js ) &
 
 sleep 5
 
