@@ -1,6 +1,8 @@
 const electron = require('electron');
 const path = require('path');
 const url = require('url');
+const ipc = require('node-ipc');
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -82,5 +84,14 @@ app.on('ready', () => {
   });
   // the big red button, here we go
   window.loadURL(electronConfig.URL_LAUNCHER_URL);
-  console.log('electron window is resizable: ' + window.isResizable());
+
+  // recieve URI to display
+  ipc.config.id = 'dplayer-ipc';
+  ipc.config.retry = 1500;
+  ipc.config.silent = true;
+  ipc.serve(() => ipc.server.on('set-uri', message => {
+    console.log(message);
+    window.loadURL(message); // display recieved URI
+  }));
+  ipc.server.start();
 });
