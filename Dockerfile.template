@@ -48,12 +48,18 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && mv ./bin/hyperiond /usr/bin/ \
   && rm -rf "/usr/src/app/$HYPERION_DIR"
 
-# install deps for dplayer (electron)
+# install ipfs
+ENV IPFS_VERSION=0.4.13
+RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
+  && tar xzvf go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
+  && cp go-ipfs/ipfs /usr/bin/ipfs \
+  && rm -rf go-ipfs*
+
+# install nodejs dependencies
 COPY ./app/core/dremote/package.json ./core/dremote/
 COPY ./app/core/dsetup/package.json ./core/dsetup/
 COPY ./app/core/dsharing/package.json ./core/dsharing/
 COPY ./app/core/dplayer/package.json ./core/dplayer/
-
 RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && cd ./../dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
@@ -65,36 +71,24 @@ RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
 
-# install ipfs
-ENV IPFS_VERSION=0.4.13
-RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
-  && tar xzvf go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
-  && cp go-ipfs/ipfs /usr/bin/ipfs \
-  && rm -rf go-ipfs*
-
-# move app to filesystem
-COPY ./app ./
-
-# set arduino variables
+# set variables
+ENV INITSYSTEM on
 ENV ARDUINODIR /usr/share/arduino
 ENV BOARD uno
 
 # nginx setup
 EXPOSE 80 443
+
+# copy config files
+COPY /etc/supervisor/conf.d /etc/supervisor/conf.d/
+COPY /etc/systemd/system/ipfs.service /etc/systemd/system/
 COPY /etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/default
 
-# copy supervisord config files
-COPY /etc/supervisor/conf.d /etc/supervisor/conf.d/
+# start ipfs and disable default nginx service
+RUN systemctl enable ipfs.service && systemctl disable nginx.service
 
-## uncomment if you want systemd
-ENV INITSYSTEM on
-
-# copy ipfs sevice config
-COPY /etc/systemd/system/ipfs.service /etc/systemd/system/
-RUN systemctl enable ipfs.service
-
-# disable default nginx starting
-RUN systemctl disable nginx.service
+# move app to filesystem
+COPY ./app ./
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]

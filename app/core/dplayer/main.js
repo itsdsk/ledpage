@@ -79,19 +79,43 @@ app.on('ready', () => {
   if (electronConfig.URL_LAUNCHER_CONSOLE) {
     window.webContents.openDevTools();
   }
-  process.on('uncaughtException', function(err) {
+  process.on('uncaughtException', function (err) {
     console.log(err);
   });
   // the big red button, here we go
   window.loadURL(electronConfig.URL_LAUNCHER_URL);
 
   // recieve URI to display
-  ipc.config.id = 'dplayer-ipc';
+  ipc.config.id = 'dplayeripc';
   ipc.config.retry = 1500;
-  ipc.config.silent = true;
-  ipc.serve(() => ipc.server.on('set-uri', message => {
-    console.log(message);
-    window.loadURL(message); // display recieved URI
-  }));
+  ipc.config.maxConnections = 1;
+  ipc.serve(
+    function () {
+      ipc.server.on(
+        'message',
+        function (data, socket) {
+          ipc.log('got a message : '.debug, data);
+          console.log(data);
+          window.loadURL(data); // display recieved URI
+          //ipc.server.emit(
+          //  socket,
+          //  'message', //this can be anything you want so long as
+          //  //your client knows.
+          //  data + ' world!'
+          //);
+        }
+      );
+      ipc.server.on(
+        'socket.disconnected',
+        function (socket, destroyedSocketID) {
+          ipc.log('client ' + destroyedSocketID + ' has disconnected!');
+        }
+      );
+    }
+  );
+  //ipc.serve(() => ipc.server.on('set-uri', message => {
+  //  console.log(message);
+  //  window.loadURL(message); // display recieved URI
+  //}));
   ipc.server.start();
 });
