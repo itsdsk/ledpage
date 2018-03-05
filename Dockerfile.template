@@ -49,18 +49,28 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && rm -rf "/usr/src/app/$HYPERION_DIR"
 
 # install deps for dplayer (electron)
-COPY ./app/core/dplayer/package.json ./core/dplayer/
 COPY ./app/core/dremote/package.json ./core/dremote/
 COPY ./app/core/dsetup/package.json ./core/dsetup/
+COPY ./app/core/dsharing/package.json ./core/dsharing/
+COPY ./app/core/dplayer/package.json ./core/dplayer/
 
 RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && cd ./../dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
+  && cd ./../dsharing/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/* \
   && cd ./../dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
   && npm install pm2 -g \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
+
+# install ipfs
+ENV IPFS_VERSION=0.4.13
+RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
+  && tar xzvf go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
+  && cp go-ipfs/ipfs /usr/bin/ipfs \
+  && rm -rf go-ipfs*
 
 # move app to filesystem
 COPY ./app ./
@@ -78,6 +88,10 @@ COPY /etc/supervisor/conf.d /etc/supervisor/conf.d/
 
 ## uncomment if you want systemd
 ENV INITSYSTEM on
+
+# copy ipfs sevice config
+COPY /etc/systemd/system/ipfs.service /etc/systemd/system/
+RUN systemctl enable ipfs.service
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]

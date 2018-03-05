@@ -14,5 +14,8 @@ rm /tmp/.X0-lock &>/dev/null || true
 # start webserver/cms
 ( cd /usr/src/app/core/dremote && pm2 start keystone.js ) &
 
+# start sharing component
+( cd /usr/src/app/core/dsharing && pm2 start app.js ) &
+
 # wait for subprocesses to finish
 wait
