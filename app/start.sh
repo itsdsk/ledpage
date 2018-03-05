@@ -19,12 +19,12 @@ rm /tmp/.X0-lock &>/dev/null || true
 sleep 5
 
 # start webserver/led layout
-( cd /usr/src/app/core/dsetup && /usr/local/bin/node /usr/src/app/core/dsetup/d3server.js ) &
+( cd /usr/src/app/core/dsetup && pm2 start d3server.js ) &
 
 sleep 5
 
 # start webserver/cms
-( cd /usr/src/app/core/dremote && /usr/local/bin/node /usr/src/app/core/dremote/keystone.js ) &
+( cd /usr/src/app/core/dremote && pm2 start keystone.js ) &
 
 sleep 5
 
