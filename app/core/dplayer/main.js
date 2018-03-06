@@ -88,7 +88,6 @@ app.on('ready', () => {
   // recieve URI to display
   ipc.config.id = 'dplayeripc';
   ipc.config.retry = 1500;
-  ipc.config.maxConnections = 1;
   ipc.serve(
     function () {
       ipc.server.on(

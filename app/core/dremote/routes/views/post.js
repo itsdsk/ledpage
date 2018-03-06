@@ -1,5 +1,5 @@
 var keystone = require('keystone');
-var ipc = require('node-ipc');
+const ipc = require('node-ipc');
 
 exports = module.exports = function (req, res) {
 
@@ -44,8 +44,41 @@ exports = module.exports = function (req, res) {
 
 	// Forward instruction to display selected sketch
 	view.on('get', { display: 'on' }, function(next) {
+
 		var sketchPath = locals.data.post.localPath;
-		console.log(sketchPath);
+
+		ipc.config.id = 'dremoteipc'; 
+		ipc.config.retry = 1500; 
+		 
+		ipc.connectTo( 
+			'dplayeripc', 
+			function(){ 
+				ipc.of.dplayeripc.on( 
+					'connect', 
+					function(){ 
+						//ipc.log('## connected to world ##'.rainbow, ipc.config.delay); 
+						ipc.of.dplayeripc.emit( 
+							'message',  //any event or message type your server listens for 
+							sketchPath
+						);
+						ipc.disconnect('dplayeripc');
+					} 
+				); 
+				ipc.of.dplayeripc.on( 
+					'disconnect', 
+					function(){ 
+						ipc.log('disconnected from world'.notice); 
+					} 
+				); 
+				ipc.of.dplayeripc.on( 
+					'message',  //any event or message type your server listens for 
+					function(data){ 
+						ipc.log('got a message from world : '.debug, data); 
+					} 
+				); 
+			} 
+		);		
+
 		next();
 	});
 
