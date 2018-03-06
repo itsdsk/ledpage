@@ -89,7 +89,7 @@ RUN systemctl disable ipfs.service && systemctl disable nginx.service
 
 # move app to filesystem
 COPY ./app ./
-COPY ./data /data/
+COPY ./data/sketches /data/sketches/
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
