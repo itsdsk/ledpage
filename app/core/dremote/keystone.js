@@ -14,7 +14,7 @@ keystone.init({
 	'name': 'Sketch Browser',
 	'port': 8081,
 	'sass': 'public',
-	'static': 'public',
+	'static': ['public','/data/sketches'],
 	'favicon': 'public/favicon.ico',
 	'views': 'templates/views',
 	'view engine': 'pug',
