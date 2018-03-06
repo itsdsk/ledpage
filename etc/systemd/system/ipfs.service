@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 EnvironmentFile=/usr/src/app/core/dsharing/IPFS_ENV
-ExecStart=/usr/bin/ipfs daemon --init --enable-pubsub-experiment --enable-gc
+ExecStart=/usr/bin/ipfs daemon --init --enable-gc
 Restart=on-failure
 
 [Install]
