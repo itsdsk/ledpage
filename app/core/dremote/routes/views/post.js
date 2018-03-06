@@ -1,4 +1,5 @@
 var keystone = require('keystone');
+var ipc = require('node-ipc');
 
 exports = module.exports = function (req, res) {
 
@@ -39,6 +40,13 @@ exports = module.exports = function (req, res) {
 			next(err);
 		});
 
+	});
+
+	// Forward instruction to display selected sketch
+	view.on('get', { display: 'on' }, function(next) {
+		var sketchPath = locals.data.post.localPath;
+		console.log(sketchPath);
+		next();
 	});
 
 	// Render the view
