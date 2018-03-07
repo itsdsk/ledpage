@@ -59,13 +59,15 @@ exports = module.exports = function (req, res) {
 	}, function (next) {
 
 		var fs = require('fs');
-		var sketchPath = locals.data.sketch.localPath;
-		var sketchHash = locals.data.sketch.ipnsHash;
+		const sketchPath = locals.data.sketch.localPath;
+		const sketchHash = locals.data.sketch.ipnsHash;
 		console.log(sketchHash);
 		locals.ipfs.files.get(sketchHash, function (err, files) {
 			if (err) {
+				console.log('not workng')
 				console.log(err)
 			} else {
+				console.log('workng')
 				files.forEach((file) => {
 					console.log(file.path);
 					//var filePath = sketchPath
