@@ -47,7 +47,7 @@ exports = module.exports = function (req, res) {
 		display: 'on'
 	}, function (next) {
 
-		var sketchPath = locals.data.sketch.localPath;
+		var sketchPath = locals.data.sketch.localPath + 'index.html';
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		req.flash('success', 'Sketch queued for display.')
 		return next();
@@ -58,7 +58,7 @@ exports = module.exports = function (req, res) {
 		update: 'ipns'
 	}, function (next) {
 
-		var fs = require('fs');
+		//var fs = require('fs');
 		const sketchPath = locals.data.sketch.localPath;
 		const sketchHash = locals.data.sketch.ipnsHash;
 		console.log(sketchHash);
