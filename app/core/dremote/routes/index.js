@@ -32,14 +32,14 @@ var routes = {
 };
 
 // redirect
-keystone.redirect('/', '/blog/');
+keystone.redirect('/', '/browse/');
 
 // Setup Route Bindings
 exports = module.exports = function (app) {
 	// Views
 	//app.get('/', routes.views.index);
-	app.get('/blog/:category?', routes.views.blog);
-	app.get('/blog/post/:post', routes.views.post);
+	app.get('/browse/:category?', routes.views.browse);
+	app.get('/browse/post/:post', routes.views.post);
 	app.get('/gallery', routes.views.gallery);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
