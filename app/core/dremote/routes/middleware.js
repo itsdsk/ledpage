@@ -8,6 +8,7 @@
  * modules in your project's /lib directory.
  */
 var _ = require('lodash');
+var ipfsAPI = require('ipfs-api');
 
 
 /**
@@ -24,6 +25,7 @@ exports.initLocals = function (req, res, next) {
 		//{ label: 'Gallery', key: 'gallery', href: '/gallery' },
 	];
 	res.locals.user = req.user;
+	res.locals.ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
 	next();
 };
 

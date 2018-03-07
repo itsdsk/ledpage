@@ -18,6 +18,20 @@ exports = module.exports = function (req, res) {
 	// Load the current sketch
 	view.on('init', function (next) {
 
+		var startup = () => {
+			locals.ipfs.id(function (err, identity) {
+				if (err) {
+					console.log(err)
+					setTimeout(function(){ startup(); }, 5000);
+				} else {
+					console.log("Identity:")
+					console.log(identity)
+				}
+			})
+		}
+		startup()
+		
+
 		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
@@ -43,40 +57,42 @@ exports = module.exports = function (req, res) {
 	});
 
 	// Forward instruction to display selected sketch
-	view.on('get', { display: 'on' }, function(next) {
+	view.on('get', {
+		display: 'on'
+	}, function (next) {
 
 		var sketchPath = locals.data.sketch.localPath;
 
-		ipc.config.id = 'dremoteipc'; 
-		ipc.config.retry = 1500; 
-		 
-		ipc.connectTo( 
-			'dplayeripc', 
-			function(){ 
-				ipc.of.dplayeripc.on( 
-					'connect', 
-					function(){ 
+		ipc.config.id = 'dremoteipc';
+		ipc.config.retry = 1500;
+
+		ipc.connectTo(
+			'dplayeripc',
+			function () {
+				ipc.of.dplayeripc.on(
+					'connect',
+					function () {
 						//ipc.log('## connected to world ##'.rainbow, ipc.config.delay); 
-						ipc.of.dplayeripc.emit( 
-							'message',  //any event or message type your server listens for 
+						ipc.of.dplayeripc.emit(
+							'message', //any event or message type your server listens for 
 							sketchPath
 						);
 						ipc.disconnect('dplayeripc');
-					} 
-				); 
-				ipc.of.dplayeripc.on( 
-					'disconnect', 
-					function(){ 
-						ipc.log('disconnected from world'.notice); 
-					} 
-				); 
-				ipc.of.dplayeripc.on( 
-					'message',  //any event or message type your server listens for 
-					function(data){ 
-						ipc.log('got a message from world : '.debug, data); 
-					} 
-				); 
-			} 
+					}
+				);
+				ipc.of.dplayeripc.on(
+					'disconnect',
+					function () {
+						ipc.log('disconnected from world'.notice);
+					}
+				);
+				ipc.of.dplayeripc.on(
+					'message', //any event or message type your server listens for 
+					function (data) {
+						ipc.log('got a message from world : '.debug, data);
+					}
+				);
+			}
 		);
 		req.flash('success', 'Sketch queued for display.')
 		return next();
