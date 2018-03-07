@@ -9,8 +9,6 @@
  */
 var _ = require('lodash');
 var ipfsAPI = require('ipfs-api');
-const ipc = require('node-ipc');
-
 
 /**
 	Initialises the standard view locals
@@ -28,19 +26,6 @@ exports.initLocals = function (req, res, next) {
 	res.locals.user = req.user;
 	// ipfs
 	res.locals.ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
-	// ipc
-	ipc.config.id = 'dremoteipc';
-	ipc.config.retry = 1500;
-	ipc.connectTo(
-		'dplayeripc',
-		function() {
-			ipc.of.dplayeripc.on(
-				'connect',
-				function () {
-					console.log("IPC connected");
-				}
-			)
-		});
 	
 	next();
 };
