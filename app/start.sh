@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # start webserver/led layout
-pm2 start /usr/src/app/core/dsetup/d3server.js --cwd "/usr/src/app/core/dsetup/" --name "dsetup"
+#pm2 start /usr/src/app/core/dsetup/d3server.js --cwd "/usr/src/app/core/dsetup/" --name "dsetup"
 
 # start webserver/cms
 pm2 start /usr/src/app/core/dremote/keystone.js --cwd "/usr/src/app/core/dremote/" --name "dremote"

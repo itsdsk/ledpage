@@ -3,7 +3,7 @@ Description=IPFS daemon
 After=network.target
 
 [Service]
-EnvironmentFile=/usr/src/app/core/dsharing/IPFS_ENV
+EnvironmentFile=/usr/src/app/core/dremote/IPFS_ENV
 ExecStart=/usr/bin/ipfs daemon --init --enable-gc
 Restart=on-failure
 
