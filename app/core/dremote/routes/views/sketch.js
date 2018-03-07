@@ -60,12 +60,18 @@ exports = module.exports = function (req, res) {
 
 		var fs = require('fs');
 		var sketchPath = locals.data.sketch.localPath;
-		locals.ipfs.files.get(locals.data.sketch.ipnsHash, function (err, files) {
-			files.forEach((file) => {
-				console.log(file.path);
-				//var filePath = sketchPath
-				//fs.writeFile()
-			});
+		var sketchHash = locals.data.sketch.ipnsHash;
+		console.log(sketchHash);
+		locals.ipfs.files.get(sketchHash, function (err, files) {
+			if (err) {
+				console.log(err)
+			} else {
+				files.forEach((file) => {
+					console.log(file.path);
+					//var filePath = sketchPath
+					//fs.writeFile()
+				});
+			}
 		});
 
 		// var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
