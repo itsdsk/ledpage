@@ -57,16 +57,27 @@ exports = module.exports = function (req, res) {
 	view.on('get', {
 		update: 'ipns'
 	}, function (next) {
-		var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
-		locals.ipfs.name.resolve(addr, function(err, name) {
-			if (err) {
-				console.log(err);
-			} else {
-				console.log('Resolved name:');
-				console.log(name);
-			}
+
+		var fs = require('fs');
+		var sketchPath = locals.data.sketch.localPath;
+		locals.ipfs.files.get(locals.data.sketch.ipnsHash, function (err, files) {
+			files.forEach((file) => {
+				console.log(file.path);
+				//var filePath = sketchPath
+				//fs.writeFile()
+			});
 		});
-		req.flash('success', 'Handled.')
+
+		// var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
+		// locals.ipfs.name.resolve(addr, function(err, name) {
+		// 	if (err) {
+		// 		console.log(err);
+		// 	} else {
+		// 		console.log('Resolved name:');
+		// 		console.log(name);
+		// 	}
+		// });
+		req.flash('success', 'Handled.');
 		return next();
 	});
 
