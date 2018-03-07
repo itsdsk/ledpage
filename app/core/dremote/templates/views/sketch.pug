@@ -10,6 +10,8 @@ block content
 			else
 				header
 					h1= data.sketch.title
+					if data.sketch.ipnsHash
+						h2: a(href='?update=ipns') Update IPNS #{data.sketch.ipnsHash}
 					h5 Posted 
 						if data.sketch.publishedDate
 							| on #{data.sketch._.publishedDate.format('MMMM Do, YYYY')} 

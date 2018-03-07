@@ -18,16 +18,6 @@ exports = module.exports = function (req, res) {
 	// Load the current sketch
 	view.on('init', function (next) {
 
-		var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
-		locals.ipfs.name.resolve(addr, function(err, name) {
-			if (err) {
-				console.log(err);
-			} else {
-				console.log('Resolved name:');
-				console.log(name);
-			}
-		});
-
 		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
@@ -60,6 +50,23 @@ exports = module.exports = function (req, res) {
 		var sketchPath = locals.data.sketch.localPath;
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		req.flash('success', 'Sketch queued for display.')
+		return next();
+	});
+
+	// update ipns
+	view.on('get', {
+		update: 'ipns'
+	}, function (next) {
+		var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
+		locals.ipfs.name.resolve(addr, function(err, name) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log('Resolved name:');
+				console.log(name);
+			}
+		});
+		req.flash('success', 'Handled.')
 		return next();
 	});
 
