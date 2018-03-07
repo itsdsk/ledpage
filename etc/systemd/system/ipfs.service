@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 EnvironmentFile=/usr/src/app/core/dremote/IPFS_ENV
-ExecStart=/usr/bin/ipfs daemon
+ExecStart=/usr/bin/ipfs daemon --init
 Restart=on-failure
 
 [Install]
