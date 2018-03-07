@@ -47,7 +47,7 @@ exports = module.exports = function (req, res) {
 		display: 'on'
 	}, function (next) {
 
-		var sketchPath = locals.data.sketch.localPath + 'index.html';
+		var sketchPath = 'file:///' + locals.data.sketch.localPath + 'index.html';
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		req.flash('success', 'Sketch queued for display.')
 		return next();
