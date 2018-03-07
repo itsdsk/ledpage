@@ -1,5 +1,5 @@
 exports.create = {
-    Post: [{
+    Sketch: [{
             'title': 'RGB Fade',
             'state': 'published',
             //'author': 'user@keystonejs.com',

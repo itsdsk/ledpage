@@ -9,34 +9,34 @@ exports = module.exports = function (req, res) {
 	// Set locals
 	locals.section = 'browse';
 	locals.filters = {
-		post: req.params.post,
+		sketch: req.params.sketch,
 	};
 	locals.data = {
-		posts: [],
+		sketches: [],
 	};
 
-	// Load the current post
+	// Load the current sketch
 	view.on('init', function (next) {
 
-		var q = keystone.list('Post').model.findOne({
+		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',
-			slug: locals.filters.post,
+			slug: locals.filters.sketch,
 		}).populate('author categories');
 
 		q.exec(function (err, result) {
-			locals.data.post = result;
+			locals.data.sketch = result;
 			next(err);
 		});
 
 	});
 
-	// Load other posts
+	// Load other sketches
 	view.on('init', function (next) {
 
-		var q = keystone.list('Post').model.find().where('state', 'published').sort('-publishedDate').populate('author').limit('4');
+		var q = keystone.list('Sketch').model.find().where('state', 'published').sort('-publishedDate').populate('author').limit('4');
 
 		q.exec(function (err, results) {
-			locals.data.posts = results;
+			locals.data.sketches = results;
 			next(err);
 		});
 
@@ -45,7 +45,7 @@ exports = module.exports = function (req, res) {
 	// Forward instruction to display selected sketch
 	view.on('get', { display: 'on' }, function(next) {
 
-		var sketchPath = locals.data.post.localPath;
+		var sketchPath = locals.data.sketch.localPath;
 
 		ipc.config.id = 'dremoteipc'; 
 		ipc.config.retry = 1500; 
@@ -83,5 +83,5 @@ exports = module.exports = function (req, res) {
 	});
 
 	// Render the view
-	view.render('post');
+	view.render('sketch');
 };
