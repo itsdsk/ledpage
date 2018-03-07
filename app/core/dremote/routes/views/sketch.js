@@ -58,33 +58,62 @@ exports = module.exports = function (req, res) {
 		update: 'ipns'
 	}, function (next) {
 
-		//var fs = require('fs');
-		const sketchPath = locals.data.sketch.localPath;
-		const sketchHash = locals.data.sketch.ipnsHash;
-		console.log(sketchHash);
-		locals.ipfs.files.get(sketchHash, function (err, files) {
-			if (err) {
-				console.log('not workng')
-				console.log(err)
-			} else {
-				console.log('workng')
-				files.forEach((file) => {
-					console.log(file.path);
-					//var filePath = sketchPath
-					//fs.writeFile()
-				});
-			}
-		});
+		var fs = require('fs');
+		var path = require('path');
 
-		// var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
-		// locals.ipfs.name.resolve(addr, function(err, name) {
+		var sketchPath = locals.data.sketch.localPath;
+		// const sketchHash = locals.data.sketch.ipnsHash;
+		// console.log(sketchHash);
+		//var addr = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t'
+
+		// locals.ipfs.files.get(addr, function (err, files) {
+		// 	console.log('hereyt')
 		// 	if (err) {
-		// 		console.log(err);
+		// 		console.log('not workng')
+		// 		console.log(err)
 		// 	} else {
-		// 		console.log('Resolved name:');
-		// 		console.log(name);
+		// 		console.log('workng')
+		// 		files.forEach((file) => {
+		// 			console.log(file.path);
+		// 			//var filePath = sketchPath
+		// 			//fs.writeFile()
+		// 		});
 		// 	}
 		// });
+
+		var ipnsURI = '/ipns/'+locals.data.sketch.ipnsHash;//QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
+		locals.ipfs.name.resolve(ipnsURI, function(err, ipfsHash) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log('Resolved name:');
+				console.log(ipfsHash);
+				var ipfsURI = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t'//'/ipfs/' + ipfsHash;
+				locals.ipfs.files.get(ipfsURI, function (err, files) {
+					if (err) {
+						console.log('not workng')
+						console.log(err)
+					} else {
+						console.log('workng')
+						files.forEach((file) => {
+							//console.log(file.path);
+							var fileName = file.path.slice(33); // trim ipfs hash
+							var filePath = sketchPath + path.dirname(fileName); // full directory
+							if(!fs.existsSync(filePath)){
+								fs.mkdirSync(filePath); // create directory if missing
+							}
+							var fileURI = sketchPath + filename;
+							console.log(fileURI);
+							fs.writeFile(fileURI, file.content, 'binary', (err)=>{
+								if(err) console.log(err)
+								else console.log('File saved')
+							 });
+						});
+					}
+				});
+		
+			}
+		});
 		req.flash('success', 'Handled.');
 		return next();
 	});

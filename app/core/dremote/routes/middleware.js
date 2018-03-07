@@ -26,7 +26,7 @@ exports.initLocals = function (req, res, next) {
 	res.locals.user = req.user;
 	// ipfs
 	res.locals.ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
-	
+	console.log('connected to IPFS');
 	next();
 };
 
