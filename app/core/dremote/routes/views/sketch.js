@@ -62,38 +62,7 @@ exports = module.exports = function (req, res) {
 	}, function (next) {
 
 		var sketchPath = locals.data.sketch.localPath;
-
-		ipc.config.id = 'dremoteipc';
-		ipc.config.retry = 1500;
-
-		ipc.connectTo(
-			'dplayeripc',
-			function () {
-				ipc.of.dplayeripc.on(
-					'connect',
-					function () {
-						//ipc.log('## connected to world ##'.rainbow, ipc.config.delay); 
-						ipc.of.dplayeripc.emit(
-							'message', //any event or message type your server listens for 
-							sketchPath
-						);
-						ipc.disconnect('dplayeripc');
-					}
-				);
-				ipc.of.dplayeripc.on(
-					'disconnect',
-					function () {
-						ipc.log('disconnected from world'.notice);
-					}
-				);
-				ipc.of.dplayeripc.on(
-					'message', //any event or message type your server listens for 
-					function (data) {
-						ipc.log('got a message from world : '.debug, data);
-					}
-				);
-			}
-		);
+		ipc.of.dplayeripc.emit('message', sketchPath);
 		req.flash('success', 'Sketch queued for display.')
 		return next();
 	});

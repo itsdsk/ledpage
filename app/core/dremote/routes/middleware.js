@@ -9,6 +9,7 @@
  */
 var _ = require('lodash');
 var ipfsAPI = require('ipfs-api');
+const ipc = require('node-ipc');
 
 
 /**
@@ -25,7 +26,22 @@ exports.initLocals = function (req, res, next) {
 		//{ label: 'Gallery', key: 'gallery', href: '/gallery' },
 	];
 	res.locals.user = req.user;
+	// ipfs
 	res.locals.ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
+	// ipc
+	ipc.config.id = 'dremoteipc';
+	ipc.config.retry = 1500;
+	ipc.connectTo(
+		'dplayeripc',
+		function() {
+			ipc.of.dplayeripc.on(
+				'connect',
+				function () {
+					console.log("IPC connected");
+				}
+			)
+		});
+	
 	next();
 };
 
