@@ -77,9 +77,9 @@ exports = module.exports = function (req, res) {
 					} 
 				); 
 			} 
-		);		
-
-		next();
+		);
+		req.flash('success', 'Sketch queued for display.')
+		return next();
 	});
 
 	// Render the view
