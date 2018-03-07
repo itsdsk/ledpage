@@ -18,19 +18,15 @@ exports = module.exports = function (req, res) {
 	// Load the current sketch
 	view.on('init', function (next) {
 
-		// var startup = () => {
-		// 	locals.ipfs.id(function (err, identity) {
-		// 		if (err) {
-		// 			console.log(err)
-		// 			setTimeout(function(){ startup(); }, 5000);
-		// 		} else {
-		// 			console.log("Identity:")
-		// 			console.log(identity)
-		// 		}
-		// 	})
-		// }
-		//startup()
-		
+		var addr = '/ipns/QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
+		locals.ipfs.name.resolve(addr, function(err, name) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log('Resolved name:');
+				console.log(name);
+			}
+		});
 
 		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',

@@ -22,6 +22,8 @@ Sketch.add({
 	//	extended: { type: Types.Html, wysiwyg: true, height: 400 },
 	//},
 	localPath: { type: String },
+	ipnsHash: { type: Types.Key },
+	ipfsHash: { type: Types.Key },
 	categories: { type: Types.Relationship, ref: 'SketchCategory', many: true },
 });
 
