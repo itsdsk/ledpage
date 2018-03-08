@@ -81,14 +81,14 @@ exports = module.exports = function (req, res) {
 		// 	}
 		// });
 
-		var ipnsURI = '/ipns/'+locals.data.sketch.ipnsHash;//QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
-		locals.ipfs.name.resolve(ipnsURI, function(err, ipfsHash) {
+		var ipnsURI = '/ipns/' + locals.data.sketch.ipnsHash; //QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
+		locals.ipfs.name.resolve(ipnsURI, function (err, ipfsHash) {
 			if (err) {
 				console.log(err);
 			} else {
 				console.log('Resolved name:');
 				console.log(ipfsHash);
-				var ipfsURI = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t'//'/ipfs/' + ipfsHash;
+				var ipfsURI = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t' //'/ipfs/' + ipfsHash;
 				locals.ipfs.files.get(ipfsURI, function (err, files) {
 					if (err) {
 						console.log('not workng')
@@ -96,22 +96,41 @@ exports = module.exports = function (req, res) {
 					} else {
 						console.log('workng')
 						files.forEach((file) => {
-							//console.log(file.path);
-							var fileName = file.path.slice(33); // trim ipfs hash
-							var filePath = sketchPath + path.dirname(fileName); // full directory
-							if(!fs.existsSync(filePath)){
-								fs.mkdirSync(filePath); // create directory if missing
+							if (file.content) {
+
+								console.log(file.path);
+								var fileName = file.path.slice(46); // trim ipfs hash
+								var fileDir = path.dirname(fileName);
+								//var filePath = sketchPath + fileDir; // full directory
+								fileDir
+									.split(path.sep)
+									.reduce((currentPath, folder) => {
+										currentPath += folder + path.sep;
+										if (!fs.existsSync(path.join(sketchPath, currentPath))) {
+											try {
+												fs.mkdirSync(path.join(sketchPath, currentPath));
+											} catch (fserr) {
+												if (fserr.code !== 'EEXIST') {
+													throw fserr;
+												}
+											}
+										}
+										return currentPath;
+									}, '');
+								//if(!fs.existsSync(filePath)){
+								//	fs.mkdirSync(filePath); // create directory if missing
+								//}
+								var fileURI = sketchPath + fileName;
+								//console.log(fileURI);
+								fs.writeFile(fileURI, file.content, 'binary', (err) => {
+									if (err) console.log(err)
+									else console.log('File saved')
+								});
 							}
-							var fileURI = sketchPath + filename;
-							console.log(fileURI);
-							fs.writeFile(fileURI, file.content, 'binary', (err)=>{
-								if(err) console.log(err)
-								else console.log('File saved')
-							 });
 						});
 					}
 				});
-		
+
 			}
 		});
 		req.flash('success', 'Handled.');
