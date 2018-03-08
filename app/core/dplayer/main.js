@@ -93,8 +93,8 @@ app.on('ready', () => {
       ipc.server.on(
         'message',
         function (data, socket) {
-          ipc.log('got a message : '.debug, data);
-          console.log(data);
+          //ipc.log('got a message : '.debug, data);
+          //console.log(data);
           window.loadURL(data); // display recieved URI
           //ipc.server.emit(
           //  socket,
@@ -107,7 +107,7 @@ app.on('ready', () => {
       ipc.server.on(
         'socket.disconnected',
         function (socket, destroyedSocketID) {
-          ipc.log('client ' + destroyedSocketID + ' has disconnected!');
+          //ipc.log('client ' + destroyedSocketID + ' has disconnected!');
         }
       );
     }

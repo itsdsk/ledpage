@@ -25,7 +25,9 @@ exports.initLocals = function (req, res, next) {
 	];
 	res.locals.user = req.user;
 	// ipfs
-	res.locals.ipfs = ipfsAPI('localhost', '5001', {protocol: 'http'});
+	res.locals.ipfs = ipfsAPI('localhost', '5001', {
+		protocol: 'http'
+	});
 	next();
 };
 
@@ -40,7 +42,9 @@ exports.flashMessages = function (req, res, next) {
 		warning: req.flash('warning'),
 		error: req.flash('error'),
 	};
-	res.locals.messages = _.some(flashMessages, function (msgs) { return msgs.length; }) ? flashMessages : false;
+	res.locals.messages = _.some(flashMessages, function (msgs) {
+		return msgs.length;
+	}) ? flashMessages : false;
 	next();
 };
 

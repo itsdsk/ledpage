@@ -40,7 +40,7 @@ exports = module.exports = function (app) {
 	//app.get('/', routes.views.index);
 	app.get('/browse/:category?', routes.views.browse);
 	app.get('/browse/sketch/:sketch', routes.views.sketch);
-	app.get('/gallery', routes.views.gallery);
+	//app.get('/gallery', routes.views.gallery);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);
