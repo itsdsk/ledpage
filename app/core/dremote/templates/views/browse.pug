@@ -3,10 +3,11 @@ extends ../layouts/default
 mixin sketch(sketch)
 	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
 		.media-heading
-			if sketch.image.exists
-				img(src=sketch._.image.fit(720,720)).img-responsive
-			else
-				img(src="http://placehold.it/720x720").img-responsive
+			a(href='/browse/sketch/' + sketch.slug + '?display=on')
+				if sketch.image.exists
+					img(src=sketch._.image.fit(720,720)).img-responsive
+				else
+					img(src="http://placehold.it/720x720").img-responsive
 		.media-middle
 			h2.media-heading
 				a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title

@@ -47,6 +47,25 @@ exports = module.exports = function (req, res) {
 		display: 'on'
 	}, function (next) {
 
+		// // if image does not exist
+		// if (locals.data.sketch.image.exists) {
+		// 	console.log('going to try ')
+		// 	//var fs = require('fs');
+		// 	var sys = require('sys')
+		// 	var exec = require('child_process').exec;
+		// 	// save screenshot
+		// 	function puts(error, stdout, stderr) {
+		// 		sys.puts(stdout)
+		// 	}
+		// 	exec("sleep 7 && import -window root -display :0.0 /tmp/screen.png", function (err, stdout, stderr) {
+		// 		console.log(stdout);
+		// 	});
+		// 	// upload screenshot from file
+		// 	locals.data.sketch._.image.upload({
+		// 		path: '/tmp/screen.png',
+		// 	}, (err) => { console.log('done done done') });
+		// }
+
 		var sketchPath = 'file:///' + locals.data.sketch.localPath + 'index.html';
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		req.flash('success', 'Sketch queued for display.')

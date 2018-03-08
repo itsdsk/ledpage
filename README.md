@@ -26,6 +26,8 @@ resin sync --source ./app/ --destination /usr/src/app/
 
 mongod --repair
 
+import -window root -display :0.0 screenshot.jpg
+
 curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://localhost:19444
 
 curl -X POST -H "Content-Type: application/json" -d '"leds":[{"index":0,"hscan":{"minimum":0.2222,"maximum":0.3333},"vscan":{"minimum":0.1111,"maximum":0.2222}}]' http://localhost:19444
