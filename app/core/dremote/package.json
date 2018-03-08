@@ -12,7 +12,7 @@
     "async": "2.1.4",
     "node-ipc": "^9.1.1",
     "ipfs-api": "^18.1.1",
-    "pageres": "^4.5.1"
+    "electron-screenshot-service": "^4.0.3"
   },
   "devDependencies": {
     "eslint": "3.15.0",
