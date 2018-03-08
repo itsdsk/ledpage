@@ -62,25 +62,6 @@ exports = module.exports = function (req, res) {
 		var path = require('path');
 
 		var sketchPath = locals.data.sketch.localPath;
-		// const sketchHash = locals.data.sketch.ipnsHash;
-		// console.log(sketchHash);
-		//var addr = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t'
-
-		// locals.ipfs.files.get(addr, function (err, files) {
-		// 	console.log('hereyt')
-		// 	if (err) {
-		// 		console.log('not workng')
-		// 		console.log(err)
-		// 	} else {
-		// 		console.log('workng')
-		// 		files.forEach((file) => {
-		// 			console.log(file.path);
-		// 			//var filePath = sketchPath
-		// 			//fs.writeFile()
-		// 		});
-		// 	}
-		// });
-
 		var ipnsURI = '/ipns/' + locals.data.sketch.ipnsHash; //QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
 		locals.ipfs.name.resolve(ipnsURI, function (err, ipfsHash) {
 			if (err) {
@@ -91,14 +72,14 @@ exports = module.exports = function (req, res) {
 				var ipfsURI = '/ipfs/QmXb44wak42nvBeuyPXDHQSapXnKNJV9WYLDA5a5GnNP8t' //'/ipfs/' + ipfsHash;
 				locals.ipfs.files.get(ipfsURI, function (err, files) {
 					if (err) {
-						console.log('not workng')
+						//console.log('not workng')
 						console.log(err)
 					} else {
-						console.log('workng')
+						//console.log('workng')
 						files.forEach((file) => {
 							if (file.content) {
 
-								console.log(file.path);
+								//console.log(file.path);
 								var fileName = file.path.slice(46); // trim ipfs hash
 								var fileDir = path.dirname(fileName);
 								//var filePath = sketchPath + fileDir; // full directory
@@ -117,14 +98,11 @@ exports = module.exports = function (req, res) {
 										}
 										return currentPath;
 									}, '');
-								//if(!fs.existsSync(filePath)){
-								//	fs.mkdirSync(filePath); // create directory if missing
-								//}
 								var fileURI = sketchPath + fileName;
 								//console.log(fileURI);
 								fs.writeFile(fileURI, file.content, 'binary', (err) => {
 									if (err) console.log(err)
-									else console.log('File saved')
+									//else console.log('File saved')
 								});
 							}
 						});
