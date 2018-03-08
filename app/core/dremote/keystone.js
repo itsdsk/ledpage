@@ -21,8 +21,8 @@ keystone.init({
   'view engine': 'pug',
 
   'auto update': true,
-  'session': true,
-  'auth': true,
+  'session': false,
+  'auth': false,
   'user model': 'User',
 });
 

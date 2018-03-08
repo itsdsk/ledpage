@@ -45,7 +45,9 @@ exports = module.exports = function (req, res) {
 	view.on('init', function (next) {
 
 		if (req.params.category) {
-			keystone.list('SketchCategory').model.findOne({ key: locals.filters.category }).exec(function (err, result) {
+			keystone.list('SketchCategory').model.findOne({
+				key: locals.filters.category
+			}).exec(function (err, result) {
 				locals.data.category = result;
 				next(err);
 			});
@@ -58,13 +60,13 @@ exports = module.exports = function (req, res) {
 	view.on('init', function (next) {
 
 		var q = keystone.list('Sketch').paginate({
-			page: req.query.page || 1,
-			perPage: 10,
-			maxPages: 10,
-			filters: {
-				state: 'published',
-			},
-		})
+				page: req.query.page || 1,
+				perPage: 10,
+				maxPages: 10,
+				filters: {
+					state: 'published',
+				},
+			})
 			.sort('-publishedDate')
 			.populate('author categories');
 
