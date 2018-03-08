@@ -11,6 +11,15 @@ var Sketch = new keystone.List('Sketch', {
 	autokey: { path: 'slug', from: 'title', unique: true },
 });
 
+//
+var myStorage = new keystone.Storage({
+	adapter: keystone.Storage.Adapters.FS,
+	fs: {
+	  path: keystone.expandPath('./public/uploads/files'), // required; path where the files should be stored
+	  publicPath: '/public/uploads/files', // path where files will be served
+	}
+  });
+
 Sketch.add({
 	title: { type: String, required: true },
 	state: { type: Types.Select, options: 'draft, published, archived', default: 'draft', index: true },
@@ -24,6 +33,10 @@ Sketch.add({
 	localPath: { type: String },
 	ipnsHash: { type: String },
 	ipfsHash: { type: String },
+	image: {
+		type: Types.File,
+		storage: myStorage
+	},
 	categories: { type: Types.Relationship, ref: 'SketchCategory', many: true },
 });
 
