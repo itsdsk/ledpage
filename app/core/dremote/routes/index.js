@@ -29,6 +29,7 @@ keystone.pre('render', middleware.flashMessages);
 // Import Route Controllers
 var routes = {
 	views: importRoutes('./views'),
+	api: importRoutes('./api')
 };
 
 // redirect
@@ -41,6 +42,14 @@ exports = module.exports = function (app) {
 	app.get('/browse/:category?', routes.views.browse);
 	app.get('/browse/sketch/:sketch', routes.views.sketch);
 	//app.get('/gallery', routes.views.gallery);
+
+	// public API
+	app.all('/api*', keystone.middleware.api);
+	app.get('/api/list', keystone.middleware.api, routes.api.sketch.list);
+	app.get('/api/:id', keystone.middleware.api, routes.api.sketch.get);
+	app.get('/api/:id/play', keystone.middleware.api, routes.api.sketch.play);
+
+	app.get('/api/sync', keystone.middleware.api, routes.api.sketch.sync);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);
