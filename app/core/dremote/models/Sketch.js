@@ -33,9 +33,9 @@ Sketch.add({
 	categories: { type: Types.Relationship, ref: 'SketchCategory', many: true },
 
 
-	//state: { type: Types.Select, options: 'draft, published, archived', default: 'draft', index: true },
+	state: { type: Types.Select, options: 'draft, published, archived', default: 'draft', index: true },
 	//author: { type: Types.Relationship, ref: 'User', index: true },
-	//publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
+	publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
 	//image: { type: Types.CloudinaryImage },
 	//content: {
 	//	brief: { type: Types.Html, wysiwyg: true, height: 150 },
