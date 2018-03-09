@@ -4,7 +4,7 @@ require('dotenv').config();
 
 // Require keystone
 var keystone = require('keystone');
-const ipc = require('node-ipc');
+//const ipc = require('node-ipc');
 
 // Initialise Keystone with your project's configuration.
 // See http://keystonejs.com/guide/config for available options
@@ -38,19 +38,19 @@ keystone.set('locals', {
   editable: keystone.content.editable,
 });
 
-// ipc
-ipc.config.id = 'dremoteipc';
-ipc.config.retry = 1500;
-ipc.connectTo(
-  'dplayeripc',
-  function () {
-    ipc.of.dplayeripc.on(
-      'connect',
-      function () {
-        console.log("IPC connected");
-      }
-    )
-  });
+// // ipc
+// ipc.config.id = 'dremoteipc';
+// ipc.config.retry = 1500;
+// ipc.connectTo(
+//   'dplayeripc',
+//   function () {
+//     ipc.of.dplayeripc.on(
+//       'connect',
+//       function () {
+//         console.log("IPC connected");
+//       }
+//     )
+//   });
 
 
 // Load your project's Routes

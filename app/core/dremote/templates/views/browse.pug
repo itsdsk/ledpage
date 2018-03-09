@@ -9,6 +9,7 @@ mixin sketch(sketch)
 				else
 					img(src="http://placehold.it/720x720").img-responsive
 		.media-middle
+			a(href='/api/' + sketch.id + '/play').btn.btn-default Display
 			h2.media-heading
 				a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
 			p.lead.text-muted Posted 
@@ -79,3 +80,18 @@ block content
 					a(href='/browse', class=!data.category ? 'active' : false).list-group-item All Categories
 					each cat in data.categories
 						a(href='/browse/' + cat.key, class=data.category && data.category.id == cat.id ? 'active' : false).list-group-item= cat.name
+block js
+	script.
+		jQuery(function($) {
+			function playSketch(e) {
+
+				e.preventDefault();
+
+				var url = $(this).attr('href');
+
+				$.get(url, function() {
+					// success
+				});
+			}
+			$(".btn-default").click( playSketch );
+		});
