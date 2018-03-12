@@ -189,7 +189,7 @@
  							} else {
  								res.apiResponse({
  									success: true,
- 									sketch: application
+ 									sketch: files
  								});
 
  							}

@@ -25,7 +25,7 @@ Sketch.add({
 	modifiedDate: { type: Types.Date, index: true },
 	localPath: { type: String },
 	ipnsHash: { type: String },
-	ipfsHash: { type: String, unique: true },
+	ipfsHash: { type: String },
 	image: {
 		type: Types.File,
 		storage: myStorage
