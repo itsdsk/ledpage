@@ -112,9 +112,13 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = item.localPath;//["/data/sketches/view-static/sketch1"];
+ 		//var okSketchPath = ["/data/sketches/view-static/sketch1"];
+ 		var sketchPath = [];
+ 		sketchPath.push(item.localPath);
 
- 		ipfs.files.add(sketchPath, {recursive: true}, function (ipfserr, files) {
+ 		ipfs.files.add(sketchPath, {
+ 			recursive: true
+ 		}, function (ipfserr, files) {
  			if (ipfserr) {
  				console.log(ipfserr)
  				return res.apiError('ipfs error', ipfserr);
@@ -125,6 +129,13 @@
  					console.log(file.hash);
  					console.log(file.size);
  				});
+ 				Sketch.updateItem(item, files[0].hash, {
+ 					fields: "ipfsHash"
+ 				}, function (dberror) {
+					 if (dberror) console.log(dberror);
+					 
+ 				});
+
  				res.apiResponse({
  					files: files
  				});
