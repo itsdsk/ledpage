@@ -133,7 +133,8 @@
 
  					} else {
  						// save each file
- 						var sketchPath = '/data/sketches/view-static/' + req.params.ipfs;
+ 						var saveDir = req.params.ipfs;
+ 						var sketchPath = '/data/content/view-static/' + saveDir;
  						files.forEach((file) => {
  							if (file.content) {
 
@@ -163,6 +164,7 @@
  										console.log(fserr)
  										res.apiResponse({
  											success: false,
+ 											note: 'Error saving file...',
  											error: fserr
  										});
  									}
@@ -174,9 +176,9 @@
  						var application = new Sketch.model();
  						var updater = application.getUpdateHandler(req);
  						var data = {
- 							title: application.id,
+ 							title: saveDir,
  							ipfsHash: req.params.ipfs,
- 							localPath: sketchPath
+ 							localDir: saveDir
  						};
  						updater.process(data, {
  							flashErrors: true
@@ -184,6 +186,7 @@
  							if (upderr) {
  								res.apiResponse({
  									success: false,
+ 									note: 'Error adding new sketch to database...',
  									error: upderr
  								});
  							} else {
@@ -223,7 +226,7 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = 'file:///' + item.localPath + '/index.html';
+ 		var sketchPath = 'file:////data/content/view-static/' + item.localPath + '/index.html';
  		ipc.of.dplayeripc.emit('message', sketchPath);
 
 
@@ -240,126 +243,45 @@
   */
 
  exports.sync = function (req, res) {
- 	Sketch.model.findById(req.params.id).exec(function (err, item) {
+ 		Sketch.model.findById(req.params.id).exec(function (err, item) {
 
- 		if (err) return res.apiError('database error', err);
- 		if (!item) return res.apiError('not found');
+ 				if (err) return res.apiError('database error', err);
+ 				if (!item) return res.apiError('not found');
 
- 		//var okSketchPath = ["/data/sketches/view-static/sketch1"];
- 		var sketchPath = [];
- 		sketchPath.push(item.localPath);
+ 				//var okSketchPath = ["/data/sketches/view-static/sketch1"];
+ 				var sketchPath = [];
+ 				sketchPath.push(path.join('/data/content/view-static/', item.localDir));
 
- 		ipfs.files.add(sketchPath, {
- 			recursive: true
- 		}, function (ipfserr, files) {
- 			if (ipfserr) {
- 				console.log(ipfserr)
- 				return res.apiError('ipfs error', ipfserr);
- 			} else {
- 				console.log("Added:")
- 				files.forEach((file) => {
- 					console.log(file.path);
- 					console.log(file.hash);
- 					console.log(file.size);
+ 					ipfs.files.add(sketchPath, {
+ 						recursive: true
+ 					}, function (ipfserr, files) {
+ 						if (ipfserr) {
+ 							console.log(ipfserr)
+ 							return res.apiError('ipfs error', ipfserr);
+ 						} else {
+ 							console.log("Added:")
+ 							files.forEach((file) => {
+ 								console.log(file.path);
+ 								console.log(file.hash);
+ 								console.log(file.size);
+ 							});
+
+ 							var data = {
+ 								ipfsHash: files[files.length - 1].hash
+ 							};
+
+ 							Sketch.updateItem(item, data, {
+ 								fields: ["ipfsHash"]
+ 							}, function (dberror) {
+ 								if (dberror) console.log(dberror);
+
+ 							});
+
+ 							res.apiResponse({
+ 								files: files
+ 							});
+
+ 						}
+ 					})
  				});
-
- 				var data = {
- 					ipfsHash: files[files.length - 1].hash
- 				};
-
- 				Sketch.updateItem(item, data, {
- 					fields: ["ipfsHash"]
- 				}, function (dberror) {
- 					if (dberror) console.log(dberror);
-
- 				});
-
- 				res.apiResponse({
- 					files: files
- 				});
-
- 			}
- 		})
- 	});
- }
-
-
- // /**
- //  * Get Post by ID
- //  */
- // exports.get = function(req, res) {
- // 	Post.model.findById(req.params.id).exec(function(err, item) {
-
- // 		if (err) return res.apiError('database error', err);
- // 		if (!item) return res.apiError('not found');
-
- // 		res.apiResponse({
- // 			post: item
- // 		});
-
- // 	});
- // }
-
-
- // /**
- //  * Create a Post
- //  */
- // exports.create = function(req, res) {
-
- // 	var item = new Post.model(),
- // 		data = (req.method == 'POST') ? req.body : req.query;
-
- // 	item.getUpdateHandler(req).process(data, function(err) {
-
- // 		if (err) return res.apiError('error', err);
-
- // 		res.apiResponse({
- // 			post: item
- // 		});
-
- // 	});
- // }
-
- // /**
- //  * Get Post by ID
- //  */
- // exports.update = function(req, res) {
- // 	Post.model.findById(req.params.id).exec(function(err, item) {
-
- // 		if (err) return res.apiError('database error', err);
- // 		if (!item) return res.apiError('not found');
-
- // 		var data = (req.method == 'POST') ? req.body : req.query;
-
- // 		item.getUpdateHandler(req).process(data, function(err) {
-
- // 			if (err) return res.apiError('create error', err);
-
- // 			res.apiResponse({
- // 				post: item
- // 			});
-
- // 		});
-
- // 	});
- // }
-
- // /**
- //  * Delete Post by ID
- //  */
- // exports.remove = function(req, res) {
- // 	Post.model.findById(req.params.id).exec(function (err, item) {
-
- // 		if (err) return res.apiError('database error', err);
- // 		if (!item) return res.apiError('not found');
-
- // 		item.remove(function (err) {
- // 			if (err) return res.apiError('database error', err);
-
- // 			return res.apiResponse({
- // 				success: true
- // 			});
- // 		});
-
- // 	});
- // }
+ 		}

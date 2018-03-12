@@ -23,7 +23,8 @@ var myStorage = new keystone.Storage({
 Sketch.add({
 	title: { type: String, required: true },
 	modifiedDate: { type: Types.Date, index: true },
-	localPath: { type: String },
+	//localPath: { type: String },
+	localDir: { type: String },
 	ipnsHash: { type: String },
 	ipfsHash: { type: String },
 	image: {

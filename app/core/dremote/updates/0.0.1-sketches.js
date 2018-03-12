@@ -3,19 +3,19 @@ exports.create = {
             'title': 'RGB Fade',
             'state': 'published',
             //'author': 'user@keystonejs.com',
-            'localPath': '/data/sketches/view-static/sketch1',
+            'localDir': 'sketch1',
         },
         {
             'title': 'Intensity Pulse',
             'state': 'published',
             //'author': 'user@keystonejs.com',
-            'localPath': '/data/sketches/view-static/sketch2',
+            'localDir': 'sketch2',
         },
         {
             'title': 'Decentralised',
             'state': 'published',
             //'author': 'user@keystonejs.com',
-            'localPath': '/data/sketches/view-static/sketch3',
+            'localDir': 'sketch3',
             'ipnsHash': 'QmZXWHxvnAPdX1PEc7dZHTSoycksUE7guLAih8z3b43UmU'
         }
     ],

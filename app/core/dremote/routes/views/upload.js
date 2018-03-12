@@ -26,7 +26,8 @@ exports = module.exports = function (req, res) {
 
 
         // make folder
-        var uploadPath = "/data/sketches/view-static/" + application.id;
+        var saveDir = application.id;
+        var uploadPath = "/data/content/view-static/" + saveDir;
         try {
             fs.mkdirSync(uploadPath);
         } catch (fserr) {
@@ -42,8 +43,8 @@ exports = module.exports = function (req, res) {
         });
 
         var data = {
-            title: application.id,
-            localPath: uploadPath
+            title: saveDir,
+            localDir: saveDir
         };
 
         updater.process(data, {
