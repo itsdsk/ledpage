@@ -129,7 +129,10 @@
  					console.log(file.hash);
  					console.log(file.size);
  				});
- 				Sketch.updateItem(item, files[0].hash, {
+
+				var data = { ipfsHash: files[files.length-1].hash };
+				
+ 				Sketch.updateItem(item, data, {
  					fields: ["ipfsHash"]
  				}, function (dberror) {
  					if (dberror) console.log(dberror);
