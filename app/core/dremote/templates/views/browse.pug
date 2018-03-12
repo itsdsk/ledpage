@@ -10,28 +10,33 @@ mixin sketch(sketch)
 					img(src="http://placehold.it/720x720").img-responsive
 		.media-middle
 			a(href='/api/' + sketch.id + '/play').btn.btn-default Display
-			h2.media-heading
-				a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
-			p.lead.text-muted Posted 
-			if sketch.publishedDate
-				| on #{sketch._.publishedDate.format('MMMM Do, YYYY')} 
-			if sketch.categories && sketch.categories.length
-				| in 
-				each cat, i in sketch.categories
-					a(href='/browse/' + cat.key)= cat.name
-					if i < sketch.categories.length - 1
-						| , 
-					else
-						|  
-			if sketch.author
-				| by #{sketch.author.name.first}
+			if sketch.ipfsHash
+				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
+			else
+				a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
+			a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
+			//- h2.media-heading
+			//- 	a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
+			//- p.lead.text-muted Posted 
+			//- if sketch.publishedDate
+			//- 	| on #{sketch._.publishedDate.format('MMMM Do, YYYY')} 
+			//- if sketch.categories && sketch.categories.length
+			//- 	| in 
+			//- 	each cat, i in sketch.categories
+			//- 		a(href='/browse/' + cat.key)= cat.name
+			//- 		if i < sketch.categories.length - 1
+			//- 			| , 
+			//- 		else
+			//- 			|  
+			//- if sketch.author
+			//- 	| by #{sketch.author.name.first}
 		//p!= sketch.content.brief
 		//if sketch.content.extended
 		//	p.read-more: a(href='/browse/sketch/' + sketch.slug) Read more...
 
-block intro
-	.container
-		h1= data.category ? data.category.name : 'Select a Sketch'
+//- block intro
+//- 	.container
+//- 		h1= data.category ? data.category.name : 'Select a Sketch'
 
 block content
 	.container: .row
@@ -40,16 +45,16 @@ block content
 				h3.text-muted Invalid Category.
 			else
 				if data.sketches.results.length
-					if data.sketches.totalPages > 1
-						h4.text-weight-normal Showing 
-							strong #{data.sketches.first}
-							|  to 
-							strong #{data.sketches.last}
-							|  of 
-							strong #{data.sketches.total}
-							|  sketches.
-					else
-						h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
+					//- if data.sketches.totalPages > 1
+					//- 	h4.text-weight-normal Showing 
+					//- 		strong #{data.sketches.first}
+					//- 		|  to 
+					//- 		strong #{data.sketches.last}
+					//- 		|  of 
+					//- 		strong #{data.sketches.total}
+					//- 		|  sketches.
+					//- else
+					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
 					.browse
 						each sketch in data.sketches.results
 							+sketch(sketch)

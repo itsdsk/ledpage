@@ -8,8 +8,8 @@
  * modules in your project's /lib directory.
  */
 var _ = require('lodash');
-var ipfsAPI = require('ipfs-api');
-
+//var ipfsAPI = require('ipfs-api');
+console.log('routes middleware');
 /**
 	Initialises the standard view locals
 
@@ -25,9 +25,9 @@ exports.initLocals = function (req, res, next) {
 	];
 	res.locals.user = req.user;
 	// ipfs
-	res.locals.ipfs = ipfsAPI('localhost', '5001', {
-		protocol: 'http'
-	});
+	// res.locals.ipfs = ipfsAPI('localhost', '5001', {
+	// 	protocol: 'http'
+	// });
 	next();
 };
 

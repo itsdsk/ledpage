@@ -1,6 +1,6 @@
 var keystone = require('keystone');
 const ipc = require('node-ipc');
-
+console.log('routes views sketch');
 exports = module.exports = function (req, res) {
 
 	var view = new keystone.View(req, res);
