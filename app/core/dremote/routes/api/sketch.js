@@ -226,7 +226,7 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = 'file:////data/content/view-static/' + item.localPath + '/index.html';
+ 		var sketchPath = 'file:////data/content/view-static/' + item.localDir + '/index.html';
  		ipc.of.dplayeripc.emit('message', sketchPath);
 
 
