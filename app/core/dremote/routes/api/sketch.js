@@ -134,7 +134,7 @@
  					} else {
  						// save each file
  						var saveDir = req.params.ipfs;
- 						var sketchPath = '/data/content/view-static/' + saveDir;
+ 						var sketchPath = res.locals.staticPath + saveDir;
  						files.forEach((file) => {
  							if (file.content) {
 
@@ -226,7 +226,7 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = 'file:////data/content/view-static/' + item.localDir + '/index.html';
+ 		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
  		ipc.of.dplayeripc.emit('message', sketchPath);
 
 
@@ -250,7 +250,7 @@
 
  				//var okSketchPath = ["/data/sketches/view-static/sketch1"];
  				var sketchPath = [];
- 				sketchPath.push(path.join('/data/content/view-static/', item.localDir));
+ 				sketchPath.push(path.join(res.locals.staticPath, item.localDir));
 
  					ipfs.files.add(sketchPath, {
  						recursive: true

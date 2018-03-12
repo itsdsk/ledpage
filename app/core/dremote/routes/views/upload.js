@@ -27,7 +27,7 @@ exports = module.exports = function (req, res) {
 
         // make folder
         var saveDir = application.id;
-        var uploadPath = "/data/content/view-static/" + saveDir;
+        var uploadPath = locals.staticPath + saveDir;
         try {
             fs.mkdirSync(uploadPath);
         } catch (fserr) {
