@@ -47,6 +47,7 @@ exports = module.exports = function (app) {
 	// public API
 	app.all('/api*', keystone.middleware.api);
 	app.get('/api/list', keystone.middleware.api, routes.api.sketch.list);
+	app.get('/api/:ipfs/add', keystone.middleware.api, routes.api.sketch.add);
 	app.get('/api/:id', keystone.middleware.api, routes.api.sketch.get);
 	app.get('/api/:id/play', keystone.middleware.api, routes.api.sketch.play);
 	app.get('/api/:id/sync', keystone.middleware.api, routes.api.sketch.sync);

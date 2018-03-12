@@ -8,6 +8,11 @@
  });
  console.log('routes api sketch');
 
+ // fs
+ var fs = require('fs');
+ var path = require('path');
+
+
  // ipc connection
  const ipc = require('node-ipc');
  ipc.config.id = 'dremoteipc';
@@ -81,6 +86,134 @@
  }
 
  /**
+  * Add Sketch from IPFS
+  */
+ exports.add = function (req, res) {
+
+ 	if (req.params.ipfs) {
+ 		// // check if hash is already in database
+ 		// Sketch.model.findOne({
+ 		// 	ipfsHash: req.params.ipfs
+ 		// }).exec(function (err, result) {
+ 		// 	// IPFS hash is already in database
+ 		// 	if (result) {
+ 		// 		res.apiResponse({
+ 		// 			success: false
+ 		// 		});
+ 		// 	}
+ 		// });
+ 		// // try add IPFS hash
+ 		// res.apiResponse({
+ 		// 	success: true,
+ 		// 	ipfsHash: req.params.ipfs
+ 		// });
+
+ 		// try add IPFS hash
+ 		var ipfsURI = '/ipfs/' + req.params.ipfs; //'/ipfs/' + ipfsHash;
+ 		ipfs.files.get(ipfsURI, function (err, files) {
+ 			if (err) {
+ 				//console.log('not workng')
+ 				console.log(err)
+ 				res.apiResponse({
+ 					success: false,
+ 					error: err
+ 				});
+
+ 			} else {
+
+ 				// check existing database
+ 				Sketch.model.findOne({
+ 					ipfsHash: req.params.ipfs
+ 				}).exec(function (dberr, result) {
+ 					if (result) {
+ 						res.apiResponse({
+ 							success: false,
+ 							duplicates: result
+ 						});
+
+ 					} else {
+ 						// save each file
+ 						var sketchPath = '/data/sketches/view-static/' + req.params.ipfs;
+ 						files.forEach((file) => {
+ 							if (file.content) {
+
+ 								//console.log(file.path);
+ 								var fileName = file.path.slice(46); // trim ipfs hash
+ 								var fileDir = path.dirname(fileName);
+ 								//var filePath = sketchPath + fileDir; // full directory
+ 								fileDir
+ 									.split(path.sep)
+ 									.reduce((currentPath, folder) => {
+ 										currentPath += folder + path.sep;
+ 										if (!fs.existsSync(path.join(sketchPath, currentPath))) {
+ 											try {
+ 												fs.mkdirSync(path.join(sketchPath, currentPath));
+ 											} catch (fserr) {
+ 												if (fserr.code !== 'EEXIST') {
+ 													throw fserr;
+ 												}
+ 											}
+ 										}
+ 										return currentPath;
+ 									}, '');
+ 								var fileURI = sketchPath + fileName;
+ 								//console.log(fileURI);
+ 								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
+ 									if (fserr) {
+ 										console.log(fserr)
+ 										res.apiResponse({
+ 											success: false,
+ 											error: fserr
+ 										});
+ 									}
+ 									//else console.log('File saved')
+ 								});
+ 							}
+ 						});
+ 						// add to database
+ 						var application = new Sketch.model();
+ 						var updater = application.getUpdateHandler(req);
+ 						var data = {
+ 							title: application.id,
+ 							ipfsHash: req.params.ipfs,
+ 							localPath: sketchPath
+ 						};
+ 						updater.process(data, {
+ 							flashErrors: true
+ 						}, function (upderr) {
+ 							if (upderr) {
+ 								res.apiResponse({
+ 									success: false,
+ 									error: upderr
+ 								});
+ 							} else {
+ 								res.apiResponse({
+ 									success: true,
+ 									sketch: application
+ 								});
+
+ 							}
+ 						});
+
+
+ 					}
+ 				})
+
+ 			}
+ 		});
+
+ 	} else {
+ 		// no IPFS key added
+ 		res.apiResponse({
+ 			success: false,
+ 			error: "no ipfs key aded"
+ 		});
+
+ 	}
+ }
+
+
+ /**
   * Play Sketch by ID
   */
 
@@ -130,8 +263,10 @@
  					console.log(file.size);
  				});
 
-				var data = { ipfsHash: files[files.length-1].hash };
-				
+ 				var data = {
+ 					ipfsHash: files[files.length - 1].hash
+ 				};
+
  				Sketch.updateItem(item, data, {
  					fields: ["ipfsHash"]
  				}, function (dberror) {
