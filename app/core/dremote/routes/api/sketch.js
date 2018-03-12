@@ -130,10 +130,10 @@
  					console.log(file.size);
  				});
  				Sketch.updateItem(item, files[0].hash, {
- 					fields: "ipfsHash"
+ 					fields: ["ipfsHash"]
  				}, function (dberror) {
-					 if (dberror) console.log(dberror);
-					 
+ 					if (dberror) console.log(dberror);
+
  				});
 
  				res.apiResponse({
