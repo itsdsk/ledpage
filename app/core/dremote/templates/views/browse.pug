@@ -14,6 +14,7 @@ mixin sketch(sketch)
 				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
 			else
 				a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
+				a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
 			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
 			//- h2.media-heading
 			//- 	a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
