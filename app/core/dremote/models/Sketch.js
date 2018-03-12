@@ -33,7 +33,7 @@ Sketch.add({
 	categories: { type: Types.Relationship, ref: 'SketchCategory', many: true },
 
 
-	state: { type: Types.Select, options: 'draft, published, archived', default: 'draft', index: true },
+	state: { type: Types.Select, options: 'draft, published, archived', default: 'published', index: true },
 	//author: { type: Types.Relationship, ref: 'User', index: true },
 	publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
 	//image: { type: Types.CloudinaryImage },

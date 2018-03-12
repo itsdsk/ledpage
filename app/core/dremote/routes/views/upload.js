@@ -15,25 +15,47 @@ exports = module.exports = function (req, res) {
     locals.validationErrors = {};
     locals.sketchSubmitted = false;
 
-    view.on('post', { action: 'upload' }, function (next) {
+    view.on('post', {
+        action: 'upload'
+    }, function (next) {
 
         var application = new Sketch.model();
         console.log('made new sketch id:');
         console.log(application.id);
-    	var updater = application.getUpdateHandler(req);
+        var updater = application.getUpdateHandler(req);
 
-        var data = { title: application.id };
 
-    	updater.process(data, {
-    		flashErrors: true
-    	}, function (err) {
-    		if (err) {
-    			locals.validationErrors = err.errors;
-    		} else {
-    			locals.sketchSubmitted = true;
-    		}
-    		next();
-    	});
+        // make folder
+        var uploadPath = "/data/sketches/view-static/" + application.id;
+        try {
+            fs.mkdirSync(uploadPath);
+        } catch (fserr) {
+            if (fserr.code !== 'EEXIST') {
+                throw fserr;
+            }
+        }
+        // save file
+        var uploadName = uploadPath + "/index.html";
+        fs.writeFile(uploadName, req.body.sketch, 'utf8', (err) => {
+            if (err) console.log(err)
+            //else console.log('File saved')
+        });
+
+        var data = {
+            title: application.id,
+            localPath: uploadPath
+        };
+
+        updater.process(data, {
+            flashErrors: true
+        }, function (err) {
+            if (err) {
+                locals.validationErrors = err.errors;
+            } else {
+                locals.sketchSubmitted = true;
+            }
+            next();
+        });
 
     });
 
