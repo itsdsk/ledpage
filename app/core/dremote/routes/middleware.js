@@ -19,6 +19,7 @@ console.log('routes middleware');
 */
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
+		{ label: 'Upload', key: 'upload', href: '/upload' },
 		//{ label: 'Home', key: 'home', href: '/' },
 		//{ label: 'List', key: 'browse', href: '/browse' },
 		//{ label: 'Gallery', key: 'gallery', href: '/gallery' },

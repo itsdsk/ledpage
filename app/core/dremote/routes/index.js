@@ -41,6 +41,7 @@ exports = module.exports = function (app) {
 	//app.get('/', routes.views.index);
 	app.get('/browse/:category?', routes.views.browse);
 	app.get('/browse/sketch/:sketch', routes.views.sketch);
+	app.all('/upload', routes.views.upload);
 	//app.get('/gallery', routes.views.gallery);
 
 	// public API
