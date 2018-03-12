@@ -90,7 +90,7 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = 'file:///' + item.localPath + 'index.html';
+ 		var sketchPath = 'file:///' + item.localPath + '/index.html';
  		ipc.of.dplayeripc.emit('message', sketchPath);
 
 
@@ -112,7 +112,7 @@
  		if (err) return res.apiError('database error', err);
  		if (!item) return res.apiError('not found');
 
- 		var sketchPath = ["/data/sketches/view-static/sketch1"];//item.localPath;
+ 		var sketchPath = item.localPath;//["/data/sketches/view-static/sketch1"];
 
  		ipfs.files.add(sketchPath, {recursive: true}, function (ipfserr, files) {
  			if (ipfserr) {
