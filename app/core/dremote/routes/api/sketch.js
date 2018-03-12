@@ -30,7 +30,7 @@
  /**
   * List IPFS id
   */
- exports.sync = function (req, res) {
+ exports.ipfs = function (req, res) {
 
  	ipfs.id(function (err, identity) {
  		if (err) {
@@ -48,28 +48,28 @@
  }
 
  /**
- * Get Sketch by ID
- */
+  * Get Sketch by ID
+  */
 
-exports.get = function(req, res) {
-	Sketch.model.findById(req.params.id).exec(function(err, item) {
-		
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
-		
-		res.apiResponse({
-			sketch: item
-		});
-		
-	});
-}
+ exports.get = function (req, res) {
+ 	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+ 		if (err) return res.apiError('database error', err);
+ 		if (!item) return res.apiError('not found');
+
+ 		res.apiResponse({
+ 			sketch: item
+ 		});
+
+ 	});
+ }
 
 
  /**
   * List Sketches
   */
- exports.list = function(req, res) {
-	Sketch.model.find(function(err, items) {
+ exports.list = function (req, res) {
+ 	Sketch.model.find(function (err, items) {
 
  		if (err) return res.apiError('database error', err);
 
@@ -81,25 +81,58 @@ exports.get = function(req, res) {
  }
 
  /**
- * Play Sketch by ID
- */
+  * Play Sketch by ID
+  */
 
-exports.play = function(req, res) {
-	Sketch.model.findById(req.params.id).exec(function(err, item) {
-		
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
-		
-		var sketchPath = 'file:///' + item.localPath + 'index.html';
-		ipc.of.dplayeripc.emit('message', sketchPath);
+ exports.play = function (req, res) {
+ 	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+ 		if (err) return res.apiError('database error', err);
+ 		if (!item) return res.apiError('not found');
+
+ 		var sketchPath = 'file:///' + item.localPath + 'index.html';
+ 		ipc.of.dplayeripc.emit('message', sketchPath);
 
 
-		res.apiResponse({
-			success: true
-		});
-		
-	});
-}
+ 		res.apiResponse({
+ 			success: true
+ 		});
+
+ 	});
+ }
+
+
+ /**
+  * Sync Sketch to IPFS
+  */
+
+ exports.sync = function (req, res) {
+ 	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+ 		if (err) return res.apiError('database error', err);
+ 		if (!item) return res.apiError('not found');
+
+ 		var sketchPath = ["/data/sketches/view-static/sketch1"];//item.localPath;
+
+ 		ipfs.files.add(sketchPath, {recursive: true}, function (ipfserr, files) {
+ 			if (ipfserr) {
+ 				console.log(ipfserr)
+ 				return res.apiError('ipfs error', ipfserr);
+ 			} else {
+ 				console.log("Added:")
+ 				files.forEach((file) => {
+ 					console.log(file.path);
+ 					console.log(file.hash);
+ 					console.log(file.size);
+ 				});
+ 				res.apiResponse({
+ 					files: files
+ 				});
+
+ 			}
+ 		})
+ 	});
+ }
 
 
  // /**

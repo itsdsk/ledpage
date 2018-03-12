@@ -48,8 +48,9 @@ exports = module.exports = function (app) {
 	app.get('/api/list', keystone.middleware.api, routes.api.sketch.list);
 	app.get('/api/:id', keystone.middleware.api, routes.api.sketch.get);
 	app.get('/api/:id/play', keystone.middleware.api, routes.api.sketch.play);
+	app.get('/api/:id/sync', keystone.middleware.api, routes.api.sketch.sync);
 
-	app.get('/api/sync', keystone.middleware.api, routes.api.sketch.sync);
+	app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);
