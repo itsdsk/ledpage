@@ -50,13 +50,6 @@
  				ipfsInit();
  			}, 5000);
  		} else {
- 			console.log("Identity:");
- 			console.log(identity);
- 			// ipfs.pubsub.subscribe(topic, channelMsg, (err) => {
- 			// 	console.log('Could not subscribe..');
- 			// 	console.log(err);
- 			// });
-
  			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
  				if (err || !channels.length) {
@@ -64,12 +57,14 @@
  				}
 
  				channels.forEach((channel) => {
- 					console.log('adding channel:')
+ 					//console.log('adding channel:')
  					var topic = channel.name;
- 					console.log(topic);
+ 					//console.log(topic);
  					ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
- 						console.log('Could not subscribe..')
- 						console.log(suberr);
+ 						if (suberr) {
+ 							console.log('Could not subscribe..')
+ 							console.log(suberr);
+ 						}
  					})
  				})
  			})
@@ -79,8 +74,8 @@
  					console.log(err);
  					throw err;
  				}
- 				console.log("Subscribed topics:");
- 				console.log(topics);
+ 				//console.log("Subscribed topics:");
+ 				//console.log(topics);
  			});
 
  		}
@@ -91,6 +86,7 @@
 
  // Periodically show peers
  setInterval(function () {
+ 	console.log('syncing with ipfs');
  	// share sketches on ipfs
  	ipfs.id(function (err, identity) {
  		if (err) {
@@ -103,20 +99,27 @@
  				if (err || !channels.length) {
  					console.log('error finding sketch categories to sync with ipfs')
  				}
-
+ 				// loop through channels
  				channels.forEach((channel) => {
  					console.log('adding channel:')
  					var ipfsTopic = channel.name;
  					console.log(ipfsTopic);
-
- 					Sketch.model.find().where('channels').in([channel.id]).populate('ipfsHash').exec(function (err, sketchesToShare) {
+ 					// loop through sketches
+ 					keystone.list('Sketch').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
+ 						if (err) console.log(err);
  						sketchesToShare.forEach((sketchToShare) => {
  							if (sketchToShare.ipfsHash) {
  								console.log('trying to share');
  								console.log(sketchToShare.ipfsHash);
  								console.log('in topic');
- 								console.log(channel);
- 								ipfs.pubsub.publish(channel, new Buffer(sketchToShare.ipfsHash), () => {});
+ 								console.log(channel.name);
+ 								ipfs.pubsub.publish(channel.name, new Buffer(sketchToShare.ipfsHash), (err) => {
+ 									if (err) {
+ 										console.log('error trying to publish sketch');
+ 										console.log(err);
+ 										throw err;
+ 									}
+ 								});
  							}
  						})
  					});
