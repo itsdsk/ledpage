@@ -9,26 +9,26 @@
  	protocol: 'http'
  });
  const channelMsg = (msg) => {
- 	console.log(msg)
- 	data = msg.data.toString('utf8')
- 	console.log("Received data: '" + data + "'")
- }
- var topic = 'resin-ipfs'
+ 	console.log(msg);
+ 	data = msg.data.toString('utf8');
+ 	console.log("Received data: '" + data + "'");
+ };
+ var topic = 'resin-ipfs';
 
  var ipfsInit = () => {
  	ipfs.id(function (err, identity) {
  		if (err) {
- 			console.log(err)
+ 			console.log(err);
  			setTimeout(function () {
  				ipfsInit();
- 			}, 5000)
+ 			}, 5000);
  		} else {
- 			console.log("Identity:")
- 			console.log(identity)
+ 			console.log("Identity:");
+ 			console.log(identity);
  			ipfs.pubsub.subscribe(topic, channelMsg, (err) => {
- 				console.log('Could not subscribe..')
+ 				console.log('Could not subscribe..');
  				console.log(err);
- 			})
+ 			});
 
  			// keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
@@ -49,16 +49,16 @@
  			ipfs.pubsub.ls((err, topics) => {
  				if (err) {
  					console.log('ipfs pubsub ls err:');
- 					console.log(err)
- 					throw err
+ 					console.log(err);
+ 					throw err;
  				}
- 				console.log("Subscribed topics:")
- 				console.log(topics)
- 			})
+ 				console.log("Subscribed topics:");
+ 				console.log(topics);
+ 			});
 
  		}
- 	})
- }
+ 	});
+ };
 
  ipfsInit()
 
@@ -66,20 +66,20 @@
  setInterval(function () {
  	ipfs.pubsub.peers(topic, (err, peerIds) => {
  		if (err) {
- 			throw err
+ 			throw err;
  		}
- 		console.log("Peers:")
- 		console.log(peerIds)
- 	})
+ 		console.log("Peers:");
+ 		console.log(peerIds);
+ 	});
  	ipfs.pubsub.ls((err, topics) => {
  		if (err) {
  			console.log('ipfs pubsub ls err:');
- 			console.log(err)
- 			throw err
+ 			console.log(err);
+ 			throw err;
  		}
- 		console.log("Subscribed topics:")
- 		console.log(topics)
- 	})
+ 		console.log("Subscribed topics:");
+ 		console.log(topics);
+ 	});
 
  	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
  }, 30000);
@@ -101,7 +101,7 @@
  			function () {
  				console.log("IPC connected");
  			}
- 		)
+ 		);
  	});
 
 
@@ -118,15 +118,15 @@
  			console.log(err)
  			return res.apiError('ipfs error', err);
  		} else {
- 			console.log("Identity:")
- 			console.log(identity)
+ 			console.log("Identity:");
+ 			console.log(identity);
  			res.apiResponse({
  				id: identity
  			});
 
  		}
- 	})
- }
+ 	});
+ };
 
  /**
   * Get Sketch by ID
@@ -143,7 +143,7 @@
  		});
 
  	});
- }
+ };
 
 
  /**
@@ -159,7 +159,7 @@
  		});
 
  	});
- }
+ };
 
  /**
   * Add Sketch from IPFS
@@ -237,7 +237,7 @@
  								//console.log(fileURI);
  								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
  									if (fserr) {
- 										console.log(fserr)
+ 										console.log(fserr);
  										res.apiResponse({
  											success: false,
  											note: 'Error saving file...',
@@ -276,7 +276,7 @@
 
 
  					}
- 				})
+ 				});
 
  			}
  		});
@@ -289,7 +289,7 @@
  		});
 
  	}
- }
+ };
 
 
  /**
@@ -311,7 +311,7 @@
  		});
 
  	});
- }
+ };
 
 
  /**
@@ -332,10 +332,10 @@
  			recursive: true
  		}, function (ipfserr, files) {
  			if (ipfserr) {
- 				console.log(ipfserr)
+ 				console.log(ipfserr);
  				return res.apiError('ipfs error', ipfserr);
  			} else {
- 				console.log("Added:")
+ 				console.log("Added:");
  				files.forEach((file) => {
  					console.log(file.path);
  					console.log(file.hash);
