@@ -78,7 +78,7 @@ ENV ARDUINODIR /usr/share/arduino
 ENV BOARD uno
 
 # nginx setup
-EXPOSE 80 443
+EXPOSE 80 443 4001
 
 # copy config files
 COPY /etc/supervisor/conf.d /etc/supervisor/conf.d/

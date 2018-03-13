@@ -9,6 +9,7 @@
  	protocol: 'http'
  });
  const channelMsg = (msg) => {
+	console.log('Channel msg received...');
  	console.log(msg);
  	data = msg.data.toString('utf8');
  	console.log("Received data: '" + data + "'");
@@ -64,25 +65,26 @@
 
  // Periodically show peers
  setInterval(function () {
- 	ipfs.pubsub.peers(topic, (err, peerIds) => {
- 		if (err) {
- 			throw err;
- 		}
- 		console.log("Peers:");
- 		console.log(peerIds);
- 	});
- 	ipfs.pubsub.ls((err, topics) => {
- 		if (err) {
- 			console.log('ipfs pubsub ls err:');
- 			console.log(err);
- 			throw err;
- 		}
- 		console.log("Subscribed topics:");
- 		console.log(topics);
- 	});
+	ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
+ 	// ipfs.pubsub.peers(topic, (err, peerIds) => {
+ 	// 	if (err) {
+ 	// 		throw err;
+ 	// 	}
+ 	// 	console.log("Peers:");
+ 	// 	console.log(peerIds);
+ 	// });
+ 	// ipfs.pubsub.ls((err, topics) => {
+ 	// 	if (err) {
+ 	// 		console.log('ipfs pubsub ls err:');
+ 	// 		console.log(err);
+ 	// 		throw err;
+ 	// 	}
+ 	// 	console.log("Subscribed topics:");
+ 	// 	console.log(topics);
+ 	// });
 
  	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
- }, 30000);
+ }, 10000);
 
  // fs
  var fs = require('fs');
