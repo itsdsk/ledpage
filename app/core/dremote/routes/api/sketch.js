@@ -1,7 +1,8 @@
  //var async = require('async'),
  var keystone = require('keystone');
 
-
+// http
+var http = require('http');
 
  // ipfs connection
  var ipfsAPI = require('ipfs-api');
@@ -12,9 +13,28 @@
 	console.log('Channel msg received...');
  	console.log(msg);
  	data = msg.data.toString('utf8');
- 	console.log("Received data: '" + data + "'");
+	 console.log("Received data: '" + data + "'");
+	 // get api route
+	 var addPath = '/api/' + data + '/add';
+	 // call add api
+	 http.get({
+        host: 'localhost',
+        path: addPath
+    }, function(response) {
+        // Continuously update stream with data
+        var body = '';
+        response.on('data', function(d) {
+            body += d;
+        });
+        response.on('end', function() {
+
+            // Data reception is done, do whatever with it!
+            var parsed = JSON.parse(body);
+			console.log('added');
+			console.log(parsed);
+        });
+    });
  };
- var topic = 'resin-ipfs';
 
  var ipfsInit = () => {
  	ipfs.id(function (err, identity) {
@@ -26,27 +46,27 @@
  		} else {
  			console.log("Identity:");
  			console.log(identity);
- 			ipfs.pubsub.subscribe(topic, channelMsg, (err) => {
- 				console.log('Could not subscribe..');
- 				console.log(err);
- 			});
+ 			// ipfs.pubsub.subscribe(topic, channelMsg, (err) => {
+ 			// 	console.log('Could not subscribe..');
+ 			// 	console.log(err);
+ 			// });
 
- 			// keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+ 			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
- 			// 	if (err || !channels.length) {
- 			// 		console.log('error: no channels')
- 			// 	}
+ 				if (err || !channels.length) {
+ 					console.log('error: no channels')
+ 				}
 
- 			// 	channels.forEach((channel) => {
- 			// 		console.log('adding channel:')
- 			// 		console.log(channel.name);
- 			// 		var topic = 'resin-ipfs'
- 			// 		ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
- 			// 			console.log('Could not subscribe..')
- 			// 			console.log(suberr);
- 			// 		})
- 			// 	})
- 			// })
+ 				channels.forEach((channel) => {
+					 console.log('adding channel:')
+					 var topic = channel.name;
+ 					console.log(topic);
+ 					ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
+ 						console.log('Could not subscribe..')
+ 						console.log(suberr);
+ 					})
+ 				})
+ 			})
  			ipfs.pubsub.ls((err, topics) => {
  				if (err) {
  					console.log('ipfs pubsub ls err:');
@@ -65,26 +85,28 @@
 
  // Periodically show peers
  setInterval(function () {
-	ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
- 	// ipfs.pubsub.peers(topic, (err, peerIds) => {
- 	// 	if (err) {
- 	// 		throw err;
- 	// 	}
- 	// 	console.log("Peers:");
- 	// 	console.log(peerIds);
- 	// });
- 	// ipfs.pubsub.ls((err, topics) => {
- 	// 	if (err) {
- 	// 		console.log('ipfs pubsub ls err:');
- 	// 		console.log(err);
- 	// 		throw err;
- 	// 	}
- 	// 	console.log("Subscribed topics:");
- 	// 	console.log(topics);
- 	// });
+ 	ipfs.pubsub.ls((err, topics) => {
+ 		if (err) {
+ 			console.log('ipfs pubsub ls err:');
+ 			console.log(err);
+ 			throw err;
+ 		}
+ 		console.log("Subscribed topics:");
+		 console.log(topics);
+		 topics.forEach((topic) => {
+			ipfs.pubsub.peers(topic, (err, peerIds) => {
+				if (err) {
+					throw err;
+				}
+				console.log("Peers:");
+				console.log(peerIds);
+			});
+	   
+		 })
+ 	});
 
  	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
- }, 10000);
+ }, 90000);
 
  // fs
  var fs = require('fs');
