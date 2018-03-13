@@ -35,13 +35,13 @@ mixin sketch(sketch)
 		//if sketch.content.extended
 		//	p.read-more: a(href='/browse/sketch/' + sketch.slug) Read more...
 
-block intro
-	.container
-		h1= data.channel ? data.channel.name : 'Select a Sketch'
+//- block intro
+//- 	.container
+//- 		h1= data.channel ? data.channel.name : 'Select a Sketch'
 
 block content
 	.container: .row 
-		.col-sm-8.col-md-9 
+		.col-sm-8.col-md-7 
 			if filters.channel && !data.channel 
 				h3.text-muted Invalid channel. 
 			else
@@ -78,14 +78,13 @@ block content
 						h3.text-muted There are no sketches in the channel #{data.channel.name}.
 					else
 						h3.text-muted There are no sketches yet.
-		
-	if data.channels.length
-		.col-sm-4.col-md-3
-			h2 Channels
-			.list-group(style='margin-top: 70px;')
-				a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
-				each channel in data.channels
-					a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+		if data.channels.length
+			.col-sm-4.col-md-5
+				h2 Channels
+				.list-group(style='margin-top: 70px;')
+					a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
+					each channel in data.channels
+						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
 block js
 	script.
 		jQuery(function($) {
