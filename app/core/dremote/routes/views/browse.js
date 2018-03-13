@@ -9,29 +9,29 @@ exports = module.exports = function (req, res) {
 	// Init locals
 	locals.section = 'browse';
 	locals.filters = {
-		category: req.params.category,
+		channel: req.params.channel,
 	};
 	locals.data = {
 		sketches: [],
-		categories: [],
+		channels: [],
 	};
 
-	// Load all categories
+	// Load all channels
 	view.on('init', function (next) {
 
-		keystone.list('SketchCategory').model.find().sort('name').exec(function (err, results) {
+		keystone.list('SketchChannel').model.find().sort('name').exec(function (err, results) {
 
 			if (err || !results.length) {
 				return next(err);
 			}
 
-			locals.data.categories = results;
+			locals.data.channels = results;
 
-			// Load the counts for each category
-			async.each(locals.data.categories, function (category, next) {
+			// Load the counts for each channel
+			async.each(locals.data.channels, function (channel, next) {
 
-				keystone.list('Sketch').model.count().where('categories').in([category.id]).exec(function (err, count) {
-					category.sketchCount = count;
+				keystone.list('Sketch').model.count().where('channels').in([channel.id]).exec(function (err, count) {
+					channel.sketchCount = count;
 					next(err);
 				});
 
@@ -41,14 +41,14 @@ exports = module.exports = function (req, res) {
 		});
 	});
 
-	// Load the current category filter
+	// Load the current channel filter
 	view.on('init', function (next) {
 
-		if (req.params.category) {
-			keystone.list('SketchCategory').model.findOne({
-				key: locals.filters.category
+		if (req.params.channel) {
+			keystone.list('SketchChannel').model.findOne({
+				key: locals.filters.channel
 			}).exec(function (err, result) {
-				locals.data.category = result;
+				locals.data.channel = result;
 				next(err);
 			});
 		} else {
@@ -68,10 +68,10 @@ exports = module.exports = function (req, res) {
 				},
 			})
 			.sort('-publishedDate')
-			.populate('author categories');
+			.populate('author channels');
 
-		if (locals.data.category) {
-			q.where('categories').in([locals.data.category]);
+		if (locals.data.channel) {
+			q.where('channels').in([locals.data.channel]);
 		}
 
 		q.exec(function (err, results) {

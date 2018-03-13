@@ -21,11 +21,11 @@ mixin sketch(sketch)
 			//- p.lead.text-muted Posted 
 			//- if sketch.publishedDate
 			//- 	| on #{sketch._.publishedDate.format('MMMM Do, YYYY')} 
-			//- if sketch.categories && sketch.categories.length
+			//- if sketch.channels && sketch.channels.length
 			//- 	| in 
-			//- 	each cat, i in sketch.categories
-			//- 		a(href='/browse/' + cat.key)= cat.name
-			//- 		if i < sketch.categories.length - 1
+			//- 	each channel, i in sketch.channels
+			//- 		a(href='/browse/' + channel.key)= channel.name
+			//- 		if i < sketch.channels.length - 1
 			//- 			| , 
 			//- 		else
 			//- 			|  
@@ -35,15 +35,15 @@ mixin sketch(sketch)
 		//if sketch.content.extended
 		//	p.read-more: a(href='/browse/sketch/' + sketch.slug) Read more...
 
-//- block intro
-//- 	.container
-//- 		h1= data.category ? data.category.name : 'Select a Sketch'
+block intro
+	.container
+		h1= data.channel ? data.channel.name : 'Select a Sketch'
 
 block content
-	.container: .row
-		.col-sm-8.col-md-9
-			if filters.category && !data.category
-				h3.text-muted Invalid Category.
+	.container: .row 
+		.col-sm-8.col-md-9 
+			if filters.channel && !data.channel 
+				h3.text-muted Invalid channel. 
 			else
 				if data.sketches.results.length
 					//- if data.sketches.totalPages > 1
@@ -59,7 +59,7 @@ block content
 					.browse
 						each sketch in data.sketches.results
 							+sketch(sketch)
-					
+				
 					if data.sketches.totalPages > 1
 						ul.pagination
 							if data.sketches.previous
@@ -74,18 +74,18 @@ block content
 							else
 								li.disabled: a(href='?page=' + data.sketches.totalPages): span.entypo.glyphicon.glyphicon-chevron-right
 				else
-					if data.category
-						h3.text-muted There are no sketches in the category #{data.category.name}.
+					if data.channel
+						h3.text-muted There are no sketches in the channel #{data.channel.name}.
 					else
 						h3.text-muted There are no sketches yet.
 		
-		if data.categories.length
-			.col-sm-4.col-md-3
-				h2 Categories
-				.list-group(style='margin-top: 70px;')
-					a(href='/browse', class=!data.category ? 'active' : false).list-group-item All Categories
-					each cat in data.categories
-						a(href='/browse/' + cat.key, class=data.category && data.category.id == cat.id ? 'active' : false).list-group-item= cat.name
+	if data.channels.length
+		.col-sm-4.col-md-3
+			h2 Channels
+			.list-group(style='margin-top: 70px;')
+				a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
+				each channel in data.channels
+					a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
 block js
 	script.
 		jQuery(function($) {

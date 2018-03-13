@@ -21,7 +21,7 @@ exports = module.exports = function (req, res) {
 		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
-		}).populate('author categories');
+		}).populate('author channels');
 
 		q.exec(function (err, result) {
 			locals.data.sketch = result;

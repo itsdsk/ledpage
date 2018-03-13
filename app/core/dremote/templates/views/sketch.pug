@@ -15,11 +15,11 @@ block content
 					h5 Posted 
 						if data.sketch.publishedDate
 							| on #{data.sketch._.publishedDate.format('MMMM Do, YYYY')} 
-						if data.sketch.categories && data.sketch.categories.length
+						if data.sketch.channels && data.sketch.channels.length
 							| in 
-							each cat, cat_i in data.sketch.categories
-								a(href='/browse/' + cat.key)= cat.name
-								if cat_i < data.sketch.categories.length - 1
+							each channel, channel_i in data.sketch.channels
+								a(href='/browse/' + channel.key)= channel.name
+								if channel_i < data.sketch.channels.length - 1
 									| , 
 								else
 									|  
