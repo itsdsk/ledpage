@@ -1,6 +1,9 @@
+var keystone = require('keystone');
+
 exports.create = {
     SketchChannel: [{
-        'name': 'sketches'
+        'name': 'sketches',
+        __ref: 'sketches'
     }],
     Sketch: [{
             'title': 'RGB Fade',
