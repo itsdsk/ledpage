@@ -1,12 +1,88 @@
- var async = require('async'),
- 	keystone = require('keystone');
+ //var async = require('async'),
+ var keystone = require('keystone');
+
+
 
  // ipfs connection
  var ipfsAPI = require('ipfs-api');
  var ipfs = ipfsAPI('localhost', '5001', {
  	protocol: 'http'
  });
- console.log('routes api sketch');
+ const channelMsg = (msg) => {
+ 	console.log(msg)
+ 	data = msg.data.toString('utf8')
+ 	console.log("Received data: '" + data + "'")
+ }
+ var topic = 'resin-ipfs'
+
+ var ipfsInit = () => {
+ 	ipfs.id(function (err, identity) {
+ 		if (err) {
+ 			console.log(err)
+ 			setTimeout(function () {
+ 				ipfsInit();
+ 			}, 5000)
+ 		} else {
+ 			console.log("Identity:")
+ 			console.log(identity)
+ 			ipfs.pubsub.subscribe(topic, channelMsg, (err) => {
+ 				console.log('Could not subscribe..')
+ 				console.log(err);
+ 			})
+
+ 			// keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+
+ 			// 	if (err || !channels.length) {
+ 			// 		console.log('error: no channels')
+ 			// 	}
+
+ 			// 	channels.forEach((channel) => {
+ 			// 		console.log('adding channel:')
+ 			// 		console.log(channel.name);
+ 			// 		var topic = 'resin-ipfs'
+ 			// 		ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
+ 			// 			console.log('Could not subscribe..')
+ 			// 			console.log(suberr);
+ 			// 		})
+ 			// 	})
+ 			// })
+ 			ipfs.pubsub.ls((err, topics) => {
+ 				if (err) {
+ 					console.log('ipfs pubsub ls err:');
+ 					console.log(err)
+ 					throw err
+ 				}
+ 				console.log("Subscribed topics:")
+ 				console.log(topics)
+ 			})
+
+ 		}
+ 	})
+ }
+
+ ipfsInit()
+
+ // Periodically show peers
+ setInterval(function () {
+ 	ipfs.pubsub.peers(topic, (err, peerIds) => {
+ 		if (err) {
+ 			throw err
+ 		}
+ 		console.log("Peers:")
+ 		console.log(peerIds)
+ 	})
+ 	ipfs.pubsub.ls((err, topics) => {
+ 		if (err) {
+ 			console.log('ipfs pubsub ls err:');
+ 			console.log(err)
+ 			throw err
+ 		}
+ 		console.log("Subscribed topics:")
+ 		console.log(topics)
+ 	})
+
+ 	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
+ }, 30000);
 
  // fs
  var fs = require('fs');
@@ -243,45 +319,45 @@
   */
 
  exports.sync = function (req, res) {
- 		Sketch.model.findById(req.params.id).exec(function (err, item) {
+ 	Sketch.model.findById(req.params.id).exec(function (err, item) {
 
- 				if (err) return res.apiError('database error', err);
- 				if (!item) return res.apiError('not found');
+ 		if (err) return res.apiError('database error', err);
+ 		if (!item) return res.apiError('not found');
 
- 				//var okSketchPath = ["/data/sketches/view-static/sketch1"];
- 				var sketchPath = [];
- 				sketchPath.push(path.join(res.locals.staticPath, item.localDir));
+ 		//var okSketchPath = ["/data/sketches/view-static/sketch1"];
+ 		var sketchPath = [];
+ 		sketchPath.push(path.join(res.locals.staticPath, item.localDir));
 
- 					ipfs.files.add(sketchPath, {
- 						recursive: true
- 					}, function (ipfserr, files) {
- 						if (ipfserr) {
- 							console.log(ipfserr)
- 							return res.apiError('ipfs error', ipfserr);
- 						} else {
- 							console.log("Added:")
- 							files.forEach((file) => {
- 								console.log(file.path);
- 								console.log(file.hash);
- 								console.log(file.size);
- 							});
-
- 							var data = {
- 								ipfsHash: files[files.length - 1].hash
- 							};
-
- 							Sketch.updateItem(item, data, {
- 								fields: ["ipfsHash"]
- 							}, function (dberror) {
- 								if (dberror) console.log(dberror);
-
- 							});
-
- 							res.apiResponse({
- 								files: files
- 							});
-
- 						}
- 					})
+ 		ipfs.files.add(sketchPath, {
+ 			recursive: true
+ 		}, function (ipfserr, files) {
+ 			if (ipfserr) {
+ 				console.log(ipfserr)
+ 				return res.apiError('ipfs error', ipfserr);
+ 			} else {
+ 				console.log("Added:")
+ 				files.forEach((file) => {
+ 					console.log(file.path);
+ 					console.log(file.hash);
+ 					console.log(file.size);
  				});
- 		}
+
+ 				var data = {
+ 					ipfsHash: files[files.length - 1].hash
+ 				};
+
+ 				Sketch.updateItem(item, data, {
+ 					fields: ["ipfsHash"]
+ 				}, function (dberror) {
+ 					if (dberror) console.log(dberror);
+
+ 				});
+
+ 				res.apiResponse({
+ 					files: files
+ 				});
+
+ 			}
+ 		})
+ 	});
+ }
