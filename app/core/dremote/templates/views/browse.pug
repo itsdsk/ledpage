@@ -1,20 +1,31 @@
 extends ../layouts/default
 
 mixin sketch(sketch)
-	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
-		.media-heading
+	//- .sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
+	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).panel.panel-default
+		//- h4.media-heading
+		.panel-heading
+			h3.panel-title= sketch.title
+			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
+		//- .media-middle
+		.panel-body
 			a(href='/browse/sketch/' + sketch.slug + '?display=on')
 				if sketch.image.exists
-					img(src=sketch._.image.fit(720,720)).img-responsive
+					img(src=sketch._.image.fit(750,750)).img-responsive
 				else
-					img(src="http://placehold.it/720x720").img-responsive
-		.media-middle
-			a(href='/api/' + sketch.id + '/play').btn.btn-default Display
+					img(src="http://placehold.it/750x750").img-responsive
+		//- .media-bottom
+		.list-group
+			//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
+			a(href='/api/' + sketch.id + '/play').list-group-item Display
 			if sketch.ipfsHash
-				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
+				//- a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
+				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).list-group-item Preview IPFS
 			else
-				a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
-				a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
+				//- a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
+				a(href='/api/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
+				//- a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
+				a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
 			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
 			//- h2.media-heading
 			//- 	a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
@@ -41,7 +52,7 @@ mixin sketch(sketch)
 
 block content
 	.container: .row 
-		.col-sm-8.col-md-7 
+		.col-sm-8.col-md-8
 			if filters.channel && !data.channel 
 				h3.text-muted Invalid channel. 
 			else
@@ -79,9 +90,9 @@ block content
 					else
 						h3.text-muted There are no sketches yet.
 		if data.channels.length
-			.col-sm-4.col-md-5
-				h2 Channels
-				.list-group(style='margin-top: 70px;')
+			.col-sm-4.col-md-4
+				h4 Sharing Channels
+				.list-group
 					a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
 					each channel in data.channels
 						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
