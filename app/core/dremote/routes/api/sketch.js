@@ -173,35 +173,70 @@ ipc.connectTo(
 	});
 
 const hyperion = new(require('hyperion-js-api'))("localhost", 19444);
+const net = require('net');
 /**
  * Set hyperion brightness
  */
 exports.setBrightness = function (req, res) {
-	hyperion.getOn((error, response) => {
-		if (error) {
-			console.log('error setting hyperion brightness - no connection?');
-			console.log(error);
-			return res.apiResponse({
-				error: error
-			})
-		}
-		var val = parseInt(req.params.val, 10);
 
-		const col = hyperion.color.rgb(val, val, val);
-		hyperion.setBrightness(col.value(), (error, response) => {
-			if (error) {
-				console.log('error setting hyperion brightness - no connection?');
-				console.log(error);
-				return res.apiResponse({
-					error: error
-				})
-			}
-			res.apiResponse({
-				success: true,
-				response: response
-			})
+	var val = parseFloat(req.params.val);
+
+	var jsonCommand = {
+		command: "transform",
+		transform: {
+			luminanceGain: val
+		}
+	};
+
+	var client = new net.Socket();
+	client.setTimeout(1500);
+	client.connect(19444, 'localhost', function () {
+		console.log('Connected');
+		const string = JSON.stringify(jsonCommand) + "\n";
+		client.write(string);
+	});
+
+	client.on('error', (error) => {
+		console.log('error setting brightness');
+		console.log(error);
+		return res.apiResponse({
+			error: error
 		})
 	})
+
+	client.on('data', function (data) {
+		console.log('Received: ' + data);
+		client.destroy(); // kill client after server's response
+		res.apiResponse({
+			success: true,
+			response: data
+		})
+	});
+
+	// hyperion.getOn((error, response) => {
+	// 	if (error) {
+	// 		console.log('error setting hyperion brightness - no connection?');
+	// 		console.log(error);
+	// 		return res.apiResponse({
+	// 			error: error
+	// 		})
+	// 	}
+
+	// 	const col = hyperion.color.rgb(val, val, val);
+	// 	hyperion.setBrightness(col.value(), (error, response) => {
+	// 		if (error) {
+	// 			console.log('error setting hyperion brightness - no connection?');
+	// 			console.log(error);
+	// 			return res.apiResponse({
+	// 				error: error
+	// 			})
+	// 		}
+	// 		res.apiResponse({
+	// 			success: true,
+	// 			response: response
+	// 		})
+	// 	})
+	// })
 };
 /**
  * Get hyperion brightness

@@ -1,12 +1,11 @@
 const net = require('net');
 
 var colorCommand = {
-  command: "color",
-  priority: 100,
-  duration: 360,
-  color: [255, 0, 0]
+	command: "transform",
+	transform: {
+		luminanceGain: 0.5
+	}
 };
-
 
 const string = JSON.stringify(colorCommand) + "\n";
 
