@@ -1,0 +1,7 @@
+{
+	"ledcount": 32,
+	"chipset": "WS2812B",
+	"order": "RGB",
+	"platform": "arduino-uno",
+	"datapin": "5"
+}
