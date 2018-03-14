@@ -42,6 +42,7 @@ exports = module.exports = function (app) {
 	app.get('/browse/:channel?', routes.views.browse);
 	app.get('/browse/sketch/:sketch', routes.views.sketch);
 	app.all('/upload', routes.views.upload);
+	app.all('/setup', routes.views.setup);
 
 	// public API
 	app.all('/api*', keystone.middleware.api);
