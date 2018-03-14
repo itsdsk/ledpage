@@ -172,7 +172,16 @@ block js
 				.attr('cy', function(d) { return scaleY(d.y); })
 				.attr('r', function(d) { return 0.9*padding; })
 				.attr('fill', '#337ab7');
-				//- .attr('cx', function(d) { return 50*d.x; })
-				//- .attr('cy', function(d) { return 50*d.y; })
+
+			var line = d3.line()
+				.curve(d3.curveLinear)
+				.x(function(d) { return scaleX(d.x); })
+				.y(function(d) { return scaleY(d.y); });
+
+			var path = svgContainer.append('path')
+				.attr('fill', 'none')
+				.attr('stroke', 'steelblue')
+				.attr('stroke-width', 0.5*padding)
+				.attr('d', line(data.leds));
 
 		})
