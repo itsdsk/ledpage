@@ -52,7 +52,7 @@ exports = module.exports = function (req, res) {
 
         // construct arduino file
         fs.writeFile("./libs/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
-            if(err) {
+            if (err) {
                 console.log('error starting arduino file');
                 console.log(err);
                 return next();
@@ -62,40 +62,41 @@ exports = module.exports = function (req, res) {
             var define3 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
             var define4 = '#define LED_TYPE ' + req.body.ledChip + '\n';
             var defines = define1.concat(define2, define3, define4);
-            fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function(err) {
-                if(err) {
+            fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function (err) {
+                if (err) {
                     console.log('error adding defines to arduino file');
                     console.log(err);
                     return next();
                 }
                 fs.readFile("./libs/arduino_segments/template.txt", (err, contents) => {
-                    if(err) {
+                    if (err) {
                         console.log('error reading template arduino file');
                         console.log(err);
-                        return next();    
+                        return next();
                     }
-                    fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function(err) {
-                        if(err) {
+                    fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function (err) {
+                        if (err) {
                             console.log('error adding arduino template to file');
                             console.log(err);
-                            return next();        
+                            return next();
                         }
                         console.log('finished creating arduino file!');
+                        // compile and upload new arduino file
+                        const exec = require('child_process').exec;
+                        console.log('starting arduino compile & upload');
+                        var syncArduino = exec('./libs/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
+                            console.log(`${stdout}`);
+                            console.log(`${stderr}`);
+                            if (err !== null) {
+                                console.log(`exec error: ${error}`);
+                            } // ref: https://stackoverflow.com/a/44667294
+                        });
+
                     })
                 })
             });
         });
 
-        // compile and upload new arduino file
-        const exec = require('child_process').exec;
-        console.log('starting arduino compile & upload');
-        var syncArduino = exec('./libs/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
-            console.log(`${stdout}`);
-            console.log(`${stderr}`);
-            if(err !== null) {
-                console.log(`exec error: ${error}`);
-            } // ref: https://stackoverflow.com/a/44667294
-        });
 
         // var config = {
         //     "ledcount": parseInt(req.body.numLeds, 10),
