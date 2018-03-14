@@ -153,13 +153,14 @@ setInterval(function () {
 	// });
 
 	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
-}, 30000);
+}, 900000); // 15 min timer
 
 
 // ipc connection
 const ipc = require('node-ipc');
 ipc.config.id = 'dremoteipc';
-ipc.config.retry = 1500;
+ipc.config.retry = 5000;
+ipc.config.maxRetries = 3;
 ipc.connectTo(
 	'dplayeripc',
 	function () {
