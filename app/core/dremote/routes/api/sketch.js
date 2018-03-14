@@ -172,7 +172,66 @@ ipc.connectTo(
 		);
 	});
 
+const hyperion = new(require('hyperion-js-api'))("localhost", 19444);
+/**
+ * Set hyperion brightness
+ */
+exports.setBrightness = function (req, res) {
+	hyperion.getOn((error, response) => {
+		if (error) {
+			console.log('error setting hyperion brightness - no connection?');
+			console.log(error);
+			return res.apiResponse({
+				error: error
+			})
+		}
+		var val = parseInt(req.params.val, 10);
 
+		const col = hyperion.color.rgb(val, val, val);
+		hyperion.setBrightness(col.value(), (error, response) => {
+			if (error) {
+				console.log('error setting hyperion brightness - no connection?');
+				console.log(error);
+				return res.apiResponse({
+					error: error
+				})
+			}
+			res.apiResponse({
+				success: true,
+				response: response
+			})
+		})
+	})
+};
+/**
+ * Get hyperion brightness
+ */
+exports.getBrightness = function (req, res) {
+	hyperion.getOn((error, response) => {
+		if (error) {
+			console.log('error getting hyperion brightness - no connection?');
+			console.log(error);
+			return res.apiResponse({
+				error: error
+			})
+		}
+		hyperion.getBrightness((error, response) => {
+			if (error) {
+				console.log('error getting hyperion brightness - no connection?');
+				console.log(error);
+				return res.apiResponse({
+					error: error
+				})
+			}
+			console.log('success getting hyperion brightness');
+			console.log(response);
+			res.apiResponse({
+				success: true,
+				response: response
+			})
+		})
+	})
+};
 
 
 /**
@@ -199,7 +258,7 @@ exports.ipfs = function (req, res) {
  * Get Sketch by ID
  */
 
-exports.get = function (req, res) {
+exports.getSketch = function (req, res) {
 	Sketch.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);

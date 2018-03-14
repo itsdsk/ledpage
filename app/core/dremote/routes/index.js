@@ -45,11 +45,13 @@ exports = module.exports = function (app) {
 
 	// public API
 	app.all('/api*', keystone.middleware.api);
-	app.get('/api/list', keystone.middleware.api, routes.api.sketch.list);
-	app.get('/api/:ipfs/add', keystone.middleware.api, routes.api.sketch.add);
-	app.get('/api/:id', keystone.middleware.api, routes.api.sketch.get);
-	app.get('/api/:id/play', keystone.middleware.api, routes.api.sketch.play);
-	app.get('/api/:id/sync', keystone.middleware.api, routes.api.sketch.sync);
+	app.get('/api/sketch/list', keystone.middleware.api, routes.api.sketch.list); // list sketches
+	app.get('/api/sketch/:ipfs/add', keystone.middleware.api, routes.api.sketch.add); // try add ipfs hash
+	app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
+	app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
+	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
+	app.get('/api/display/brightness/:val', keystone.middleware.api, routes.api.sketch.setBrightness); // 
+	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
 
 	app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
 
