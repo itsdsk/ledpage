@@ -41,14 +41,17 @@ const channelMsg = (msg) => {
 		});
 	});
 };
-
+var ipfsInitAttempts = 0;
 var ipfsInit = () => {
 	ipfs.id(function (err, identity) {
 		if (err) {
 			console.log(err);
-			setTimeout(function () {
-				ipfsInit();
-			}, 5000);
+			ipfsInitAttempts += 1;
+			if (ipfsInitAttempts < 3) {
+				setTimeout(function () {
+					ipfsInit();
+				}, 15000);
+			}
 		} else {
 			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
@@ -87,12 +90,14 @@ ipfsInit()
 
 // Periodically show peers
 setInterval(function () {
-	console.log('syncing with ipfs');
+	//console.log('syncing with ipfs');
 	// share sketches on ipfs
 	ipfs.id(function (err, identity) {
 		if (err) {
-			console.log('connection error trying to sync with ipfs')
-			console.log(err);
+			if(ipfsInitAttempts < 3){
+				console.log('connection error trying to sync with ipfs')
+				console.log(err);
+			}
 		} else {
 			// find channels
 			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
