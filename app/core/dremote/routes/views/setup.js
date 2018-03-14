@@ -51,7 +51,7 @@ exports = module.exports = function (req, res) {
         //var stream = fs.createWriteStream("hodho.json")
 
         // construct arduino file
-        fs.writeFile("./libs/arduino_segments/form-setup.ino", '#include "FastLED.h"\n', function (err) {
+        fs.writeFile("./libs/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
             if(err) {
                 console.log('error starting arduino file');
                 console.log(err);
@@ -62,19 +62,19 @@ exports = module.exports = function (req, res) {
             var define3 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
             var define4 = '#define LED_TYPE ' + req.body.ledChip + '\n';
             var defines = define1.concat(define2, define3, define4);
-            fs.appendFile("./libs/arduino_segments/form-setup.ino", defines, function(err) {
+            fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function(err) {
                 if(err) {
                     console.log('error adding defines to arduino file');
                     console.log(err);
                     return next();
                 }
-                fs.readFile("./libs/arduino_segments/display.txt", (err, contents) => {
+                fs.readFile("./libs/arduino_segments/template.txt", (err, contents) => {
                     if(err) {
                         console.log('error reading template arduino file');
                         console.log(err);
                         return next();    
                     }
-                    fs.appendFile("./libs/arduino_segments/form-setup.ino", contents, function(err) {
+                    fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function(err) {
                         if(err) {
                             console.log('error adding arduino template to file');
                             console.log(err);
