@@ -17,13 +17,13 @@ mixin sketch(sketch)
 		//- .media-bottom
 		.list-group
 			//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
-			a(href='/api/' + sketch.id + '/play').list-group-item Display
+			a(href='/api/sketch/' + sketch.id + '/play').list-group-item.display-sketch Display
 			if sketch.ipfsHash
 				//- a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
 				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).list-group-item Preview IPFS
 			else
 				//- a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
-				a(href='/api/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
+				a(href='/api/sketch/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
 				//- a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
 				a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
 			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
@@ -91,14 +91,18 @@ block content
 						h3.text-muted There are no sketches yet.
 		if data.channels.length
 			.col-sm-4.col-md-4
-				h4 Sharing Channels
+				h4 Subscribed
 				.list-group
 					a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
 					each channel in data.channels
 						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+		.col-sm-4.col-md-4
+			h4 Brightness
+			input(type='range', min='0.0', max='1.0', step='0.01', value='1.0').brightnessSlider
 block js
 	script.
 		jQuery(function($) {
+			// play sketch button
 			function playSketch(e) {
 
 				e.preventDefault();
@@ -109,5 +113,14 @@ block js
 					// success
 				});
 			}
-			$(".btn-default").click( playSketch );
+			$(".display-sketch").click( playSketch );
+
+			// setbrightness slider
+			function setBrightness(e) {
+				var url = '/api/display/brightness/' + $(this).val();
+				$.get(url, function() {
+					// success
+				});
+			}
+			$(".brightnessSlider").change( setBrightness );
 		});
