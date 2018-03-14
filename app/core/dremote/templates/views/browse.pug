@@ -4,12 +4,13 @@ mixin sketch(sketch)
 	//- .sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
 	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).panel.panel-default
 		//- h4.media-heading
-		.panel-heading
-			h3.panel-title= sketch.title
+		//- .panel-heading
+		//- 	h3.panel-title= sketch.title
 			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
 		//- .media-middle
-		.panel-body
-			a(href='/browse/sketch/' + sketch.slug + '?display=on')
+		.sketch-thumbnail
+			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')
+			a(href='/api/sketch/' + sketch.id + '/play')
 				if sketch.image.exists
 					img(src=sketch._.image.fit(750,750)).img-responsive
 				else
@@ -97,11 +98,14 @@ block content
 					each channel in data.channels
 						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
 		.col-sm-4.col-md-4
-			h4 Brightness
-			input(type='range', min='0.0', max='1.0', step='0.01', value='1.0').brightnessSlider
-		.col-sm-4.col-md-4
-			h4 Network
-			div(id='leds')
+			h4 LEDs:
+			.list-group
+				div(id='leds').list-group-item
+				p.list-group-item Brightness:
+				input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').list-group-item.brightnessSlider
+		//- .col-sm-4.col-md-4
+		//- 	h4 Network
+		//- 	div(id='leds')
 block js
 	script.
 		jQuery(function($) {
