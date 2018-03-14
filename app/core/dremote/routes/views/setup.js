@@ -14,8 +14,8 @@ exports = module.exports = function (req, res) {
         label: "Arduino Uno"
     }];
     locals.dataPins = [{
-        value: "A1",
-        label: "A1"
+        value: "5",
+        label: "5"
     }];
     locals.ledChips = [{
         value: "WS2812B",

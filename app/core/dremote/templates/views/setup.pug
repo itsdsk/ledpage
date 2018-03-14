@@ -9,20 +9,10 @@ block content
 		.container: .jumbotron
 			form(method='post').form-horizontal
 				input(type='hidden', name='action', value='setup')
-				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
-					label.col-sm-2.control-label Platform
+				.form-group
+					label.col-sm-2.control-label LED Count
 					.col-sm-10
-						select(name='boardType' required).form-control
-							option(value='') (required)
-							each type in boardTypes
-								option(value=type.value selected=formData.boardType === type.value)= type.label
-				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
-					label.col-sm-2.control-label Data Pin
-					.col-sm-10
-						select(name='dataPin' required).form-control
-							option(value='') (required)
-							each type in dataPins
-								option(value=type.value selected=formData.dataPin === type.value)= type.label
+						input(type='number' name='numleds' value=formData.numLeds required placeholder='(required)').form-control
 				.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
 					label.col-sm-2.control-label LED Chipset
 					.col-sm-10
@@ -37,10 +27,20 @@ block content
 							option(value='') (required)
 							each type in ledOrders
 								option(value=type.value selected=formData.ledOrder === type.value)= type.label
-				.form-group
-					label.col-sm-2.control-label LED Count
+				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+					label.col-sm-2.control-label Platform
 					.col-sm-10
-						input(type='number' name='numleds' value=formData.numLeds required placeholder='(required)').form-control
+						select(name='boardType' required).form-control
+							option(value='') (required)
+							each type in boardTypes
+								option(value=type.value selected=formData.boardType === type.value)= type.label
+				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+					label.col-sm-2.control-label Data Pin
+					.col-sm-10
+						select(name='dataPin' required).form-control
+							option(value='') (required)
+							each type in dataPins
+								option(value=type.value selected=formData.dataPin === type.value)= type.label
 				.form-group
 					.col-sm-10.col-sm-offset-2
 						button(type='submit').btn.btn-primary Upload
