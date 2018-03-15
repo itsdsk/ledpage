@@ -108,3 +108,5 @@ Temporary Items
 .Trash-*
 
 app/arduino_files/arduino_display\.ino
+
+app/core/dremote/libs/arduino_segments/form_setup\.ino
