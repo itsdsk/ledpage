@@ -16,7 +16,7 @@ keystone.init({
   'port': 8081,
   'sass': 'public',
   'static': ['public', '/data/content'],
-  'favicon': 'public/favicon.ico',
+  //'favicon': 'public/favicon.ico',
   'views': 'templates/views',
   'view engine': 'pug',
 
