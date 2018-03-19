@@ -6,7 +6,9 @@ block content
 			h1 Success!
 			.lead Your device should be ready soon
 	else
-		.container: .jumbotron
+		.container
+			.page-header
+				h1 Configure Output
 			form(method='post').form-horizontal
 				input(type='hidden', name='action', value='setup')
 				.form-group

@@ -51,8 +51,8 @@ html
 						each link in navLinks
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
 					ul.nav.navbar-nav.navbar-right
-						li: a(href='/keystone') Content
-						li: a(href='/setup') Display
+						li: a(href='/setup') Setup
+					//- 	li: a(href='/keystone') Content
 			//- Customise your site's navigation by changing the navLinks Array in ./routes/middleware.js
 			//- ... or completely change this header to suit your design.
 
