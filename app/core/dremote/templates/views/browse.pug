@@ -14,7 +14,10 @@ mixin sketch(sketch)
 				if sketch.image.exists
 					img(src=sketch._.image.fit(750,750)).img-responsive
 				else
-					img(src="http://placehold.it/750x750").img-responsive
+					//img(src="http://placehold.it/750x750").img-responsive
+					//div(id='leds').list-group-item.led-svg
+					iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir)
+
 		//- .media-bottom
 		.list-group
 			//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
