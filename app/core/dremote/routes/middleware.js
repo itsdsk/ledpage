@@ -9,6 +9,8 @@
  */
 var _ = require('lodash');
 //var ipfsAPI = require('ipfs-api');
+//var http = require('http');
+
 console.log('routes middleware');
 /**
 	Initialises the standard view locals
@@ -32,6 +34,18 @@ exports.initLocals = function (req, res, next) {
 	// res.locals.ipfs = ipfsAPI('localhost', '5001', {
 	// 	protocol: 'http'
 	// });
+
+	// http.request('http://0.0.0.0:8081/api/player', (res) =>
+	// {
+	// 	res.on('error', function() {
+	// 		req.flash('error', 'Error: No connection to sketch player');
+	// 		next();
+	// 	})
+	// }).end();
+	//req.flash('error', '<div id="rsgf">'+'Error: No connection to sketch player'+'</div>');
+	//req.flash('error', 'Error: No peer to peer connection');
+	//req.flash('info', 'Error: No connection to sketch player');
+	//req.flash('warning', 'Error: No connection to sketch player');
 	next();
 };
 

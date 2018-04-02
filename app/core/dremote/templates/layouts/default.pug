@@ -50,6 +50,9 @@ html
 					ul.nav.navbar-nav.navbar-left
 						each link in navLinks
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
+						li: a(href='/')
+							span(id='status-dot')
+							span &ensp; Status
 					ul.nav.navbar-nav.navbar-right
 						li: a(href='/setup') Setup
 					//- 	li: a(href='/keystone') Content
@@ -111,6 +114,42 @@ html
 		//- space body away from navbar
 		script.
 			$('body')[0].style.paddingTop = $('.navbar').height() + 20 + 'px';
+
+
+			var dotStyle = 'height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color: '
+			$('#status-dot').attr('style', dotStyle+'green;');
+
+			var flashMsgDiv = '<div id="flash-messages" class="container"></div>';
+			$('#body').prepend(flashMsgDiv);
+			var alertMsgDiv = '<div class="alert alert-warning">';
+
+			$(function() {
+				// check sketch player connection
+				$.ajax({url: '/api/playing', async: true, 
+					error: function(){
+						$('#status-dot').attr('style', dotStyle+'red;');
+						var alertMsg = 'ⓘ&emsp;No connection to player component (sketch player unavailable)</div>'
+						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+					}
+				});
+				// check p2p connection
+				$.ajax({url: '/api/ipfs', async: true, 
+					error: function(){
+						$('#status-dot').attr('style', dotStyle+'red;');
+						var alertMsg = 'ⓘ&emsp;No connection to P2P network (IPFS unavailable)</div>'
+						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+					}
+				});
+				// check hyperion connection
+				$.ajax({url: '/api/display/brightness', async: true, 
+					error: function(){
+						$('#status-dot').attr('style', dotStyle+'red;');
+						var alertMsg = 'ⓘ&emsp;No connection to LEDs (Hyperion controller unavailable)</div>'
+						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+					}
+				});
+
+			});
 
 		//- FOOTER
 		.container: #footer
