@@ -125,7 +125,7 @@ html
 
 			$(function() {
 				// check sketch player connection
-				$.ajax({url: '/api/playing', async: true, 
+				$.ajax({url: '/api/player', async: true, 
 					error: function(){
 						$('#status-dot').attr('style', dotStyle+'red;');
 						var alertMsg = 'ⓘ&emsp;No connection to player component (sketch player unavailable)</div>'
