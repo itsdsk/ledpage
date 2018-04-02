@@ -23,11 +23,13 @@ exports = module.exports = function (req, res) {
     }];
     locals.ledChips = [{
         value: "WS2812B",
-        label: "WS2812B (also Neopixel)"
+        label: "WS2812B (also Neopixel)",
+        pins: "3pin"
     },
     {
         value: "APA102",
-        label: "APA102 (also Dotstar)"
+        label: "APA102 (also Dotstar)",
+        pins: "4pin"
     }];
     locals.ledOrders = [{
             value: "RGB",
@@ -69,9 +71,9 @@ exports = module.exports = function (req, res) {
             var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
             var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
             var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
-            if(req.body.ledChip == 'WS2812B'){
+            if(!req.body.clockPin){
                 var defines = define1.concat(define3, define4, define5);
-            }else if(req.body.ledChip == 'APA102'){
+            }else if(req.body.clockPin){
                 var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
                 var defines = define1.concat(define2, define3, define4, define5);
             }

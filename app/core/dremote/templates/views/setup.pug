@@ -18,10 +18,10 @@ block content
 				.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
 					label.col-sm-2.control-label LED Chipset
 					.col-sm-10
-						select(name='ledChip' required).form-control
-							option(value='') (required)
+						select(name='ledChip' id='ledChip' required).form-control
+							option(value='' class = '') (required)
 							each type in ledChips
-								option(value=type.value selected=formData.ledChip === type.value)= type.label
+								option(value=type.value class=type.pins selected=formData.ledChip === type.value)= type.label
 				.form-group(class=validationErrors.ledOrders ? 'has-error' : null required)
 					label.col-sm-2.control-label Color Order
 					.col-sm-10
@@ -43,10 +43,10 @@ block content
 							option(value='') (required)
 							each type in dataPins
 								option(value=type.value selected=formData.dataPin === type.value)= type.label
-				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+				.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv' required).hidden
 					label.col-sm-2.control-label Clock Pin
 					.col-sm-10
-						select(name='clockPin' required).form-control
+						select(name='clockPin' id='clockPinSelect' required).form-control
 							option(value='') (required)
 							each type in clockPins
 								option(value=type.value selected=formData.clockPin === type.value)= type.label
@@ -59,3 +59,24 @@ block content
 			//- 	label.col-sm-2.control-label LED Mapping File
 			//- 	.col-sm-10
 			//- 		input(type='file' name='mapping').form-control
+
+block js
+	script.
+		jQuery(function($) {
+
+			$('.3pin').on('click', function(e) {
+				// add hidden class
+				$('#clockPinDiv').addClass('hidden');
+				// remove 'required' property
+				$('#clockPinDiv').removeAttr('required');
+				$('#clockPinSelect').removeAttr('required');
+			});
+			$('.4pin').on('click', function(e) {
+				// remove hidden class
+				$('#clockPinDiv').removeClass('hidden');
+				// add 'required' property
+				$('#clockPinDiv').attr('required', 'required');
+				$('#clockPinSelect').attr('required', 'required');
+			});
+		});
+
