@@ -121,33 +121,38 @@ html
 
 			var flashMsgDiv = '<div id="flash-messages" class="container"></div>';
 			$('#body').prepend(flashMsgDiv);
-			var alertMsgDiv = '<div class="alert alert-warning">';
-
 			$(function() {
+				var badConnections = new Array();
 				// check sketch player connection
-				$.ajax({url: '/api/player', async: true, 
+				$.ajax({url: '/api/player', async: false, 
 					error: function(){
-						$('#status-dot').attr('style', dotStyle+'red;');
-						var alertMsg = 'ⓘ&emsp;No connection to player component (sketch player unavailable)</div>'
-						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+						badConnections.push("<i>sketch player</i>");
 					}
 				});
 				// check p2p connection
-				$.ajax({url: '/api/ipfs', async: true, 
+				$.ajax({url: '/api/ipfs', async: false, 
 					error: function(){
-						$('#status-dot').attr('style', dotStyle+'red;');
-						var alertMsg = 'ⓘ&emsp;No connection to P2P network (IPFS unavailable)</div>'
-						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+						badConnections.push("<i>peer-to-peer network</i>");
 					}
 				});
 				// check hyperion connection
-				$.ajax({url: '/api/display/brightness', async: true, 
+				$.ajax({url: '/api/display/brightness', async: false, 
 					error: function(){
-						$('#status-dot').attr('style', dotStyle+'red;');
-						var alertMsg = 'ⓘ&emsp;No connection to LEDs (Hyperion controller unavailable)</div>'
-						$('#flash-messages').prepend(alertMsgDiv+alertMsg);
+						badConnections.push("<i>serial LED controller</i>");
 					}
 				});
+
+				if(!(badConnections.length === 0)){
+					$('#status-dot').attr('style', dotStyle+'red;');
+					var flashMsg = '<div class="alert alert-danger">ⓘ&emsp;Connection to the ';
+					for(var i=0; i<badConnections.length-1; i++)
+					{
+						flashMsg += (badConnections[i] + ', ');
+					};
+					flashMsg = flashMsg.slice(0, -2);
+					flashMsg += ' and ' + badConnections[badConnections.length-1] + ' components is unavailable.';
+					$('#flash-messages').prepend(flashMsg+'</div>');
+				}
 
 			});
 
