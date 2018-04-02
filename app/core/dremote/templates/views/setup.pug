@@ -45,10 +45,10 @@ block content
 								option(value='') (required)
 								each type in dataPins
 									option(value=type.value selected=formData.dataPin === type.value)= type.label
-					.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv' required).hidden
+					.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv').hidden
 						label.col-sm-2.control-label Clock Pin
 						.col-sm-10
-							select(name='clockPin' id='clockPinSelect' required).form-control
+							select(name='clockPin' id='clockPinSelect').form-control
 								option(value='') (required)
 								each type in clockPins
 									option(value=type.value selected=formData.clockPin === type.value)= type.label
