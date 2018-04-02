@@ -163,16 +163,18 @@ setInterval(function () {
 
 // ipc connection
 const ipc = require('node-ipc');
+var isDplayerConnected = false;
 ipc.config.id = 'dremoteipc';
 ipc.config.retry = 5000;
 ipc.config.maxRetries = 3;
+ipc.config.silent = true;
 ipc.connectTo(
 	'dplayeripc',
 	function () {
 		ipc.of.dplayeripc.on(
 			'connect',
 			function () {
-				console.log("IPC connected");
+				isDplayerConnected = true;
 			}
 		);
 	});
@@ -463,7 +465,7 @@ exports.add = function (req, res) {
  */
 
 exports.play = function (req, res) {
-	if (!ipc.of.dplayipc) {
+	if (!isDplayerConnected) {
 		console.log('no');
 
 		return res.apiError({
@@ -501,7 +503,7 @@ exports.play = function (req, res) {
  */
 
 exports.player = function (req, res) {
-	if (!ipc.of.dplayipc) {
+	if (!isDplayerConnected) {
 		console.log('no');
 
 		return res.apiError({
