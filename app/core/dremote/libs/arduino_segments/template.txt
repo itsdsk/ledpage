@@ -19,7 +19,12 @@ uint8_t prefix[] = {'A', 'd', 'a'}, hi, lo, chk, i;
 void setup()
 {
   // initialise LEDs
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  //FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  #ifdef CLOCK_PIN
+    FastLED.addLeds<LED_TYPE, DATA_PIN, CLOCK_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  #else
+    FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  #endif
 
   // initialise randomness
   randomSeed(analogRead(0));

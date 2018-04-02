@@ -17,9 +17,17 @@ exports = module.exports = function (req, res) {
         value: "5",
         label: "5"
     }];
+    locals.clockPins = [{
+        value: "13",
+        label: "13"
+    }];
     locals.ledChips = [{
         value: "WS2812B",
         label: "WS2812B (also Neopixel)"
+    },
+    {
+        value: "APA102",
+        label: "APA102 (also Dotstar)"
     }];
     locals.ledOrders = [{
             value: "RGB",
@@ -58,10 +66,15 @@ exports = module.exports = function (req, res) {
                 return next();
             }
             var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
-            var define2 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
-            var define3 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
-            var define4 = '#define LED_TYPE ' + req.body.ledChip + '\n';
-            var defines = define1.concat(define2, define3, define4);
+            var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
+            var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
+            var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
+            if(req.body.ledChip == 'WS2812B'){
+                var defines = define1.concat(define3, define4, define5);
+            }else if(req.body.ledChip == 'APA102'){
+                var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
+                var defines = define1.concat(define2, define3, define4, define5);
+            }
             fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function (err) {
                 if (err) {
                     console.log('error adding defines to arduino file');

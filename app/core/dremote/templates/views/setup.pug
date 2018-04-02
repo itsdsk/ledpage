@@ -43,6 +43,13 @@ block content
 							option(value='') (required)
 							each type in dataPins
 								option(value=type.value selected=formData.dataPin === type.value)= type.label
+				.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+					label.col-sm-2.control-label Clock Pin
+					.col-sm-10
+						select(name='clockPin' required).form-control
+							option(value='') (required)
+							each type in clockPins
+								option(value=type.value selected=formData.clockPin === type.value)= type.label
 				.form-group
 					.col-sm-10.col-sm-offset-2
 						button(type='submit').btn.btn-primary Upload
