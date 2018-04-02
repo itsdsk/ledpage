@@ -16,7 +16,7 @@ block content
 					.form-group
 						label.col-sm-2.control-label LED Count
 						.col-sm-10
-							input(type='number' name='numLeds' value=formData.numLeds required placeholder='(required)').form-control
+							input(type='number' name='numLeds' id='numLedsInput' value=formData.numLeds required placeholder='(required)').form-control
 					.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
 						label.col-sm-2.control-label LED Chipset
 						.col-sm-10
@@ -27,21 +27,21 @@ block content
 					.form-group(class=validationErrors.ledOrders ? 'has-error' : null required)
 						label.col-sm-2.control-label Color Order
 						.col-sm-10
-							select(name='ledOrder' required).form-control
+							select(name='ledOrder' id='ledOrderInput' required).form-control
 								option(value='') (required)
 								each type in ledOrders
 									option(value=type.value selected=formData.ledOrder === type.value)= type.label
 					.form-group(class=validationErrors.boardType ? 'has-error' : null required)
 						label.col-sm-2.control-label Platform
 						.col-sm-10
-							select(name='boardType' required).form-control
+							select(name='boardType' id='platformInput' required).form-control
 								option(value='') (required)
 								each type in boardTypes
 									option(value=type.value selected=formData.boardType === type.value)= type.label
 					.form-group(class=validationErrors.boardType ? 'has-error' : null required)
 						label.col-sm-2.control-label Data Pin
 						.col-sm-10
-							select(name='dataPin' required).form-control
+							select(name='dataPin' id='dataPinInput' required).form-control
 								option(value='') (required)
 								each type in dataPins
 									option(value=type.value selected=formData.dataPin === type.value)= type.label
@@ -66,6 +66,7 @@ block js
 	script.
 		jQuery(function($) {
 
+			// show/hide CLOCK_PIN form field based on selected LED chipset
 			$('.3pin').on('click', function(e) {
 				// add hidden class
 				$('#clockPinDiv').addClass('hidden');
@@ -81,9 +82,65 @@ block js
 				$('#clockPinSelect').attr('required', 'required');
 			});
 
+			// make form editable
 			$('#make-editable').click(function(e){
 				e.preventDefault();
 				$('fieldset').removeAttr('disabled');
 			})
 		});
+		$(function() {
+			// get existing settings from file
+			$.ajax({url: '/config-static/setup.json', async: true, 
+				error: function(){
+					var flashMsg = '<div class="alert alert-error">ⓘ&emsp;No settings found, please continue</div>'
+					$('#flash-messages').prepend(flashMsg);
+				},
+				success: function(result){
+					var flashMsg = '<div class="alert alert-success">ⓘ&emsp;Loaded config from settings file</div>'
+					$('#flash-messages').prepend(flashMsg);
+					// set lednum from setup.json
+					if(result.ledcount){
+						$('#numLedsInput').val(result.ledcount)
+					}else{
+						console.log('error: no ledcount property found in setup.json');
+					}
+					// set chipset from setup.json
+					if(result.chipset){
+						$('#ledChip').val(result.chipset)
+					}else{
+						console.log('error: no ledchipset property found in setup.json');
+					}
+					// set order from setup.json
+					if(result.order){
+						$('#ledOrderInput').val(result.order)
+					}else{
+						console.log('error: no led order property found in setup.json');
+					}
+					// set platform from setup.json
+					if(result.platform){
+						$('#platformInput').val(result.platform)
+					}else{
+						console.log('error: no board/platform property found in setup.json');
+					}
+					// set data pin from setup.json
+					if(result.datapin){
+						$('#dataPinInput').val(result.datapin)
+					}else{
+						console.log('error: no datapin property found in setup.json');
+					}
+					// set data pin from setup.json
+					if(result.clockpin){
+						// remove hidden class
+						$('#clockPinDiv').removeClass('hidden');
+						// add 'required' property
+						$('#clockPinDiv').attr('required', 'required');
+						$('#clockPinSelect').attr('required', 'required');
+						// set form var
+						$('#clockPinSelect').val(result.clockpin)
+					}else{
+						console.log('error: no clockpin property found in setup.json');
+					}
 
+				}
+			});
+		});

@@ -22,15 +22,16 @@ exports = module.exports = function (req, res) {
         label: "13"
     }];
     locals.ledChips = [{
-        value: "WS2812B",
-        label: "WS2812B (also Neopixel)",
-        pins: "3pin"
-    },
-    {
-        value: "APA102",
-        label: "APA102 (also Dotstar)",
-        pins: "4pin"
-    }];
+            value: "WS2812B",
+            label: "WS2812B (also Neopixel)",
+            pins: "3pin"
+        },
+        {
+            value: "APA102",
+            label: "APA102 (also Dotstar)",
+            pins: "4pin"
+        }
+    ];
     locals.ledOrders = [{
             value: "RGB",
             label: "RGB"
@@ -60,58 +61,78 @@ exports = module.exports = function (req, res) {
         var fs = require('fs');
         //var stream = fs.createWriteStream("hodho.json")
 
-        // construct arduino file
-        fs.writeFile("./libs/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
+        var config = {
+            "ledcount": parseInt(req.body.numLeds, 10),
+            "chipset": req.body.ledChip,
+            "order": req.body.ledOrder,
+            "platform": req.body.boardType,
+            "datapin": req.body.dataPin
+        };
+        if(req.body.clockPin){
+            config.clockpin = req.body.clockPin;
+        }
+        fs.writeFile("./public/config-static/setup.json", JSON.stringify(config, null, 4), 'utf8', function (err) {
             if (err) {
-                console.log('error starting arduino file');
+                console.log('error saving setup json');
                 console.log(err);
                 return next();
             }
-            var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
-            var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
-            var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
-            var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
-            if(!req.body.clockPin){
-                var defines = define1.concat(define3, define4, define5);
-            }else if(req.body.clockPin){
-                var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
-                var defines = define1.concat(define2, define3, define4, define5);
-            }
-            fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function (err) {
+            console.log('saved setup.json');
+        });
+
+        if (true) {
+            // construct arduino file
+            fs.writeFile("./libs/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
                 if (err) {
-                    console.log('error adding defines to arduino file');
+                    console.log('error starting arduino file');
                     console.log(err);
                     return next();
                 }
-                fs.readFile("./libs/arduino_segments/template.txt", (err, contents) => {
+                var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
+                var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
+                var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
+                var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
+                if (!req.body.clockPin) {
+                    var defines = define1.concat(define3, define4, define5);
+                } else if (req.body.clockPin) {
+                    var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
+                    var defines = define1.concat(define2, define3, define4, define5);
+                }
+                fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function (err) {
                     if (err) {
-                        console.log('error reading template arduino file');
+                        console.log('error adding defines to arduino file');
                         console.log(err);
                         return next();
                     }
-                    fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function (err) {
+                    fs.readFile("./libs/arduino_segments/template.txt", (err, contents) => {
                         if (err) {
-                            console.log('error adding arduino template to file');
+                            console.log('error reading template arduino file');
                             console.log(err);
                             return next();
                         }
-                        console.log('finished creating arduino file!');
-                        // compile and upload new arduino file
-                        const exec = require('child_process').exec;
-                        console.log('starting arduino compile & upload');
-                        var syncArduino = exec('./libs/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
-                            console.log(`${stdout}`);
-                            console.log(`${stderr}`);
-                            if (err !== null) {
-                                console.log(`exec error: ${error}`);
-                            } // ref: https://stackoverflow.com/a/44667294
-                        });
+                        fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function (err) {
+                            if (err) {
+                                console.log('error adding arduino template to file');
+                                console.log(err);
+                                return next();
+                            }
+                            console.log('finished creating arduino file!');
+                            // compile and upload new arduino file
+                            const exec = require('child_process').exec;
+                            console.log('starting arduino compile & upload');
+                            var syncArduino = exec('./libs/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
+                                console.log(`${stdout}`);
+                                console.log(`${stderr}`);
+                                if (err !== null) {
+                                    console.log(`exec error: ${error}`);
+                                } // ref: https://stackoverflow.com/a/44667294
+                            });
 
+                        })
                     })
-                })
+                });
             });
-        });
-
+        }
 
         // var config = {
         //     "ledcount": parseInt(req.body.numLeds, 10),
