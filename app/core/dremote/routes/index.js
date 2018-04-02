@@ -50,6 +50,7 @@ exports = module.exports = function (app) {
 	app.get('/api/sketch/:ipfs/add', keystone.middleware.api, routes.api.sketch.add); // try add ipfs hash
 	app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
 	app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
+	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status
 	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
 	app.get('/api/display/brightness/:val', keystone.middleware.api, routes.api.sketch.setBrightness); // 
 	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 

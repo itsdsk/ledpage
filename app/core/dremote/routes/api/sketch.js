@@ -94,7 +94,7 @@ setInterval(function () {
 	// share sketches on ipfs
 	ipfs.id(function (err, identity) {
 		if (err) {
-			if(ipfsInitAttempts < 3){
+			if (ipfsInitAttempts < 3) {
 				console.log('connection error trying to sync with ipfs')
 				console.log(err);
 			}
@@ -251,7 +251,7 @@ exports.getBrightness = function (req, res) {
 		if (error) {
 			console.log('error getting hyperion brightness - no connection?');
 			console.log(error);
-			return res.apiResponse({
+			return res.apiError({
 				error: error
 			})
 		}
@@ -259,7 +259,7 @@ exports.getBrightness = function (req, res) {
 			if (error) {
 				console.log('error getting hyperion brightness - no connection?');
 				console.log(error);
-				return res.apiResponse({
+				return res.apiError({
 					error: error
 				})
 			}
@@ -463,22 +463,59 @@ exports.add = function (req, res) {
  */
 
 exports.play = function (req, res) {
+	if (!ipc.of.dplayipc) {
+		console.log('no');
+
+		return res.apiError({
+			success: false
+		});
+
+	}
 	Sketch.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
 
-		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
-		ipc.of.dplayeripc.emit('message', sketchPath);
+		if (ipc.of.dplayeripc) {
+			var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
+			ipc.of.dplayeripc.emit('message', sketchPath);
+			console.log('yes');
 
+			res.apiResponse({
+				success: true
+			});
+		} else {
+			console.log('neswsfo');
 
-		res.apiResponse({
-			success: true
-		});
+			res.apiError({
+				success: false
+			});
+
+		}
 
 	});
 };
 
+/**
+ * Get sketch player status
+ */
+
+exports.player = function (req, res) {
+	if (!ipc.of.dplayipc) {
+		console.log('no');
+
+		return res.apiError({
+			success: false
+		});
+
+	} else {
+		console.log('yes');
+
+		return res.apiResponse({
+			success: true
+		});
+	}
+};
 
 /**
  * Sync Sketch to IPFS
