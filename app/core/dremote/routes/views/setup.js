@@ -71,7 +71,7 @@ exports = module.exports = function (req, res) {
         if(req.body.clockPin){
             config.clockpin = req.body.clockPin;
         }
-        fs.writeFile("./public/config-static/setup.json", JSON.stringify(config, null, 4), 'utf8', function (err) {
+        fs.writeFile("/data/content/config-static/setup.json", JSON.stringify(config, null, 4), 'utf8', function (err) {
             if (err) {
                 console.log('error saving setup json');
                 console.log(err);
