@@ -6,55 +6,63 @@ block content
 			h1 Success!
 			.lead Your device should be ready soon
 	else
-		.container
-			.page-header
-				a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
-				h1 Output
-			form(method='post').form-horizontal
-				fieldset(disabled='disabled')
-					input(type='hidden', name='action', value='setup')
-					.form-group
-						label.col-sm-2.control-label LED Count
-						.col-sm-10
-							input(type='number' name='numLeds' id='numLedsInput' value=formData.numLeds required placeholder='(required)').form-control
-					.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
-						label.col-sm-2.control-label LED Chipset
-						.col-sm-10
-							select(name='ledChip' id='ledChip' required).form-control
-								option(value='' class = '') (required)
-								each type in ledChips
-									option(value=type.value class=type.pins selected=formData.ledChip === type.value)= type.label
-					.form-group(class=validationErrors.ledOrders ? 'has-error' : null required)
-						label.col-sm-2.control-label Color Order
-						.col-sm-10
-							select(name='ledOrder' id='ledOrderInput' required).form-control
-								option(value='') (required)
-								each type in ledOrders
-									option(value=type.value selected=formData.ledOrder === type.value)= type.label
-					.form-group(class=validationErrors.boardType ? 'has-error' : null required)
-						label.col-sm-2.control-label Platform
-						.col-sm-10
-							select(name='boardType' id='platformInput' required).form-control
-								option(value='') (required)
-								each type in boardTypes
-									option(value=type.value selected=formData.boardType === type.value)= type.label
-					.form-group(class=validationErrors.boardType ? 'has-error' : null required)
-						label.col-sm-2.control-label Data Pin
-						.col-sm-10
-							select(name='dataPin' id='dataPinInput' required).form-control
-								option(value='') (required)
-								each type in dataPins
-									option(value=type.value selected=formData.dataPin === type.value)= type.label
-					.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv').hidden
-						label.col-sm-2.control-label Clock Pin
-						.col-sm-10
-							select(name='clockPin' id='clockPinSelect').form-control
-								option(value='') (required)
-								each type in clockPins
-									option(value=type.value selected=formData.clockPin === type.value)= type.label
-					.form-group
-						.col-sm-10.col-sm-offset-2
-							button(type='submit').btn.btn-primary Upload
+		.container: .row
+			.col-sm-8.col-md-8
+				.page-header
+					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
+					h1 Output
+				form(method='post').form-horizontal
+					fieldset(disabled='disabled')
+						input(type='hidden', name='action', value='setup')
+						.form-group
+							label.col-sm-2.control-label LED Count
+							.col-sm-10
+								input(type='number' name='numLeds' id='numLedsInput' value=formData.numLeds required placeholder='(required)').form-control
+						.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
+							label.col-sm-2.control-label LED Chipset
+							.col-sm-10
+								select(name='ledChip' id='ledChip' required).form-control
+									option(value='' class = '') (required)
+									each type in ledChips
+										option(value=type.value class=type.pins selected=formData.ledChip === type.value)= type.label
+						.form-group(class=validationErrors.ledOrders ? 'has-error' : null required)
+							label.col-sm-2.control-label Color Order
+							.col-sm-10
+								select(name='ledOrder' id='ledOrderInput' required).form-control
+									option(value='') (required)
+									each type in ledOrders
+										option(value=type.value selected=formData.ledOrder === type.value)= type.label
+						.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+							label.col-sm-2.control-label Platform
+							.col-sm-10
+								select(name='boardType' id='platformInput' required).form-control
+									option(value='') (required)
+									each type in boardTypes
+										option(value=type.value selected=formData.boardType === type.value)= type.label
+						.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+							label.col-sm-2.control-label Data Pin
+							.col-sm-10
+								select(name='dataPin' id='dataPinInput' required).form-control
+									option(value='') (required)
+									each type in dataPins
+										option(value=type.value selected=formData.dataPin === type.value)= type.label
+						.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv').hidden
+							label.col-sm-2.control-label Clock Pin
+							.col-sm-10
+								select(name='clockPin' id='clockPinSelect').form-control
+									option(value='') (required)
+									each type in clockPins
+										option(value=type.value selected=formData.clockPin === type.value)= type.label
+						.form-group
+							.col-sm-10.col-sm-offset-2
+								button(type='submit').btn.btn-primary Upload
+			.col-sm-4.col-md-4
+				h4.list-group-item LEDs
+				// top left blue button
+				//h4: h(href='').btn.btn-primary LEDs
+				.list-group
+					div(id='leds').list-group-item.led-svg
+					a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
 
 
 			//- .form-group
@@ -63,6 +71,60 @@ block content
 			//- 		input(type='file' name='mapping').form-control
 
 block js
+	script(src='https://d3js.org/d3.v5.js')
+	script.
+		d3.json('/config-static/leds.json').then(function(data) {
+
+			var width = 500,
+				height = 500,
+				padding = 15;
+			
+			var svgContainer = d3.selectAll('.led-svg').append('svg')
+				.attr('viewBox', '0 0 ' + width + ' ' + height);
+				//- .attr("width", width)
+				//- .attr("height", height);
+
+			svgContainer.append('rect')
+				.attr('width', '100%')
+				.attr('height', '100%')
+				.attr('fill', 'white');
+				
+			var minX = d3.min(data.leds, function(d) {return d.x});
+			var maxX = d3.max(data.leds, function(d) {return d.x});
+			var minY = d3.min(data.leds, function(d) {return d.y});
+			var maxY = d3.max(data.leds, function(d) {return d.y});
+
+			var scaleX = d3.scaleLinear()
+				.domain([minX,maxX])
+				.range([padding, width-padding]);
+			var scaleY = d3.scaleLinear()
+				.domain([minY,maxY])
+				.range([padding, height-padding]);
+
+			var line = d3.line()
+				.curve(d3.curveLinear)
+				.x(function(d) { return scaleX(d.x); })
+				.y(function(d) { return scaleY(d.y); });
+
+			var path = svgContainer.append('path')
+				.attr('fill', 'none')
+				.attr('stroke', '#337ab7')
+				.attr('stroke-width', 0.5*padding)
+				.attr('d', line(data.leds));
+
+			var circles = svgContainer.selectAll('circle')
+				.data(data.leds)
+				.enter()
+				.append("circle");
+
+			var circleAttr = circles
+				.attr('cx', function(d) { return scaleX(d.x); })
+				.attr('cy', function(d) { return scaleY(d.y); })
+				.attr('r', function(d) { return 0.7*padding; })
+				.attr('stroke', '#337ab7')
+				.attr('stroke-width', 0.33*padding)
+				.attr('fill', 'white');
+		})
 	script.
 		jQuery(function($) {
 
