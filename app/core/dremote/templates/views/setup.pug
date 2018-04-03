@@ -77,31 +77,32 @@ block js
 	script(src='https://d3js.org/d3.v5.js')
 	//- script(src="//cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js")
 	script.
+		//
+		var width = 500,
+			height = 500,
+			padding = 15;
+		
+		var svgContainer = d3.selectAll('.led-svg').append('svg')
+			.attr('viewBox', '0 0 ' + width + ' ' + height);
+			//- .attr("width", width)
+			//- .attr("height", height);
+
+		svgContainer.append('rect')
+			.attr('width', '100%')
+			.attr('height', '100%')
+			.attr('fill', 'white');
+
+
 		// load leds.json and visualise
 		d3.json('/config-static/leds.json').then( function(data) {
 			visualiseLeds(data)
 		});
 		function visualiseLeds(data) {
-
-			var width = 500,
-				height = 500,
-				padding = 15;
-			
-			var svgContainer = d3.selectAll('.led-svg').append('svg')
-				.attr('viewBox', '0 0 ' + width + ' ' + height);
-				//- .attr("width", width)
-				//- .attr("height", height);
-
-			svgContainer.append('rect')
-				.attr('width', '100%')
-				.attr('height', '100%')
-				.attr('fill', 'white');
-				
+			// get range of data
 			var minX = d3.min(data.leds, function(d) {return d.x});
 			var maxX = d3.max(data.leds, function(d) {return d.x});
 			var minY = d3.min(data.leds, function(d) {return d.y});
 			var maxY = d3.max(data.leds, function(d) {return d.y});
-
 			var scaleX = d3.scaleLinear()
 				.domain([minX,maxX])
 				.range([padding, width-padding]);
@@ -109,29 +110,41 @@ block js
 				.domain([minY,maxY])
 				.range([padding, height-padding]);
 
+			// draw path
 			var line = d3.line()
 				.curve(d3.curveLinear)
 				.x(function(d) { return scaleX(d.x); })
 				.y(function(d) { return scaleY(d.y); });
-
-			var path = svgContainer.append('path')
+			var path = svgContainer.selectAll('.ledPath')
+				.data([0]);
+			path.exit().remove();
+			var new_path = path.enter()
+				.append('path')
+				.attr('class', 'ledPath')
 				.attr('fill', 'none')
 				.attr('stroke', '#337ab7')
 				.attr('stroke-width', 0.5*padding)
 				.attr('d', line(data.leds));
+			new_path.merge(path)
+				.attr('d', line(data.leds));
 
-			var circles = svgContainer.selectAll('circle')
-				.data(data.leds)
-				.enter()
-				.append("circle");
-
-			var circleAttr = circles
+			// draw leds
+			var circles = svgContainer.selectAll('.ledNode')
+				.data(data.leds);
+			circles.exit().remove();
+			var new_circles = circles.enter()
+				.append('circle')
+				.attr('class', 'ledNode')
 				.attr('cx', function(d) { return scaleX(d.x); })
 				.attr('cy', function(d) { return scaleY(d.y); })
 				.attr('r', function(d) { return 0.7*padding; })
 				.attr('stroke', '#337ab7')
 				.attr('stroke-width', 0.33*padding)
 				.attr('fill', 'white');
+			new_circles.merge(circles)
+				.attr('cx', function(d) { return scaleX(d.x); })
+				.attr('cy', function(d) { return scaleY(d.y); })
+				.attr('r', function(d) { return 0.7*padding; })
 		}
 		// led mapping file upload
 		d3.select('#upload-map').on('click', function(){
