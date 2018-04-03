@@ -50,7 +50,7 @@ html
 					ul.nav.navbar-nav.navbar-left
 						each link in navLinks
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
-						li: a(href='/')
+						li: a
 							span(id='status-dot')
 							span &ensp; Status
 					ul.nav.navbar-nav.navbar-right
@@ -126,7 +126,7 @@ html
 				// check sketch player connection
 				$.ajax({url: '/api/player', async: false, 
 					error: function(){
-						badConnections.push("<i>sketch player</i>");
+						badConnections.push("<i>player</i>");
 					}
 				});
 				// check p2p connection
@@ -138,7 +138,7 @@ html
 				// check hyperion connection
 				$.ajax({url: '/api/display/brightness', async: false, 
 					error: function(){
-						badConnections.push("<i>serial LED controller</i>");
+						badConnections.push("<i>LED controller</i>");
 					}
 				});
 
