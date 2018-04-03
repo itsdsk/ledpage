@@ -147,22 +147,31 @@ block js
 					const txtRes = fileReader.result;
 					switch(uploadFileName) {
 						case 'xml':
-							//
+							try{
+								const xmlRes = d3.xml.parse(txtRes);
+								visualiseLeds(xmlRes);
+							}catch(err){
+								window.alert('Error parsing XML map: ' + err);
+								return;
+							}
 							break;
 						case 'json':
 							try{
 								const jsonRes = JSON.parse(txtRes);
 								visualiseLeds(jsonRes);
 							}catch(err){
-								window.alert('Error parsing JSON map');
+								window.alert('Error parsing JSON map: ' + err);
 								return;
 							}
-							//- d3.json(txtRes).then( function(data) {
-							//- 	visualiseLeds(data)
-							//- });
 							break;
 						case 'csv':
-							//
+							try{
+								const csvRes = d3.csv.parse(txtRes);
+								visualiseLeds(csvRes);
+							}catch(err){
+								window.alert('Error parsing CSV map: ' + err);
+								return;
+							}
 							break;
 						default:
 							//
