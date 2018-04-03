@@ -520,6 +520,27 @@ exports.player = function (req, res) {
 };
 
 /**
+ * Set sketch player LED coord mapping
+ */
+exports.mapleds = function (req, res) {
+	console.log(req.body.leds);
+	if (!isDplayerConnected) {
+		console.log('no');
+
+		return res.apiError({
+			success: false
+		});
+
+	} else {
+		console.log('yes');
+
+		return res.apiResponse({
+			success: true
+		});
+	}
+};
+
+/**
  * Sync Sketch to IPFS
  */
 

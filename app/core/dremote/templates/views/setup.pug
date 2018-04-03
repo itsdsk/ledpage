@@ -256,6 +256,28 @@ block js
 				e.preventDefault();
 				$('fieldset').removeAttr('disabled');
 			})
+			// save led map
+			function saveMap(e) {
+
+				e.preventDefault();
+
+				var points = {"leds": []};
+
+
+				d3.selectAll('.ledNode').each(function (d, i) {
+					points.leds.push({x: d.x, y: d.y});
+				});
+				console.log(points);
+
+				$.post('/api/player/map', '&leds=' + JSON.stringify(points), function (data) {
+					if (data.err) {
+						console.log('error solve');
+						return;
+					}
+					console.log('sentnuieh');
+				});
+			}
+			$("#save-led-map").click(saveMap);
 		});
 		$(function() {
 			// get existing settings from file
