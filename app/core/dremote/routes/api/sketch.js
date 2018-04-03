@@ -523,7 +523,9 @@ exports.player = function (req, res) {
  * Set sketch player LED coord mapping
  */
 exports.mapleds = function (req, res) {
+	// get new led map from HTTP post body
 	const newLeds = JSON.parse(req.body.leds);
+	// duplicate new led map into hyperion format
 	const newConfig = Array();
 	for (var i=0; i<newLeds.leds.length; i++){
 		var newConf = {index: i,
@@ -532,7 +534,7 @@ exports.mapleds = function (req, res) {
 		}
 		newConfig.push(newConf);
 	}
-	//console.log(newConfig);
+	// read hyperion config template then add new led coords and save
 	fs.readFile('./libs/hyperion_segments/hyperion.template.json', function(err, data){
 		if(err) {
 			console.log('wefaf'+err);
@@ -541,9 +543,9 @@ exports.mapleds = function (req, res) {
 			});	
 		}
 		try{
+			// save new hyperion config
 			const ledConfig = JSON.parse(data);
 			ledConfig.leds = newConfig;
-			//console.log(ledConfig);
 			const jsonLedConfig = JSON.stringify(ledConfig, null, 2);
 			fs.writeFile('./libs/hyperion_segments/hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
 				if (fserr) {
@@ -553,8 +555,23 @@ exports.mapleds = function (req, res) {
 						note: 'Error saving file...',
 						error: fserr
 					});
+				}else{
+					// save new leds.json
+					const jsonNewLeds = JSON.stringify(newLeds, null, 2);
+					fs.writeFile(res.locals.configStaticPath + 'leds.json', jsonNewLeds, 'utf8', (fserr) => {
+						if (fserr) {
+							console.log(fserr);
+							res.apiResponse({
+								success: false,
+								note: 'Error saving file...',
+								error: fserr
+							});
+						}else{
+							console.log('File saved');
+						}
+					});
+					console.log('File saved');
 				}
-				//else console.log('File saved')
 			});
 			return res.apiResponse({
 				success: true

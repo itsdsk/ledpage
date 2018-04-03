@@ -25,8 +25,10 @@ exports.initLocals = function (req, res, next) {
 		//{ label: 'Setup', key: 'display', href: '/setup' },
 		//{ label: 'Gallery', key: 'gallery', href: '/gallery' },
 	];
-
-	res.locals.staticPath = "/data/content/view-static/";
+	const publicPath = '/data/content/';
+	//const publicPath = './public/';
+	res.locals.staticPath = publicPath + "view-static/";
+	res.locals.configStaticPath = publicPath + "config-static/";
 
 	res.locals.user = req.user;
 	// ipfs

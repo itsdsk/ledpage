@@ -200,6 +200,7 @@ block js
 							try{
 								const csvRes = d3.csv.parse(txtRes);
 								visualiseLeds(csvRes);
+								// check file properties https://stackoverflow.com/questions/36079390/parse-uploaded-csv-file-using-d3-js
 							}catch(err){
 								window.alert('Error parsing CSV map: ' + err);
 								return;
@@ -263,18 +264,15 @@ block js
 
 				var points = {"leds": []};
 
-
 				d3.selectAll('.ledNode').each(function (d, i) {
 					points.leds.push({x: d.x, y: d.y});
 				});
-				console.log(points);
 
 				$.post('/api/player/map', '&leds=' + JSON.stringify(points), function (data) {
 					if (data.err) {
 						console.log('error solve');
 						return;
 					}
-					console.log('sentnuieh');
 				});
 			}
 			$("#save-led-map").click(saveMap);
