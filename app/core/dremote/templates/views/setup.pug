@@ -62,10 +62,24 @@ block content
 				//h4: h(href='').btn.btn-primary LEDs
 				.list-group
 					div(id='leds').list-group-item.led-svg
+					a(data-toggle='collapse' href='#collapse1').list-group-item Upload
+					div(id='collapse1').panel-collapse.collapse
+						p.list-group-item JSON:
+						code.list-group-item {	"leds": [ { "x": 0.2222, "y": 0.1111 }, ...
+						p.list-group-item CSV:
+						code.list-group-item to be implemented
+						p.list-group-item XML:
+						code.list-group-item to be implemented
+						.form-horizontal.list-group-item
+							input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
+							a(href='/setup' id='upload-map').btn.btn-default.list-group-item 🔓&emsp;Upload
+						//- .form-horizontal.list-group-item
+							//- input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
+							//input(id='upload-map' type='image' title='upload map' src='upload-icon.png' alt='upload map')
 					a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
-				.form-horizontal
-					input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
-					input(id='upload-map' type='image' title='upload map' src='upload-icon.png' alt='upload map')
+				//- .form-horizontal
+				//- 	input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
+				//- 	input(id='upload-map' type='image' title='upload map' src='upload-icon.png' alt='upload map')
 
 
 			//- .form-group
