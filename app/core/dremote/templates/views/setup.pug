@@ -92,12 +92,12 @@ block js
 			// get existing settings from file
 			$.ajax({url: '/config-static/setup.json', async: true, 
 				error: function(){
-					var flashMsg = '<div class="alert alert-error">ⓘ&emsp;No settings found, please continue</div>'
+					var flashMsg = '<div class="alert alert-error">ⓘ&emsp;Set the settings below to start</div>'
 					$('#flash-messages').prepend(flashMsg);
 				},
 				success: function(result){
-					var flashMsg = '<div class="alert alert-success">ⓘ&emsp;Loaded config from settings file</div>'
-					$('#flash-messages').prepend(flashMsg);
+					//- var flashMsg = '<div class="alert alert-success">ⓘ&emsp;Loaded config from settings file</div>'
+					//- $('#flash-messages').prepend(flashMsg);
 					// set lednum from setup.json
 					if(result.ledcount){
 						$('#numLedsInput').val(result.ledcount)
@@ -128,7 +128,7 @@ block js
 					}else{
 						console.log('error: no datapin property found in setup.json');
 					}
-					// set data pin from setup.json
+					// set data pin from setup.json * logic needed here to check clockpin exists?
 					if(result.clockpin){
 						// remove hidden class
 						$('#clockPinDiv').removeClass('hidden');
