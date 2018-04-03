@@ -547,7 +547,7 @@ exports.mapleds = function (req, res) {
 			const ledConfig = JSON.parse(data);
 			ledConfig.leds = newConfig;
 			const jsonLedConfig = JSON.stringify(ledConfig, null, 2);
-			fs.writeFile('./libs/hyperion_segments/hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
+			fs.writeFile(res.locals.configStaticPath +'hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
 				if (fserr) {
 					console.log(fserr);
 					res.apiResponse({
