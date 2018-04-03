@@ -523,21 +523,64 @@ exports.player = function (req, res) {
  * Set sketch player LED coord mapping
  */
 exports.mapleds = function (req, res) {
-	console.log(req.body.leds);
-	if (!isDplayerConnected) {
-		console.log('no');
-
-		return res.apiError({
-			success: false
-		});
-
-	} else {
-		console.log('yes');
-
-		return res.apiResponse({
-			success: true
-		});
+	const newLeds = JSON.parse(req.body.leds);
+	const newConfig = Array();
+	for (var i=0; i<newLeds.leds.length; i++){
+		var newConf = {index: i,
+			hscan: {mininum: newLeds.leds[i].x, maximum: (newLeds.leds[i].x+0.1111)},
+			vscan: {mininum: newLeds.leds[i].y, maximum: (newLeds.leds[i].y+0.1111)}
+		}
+		newConfig.push(newConf);
 	}
+	//console.log(newConfig);
+	fs.readFile('./libs/hyperion_segments/hyperion.template.json', function(err, data){
+		if(err) {
+			console.log('wefaf'+err);
+			return res.apiError({
+				success: false
+			});	
+		}
+		try{
+			const ledConfig = JSON.parse(data);
+			ledConfig.leds = newConfig;
+			//console.log(ledConfig);
+			const jsonLedConfig = JSON.stringify(ledConfig, null, 2);
+			fs.writeFile('./libs/hyperion_segments/hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
+				if (fserr) {
+					console.log(fserr);
+					res.apiResponse({
+						success: false,
+						note: 'Error saving file...',
+						error: fserr
+					});
+				}
+				//else console.log('File saved')
+			});
+			return res.apiResponse({
+				success: true
+			});
+		}catch(exception){
+			console.log('wedwddfaf'+exception);
+			return res.apiError({
+				success: false
+			});	
+		}
+	});
+	// console.log(ledConfig);
+	// if (!isDplayerConnected) {
+	// 	console.log('no');
+
+	// 	return res.apiError({
+	// 		success: false
+	// 	});
+
+	// } else {
+	// 	console.log('yes');
+
+	// 	return res.apiResponse({
+	// 		success: true
+	// 	});
+	// }
 };
 
 /**
