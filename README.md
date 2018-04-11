@@ -35,6 +35,8 @@ curl -X POST -H "Content-Type: application/json" -d '"leds":[{"index":0,"hscan":
 curl -H "Content-Type: application/json" --data-binary @test.json http://localhost:19444
 {"command":"color","priority":100,"color":[255,0,255]}
 
+error during connect: Get http://%2Fvar%2Frun%2Fbalena.sock/v1.31/exec/fd9b23f9bed79c3b52b4dc45abddb28a00ba7f17588ff714cbefaf62ad7afb31/json: read unix @->/var/run/balena.sock: read: connection reset by peer
+
 main (pm2)
 - player
   - play sketch URI
@@ -56,3 +58,17 @@ main (pm2)
 hyperion
 mongodb
 nginx
+
+file structure:
+diskone
+	libs/
+		mongod/
+		electron/
+	public/
+	updates/
+	models/
+	routes/
+	templates/
+	package.json
+	Dockerfile.template
+	LICENSE

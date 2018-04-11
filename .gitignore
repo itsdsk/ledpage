@@ -110,3 +110,17 @@ Temporary Items
 app/arduino_files/arduino_display\.ino
 
 app/core/dremote/libs/arduino_segments/form_setup\.ino
+
+app/core/dremote/public/config-static/leds\.json
+
+app/core/dremote/libs/setup\.json
+
+app/core/dremote/public/view-static/sketch1/index\.html
+
+app/core/dremote/public/view-static/sketch1/maxresdefault\.jpg
+
+app/core/dremote/public/view-static/sketch2/index\.html
+
+app/core/dremote/public/view-static/sketch3/index\.html
+
+app/core/dremote/public/config-static/
