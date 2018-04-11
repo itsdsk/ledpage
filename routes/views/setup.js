@@ -82,7 +82,7 @@ exports = module.exports = function (req, res) {
 
         if (true) {
             // construct arduino file
-            fs.writeFile("./libs/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
+            fs.writeFile("./libs/controller/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
                 if (err) {
                     console.log('error starting arduino file');
                     console.log(err);
@@ -92,25 +92,26 @@ exports = module.exports = function (req, res) {
                 var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
                 var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
                 var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
+                var defines;
                 if (!req.body.clockPin) {
-                    var defines = define1.concat(define3, define4, define5);
+                    defines = define1.concat(define3, define4, define5);
                 } else if (req.body.clockPin) {
                     var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
-                    var defines = define1.concat(define2, define3, define4, define5);
+                    defines = define1.concat(define2, define3, define4, define5);
                 }
-                fs.appendFile("./libs/arduino_segments/form_setup.ino", defines, function (err) {
+                fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", defines, function (err) {
                     if (err) {
                         console.log('error adding defines to arduino file');
                         console.log(err);
                         return next();
                     }
-                    fs.readFile("./libs/arduino_segments/template.txt", (err, contents) => {
+                    fs.readFile("./libs/controller/arduino_segments/template.txt", (err, contents) => {
                         if (err) {
                             console.log('error reading template arduino file');
                             console.log(err);
                             return next();
                         }
-                        fs.appendFile("./libs/arduino_segments/form_setup.ino", contents, function (err) {
+                        fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", contents, function (err) {
                             if (err) {
                                 console.log('error adding arduino template to file');
                                 console.log(err);
@@ -120,7 +121,7 @@ exports = module.exports = function (req, res) {
                             // compile and upload new arduino file
                             const exec = require('child_process').exec;
                             console.log('starting arduino compile & upload');
-                            var syncArduino = exec('./libs/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
+                            var syncArduino = exec('./libs/controller/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
                                 console.log(`${stdout}`);
                                 console.log(`${stderr}`);
                                 if (err !== null) {
@@ -128,8 +129,8 @@ exports = module.exports = function (req, res) {
                                 } // ref: https://stackoverflow.com/a/44667294
                             });
 
-                        })
-                    })
+                        });
+                    });
                 });
             });
         }

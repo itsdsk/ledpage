@@ -56,7 +56,7 @@ var ipfsInit = () => {
 			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
-					console.log('error: no channels')
+					console.log('error: no channels');
 				}
 
 				channels.forEach((channel) => {
@@ -65,13 +65,13 @@ var ipfsInit = () => {
 					//console.log(topic);
 					ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
 						if (suberr) {
-							console.log('Could not subscribe..')
+							console.log('Could not subscribe..');
 							console.log(suberr);
 							throw suberr;
 						}
-					})
-				})
-			})
+					});
+				});
+			});
 			ipfs.pubsub.ls((err, topics) => {
 				if (err) {
 					console.log('ipfs pubsub ls err:');
@@ -86,7 +86,7 @@ var ipfsInit = () => {
 	});
 };
 
-ipfsInit()
+ipfsInit();
 
 // Periodically show peers
 setInterval(function () {
@@ -95,7 +95,7 @@ setInterval(function () {
 	ipfs.id(function (err, identity) {
 		if (err) {
 			if (ipfsInitAttempts < 3) {
-				console.log('connection error trying to sync with ipfs')
+				console.log('connection error trying to sync with ipfs');
 				console.log(err);
 			}
 		} else {
@@ -103,11 +103,11 @@ setInterval(function () {
 			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
-					console.log('error finding sketch categories to sync with ipfs')
+					console.log('error finding sketch categories to sync with ipfs');
 				}
 				// loop through channels
 				channels.forEach((channel) => {
-					console.log('adding channel:')
+					console.log('adding channel:');
 					var ipfsTopic = channel.name;
 					console.log(ipfsTopic);
 					// loop through sketches
@@ -127,11 +127,11 @@ setInterval(function () {
 									}
 								});
 							}
-						})
+						});
 					});
 
-				})
-			})
+				});
+			});
 		}
 	});
 
@@ -208,8 +208,8 @@ exports.setBrightness = function (req, res) {
 		console.log(error);
 		return res.apiResponse({
 			error: error
-		})
-	})
+		});
+	});
 
 	client.on('data', function (data) {
 		console.log('Received: ' + data);
@@ -217,7 +217,7 @@ exports.setBrightness = function (req, res) {
 		res.apiResponse({
 			success: true,
 			response: data
-		})
+		});
 	});
 
 	// hyperion.getOn((error, response) => {
@@ -255,7 +255,7 @@ exports.getBrightness = function (req, res) {
 			console.log(error);
 			return res.apiError({
 				error: error
-			})
+			});
 		}
 		hyperion.getBrightness((error, response) => {
 			if (error) {
@@ -263,16 +263,16 @@ exports.getBrightness = function (req, res) {
 				console.log(error);
 				return res.apiError({
 					error: error
-				})
+				});
 			}
 			console.log('success getting hyperion brightness');
 			console.log(response);
 			res.apiResponse({
 				success: true,
 				response: response
-			})
-		})
-	})
+			});
+		});
+	});
 };
 
 
@@ -283,7 +283,7 @@ exports.ipfs = function (req, res) {
 
 	ipfs.id(function (err, identity) {
 		if (err) {
-			console.log(err)
+			console.log(err);
 			return res.apiError('ipfs error', err);
 		} else {
 			console.log("Identity:");
@@ -357,7 +357,7 @@ exports.add = function (req, res) {
 		ipfs.files.get(ipfsURI, function (err, files) {
 			if (err) {
 				//console.log('not workng')
-				console.log(err)
+				console.log(err);
 				res.apiResponse({
 					success: false,
 					error: err
@@ -531,11 +531,11 @@ exports.mapleds = function (req, res) {
 		var newConf = {index: i,
 			hscan: {mininum: newLeds.leds[i].x, maximum: (newLeds.leds[i].x+0.1111)},
 			vscan: {mininum: newLeds.leds[i].y, maximum: (newLeds.leds[i].y+0.1111)}
-		}
+		};
 		newConfig.push(newConf);
 	}
 	// read hyperion config template then add new led coords and save
-	fs.readFile('./libs/hyperion_segments/hyperion.template.json', function(err, data){
+	fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function(err, data){
 		if(err) {
 			console.log('wefaf'+err);
 			return res.apiError({
@@ -644,6 +644,6 @@ exports.sync = function (req, res) {
 				});
 
 			}
-		})
+		});
 	});
-}
+};
