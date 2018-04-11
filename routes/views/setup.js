@@ -12,6 +12,21 @@ exports = module.exports = function (req, res) {
     locals.boardTypes = [{
         value: "uno",
         label: "Arduino Uno"
+    }, {
+        value: "leonardo",
+        label: "Arduino Leonardo"
+    }, {
+        value: "mega",
+        label: "Arduino Mega (ATmega1280)"
+    }, {
+        value: "mega2560",
+        label: "Arduino Mega 2560 or Mega ADK"
+    }, {
+        value: "nano328",
+        label: "Arduino Nano w/ ATmega328"
+    }, {
+        value: "nano",
+        label: "Arduino Nano w/ ATmega168"
     }];
     locals.dataPins = [{
         value: "5",
@@ -21,8 +36,7 @@ exports = module.exports = function (req, res) {
         value: "13",
         label: "13"
     }];
-    locals.ledChips = [
-        {
+    locals.ledChips = [{
             value: "APA102",
             label: "APA102 (also Dotstar)",
             pins: "4pin"
@@ -144,7 +158,7 @@ exports = module.exports = function (req, res) {
             "platform": req.body.boardType,
             "datapin": req.body.dataPin
         };
-        if(req.body.clockPin){
+        if (req.body.clockPin) {
             config.clockpin = req.body.clockPin;
         }
         fs.writeFile("/data/content/config-static/setup.json", JSON.stringify(config, null, 4), 'utf8', function (err) {
