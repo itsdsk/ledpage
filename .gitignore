@@ -124,3 +124,7 @@ app/core/dremote/public/view-static/sketch2/index\.html
 app/core/dremote/public/view-static/sketch3/index\.html
 
 app/core/dremote/public/config-static/
+
+\.resin-sync\.yml
+
+package-lock\.json
