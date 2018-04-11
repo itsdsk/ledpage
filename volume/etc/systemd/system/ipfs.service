@@ -3,7 +3,7 @@ Description=IPFS daemon
 After=network.target
 
 [Service]
-EnvironmentFile=/usr/src/app/IPFS_ENV
+EnvironmentFile=/usr/src/app/libs/peer2peer/IPFS_ENV
 ExecStart=/usr/bin/nice -n 10 /usr/bin/ipfs daemon --init --enable-pubsub-experiment --enable-gc
 Restart=on-failure
 
