@@ -90,6 +90,7 @@ RUN systemctl enable ipfs.service && systemctl disable nginx.service
 
 # move app to filesystem
 COPY ./app ./
+COPY ./start.sh ./
 COPY ./volume/data/content /data/content/
 VOLUME /data/content
 
