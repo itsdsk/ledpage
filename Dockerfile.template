@@ -51,7 +51,6 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
 
 # install ipfs
 ENV IPFS_VERSION=0.4.13
-ENV IPFS_PATH=/data/.ipfs
 RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
   && tar xzvf go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
   && cp go-ipfs/ipfs /usr/bin/ipfs \
@@ -108,6 +107,7 @@ COPY ./routes ./routes
 COPY ./models ./models
 COPY ./templates ./templates
 COPY ./start.sh ./
+COPY ./IPFS_ENV ./
 COPY ./volume/data/content /data/content/
 VOLUME /data/content
 
