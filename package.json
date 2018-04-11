@@ -5,13 +5,13 @@
   "dependencies": {
     "keystone": "4.0.0-beta.8",
     "lodash": "^4.13.1",
-    "pug": "2.0.0-beta11",
+    "pug": "2.0.3",
     "node-sass": "4.5.0",
     "node-sass-middleware": "0.11.0",
     "dotenv": "4.0.0",
     "async": "2.1.4",
     "node-ipc": "^9.1.1",
-    "ipfs-api": "^18.1.2",
+    "ipfs-api": "^20.0.0",
     "hyperion-js-api": "^1.0.3"
   },
   "devDependencies": {
@@ -21,6 +21,6 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "start": "node keystone.js"
+    "start": "node app.js"
   }
 }
