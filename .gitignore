@@ -128,3 +128,5 @@ app/core/dremote/public/config-static/
 \.resin-sync\.yml
 
 package-lock\.json
+
+notes

@@ -1,74 +1,87 @@
-avconv -f x11grab -r 25 -s 1824x984 -i :0.0+0,0 -vcodec libx264 video.mkv
+# Project Title
 
-avconv -f x11grab -r 25 -s 1824x984 -i :0.0+0,0 -c:v libx264 -f mpegts udp://224.0.0.100:1234
+One Paragraph of project description goes here
 
-uv4l --driver raspidisp --display 0 --framerate 30 --resolution 0 --auto-video_nr
+## Getting Started
 
-g++ -o process_video process_v4l.cpp
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-v4l2-ctl --all -d /dev/video0
+### Prerequisites
 
-g++ opencv_test.cpp -o  opencv_test -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc
+What things you need to install the software and how to install them
 
-export DISPLAY=":0" && g++ xscr.cpp -o  xscr -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lX11
+```
+Give examples
+```
 
-export DISPLAY=":0" && g++ Xcap.cpp -o  xcap -I/usr/local/include/ -lX11
+### Installing
 
-gcc -o capv4l2 capv4l2.c -I/usr/local/include/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lm
+A step by step series of examples that tell you have to get a development env running
 
-resin sync --source . --destination /usr/src/
+Say what the step will be
 
-avconv -r 25 -s 1824x984 -f video4linux2 -i /dev/video0 udp://224.0.0.100:1234
+```
+Give the example
+```
 
-/usr/bin/hyperiond ./hyperion.config.json
+And repeat
 
-resin sync --source ./app/ --destination /usr/src/app/
+```
+until finished
+```
 
-mongod --repair
+End with an example of getting some data out of the system or using it for a little demo
 
-import -window root -display :0.0 screenshot.jpg
+## Running the tests
 
-curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://localhost:19444
+Explain how to run the automated tests for this system
 
-curl -X POST -H "Content-Type: application/json" -d '"leds":[{"index":0,"hscan":{"minimum":0.2222,"maximum":0.3333},"vscan":{"minimum":0.1111,"maximum":0.2222}}]' http://localhost:19444
+### Break down into end to end tests
 
-curl -H "Content-Type: application/json" --data-binary @test.json http://localhost:19444
-{"command":"color","priority":100,"color":[255,0,255]}
+Explain what these tests test and why
 
-error during connect: Get http://%2Fvar%2Frun%2Fbalena.sock/v1.31/exec/fd9b23f9bed79c3b52b4dc45abddb28a00ba7f17588ff714cbefaf62ad7afb31/json: read unix @->/var/run/balena.sock: read: connection reset by peer
+```
+Give an example
+```
 
-main (pm2)
-- player
-  - play sketch URI
-  - (IPC to main)
-- hardware
-  - compile                          x
-  - upload                           x
-  - (IPC to main)
-- remote
-  - cms web view
-	- play sketch
-	- add sketch
-  - setup web view
-    - set led num+chipset+port       
-    - set positions                  
-	- (future?) sort/reorder
-- file-sharing
-  - download sketch
-hyperion
-mongodb
-nginx
+### And coding style tests
 
-file structure:
-diskone
-	libs/
-		mongod/
-		electron/
-	public/
-	updates/
-	models/
-	routes/
-	templates/
-	package.json
-	Dockerfile.template
-	LICENSE
+Explain what these tests test and why
+
+```
+Give an example
+```
+
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+## Built With
+
+* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
+* [Maven](https://maven.apache.org/) - Dependency Management
+* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+
+## Authors
+
+* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+
+See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* Hat tip to anyone who's code was used
+* Inspiration
+* etc
