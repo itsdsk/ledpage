@@ -1,8 +1,8 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:8
 
 # install mongodb
-ADD mongodb_3_0_14_core.tar.gz /usr/bin/
-ADD mongodb_3_0_14_tools.tar.gz /usr/bin/
+ADD ./volume/mongodb/mongodb_3_0_14_core.tar.gz /usr/bin/
+ADD ./volume/mongodb/mongodb_3_0_14_tools.tar.gz /usr/bin/
 RUN groupadd -r mongodb && useradd -r -g mongodb mongodb \
   && mkdir -p /data/db /data/configdb /var/log/mongodb \
   && chown -R mongodb:mongodb /usr/bin/mongo* \
