@@ -1,5 +1,0 @@
-// reference: http://www.instructables.com/id/Interface-Python-and-Arduino-with-pySerial/
-
-// LED programming objects
-#include "FastLED.h"
-#define DATA_PIN 5
