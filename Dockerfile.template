@@ -66,21 +66,6 @@ RUN JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
 
-#COPY ./app/core/dremote/package.json ./core/dremote/
-#COPY ./app/core/dsetup/package.json ./core/dsetup/
-#COPY ./app/core/dsharing/package.json ./core/dsharing/
-#COPY ./app/core/dplayer/package.json ./core/dplayer/
-#RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
-#  && npm cache clean --force && rm -rf /tmp/* \
-#  && cd ./../dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
-#  && npm cache clean --force && rm -rf /tmp/* \
-#  && cd ./../dsharing/ && JOBS=MAX npm install --unsafe-perm --production \
-#  && npm cache clean --force && rm -rf /tmp/* \
-#  && cd ./../dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
-#  && npm install pm2 -g \
-#  && npm cache clean --force && rm -rf /tmp/* \
-#  && node_modules/.bin/electron-rebuild
-
 # set variables
 ENV INITSYSTEM on
 ENV ARDUINODIR /usr/share/arduino
@@ -98,7 +83,6 @@ COPY /volume/etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/d
 RUN systemctl enable ipfs.service && systemctl disable nginx.service
 
 # move app to filesystem
-#COPY ./app ./
 COPY ./app.js ./
 COPY ./public ./public
 COPY ./libs ./libs
