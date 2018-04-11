@@ -57,20 +57,29 @@ RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v
   && rm -rf go-ipfs*
 
 # install nodejs dependencies
-COPY ./app/core/dremote/package.json ./core/dremote/
+COPY ./package.json ./
+COPY ./libs/player/package.json ./libs/player/
+RUN JOBS=MAX npm install --unsafe-perm --production \
+  && npm cache clean --force && rm -rf /tmp/* \
+  && cd ./libs/player/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm install pm2 -g \
+  && npm cache clean --force && rm -rf /tmp/* \
+  && node_modules/.bin/electron-rebuild
+
+#COPY ./app/core/dremote/package.json ./core/dremote/
 #COPY ./app/core/dsetup/package.json ./core/dsetup/
 #COPY ./app/core/dsharing/package.json ./core/dsharing/
-COPY ./app/core/dplayer/package.json ./core/dplayer/
-RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
-  && npm cache clean --force && rm -rf /tmp/* \
+#COPY ./app/core/dplayer/package.json ./core/dplayer/
+#RUN cd ./core/dremote/ && JOBS=MAX npm install --unsafe-perm --production \
+#  && npm cache clean --force && rm -rf /tmp/* \
 #  && cd ./../dsetup/ && JOBS=MAX npm install --unsafe-perm --production \
 #  && npm cache clean --force && rm -rf /tmp/* \
 #  && cd ./../dsharing/ && JOBS=MAX npm install --unsafe-perm --production \
 #  && npm cache clean --force && rm -rf /tmp/* \
-  && cd ./../dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
-  && npm install pm2 -g \
-  && npm cache clean --force && rm -rf /tmp/* \
-  && node_modules/.bin/electron-rebuild
+#  && cd ./../dplayer/ && JOBS=MAX npm install --unsafe-perm --production \
+#  && npm install pm2 -g \
+#  && npm cache clean --force && rm -rf /tmp/* \
+#  && node_modules/.bin/electron-rebuild
 
 # set variables
 ENV INITSYSTEM on
@@ -89,7 +98,14 @@ COPY /volume/etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/d
 RUN systemctl enable ipfs.service && systemctl disable nginx.service
 
 # move app to filesystem
-COPY ./app ./
+#COPY ./app ./
+COPY ./app.js ./
+COPY ./public ./public
+COPY ./libs ./libs
+COPY ./updates ./updates
+COPY ./routes ./routes
+COPY ./models ./models
+COPY ./templates ./templates
 COPY ./start.sh ./
 COPY ./volume/data/content /data/content/
 VOLUME /data/content
