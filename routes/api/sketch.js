@@ -468,7 +468,7 @@ exports.add = function (req, res) {
 
 exports.play = function (req, res) {
 	if (!isDplayerConnected) {
-		console.log('error: player not connected');
+		console.log('play error: player not connected');
 
 		return res.apiError({
 			success: false
@@ -506,14 +506,14 @@ exports.play = function (req, res) {
 
 exports.player = function (req, res) {
 	if (!isDplayerConnected) {
-		console.log('error: player not connected');
+		console.log('player error: player not connected');
 
 		return res.apiError({
 			success: false
 		});
 
 	} else {
-		console.log('yes');
+		console.log('player is connected');
 
 		return res.apiResponse({
 			success: true
