@@ -12,9 +12,9 @@ mixin sketch(sketch)
 			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')
 			a(href='/api/sketch/' + sketch.id + '/play')
 				if sketch.image.exists
-					img(src=sketch._.image.fit(750,750)).img-responsive
+					img(src=sketch._.image.fit(250,250)).img-responsive
 				else
-					img(src="http://placehold.it/750x750").img-responsive
+					img(src="http://placehold.it/250x250").img-responsive
 					// display led svgs
 					//div(id='leds').list-group-item.led-svg
 					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
@@ -75,7 +75,7 @@ block content
 					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
 					.row.browse
 						each sketch in data.sketches.results
-							.col-sm-4
+							.col-xs-4
 								+sketch(sketch)
 				
 					if data.sketches.totalPages > 1
