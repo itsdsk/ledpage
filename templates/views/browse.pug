@@ -12,8 +12,12 @@ mixin sketch(sketch)
 			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')
 			//- a(href='/api/sketch/' + sketch.id + '/play')
 			.img-wrapper(style='position:relative')
-				if sketch.image.exists
-					img(src=sketch._.image.fit(300,300)).img-responsive
+				//- if sketch.image.exists
+				//- 	img(src=sketch._.image.fit(300,300)).img-responsive
+				if sketch.prefThumb
+					- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
+					//- img(src=imgThumb)
+					div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
 				else
 					img(src="http://placehold.it/300x300").img-responsive
 				.img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
@@ -83,6 +87,7 @@ block content
 					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
 					.row.browse
 						style .img-overlay:before {content: ' ';display:block;height:50%;}
+						style .sq-thumb {float:left;position: relative;width: 100%;padding-bottom : 100%;margin:0%;background-position:center center;background-repeat:no-repeat;background-size:cover;}
 						each sketch in data.sketches.results
 							.col-xs-4(style="padding: 1px;")
 								+sketch(sketch)
