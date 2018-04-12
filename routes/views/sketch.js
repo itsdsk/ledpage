@@ -74,6 +74,7 @@ exports = module.exports = function (req, res) {
 		var exec = require('child_process').exec;
 		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
 		var execCommand = 'import -window root -display :0.0 '+uploadPath;
+		console.log('saving screenshot to: ' + uploadPath);
 		// save screenshot
 		function puts(error, stdout, stderr) {
 			sys.puts(stdout);

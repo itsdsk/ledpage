@@ -18,6 +18,10 @@ block content
 				.page-header
 					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
 					h1= data.sketch.title
+				if data.thumbnails.length
+					h4 Thumbnails
+				else
+					h4 No thumbnails
 				//- article
 				//- 	//- p: a(href='/browse') &larr; back to the sketches
 				//- 	//- hr
