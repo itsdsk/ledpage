@@ -1,0 +1,10 @@
+[Unit]
+Description=MongoDB server
+After=network.target
+
+[Service]
+ExecStart=mongod
+Restart=always
+
+[Install]
+WantedBy=default.target

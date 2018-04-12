@@ -1,0 +1,10 @@
+[Unit]
+Description=Nginx server
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/nginx -g "daemon off;"
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -7,7 +7,8 @@ echo "compileupload.sh: Starting:"
 cd /usr/src/app/libs/controller/arduino_segments && make
 
 # stop hyperion
-supervisorctl stop hyperion
+#supervisorctl stop hyperion
+systemctl stop hyperion
 echo "hyperion process stopped"
 
 # compile and upload to arduino
@@ -21,7 +22,8 @@ if [ "${PROGRAMMER:-}" == "1" ]; then
 fi
 
 # restart hyperion
-supervisorctl start hyperion
+#supervisorctl start hyperion
+systemctl start hyperion
 echo "hyperion process restarted"
 
 # report end
