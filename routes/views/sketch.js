@@ -83,7 +83,15 @@ exports = module.exports = function (req, res) {
 		// "import -window root -display :0.0 /tmp/screen.png"
 		exec(execCommand, function (err, stdout, stderr) {
 			console.log(stdout);
+			if(err){
+				req.flash('warning', 'not done');
+				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+			};
 			keystone.list('Sketch').model.findById(locals.data.sketch.id).exec(function(err, item) {
+				if(err){
+					req.flash('warning', 'not done');
+					return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				}	
 				var imgs = {
 					thumbnails: locals.data.sketch.thumbnails
 				};
@@ -91,7 +99,11 @@ exports = module.exports = function (req, res) {
 				keystone.list('Sketch').updateItem(item, imgs, {
 					fields: ["thumbnails"]
 				}, function (dberror) {
-					if(dberror) console.log('db error: ' + dberror);
+					if(dberror) {
+						console.log('db error: ' + dberror);
+						req.flash('warning', 'not done');
+						return res.redirect('/browse/sketch/'+locals.data.sketch.slug);		
+					}
 				});
 			})
 			// let updater = locals.data.sketch.getUpdateHandler(req, res, {
@@ -99,6 +111,13 @@ exports = module.exports = function (req, res) {
 			// });
 			// updater.process()
 			console.log('thumbnails: '+locals.data.sketch.thumbnails);
+			if(err){
+				req.flash('warning', 'not done');
+				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+			}else{
+				req.flash('success', 'done');
+				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+			}
 			next(err);
 		});
 		// upload screenshot from file
