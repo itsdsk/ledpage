@@ -46,20 +46,24 @@ exports = module.exports = function (req, res) {
 	view.on('get', {
 		screenshot: 'true'
 	}, function (next) {
-		console.log('ewdgszdgesrgesgegff');
 		var sys = require('sys');
 		var exec = require('child_process').exec;
+		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot'+(Math.random().toString(36).substr(2, length))+'.png';
+		console.log(uploadPath);
+		var execCommand = 'import -window root -display :0.0 '+uploadPath;
+		console.log(execCommand);
 		// save screenshot
 		function puts(error, stdout, stderr) {
 			sys.puts(stdout);
 		}
-		exec("import -window root -display :0.0 /tmp/screen.png", function (err, stdout, stderr) {
+		// "import -window root -display :0.0 /tmp/screen.png"
+		exec(execCommand, function (err, stdout, stderr) {
 			console.log(stdout);
 		});
-			// upload screenshot from file
-		locals.data.sketch._.image.upload({
-			path: '/tmp/screen.png'
-		}, (err) => { console.log('done done done') });
+		// upload screenshot from file
+		// locals.data.sketch._.image.upload({
+		// 	path: '/tmp/screen.png'
+		// }, (err) => { console.log('done done done') });
 
 		return next();
 	});
