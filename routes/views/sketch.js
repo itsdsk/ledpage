@@ -58,7 +58,7 @@ exports = module.exports = function (req, res) {
 		});
 			// upload screenshot from file
 		locals.data.sketch._.image.upload({
-			path: '/tmp/screen.png',
+			path: '/tmp/screen.png'
 		}, (err) => { console.log('done done done') });
 
 		return next();
