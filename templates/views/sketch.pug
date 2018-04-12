@@ -1,31 +1,45 @@
 extends ../layouts/default
 
 block content
-	.container: .row: .col-sm-10.col-sm-offset-1.col-md-8.col-md-offset-2
-		article
-			p: a(href='/browse') &larr; back to the sketches
-			hr
-			if !data.sketch
-				h2 Invalid Sketch.
-			else
-				header
-					h1= data.sketch.title
-					if data.sketch.ipnsHash
-						h2: a(href='?update=ipns') Update IPNS #{data.sketch.ipnsHash}
-					h5 Posted 
-						if data.sketch.publishedDate
-							| on #{data.sketch._.publishedDate.format('MMMM Do, YYYY')} 
-						if data.sketch.channels && data.sketch.channels.length
-							| in 
-							each channel, channel_i in data.sketch.channels
-								a(href='/browse/' + channel.key)= channel.name
-								if channel_i < data.sketch.channels.length - 1
-									| , 
-								else
-									|  
-						if data.sketch.author
-							| by #{data.sketch.author.name.first}
-				.sketch
+	.container: .row
+		if !data.sketch
+			h2 Invalid Sketch.
+		else
+			.col-sm-4.col-md-4
+				iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
+				.panel.panel-default
+					.panel-heading
+						h3(class='panel-title')=data.sketch.title
+					.list-group
+						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Display
+						a(href='', target='_blank').list-group-item Edit HTML
+						a(href='', target='_blank').list-group-item Delete
+			.col-sm-8.col-md-8
+				
+				article
+					//- p: a(href='/browse') &larr; back to the sketches
+					//- hr
+					if !data.sketch
+						h2 Invalid Sketch.
+					else
+						header
+							h1= data.sketch.title
+							if data.sketch.ipnsHash
+								h2: a(href='?update=ipns') Update IPNS #{data.sketch.ipnsHash}
+							h5 Posted 
+								if data.sketch.publishedDate
+									| on #{data.sketch._.publishedDate.format('MMMM Do, YYYY')} 
+								if data.sketch.channels && data.sketch.channels.length
+									| in 
+									each channel, channel_i in data.sketch.channels
+										a(href='/browse/' + channel.key)= channel.name
+										if channel_i < data.sketch.channels.length - 1
+											| , 
+										else
+											|  
+								if data.sketch.author
+									| by #{data.sketch.author.name.first}
+						.sketch
 					//if data.sketch.image.exists
 					//	.image-wrap: img(src=data.sketch._.image.fit(750,450)).img-responsive
 					//!= data.sketch.content.full

@@ -17,8 +17,10 @@ mixin sketch(sketch)
 				else
 					img(src="http://placehold.it/300x300").img-responsive
 				.img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
-					a(href='')
-						button(type='submit').btn.btn-md erfg
+					a(href='/api/sketch/' + sketch.id + '/play')
+						button(type='submit').btn.btn-md Display
+					a(href='/browse/sketch/' + sketch.slug)
+						button(type='submit').btn.btn-md More
 					// display led svgs
 					//div(id='leds').list-group-item.led-svg
 					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
