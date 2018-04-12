@@ -25,6 +25,8 @@ Sketch.add({
 	modifiedDate: { type: Types.Date, index: true },
 	//localPath: { type: String },
 	localDir: { type: String },
+	thumbnails: { type: Types.TextArray },
+	prefThumb: { type: String},
 	ipnsHash: { type: String },
 	ipfsHash: { type: String },
 	image: {

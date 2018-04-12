@@ -72,7 +72,8 @@ exports = module.exports = function (req, res) {
 	}, function (next) {
 		var sys = require('sys');
 		var exec = require('child_process').exec;
-		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
+		var uploadName = 'screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
+		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/'+uploadName;//screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
 		var execCommand = 'import -window root -display :0.0 '+uploadPath;
 		console.log('saving screenshot to: ' + uploadPath);
 		// save screenshot
@@ -82,6 +83,21 @@ exports = module.exports = function (req, res) {
 		// "import -window root -display :0.0 /tmp/screen.png"
 		exec(execCommand, function (err, stdout, stderr) {
 			console.log(stdout);
+			keystone.list('Sketch').model.findById(locals.data.sketch.id).exec(function(err, item) {
+				var imgs = {
+					thumbnails: uploadName
+				};
+				keystone.list('Sketch').updateItem(item, imgs, {
+					fields: ["thumbnails"]
+				}, function (dberror) {
+					if(dberror) console.log('db error: ' + dberror);
+				});
+			})
+			// let updater = locals.data.sketch.getUpdateHandler(req, res, {
+			// 	errorMessage: 'error updating sketch with screenshot'
+			// });
+			// updater.process()
+			console.log('thumbnails: '+locals.data.sketch.thumbnails);
 			next(err);
 		});
 		// upload screenshot from file
