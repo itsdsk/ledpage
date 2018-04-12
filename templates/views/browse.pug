@@ -2,7 +2,7 @@ extends ../layouts/default
 
 mixin sketch(sketch)
 	//- .sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
-	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).panel.panel-default
+	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id }))
 		//- h4.media-heading
 		//- .panel-heading
 		//- 	h3.panel-title= sketch.title
@@ -14,24 +14,24 @@ mixin sketch(sketch)
 				if sketch.image.exists
 					img(src=sketch._.image.fit(750,750)).img-responsive
 				else
-					//img(src="http://placehold.it/750x750").img-responsive
+					img(src="http://placehold.it/750x750").img-responsive
 					// display led svgs
 					//div(id='leds').list-group-item.led-svg
-					iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
+					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
 					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).display-sketch
 
 		//- .media-bottom
-		.list-group
-			//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
-			a(href='/api/sketch/' + sketch.id + '/play').list-group-item.display-sketch Display
-			if sketch.ipfsHash
-				//- a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
-				a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).list-group-item Preview IPFS
-			else
-				//- a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
-				a(href='/api/sketch/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
-				//- a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
-				a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
+		//- .list-group
+		//- 	//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
+		//- 	a(href='/api/sketch/' + sketch.id + '/play').list-group-item.display-sketch Display
+		//- 	if sketch.ipfsHash
+		//- 		//- a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
+		//- 		a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).list-group-item Preview IPFS
+		//- 	else
+		//- 		//- a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
+		//- 		a(href='/api/sketch/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
+		//- 		//- a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
+		//- 		a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
 			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
 			//- h2.media-heading
 			//- 	a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
@@ -73,9 +73,10 @@ block content
 					//- 		|  sketches.
 					//- else
 					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
-					.browse
+					.row.browse
 						each sketch in data.sketches.results
-							+sketch(sketch)
+							.col-sm-4
+								+sketch(sketch)
 				
 					if data.sketches.totalPages > 1
 						ul.pagination
