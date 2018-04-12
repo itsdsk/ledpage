@@ -57,6 +57,8 @@ mixin sketch(sketch)
 //- 		h1= data.channel ? data.channel.name : 'Select a Sketch'
 
 block content
+	.container
+		div(id='ledmap').led-map
 	.container: .row 
 		.col-sm-8.col-md-8
 			if filters.channel && !data.channel 
@@ -148,14 +150,13 @@ block js
 
 	script.
 
-
 		d3.json('/config-static/leds.json').then(function(data) {
 
-			var width = 500,
-				height = 500,
+			var width = 1280,
+				height = 720,
 				padding = 15;
 			
-			var svgContainer = d3.selectAll('.led-svg').append('svg')
+			var svgContainer = d3.selectAll('.led-map').append('svg')
 				.attr('viewBox', '0 0 ' + width + ' ' + height);
 				//- .attr("width", width)
 				//- .attr("height", height);
@@ -169,6 +170,14 @@ block js
 			var maxX = d3.max(data.leds, function(d) {return d.x});
 			var minY = d3.min(data.leds, function(d) {return d.y});
 			var maxY = d3.max(data.leds, function(d) {return d.y});
+
+			// flat line of points (same number as led map)
+			var initCoords = [];
+			for(var i=0; i<data.leds.length; i++){
+				var initY = (minY+maxY)/2.0;
+				var initX = minX + ((i/data.leds.length)*(maxX-minX));
+				initCoords.push({'x': initX, 'y': initY});
+			}
 
 			var scaleX = d3.scaleLinear()
 				.domain([minX,maxX])
@@ -186,7 +195,14 @@ block js
 				.attr('fill', 'none')
 				.attr('stroke', '#337ab7')
 				.attr('stroke-width', 0.5*padding)
-				.attr('d', line(data.leds));
+				.datum(initCoords)
+				.attr('d', line)
+				.transition()
+				.duration(1000)
+				.attrTween('d', function() {
+					return d3.interpolate(line(initCoords), line(data.leds));
+				});
+				//- .attr('d', line(data.leds));
 
 			var circles = svgContainer.selectAll('circle')
 				.data(data.leds)
@@ -203,3 +219,58 @@ block js
 
 
 		})
+
+		//- d3.json('/config-static/leds.json').then(function(data) {
+
+		//- 	var width = 500,
+		//- 		height = 500,
+		//- 		padding = 15;
+			
+		//- 	var svgContainer = d3.selectAll('.led-svg').append('svg')
+		//- 		.attr('viewBox', '0 0 ' + width + ' ' + height);
+		//- 		//- .attr("width", width)
+		//- 		//- .attr("height", height);
+
+		//- 	svgContainer.append('rect')
+		//- 		.attr('width', '100%')
+		//- 		.attr('height', '100%')
+		//- 		.attr('fill', 'white');
+				
+		//- 	var minX = d3.min(data.leds, function(d) {return d.x});
+		//- 	var maxX = d3.max(data.leds, function(d) {return d.x});
+		//- 	var minY = d3.min(data.leds, function(d) {return d.y});
+		//- 	var maxY = d3.max(data.leds, function(d) {return d.y});
+
+		//- 	var scaleX = d3.scaleLinear()
+		//- 		.domain([minX,maxX])
+		//- 		.range([padding, width-padding]);
+		//- 	var scaleY = d3.scaleLinear()
+		//- 		.domain([minY,maxY])
+		//- 		.range([padding, height-padding]);
+
+		//- 	var line = d3.line()
+		//- 		.curve(d3.curveLinear)
+		//- 		.x(function(d) { return scaleX(d.x); })
+		//- 		.y(function(d) { return scaleY(d.y); });
+
+		//- 	var path = svgContainer.append('path')
+		//- 		.attr('fill', 'none')
+		//- 		.attr('stroke', '#337ab7')
+		//- 		.attr('stroke-width', 0.5*padding)
+		//- 		.attr('d', line(data.leds));
+
+		//- 	var circles = svgContainer.selectAll('circle')
+		//- 		.data(data.leds)
+		//- 		.enter()
+		//- 		.append("circle");
+
+		//- 	var circleAttr = circles
+		//- 		.attr('cx', function(d) { return scaleX(d.x); })
+		//- 		.attr('cy', function(d) { return scaleY(d.y); })
+		//- 		.attr('r', function(d) { return 0.7*padding; })
+		//- 		.attr('stroke', '#337ab7')
+		//- 		.attr('stroke-width', 0.33*padding)
+		//- 		.attr('fill', 'white');
+
+
+		//- })
