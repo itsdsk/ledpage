@@ -45,7 +45,8 @@ var ipfsInitAttempts = 0;
 var ipfsInit = () => {
 	ipfs.id(function (err, identity) {
 		if (err) {
-			console.log(err);
+			console.log('ipfs init error');
+			//console.log(err);
 			ipfsInitAttempts += 1;
 			if (ipfsInitAttempts < 3) {
 				setTimeout(function () {
@@ -74,8 +75,8 @@ var ipfsInit = () => {
 			});
 			ipfs.pubsub.ls((err, topics) => {
 				if (err) {
-					console.log('ipfs pubsub ls err:');
-					console.log(err);
+					console.log('ipfs pubsub ls err');
+					//console.log(err);
 					throw err;
 				}
 				//console.log("Subscribed topics:");
@@ -96,7 +97,7 @@ setInterval(function () {
 		if (err) {
 			if (ipfsInitAttempts < 3) {
 				console.log('connection error trying to sync with ipfs');
-				console.log(err);
+				//console.log(err);
 			}
 		} else {
 			// find channels
@@ -283,7 +284,8 @@ exports.ipfs = function (req, res) {
 
 	ipfs.id(function (err, identity) {
 		if (err) {
-			console.log(err);
+			console.log('ipfs error (no connection?)');
+			//console.log(err);
 			return res.apiError('ipfs error', err);
 		} else {
 			console.log("Identity:");
@@ -466,7 +468,7 @@ exports.add = function (req, res) {
 
 exports.play = function (req, res) {
 	if (!isDplayerConnected) {
-		console.log('no');
+		console.log('error: player not connected');
 
 		return res.apiError({
 			success: false
@@ -504,7 +506,7 @@ exports.play = function (req, res) {
 
 exports.player = function (req, res) {
 	if (!isDplayerConnected) {
-		console.log('no');
+		console.log('error: player not connected');
 
 		return res.apiError({
 			success: false
@@ -618,7 +620,8 @@ exports.sync = function (req, res) {
 			recursive: true
 		}, function (ipfserr, files) {
 			if (ipfserr) {
-				console.log(ipfserr);
+				console.log('ipfs file add error');
+				//console.log(ipfserr);
 				return res.apiError('ipfs error', ipfserr);
 			} else {
 				console.log("Added:");
