@@ -75,7 +75,7 @@ block content
 					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
 					.row.browse
 						each sketch in data.sketches.results
-							.col-xs-4
+							.col-xs-4(style="padding: 15px;")
 								+sketch(sketch)
 				
 					if data.sketches.totalPages > 1
