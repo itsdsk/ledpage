@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   git cmake build-essential qtbase5-dev libqt5serialport5-dev \
   libusb-1.0-0-dev python3-dev libxrender-dev libavahi-core-dev \
   libavahi-compat-libdnssd-dev libraspberrypi-dev libqt4-dev \
-  arduino g++ gcc usbutils make nginx libkrb5-dev supervisor \
+  arduino g++ gcc usbutils make nginx libkrb5-dev \
   imagemagick htop \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -75,13 +75,10 @@ ENV BOARD uno
 EXPOSE 80 443 4001
 
 # copy config files
-# COPY /volume/etc/supervisor/conf.d /etc/supervisor/conf.d/
 COPY /volume/etc/systemd/system /etc/systemd/system/
-# COPY /volume/etc/systemd/system/ipfs.service /etc/systemd/system/
 COPY /volume/etc/nginx/sites-available/nginx-config /etc/nginx/sites-available/default
 
 # start ipfs and disable default nginx service
-# RUN systemctl enable ipfs.service && systemctl disable nginx.service
 RUN systemctl enable ipfs.service && systemctl enable nginx.service \
   && systemctl enable mongod.service && systemctl enable hyperion.service
 
