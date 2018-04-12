@@ -1,5 +1,7 @@
 var keystone = require('keystone');
 const ipc = require('node-ipc');
+var fs = require('fs');
+var path = require('path');
 
 exports = module.exports = function (req, res) {
 
@@ -30,6 +32,26 @@ exports = module.exports = function (req, res) {
 
 	});
 
+	// Loads sketch screenshots
+	view.on('init', function (next) {
+		// 
+		var sketchPath = res.locals.staticPath+locals.data.sketch.localDir;
+		// make path absolute
+		if(sketchPath.charAt(0) != '/'){
+			sketchPath = path.join(__dirname, sketchPath);
+		}
+		//
+		var targetFiles;
+		fs.readdir(sketchPath, function(err, files){
+			targetFiles = files.filter(function(file) {
+				return path.extname(file).toLowerCase() === '.png';
+			});
+			console.log(targetFiles);
+			locals.data.thumbnails = targetFiles;
+		});
+		return next();
+	});
+
 	// Load other sketches
 	view.on('init', function (next) {
 
@@ -49,9 +71,7 @@ exports = module.exports = function (req, res) {
 		var sys = require('sys');
 		var exec = require('child_process').exec;
 		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
-		console.log(uploadPath);
 		var execCommand = 'import -window root -display :0.0 '+uploadPath;
-		console.log(execCommand);
 		// save screenshot
 		function puts(error, stdout, stderr) {
 			sys.puts(stdout);
