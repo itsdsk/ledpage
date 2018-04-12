@@ -85,8 +85,9 @@ exports = module.exports = function (req, res) {
 			console.log(stdout);
 			keystone.list('Sketch').model.findById(locals.data.sketch.id).exec(function(err, item) {
 				var imgs = {
-					thumbnails: uploadName
+					thumbnails: locals.data.sketch.thumbnails
 				};
+				imgs.thumbnails.push(uploadName);
 				keystone.list('Sketch').updateItem(item, imgs, {
 					fields: ["thumbnails"]
 				}, function (dberror) {
