@@ -48,7 +48,7 @@ exports = module.exports = function (req, res) {
 	}, function (next) {
 		var sys = require('sys');
 		var exec = require('child_process').exec;
-		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot'+(Math.random().toString(36).substr(2, length))+'.png';
+		var uploadPath = res.locals.staticPath+locals.data.sketch.localDir+'/screenshot_'+(Math.random().toString(36).substr(2, 6))+'.png';
 		console.log(uploadPath);
 		var execCommand = 'import -window root -display :0.0 '+uploadPath;
 		console.log(execCommand);
