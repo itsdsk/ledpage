@@ -37,19 +37,21 @@ exports = module.exports = function (req, res) {
 		// 
 		var sketchPath = res.locals.staticPath+locals.data.sketch.localDir;
 		// make path absolute
-		if(sketchPath.charAt(0) != '/'){
-			sketchPath = path.join(__dirname, sketchPath);
-		}
-		//
+		var resolvedPath = path.resolve(__dirname+'./../../', sketchPath);
+		console.log('searching for files in: '+resolvedPath);
 		var targetFiles;
-		fs.readdir(sketchPath, function(err, files){
+		fs.readdir(resolvedPath, function(err, files){
+			if(err){
+				console.log('error getting files: '+err);
+			}
 			targetFiles = files.filter(function(file) {
 				return path.extname(file).toLowerCase() === '.png';
 			});
-			console.log(targetFiles);
+			console.log('targetfiles: '+targetFiles);
 			locals.data.thumbnails = targetFiles;
+			console.log('thumbs: '+locals.data.thumbnails);
+			next(err);
 		});
-		return next();
 	});
 
 	// Load other sketches
@@ -79,13 +81,14 @@ exports = module.exports = function (req, res) {
 		// "import -window root -display :0.0 /tmp/screen.png"
 		exec(execCommand, function (err, stdout, stderr) {
 			console.log(stdout);
+			next(err);
 		});
 		// upload screenshot from file
 		// locals.data.sketch._.image.upload({
 		// 	path: '/tmp/screen.png'
 		// }, (err) => { console.log('done done done') });
 
-		return next();
+		//return next();
 	});
 
 	// // Forward instruction to display selected sketch
