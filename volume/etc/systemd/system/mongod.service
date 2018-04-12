@@ -3,7 +3,8 @@ Description=MongoDB server
 After=network.target
 
 [Service]
-ExecStart=mongod
+User=mongodb
+ExecStart=/usr/bin/mongod
 Restart=always
 
 [Install]
