@@ -6,6 +6,11 @@ exports.create = {
         __ref: 'sketches'
     }],
     Sketch: [{
+            'title': 'wrqrffref',
+            'state': 'published',
+            //'author': 'user@keystonejs.com',
+            'localDir': 'sketch0',
+        }, {
             'title': 'RGB Fade',
             'state': 'published',
             //'author': 'user@keystonejs.com',
