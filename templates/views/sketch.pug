@@ -19,7 +19,10 @@ block content
 					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
 					h1= data.sketch.title
 				if data.thumbnails.length
-					h4 Thumbnails
+					.row
+						each thumbnail in data.thumbnails
+							.col-xs-2
+								img(src='/view-static/'+data.sketch.localDir+'/'+thumbnail).img-responsive
 				else
 					h4 No thumbnails
 				//- article
