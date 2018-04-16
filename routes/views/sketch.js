@@ -114,7 +114,7 @@ exports = module.exports = function (req, res) {
 		keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
-		})
+		}).populate('channels')
 		.exec(function (err, dbSketch) {
 			if(err){
 				//
