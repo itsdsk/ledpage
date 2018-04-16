@@ -124,19 +124,27 @@ exports = module.exports = function (req, res) {
 				return next();
 			}
 			var sketchChannels = [];
+			var alreadyInChannel = false;
 			// add existing channels
 			for(var i=0; i<dbSketch.channels.length; i++){
-				sketchChannels.push(dbSketch.channels[i]);
+				if(dbSketch.channels[i] == req.query._id){
+					alreadyInChannel = true;
+				}else{
+					sketchChannels.push(dbSketch.channels[i]);
+				}
 			}
-			// check if channel is already added
-			var newChannelIndex = sketchChannels.findIndex(x => x === req.query._id);
-			if(newChannelIndex > -1){
-				// remove channel which sketch is already added to
-				sketchChannels.splice(newChannelIndex, 1);
-			}else{
-				// add new channel
+			if(alreadyInChannel == false){
 				sketchChannels.push(req.query._id);
 			}
+			// // check if channel is already added
+			// var newChannelIndex = sketchChannels.findIndex(x => x === req.query._id);
+			// if(newChannelIndex > -1){
+			// 	// remove channel which sketch is already added to
+			// 	sketchChannels.splice(newChannelIndex, 1);
+			// }else{
+			// 	// add new channel
+			// 	sketchChannels.push(req.query._id);
+			// }
 			// create object
 			var data = {
 				channels: sketchChannels
