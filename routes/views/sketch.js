@@ -78,7 +78,6 @@ exports = module.exports = function (req, res) {
 		var sketchPath = res.locals.staticPath+locals.data.sketch.localDir;
 		// make path absolute
 		var resolvedPath = path.resolve(__dirname+'./../../', sketchPath);
-		console.log('searching for files in: '+resolvedPath);
 		var targetFiles;
 		fs.readdir(resolvedPath, function(err, files){
 			if(err){
@@ -87,9 +86,7 @@ exports = module.exports = function (req, res) {
 			targetFiles = files.filter(function(file) {
 				return path.extname(file).toLowerCase() === '.png';
 			});
-			console.log('targetfiles: '+targetFiles);
 			locals.data.thumbnails = targetFiles;
-			console.log('thumbs: '+locals.data.thumbnails);
 			next(err);
 		});
 	});
@@ -111,6 +108,30 @@ exports = module.exports = function (req, res) {
 		channel: 'false'
 	}, function(next){
 		//
+		// console.log('trying to add channel ' + req.query.key);
+		// keystone.list('Sketch').model.findOne({
+		// 	state: 'published',
+		// 	slug: locals.filters.sketch,
+		// }).populate('channels')
+		// .exec(function (err, dbSketch) {
+		// 	if(err){
+		// 		//
+		// 		req.flash('error', 'error finding sketch to delete in database');
+		// 		return next();
+		// 	}
+		// 	if(!dbSketch){
+		// 		//
+		// 		req.flash('error', 'could not find sketch to delete');
+		// 		return next();
+		// 	}
+		// 	console.log('channels looks like: ' + dbSketch.channels);
+		// 	dbSketch.channels.push(req.query.key);
+		// 	dbSketch.save(function(err) {
+		// 		if(err) return res.err(err);
+		// 		req.flash('success', 'Sketch deleted!');
+		// 		return res.redirect('/');
+		// 	})
+		// })
 		console.log('trying to add channel ' + req.query.key);
 		keystone.list('Sketch').model.findOne({
 			state: 'published',
@@ -127,15 +148,17 @@ exports = module.exports = function (req, res) {
 				req.flash('error', 'could not find sketch to delete');
 				return next();
 			}
+			var data = {
+				channels: req.query.key
+			};
 			console.log('channels looks like: ' + dbSketch.channels);
-			dbSketch.channels.push(req.query.key);
-			dbSketch.save(function(err) {
-				if(err) return res.err(err);
-				req.flash('success', 'Sketch deleted!');
-				return res.redirect('/');
-			})
-		})
 
+			dbSketch.getUpdateHandler(req).process(data, function(err) {
+				if(err) return res.apiError('error updating sketch cnannel: ', err);
+				req.flash('success', 'success adding sketch to channel');
+				return res.redirect('/');
+			});
+		});
 	});
 	// remove channel
 
