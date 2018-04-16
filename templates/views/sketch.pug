@@ -20,7 +20,7 @@ block content
 									each channel in data.channels
 										- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 										li(class=(channelActive ? 'active' : ''))
-											a(href='')=channel.name
+											a(href='?channel='+channelActive+'&key='+channel.key)=channel.name
 						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on device
 						if data.sketch.ipfsHash
 							a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
