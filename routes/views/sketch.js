@@ -38,24 +38,22 @@ exports = module.exports = function (req, res) {
 	view.on('post', {
 		action: 'save'
 	}, function (next) {
-		//
+		// get absolute file name
 		var saveName = res.locals.staticPath+locals.data.sketch.localDir+'/index.html';
-		console.log('weewfaewfuyewagaygfiuageywiuwagy' + saveName);
+		// get code from HTTP body
 		var code = req.body.code;
-		console.log(code);
+		// save sketch
 		fs.writeFile(saveName, code, 'utf8', function(err){
 			if(err){
-				//
+				// error saving
 				req.flash('warning', 'error saving html');
 				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
-				// next();
 			}else{
-				//
+				// success saving
 				req.flash('success', 'success saving html');
 				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
-				// next();
 			}
-		})
+		});
 	});
 
 	// Loads sketch screenshots
