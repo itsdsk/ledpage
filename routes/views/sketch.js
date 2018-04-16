@@ -34,6 +34,19 @@ exports = module.exports = function (req, res) {
 
 	});
 
+	// Save HTML from form
+	view.on('post', {
+		action: 'save'
+	}, function (next) {
+		//
+		console.log('weewfaewfuyewagaygfiuageywiuwagy')
+		req.flash('warning', 'saving html');
+		return res.redirect('/browse/'+locals.data.sketch.slug);
+		var code = req.body;
+		console.log(code);
+		next();
+	});
+
 	// Loads sketch screenshots
 	view.on('init', function (next) {
 		// 
