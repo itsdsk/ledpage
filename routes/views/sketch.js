@@ -39,12 +39,23 @@ exports = module.exports = function (req, res) {
 		action: 'save'
 	}, function (next) {
 		//
-		console.log('weewfaewfuyewagaygfiuageywiuwagy')
-		req.flash('warning', 'saving html');
-		return res.redirect('/browse/'+locals.data.sketch.slug);
-		var code = req.body;
+		var saveName = res.locals.staticPath+locals.data.sketch.localDir+'/index.html';
+		console.log('weewfaewfuyewagaygfiuageywiuwagy' + saveName);
+		var code = req.body.code;
 		console.log(code);
-		next();
+		fs.writeFile(saveName, code, 'utf8', function(err){
+			if(err){
+				//
+				req.flash('warning', 'error saving html');
+				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				// next();
+			}else{
+				//
+				req.flash('success', 'success saving html');
+				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				// next();
+			}
+		})
 	});
 
 	// Loads sketch screenshots
