@@ -149,12 +149,12 @@ exports = module.exports = function (req, res) {
 				return next();
 			}
 			var data = {
-				channels: req.query.key
+				channels: [req.query.key]
 			};
 			console.log('channels looks like: ' + dbSketch.channels);
 
 			dbSketch.getUpdateHandler(req).process(data, function(err) {
-				if(err) return res.apiError('error updating sketch cnannel: ', err);
+				if(err) return res.err('error updating sketch cnannel: ', err);
 				req.flash('success', 'success adding sketch to channel');
 				return res.redirect('/');
 			});
