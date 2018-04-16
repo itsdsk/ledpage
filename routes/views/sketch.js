@@ -127,36 +127,26 @@ exports = module.exports = function (req, res) {
 			var alreadyInChannel = false;
 			// add existing channels
 			for(var i=0; i<dbSketch.channels.length; i++){
+				// check if channel is already added
 				if(dbSketch.channels[i] == req.query._id){
-					alreadyInChannel = true;
+					alreadyInChannel = true; // skip adding
 				}else{
+					// keep existing channel if not the same channel in request
 					sketchChannels.push(dbSketch.channels[i]);
 				}
 			}
+			// add new channel if it wasn't already added
 			if(alreadyInChannel == false){
 				sketchChannels.push(req.query._id);
 			}
-			// // check if channel is already added
-			// var newChannelIndex = sketchChannels.findIndex(x => x === req.query._id);
-			// if(newChannelIndex > -1){
-			// 	// remove channel which sketch is already added to
-			// 	sketchChannels.splice(newChannelIndex, 1);
-			// }else{
-			// 	// add new channel
-			// 	sketchChannels.push(req.query._id);
-			// }
-			// create object
 			var data = {
 				channels: sketchChannels
 			};
-			console.log('trying to add channel ' + req.query._id); 
-			console.log('channels looks like: ' + dbSketch.channels); 
-			console.log('sketchChannels looks like: ' + sketchChannels); 	  
 			// run the database update
 			dbSketch.getUpdateHandler(req).process(data, function(err) {
 				if(err) return res.err('error updating sketch cnannel: ', err);
 				req.flash('success', 'success adding sketch to channel');
-				return res.redirect('?');
+				return res.redirect('');
 			});
 		});
 	});
