@@ -118,6 +118,9 @@ block content
 					//- a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
 					each channel in data.channels
 						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+					form(action='/browse', method='GET').list-group-item
+						input(type='text', placeholder='Add channel', id='added-channel', name='added-channel').form-control
+						button(type='submit', id='submit').hidden Add channel
 				hr
 		.col-sm-4.col-md-4
 			// top bar same as other panels
