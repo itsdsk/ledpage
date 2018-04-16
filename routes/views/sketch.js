@@ -16,6 +16,8 @@ exports = module.exports = function (req, res) {
 	locals.data = {
 		sketches: [],
 	};
+	locals.validationErrors = {};
+	locals.formData = req.body || {};
 
 	// Load the current sketch
 	view.on('init', function (next) {

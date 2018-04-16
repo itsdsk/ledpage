@@ -17,7 +17,7 @@ block content
 			.col-sm-8.col-md-8
 				.page-header
 					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
-					h1= data.sketch.title
+					h1 Saved Images
 				if data.thumbnails.length
 					.row
 						each thumbnail in data.thumbnails
@@ -25,6 +25,20 @@ block content
 								img(src='/view-static/'+data.sketch.localDir+'/'+thumbnail).img-thumbnail
 				else
 					h4 No thumbnails
+				.page-header
+					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right 📷&emsp;ersihb
+					h1 Code
+				form(method='post').form-horizontal
+					input(type='hidden', name='action', value='upload')
+					.form-group(class=validationErrors.message ? 'has-error' : null)
+						label.col-sm-2.control-label index.html
+						.col-sm-10
+							textarea(name='sketch' id='code-area' placeholder='Enter HTML sketch...' rows=24 required).form-control= formData.sketch
+					.form-group
+						.col-sm-10.col-sm-offset-2
+						p.help-block Note: others can see your enquiry in the <a href='/keystone/enquiries'>Admin UI</a>
+						button(type='submit').btn.btn-primary Upload
+
 				//- article
 				//- 	//- p: a(href='/browse') &larr; back to the sketches
 				//- 	//- hr
