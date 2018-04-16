@@ -105,33 +105,9 @@ exports = module.exports = function (req, res) {
 
 	// add channel
 	view.on('get', {
-		channel: 'false'
+		channel: 'true'
 	}, function(next){
 		//
-		// console.log('trying to add channel ' + req.query.key);
-		// keystone.list('Sketch').model.findOne({
-		// 	state: 'published',
-		// 	slug: locals.filters.sketch,
-		// }).populate('channels')
-		// .exec(function (err, dbSketch) {
-		// 	if(err){
-		// 		//
-		// 		req.flash('error', 'error finding sketch to delete in database');
-		// 		return next();
-		// 	}
-		// 	if(!dbSketch){
-		// 		//
-		// 		req.flash('error', 'could not find sketch to delete');
-		// 		return next();
-		// 	}
-		// 	console.log('channels looks like: ' + dbSketch.channels);
-		// 	dbSketch.channels.push(req.query.key);
-		// 	dbSketch.save(function(err) {
-		// 		if(err) return res.err(err);
-		// 		req.flash('success', 'Sketch deleted!');
-		// 		return res.redirect('/');
-		// 	})
-		// })
 		console.log('trying to add channel ' + req.query._id);
 		keystone.list('Sketch').model.findOne({
 			state: 'published',
@@ -153,8 +129,15 @@ exports = module.exports = function (req, res) {
 			for(var i=0; i<dbSketch.channels.length; i++){
 				sketchChannels.push(dbSketch.channels[i]);
 			}
-			// add new channel
-			sketchChannels.push(req.query._id);
+			// check if channel is already added
+			var newChannelIndex = sketchChannels.indexOf(req.query._id);
+			if(newChannelIndex > -1){
+				// remove channel which sketch is already added to
+				sketchChannels.splice(newChannelIndex, 1);
+			}else{
+				// add new channel
+				sketchChannels.push(req.query._id);
+			}
 			// create object
 			var data = {
 				channels: sketchChannels
