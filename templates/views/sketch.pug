@@ -14,13 +14,17 @@ block content
 					.list-group
 						a(href='/api/sketch/' + data.sketch.id + '/sync').list-group-item Share with peers
 						.list-group-item
+							each channel in data.channels
+								p=channel
+							p=data.sketch
 							p Channels:
 							if data.channels && data.channels.length
 								ul.nav.nav-pills
 									each channel in data.channels
 										- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 										li(class=(channelActive ? 'active' : ''))
-											a(href='?channel='+channelActive+'&key='+channel.key)=channel.name
+											//- a(href='?channel='+channelActive+'&key='+channel.key)=channel.name
+											a(href='?channel='+channelActive+'&_id='+channel._id)=channel.name
 						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on device
 						if data.sketch.ipfsHash
 							a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway

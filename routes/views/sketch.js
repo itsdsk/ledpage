@@ -149,7 +149,7 @@ exports = module.exports = function (req, res) {
 				return next();
 			}
 			var data = {
-				channels: [req.query.key]
+				channels: req.query._id
 			};
 			console.log('channels looks like: ' + dbSketch.channels);
 
