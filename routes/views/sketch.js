@@ -15,6 +15,7 @@ exports = module.exports = function (req, res) {
 	};
 	locals.data = {
 		sketches: [],
+		channels: [],
 	};
 	locals.validationErrors = {};
 	locals.formData = req.body || {};
@@ -33,6 +34,21 @@ exports = module.exports = function (req, res) {
 		});
 
 	});
+
+	// Load all channels
+	view.on('init', function (next) {
+
+		keystone.list('SketchChannel').model.find().sort('name').exec(function (err, results) {
+	
+			if (err || !results.length) {
+				return next(err);
+			}
+	
+			locals.data.channels = results;
+			next(err);
+		});
+	});
+	
 
 	// Save HTML from form
 	view.on('post', {
