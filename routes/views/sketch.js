@@ -132,7 +132,7 @@ exports = module.exports = function (req, res) {
 		// 		return res.redirect('/');
 		// 	})
 		// })
-		console.log('trying to add channel ' + req.query.key);
+		console.log('trying to add channel ' + req.query._id);
 		keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
@@ -151,7 +151,7 @@ exports = module.exports = function (req, res) {
 			var sketchChannels = [];
 			// add existing channels
 			for(var i=0; i<dbSketch.channels.length; i++){
-				sketchChannels.push(dbSketch.channels[i]._id);
+				sketchChannels.push(dbSketch.channels[i]);
 			}
 			// add new channel
 			sketchChannels.push(req.query._id);
@@ -160,6 +160,7 @@ exports = module.exports = function (req, res) {
 				channels: sketchChannels
 			};
 			console.log('channels looks like: ' + dbSketch.channels);
+			console.log('sketchChannels looks like: ' + sketchChannels);
 
 			dbSketch.getUpdateHandler(req).process(data, function(err) {
 				if(err) return res.err('error updating sketch cnannel: ', err);
