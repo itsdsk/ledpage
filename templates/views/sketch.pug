@@ -66,3 +66,22 @@ block content
 					//if data.sketch.image.exists
 					//	.image-wrap: img(src=data.sketch._.image.fit(750,450)).img-responsive
 					//!= data.sketch.content.full
+block js
+	script.
+		jQuery(function($) {
+			// load html into form
+			$('#edit-html').click(function(e){
+				e.preventDefault();
+				var sketchURL = $(this).attr('href');
+				$.ajax({url: sketchURL, async: true, 
+					error: function(){
+						var flashMsg = '<div class="alert alert-error">ⓘ&emsp;errorrr</div>'
+						$('#flash-messages').prepend(flashMsg);
+					},
+					success: function(result){
+						console.log(result);
+						$('#code-area').val(result);
+					}
+				});
+			});
+		});
