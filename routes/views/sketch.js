@@ -148,15 +148,23 @@ exports = module.exports = function (req, res) {
 				req.flash('error', 'could not find sketch to delete');
 				return next();
 			}
+			var sketchChannels = [];
+			// add existing channels
+			for(var i=0; i<dbSketch.channels.length; i++){
+				sketchChannels.push(dbSketch.channels[i]._id);
+			}
+			// add new channel
+			sketchChannels.push(req.query._id);
+			// create object
 			var data = {
-				channels: req.query._id
+				channels: sketchChannels
 			};
 			console.log('channels looks like: ' + dbSketch.channels);
 
 			dbSketch.getUpdateHandler(req).process(data, function(err) {
 				if(err) return res.err('error updating sketch cnannel: ', err);
 				req.flash('success', 'success adding sketch to channel');
-				return res.redirect('/');
+				return res.redirect('?');
 			});
 		});
 	});
