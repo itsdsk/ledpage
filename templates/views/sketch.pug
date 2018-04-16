@@ -12,8 +12,7 @@ block content
 						h3(class='panel-title')=data.sketch.title
 					.list-group
 						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Display
-						a(href='', target='_blank').list-group-item Edit HTML
-						a(href='', target='_blank').list-group-item Delete
+						a(href='?delete=true').list-group-item Delete
 			.col-sm-8.col-md-8
 				.page-header
 					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot

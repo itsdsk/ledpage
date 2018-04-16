@@ -90,6 +90,36 @@ exports = module.exports = function (req, res) {
 
 	});
 
+	// delete
+	view.on('get', {
+		delete: 'true'
+	}, function(next) {
+		//
+		keystone.list('Sketch').model.findOne({
+			state: 'published',
+			slug: locals.filters.sketch,
+		})
+		.exec(function (err, dbSketch) {
+			if(err){
+				//
+				req.flash('error', 'error finding sketch to delete in database');
+				return next();
+			}
+			if(!dbSketch){
+				//
+				req.flash('error', 'could not find sketch to delete');
+				return next();
+			}
+			dbSketch.state = 'archived';
+			dbSketch.save(function(err) {
+				if(err) return res.err(err);
+				req.flash('success', 'Sketch deleted!');
+				return res.redirect('/');
+			})
+		})
+
+	});
+
 	// screenshot
 	view.on('get', {
 		screenshot: 'true'
