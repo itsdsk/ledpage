@@ -26,18 +26,19 @@ block content
 				else
 					h4 No thumbnails
 				.page-header
-					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right 📷&emsp;ersihb
+					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
 					h1 Code
 				form(method='post').form-horizontal
-					input(type='hidden', name='action', value='upload')
-					.form-group(class=validationErrors.message ? 'has-error' : null)
-						label.col-sm-2.control-label index.html
-						.col-sm-10
-							textarea(name='sketch' id='code-area' placeholder='Enter HTML sketch...' rows=24 required).form-control= formData.sketch
-					.form-group
-						.col-sm-10.col-sm-offset-2
-						p.help-block Note: others can see your enquiry in the <a href='/keystone/enquiries'>Admin UI</a>
-						button(type='submit').btn.btn-primary Upload
+					fieldset(disabled='disabled')
+						input(type='hidden', name='action', value='upload')
+						.form-group(class=validationErrors.message ? 'has-error' : null)
+							label.col-sm-2.control-label index.html
+							.col-sm-10
+								textarea(name='sketch' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+						.form-group
+							.col-sm-10.col-sm-offset-2
+								p.help-block Note: others can see your
+								button(type='submit').btn.btn-primary Save
 
 				//- article
 				//- 	//- p: a(href='/browse') &larr; back to the sketches
@@ -69,19 +70,30 @@ block content
 block js
 	script.
 		jQuery(function($) {
-			// load html into form
+			// make code editable
 			$('#edit-html').click(function(e){
 				e.preventDefault();
-				var sketchURL = $(this).attr('href');
-				$.ajax({url: sketchURL, async: true, 
-					error: function(){
-						var flashMsg = '<div class="alert alert-error">ⓘ&emsp;errorrr</div>'
-						$('#flash-messages').prepend(flashMsg);
-					},
-					success: function(result){
-						console.log(result);
-						$('#code-area').val(result);
-					}
-				});
+				$('fieldset').removeAttr('disabled');
+				//- var sketchURL = $(this).attr('href');
+				//- $.ajax({url: sketchURL, async: true, 
+				//- 	error: function(){
+				//- 		var flashMsg = '<div class="alert alert-error">ⓘ&emsp;errorrr</div>'
+				//- 		$('#flash-messages').prepend(flashMsg);
+				//- 	},
+				//- 	success: function(result){
+				//- 		$('#code-area').val(result);
+				//- 	}
+				//- });
+			});
+			// load HTML into form
+			var sketchURL = $('#edit-html').attr('href');
+			$.ajax({url: sketchURL, async: true, 
+				error: function(){
+					var flashMsg = '<div class="alert alert-error">ⓘ&emsp;errorrr</div>'
+					$('#flash-messages').prepend(flashMsg);
+				},
+				success: function(result){
+					$('#code-area').val(result);
+				}
 			});
 		});
