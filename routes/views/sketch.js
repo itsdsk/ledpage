@@ -111,6 +111,7 @@ exports = module.exports = function (req, res) {
 		channel: 'false'
 	}, function(next){
 		//
+		console.log('trying to add channel ' + req.query.key);
 		keystone.list('Sketch').model.findOne({
 			state: 'published',
 			slug: locals.filters.sketch,
@@ -126,7 +127,8 @@ exports = module.exports = function (req, res) {
 				req.flash('error', 'could not find sketch to delete');
 				return next();
 			}
-			dbSketch.channels = req.query.key;
+			console.log('channels looks like: ' + dbSketch.channels);
+			dbSketch.channels.push(req.query.key);
 			dbSketch.save(function(err) {
 				if(err) return res.err(err);
 				req.flash('success', 'Sketch deleted!');
