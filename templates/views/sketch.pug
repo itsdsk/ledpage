@@ -13,6 +13,14 @@ block content
 						h3(class='panel-title')=data.sketch.title
 					.list-group
 						a(href='/api/sketch/' + data.sketch.id + '/sync').list-group-item Share with peers
+						.list-group-item
+							p Channels:
+							if data.channels && data.channels.length
+								ul.nav.nav-pills
+									each channel in data.channels
+										- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+										li(class=(channelActive ? 'active' : ''))
+											a(href='')=channel.name
 						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on device
 						if data.sketch.ipfsHash
 							a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
@@ -31,7 +39,7 @@ block content
 					h4 No thumbnails
 				.page-header
 					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
-					h1 Code
+					h1 Source Code
 				form(method='post').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='save')
