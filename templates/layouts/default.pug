@@ -157,15 +157,32 @@ html
 					$.ajax({url: url, async: false,
 						error: function(result){
 							console.log('play sketch ajax error')
-							console.log(result);
+							//console.log(result);
 						},
 						success: function(result){
 							console.log('play sketch ajax success')
-							console.log(result);
+							//console.log(result);
 						}
 					});
 				}
 				$('.display-btn').click( displayClicked );
+				// play linked sketch
+				function displayLinked(e) {
+					//
+					e.preventDefault();
+					var url = $(this).attr('href');
+					$.ajax({url: url, async: false,
+						error: function(result){
+							console.log('play sketch ajax error')
+							//console.log(result);
+						},
+						success: function(result){
+							console.log('play sketch ajax success')
+							//console.log(result);
+						}
+					});
+				}
+				$('.display-link').click( displayLinked );
 			});
 
 		//- FOOTER
