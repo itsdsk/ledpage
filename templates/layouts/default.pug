@@ -53,6 +53,11 @@ html
 						li: a
 							span(id='status-dot')
 							span &ensp; Status
+						each component in componentStatus
+							//- if !component.active
+							//- 	li=component.name
+							p=component.name
+							p=component.active
 					ul.nav.navbar-nav.navbar-right
 						li: a(href='/setup') Setup
 					//- 	li: a(href='/keystone') Content
@@ -124,23 +129,23 @@ html
 			$(function() {
 				var badConnections = new Array();
 				// check sketch player connection
-				$.ajax({url: '/api/player', async: false, 
-					error: function(){
-						badConnections.push("<i>player</i>");
-					}
-				});
-				// check p2p connection
-				$.ajax({url: '/api/ipfs', async: false, 
-					error: function(){
-						badConnections.push("<i>peer-to-peer network</i>");
-					}
-				});
-				// check hyperion connection
-				$.ajax({url: '/api/display/brightness', async: false, 
-					error: function(){
-						badConnections.push("<i>LED controller</i>");
-					}
-				});
+				//- $.ajax({url: '/api/player', async: false, 
+				//- 	error: function(){
+				//- 		badConnections.push("<i>player</i>");
+				//- 	}
+				//- });
+				//- // check p2p connection
+				//- $.ajax({url: '/api/ipfs', async: false, 
+				//- 	error: function(){
+				//- 		badConnections.push("<i>peer-to-peer network</i>");
+				//- 	}
+				//- });
+				//- // check hyperion connection
+				//- $.ajax({url: '/api/display/brightness', async: false, 
+				//- 	error: function(){
+				//- 		badConnections.push("<i>LED controller</i>");
+				//- 	}
+				//- });
 
 				if(!(badConnections.length === 0)){
 					$('#status-dot').attr('style', dotStyle+'red;');
