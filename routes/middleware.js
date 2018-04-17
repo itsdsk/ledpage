@@ -8,7 +8,12 @@
  * modules in your project's /lib directory.
  */
 var _ = require('lodash');
+var exec = require('child_process').exec;
 
+// port numbers of components for IPFS, Hyperion and electron
+var componentPorts = [{name: "IPFS", cmd: "lsof -i :5001"},
+					  {name: "Hyperion", cmd: "lsof -i :19444"},
+					  {name: "player", cmd: "ls /tmp/app.dplayeripc"}];
 /**
 	Initialises the standard view locals
 
@@ -20,11 +25,51 @@ exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [
 		{ label: '⁂ Upload', key: 'upload', href: '/upload' },
 	];
-	const publicPath = '/data/content/';
-	//const publicPath = './public/';
+	//const publicPath = '/data/content/';
+	const publicPath = './public/';
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
+	// check component status
+	//var tmpComponentStatus = [];
+	res.locals.componentStatus = [{name: 'player', active: true}, {name: 'ipfs', active: true}, {name: 'hyperion', active: true}];
+	// for(var i=0; i<componentPorts.length; i++){
+	// 	//console.log(componentPorts[i].name);
+	// 	var ii = i;
+	// 	exec(componentPorts[i].cmd, function(err, stdout, stderr) {
+	// 		//console.log('refr: '+stdout.length);
+	// 		if(stdout.length == 0){
+	// 			//console.log(componentPorts[i].name);
+	// 			console.log('ets');
+	// 			res.locals.componentStatus.push(componentPorts[ii].name);
+	// 			console.log(res.locals.componentStatus);
+	// 		}
 
+	// 		//console.log(componentPorts[ii].name);
+	// 	});
+	// }
+	exec("lsof -i :5001", function(err, stdout, stderr) {
+		if(stdout.length == 0){
+			//tmpComponentStatus.push("IPFS");
+			res.locals.componentStatus[1].active = false;
+			console.log(res.locals.componentStatus);
+		}
+	});
+	exec("lsof -i :19444", function(err, stdout, stderr) {
+		if(stdout.length == 0){
+			//tmpComponentStatus.push("Hyperion");
+			res.locals.componentStatus[2].active = false;
+			console.log(res.locals.componentStatus);
+		}
+	});
+	exec("ls /tmp/app.dplayeripc", function(err, stdout, stderr) {
+		if(stdout.length == 0){
+			//tmpComponentStatus.push("player");
+			res.locals.componentStatus[0].active = false;
+			console.log(res.locals.componentStatus);
+		}
+	});
+	//res.locals.componentStatus = tmpComponentStatus;
+	console.log(res.locals.componentStatus);
 	res.locals.user = req.user;
 	next();
 };
