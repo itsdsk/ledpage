@@ -56,8 +56,6 @@ html
 								each component in componentStatus
 									if !component.active
 										p.inactive-component.hidden=component.name
-							//- p=component.name
-							//- p=component.active
 					ul.nav.navbar-nav.navbar-right
 						li: a(href='/setup') Setup
 					//- 	li: a(href='/keystone') Content
@@ -128,29 +126,10 @@ html
 			$('#body').prepend(flashMsgDiv);
 			$(function() {
 				var badConnections = new Array();
+				// get names of inactive components from HTML elements
 				$('.inactive-component').each(function(i, p) {
 					badConnections.push(p.textContent);
 				})
-				//badConnections.push($('.inactive-component')[0].textContent);
-				// check sketch player connection
-				//- $.ajax({url: '/api/player', async: false, 
-				//- 	error: function(){
-				//- 		badConnections.push("<i>player</i>");
-				//- 	}
-				//- });
-				//- // check p2p connection
-				//- $.ajax({url: '/api/ipfs', async: false, 
-				//- 	error: function(){
-				//- 		badConnections.push("<i>peer-to-peer network</i>");
-				//- 	}
-				//- });
-				//- // check hyperion connection
-				//- $.ajax({url: '/api/display/brightness', async: false, 
-				//- 	error: function(){
-				//- 		badConnections.push("<i>LED controller</i>");
-				//- 	}
-				//- });
-
 				if(!(badConnections.length === 0)){
 					$('#status-dot').attr('style', dotStyle+'red;');
 					var flashMsg = '<div class="alert alert-danger">ⓘ&emsp;Connection to the ';
