@@ -53,11 +53,11 @@ html
 						li: a
 							span(id='status-dot')
 							span &ensp; Status
-						each component in componentStatus
-							//- if !component.active
-							//- 	li=component.name
-							p=component.name
-							p=component.active
+								each component in componentStatus
+									if !component.active
+										p.inactive-component.hidden=component.name
+							//- p=component.name
+							//- p=component.active
 					ul.nav.navbar-nav.navbar-right
 						li: a(href='/setup') Setup
 					//- 	li: a(href='/keystone') Content
@@ -128,6 +128,10 @@ html
 			$('#body').prepend(flashMsgDiv);
 			$(function() {
 				var badConnections = new Array();
+				$('.inactive-component').each(function(i, p) {
+					badConnections.push(p.textContent);
+				})
+				//badConnections.push($('.inactive-component')[0].textContent);
 				// check sketch player connection
 				//- $.ajax({url: '/api/player', async: false, 
 				//- 	error: function(){
