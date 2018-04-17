@@ -22,7 +22,7 @@ mixin sketch(sketch)
 					img(src="http://placehold.it/300x300").img-responsive
 				.img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
 					a(href='/api/sketch/' + sketch.id + '/play')
-						button(type='submit').btn.btn-md Display
+						button(type='submit').display-btn.btn.btn-md Display
 					a(href='/browse/sketch/' + sketch.slug)
 						button(type='submit').btn.btn-md More
 					// display led svgs

@@ -125,6 +125,7 @@ html
 			var flashMsgDiv = '<div id="flash-messages" class="container"></div>';
 			$('#body').prepend(flashMsgDiv);
 			$(function() {
+				// status check
 				var badConnections = new Array();
 				// get names of inactive components from HTML elements
 				$('.inactive-component').each(function(i, p) {
@@ -148,7 +149,23 @@ html
 				}else{
 					$('#status-dot').attr('style', dotStyle+'green;');
 				}
-
+				// play sketch
+				function displayClicked(e) {
+					//
+					e.preventDefault();
+					var url = $(this).parent().attr('href');
+					$.ajax({url: url, async: false,
+						error: function(result){
+							console.log('play sketch ajax error')
+							console.log(result);
+						},
+						success: function(result){
+							console.log('play sketch ajax success')
+							console.log(result);
+						}
+					});
+				}
+				$('.display-btn').click( displayClicked );
 			});
 
 		//- FOOTER
