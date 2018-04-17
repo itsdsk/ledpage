@@ -169,7 +169,6 @@ ipc.config.id = 'dremoteipc';
 ipc.config.retry = 5000;
 ipc.config.maxRetries = 3;
 ipc.config.silent = true;
-ipc.config.networkPort = 38477;
 ipc.connectTo(
 	'dplayeripc',
 	function () {
