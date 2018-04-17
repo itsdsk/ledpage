@@ -17,6 +17,66 @@ var exec = require('child_process').exec;
 	the navigation in the header, you may wish to change this array
 	or replace it with your own templates / logic.
 */
+var componentStatus = [{
+	name: 'player',
+	active: true
+},
+{
+	name: 'peer-to-peer network',
+	active: true
+},
+{
+	name: 'LED controller',
+	active: true
+}
+];
+setInterval(function(){
+	// player
+	exec("ls /tmp/app.dplayeripc", function (err, stdout, stderr) {
+		if (stdout.length == 0) {
+			componentStatus[0].active = false;
+		} else {
+			componentStatus[0].active = true;
+		}
+	});
+
+	// ipfs
+	exec("lsof -i :5001", function (err, stdout, stderr) {
+		if (stdout.length == 0) {
+			componentStatus[1].active = false;
+		} else {
+			componentStatus[1].active = true;
+		}
+	});
+
+	// hyperion
+	exec("lsof -i :19444", function (err, stdout, stderr) {
+		if (stdout.length == 0) {
+			componentStatus[2].active = false;
+		} else {
+			componentStatus[2].active = true;
+		}
+	});
+
+	// componentStatus[0].active = function(){exec("ls /tmp/app.dplayeripc", function(err, stdout, stderr){if(stdout.length==0){return false;}else{return true;}})};
+	// var wqr = execCmd("lsof -i :5001");
+	// componentStatus[1].active = wqr;
+	// //componentStatus[1].active = execCmd("lsof -i :5001");
+	// //componentStatus[1].active = function(){exec("lsof -i :5001", function(err, stdout, stderr){if(stdout.length==0){return false;}else{return true;}})};
+	// componentStatus[2].active = execCmd("lsof -i :19444");
+}, 5000);
+// function execCmd(cmdString) {
+// 	console.log(cmdString);
+// 	exec(cmdString, function (err, stdout, stderr) {
+// 		console.log(stdout);
+// 		if (stdout.length == 0) {
+// 			return false;
+// 		} else {
+// 			return true;
+// 		}
+// 	});
+// }
+
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [{
 		label: '⁂ Upload',
@@ -28,28 +88,21 @@ exports.initLocals = function (req, res, next) {
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
 	// check component status
-	function execCmd(cmdString) {
-		exec(cmdString, function (err, stdout, stderr) {
-			if (stdout.length == 0) {
-				return false;
-			} else {
-				return true;
-			}
-		});
-	}
-	res.locals.componentStatus = [{
-			name: 'player',
-			active: (execCmd("ls /tmp/app.dplayeripc") ? true : false)
-		},
-		{
-			name: 'peer-to-peer network',
-			active: (execCmd("lsof -i :5001") ? true : false)
-		},
-		{
-			name: 'LED controller',
-			active: (execCmd("lsof -i :19444") ? true : false)
-		}
-	];
+	res.locals.componentStatus = componentStatus;
+	// res.locals.componentStatus = [{
+	// 		name: 'player',
+	// 		active: (execCmd("ls /tmp/app.dplayeripc") ? true : false)
+	// 	},
+	// 	{
+	// 		name: 'peer-to-peer network',
+	// 		active: (execCmd("lsof -i :5001"))
+	// 	},
+	// 	{
+	// 		name: 'LED controller',
+	// 		active: (execCmd("lsof -i :19444") ? true : false)
+	// 	}
+	// ];
+	console.log(res.locals.componentStatus);
 	res.locals.user = req.user;
 	next();
 };

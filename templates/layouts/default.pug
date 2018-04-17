@@ -134,16 +134,16 @@ html
 					$('#status-dot').attr('style', dotStyle+'red;');
 					var flashMsg = '<div class="alert alert-danger">ⓘ&emsp;Connection to the ';
 					if(badConnections.length === 1){
-						flashMsg += badConnections[0] + ' component';
+						flashMsg += badConnections[0] + ' component ';
 					}else{
 						for(var i=0; i<badConnections.length-1; i++)
 						{
 							flashMsg += (badConnections[i] + ', ');
 						};
 						flashMsg = flashMsg.slice(0, -2);
-						flashMsg += ' and ' + badConnections[badConnections.length-1] + ' components';
+						flashMsg += ' and ' + badConnections[badConnections.length-1] + ' components ';
 					}
-					flashMsg += ' is unavailable.';
+					flashMsg += 'is unavailable.';
 					$('#flash-messages').prepend(flashMsg+'</div>');
 				}else{
 					$('#status-dot').attr('style', dotStyle+'green;');
