@@ -31,7 +31,21 @@ exports.initLocals = function (req, res, next) {
 	res.locals.configStaticPath = publicPath + "config-static/";
 	// check component status
 	//var tmpComponentStatus = [];
-	res.locals.componentStatus = [{name: 'player', active: true}, {name: 'ipfs', active: true}, {name: 'hyperion', active: true}];
+	//res.locals.componentStatus = [{name: 'player', active: true}, {name: 'ipfs', active: true}, {name: 'hyperion', active: true}];
+	function execCmd(cmdString){
+		exec(cmdString, function(err, stdout, stderr) {
+			if(stdout.length == 0){
+				return false;
+			}else{
+				return true;
+			}
+		});
+	
+	}
+	res.locals.componentStatus = [
+		{name: 'player', active: (execCmd("ls /tmp/app.dplayeripc")?true:false)},
+		{name: 'ipfs', active: (execCmd("lsof -i :5001")?true:false)},
+		{name: 'hyperion', active: (execCmd("lsof -i :19444")?true:false)}];
 	// for(var i=0; i<componentPorts.length; i++){
 	// 	//console.log(componentPorts[i].name);
 	// 	var ii = i;
@@ -47,29 +61,31 @@ exports.initLocals = function (req, res, next) {
 	// 		//console.log(componentPorts[ii].name);
 	// 	});
 	// }
-	exec("lsof -i :5001", function(err, stdout, stderr) {
-		if(stdout.length == 0){
-			//tmpComponentStatus.push("IPFS");
-			res.locals.componentStatus[1].active = false;
-			console.log(res.locals.componentStatus);
-		}
-	});
-	exec("lsof -i :19444", function(err, stdout, stderr) {
-		if(stdout.length == 0){
-			//tmpComponentStatus.push("Hyperion");
-			res.locals.componentStatus[2].active = false;
-			console.log(res.locals.componentStatus);
-		}
-	});
-	exec("ls /tmp/app.dplayeripc", function(err, stdout, stderr) {
-		if(stdout.length == 0){
-			//tmpComponentStatus.push("player");
-			res.locals.componentStatus[0].active = false;
-			console.log(res.locals.componentStatus);
-		}
-	});
+	// ipfs
+	// exec("lsof -i :5001", function(err, stdout, stderr) {
+	// 	if(stdout.length == 0){
+	// 		//tmpComponentStatus.push("IPFS");
+	// 		res.locals.componentStatus[1].active = false;
+	// 		console.log(res.locals.componentStatus);
+	// 	}
+	// });
+	// // hyperion
+	// exec("lsof -i :19444", function(err, stdout, stderr) {
+	// 	if(stdout.length == 0){
+	// 		//tmpComponentStatus.push("Hyperion");
+	// 		res.locals.componentStatus[2].active = false;
+	// 	}
+	// });
+	// // player
+	// exec("ls /tmp/app.dplayeripc", function(err, stdout, stderr) {
+	// 	if(stdout.length == 0){
+	// 		//tmpComponentStatus.push("player");
+	// 		res.locals.componentStatus[0].active = false;
+	// 		//console.log(res.locals.componentStatus);
+	// 	}
+	// });
 	//res.locals.componentStatus = tmpComponentStatus;
-	console.log(res.locals.componentStatus);
+	//console.log(res.locals.componentStatus);
 	res.locals.user = req.user;
 	next();
 };
