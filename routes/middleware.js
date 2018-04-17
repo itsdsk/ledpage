@@ -23,8 +23,8 @@ exports.initLocals = function (req, res, next) {
 		key: 'upload',
 		href: '/upload'
 	}, ];
-	//const publicPath = '/data/content/';
-	const publicPath = './public/';
+	const publicPath = '/data/content/';
+	//const publicPath = './public/';
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
 	// check component status
