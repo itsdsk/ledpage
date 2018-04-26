@@ -40,7 +40,7 @@ exports = module.exports = function (app) {
 	// Views
 	//app.get('/', routes.views.index);
 	app.get('/browse/:channel?', routes.views.browse);
-	app.all('/browse/sketch/:sketch', routes.views.sketch);
+	app.all('/browse/sketch/:id', routes.views.sketch);
 	app.all('/upload', routes.views.upload);
 	app.all('/setup', routes.views.setup);
 

@@ -11,7 +11,7 @@ exports = module.exports = function (req, res) {
 	// Set locals
 	locals.section = 'browse';
 	locals.filters = {
-		sketch: req.params.sketch,
+		id: req.params.id,
 	};
 	locals.data = {
 		sketches: [],
@@ -25,7 +25,8 @@ exports = module.exports = function (req, res) {
 
 		var q = keystone.list('Sketch').model.findOne({
 			state: 'published',
-			slug: locals.filters.sketch,
+			_id: locals.filters.id,
+			// slug: locals.filters.sketch,
 		}).populate('author channels');
 
 		q.exec(function (err, result) {

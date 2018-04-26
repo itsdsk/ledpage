@@ -25,7 +25,7 @@ mixin sketch(sketch)
 				.img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
 					a(href='/api/sketch/' + sketch.id + '/play')
 						button(type='submit').display-btn.btn.btn-md ▶
-					a(href='/browse/sketch/' + sketch.slug)
+					a(href='/browse/sketch/' + sketch._id)
 						button(type='submit').btn.btn-md ⋯
 	.panel.panel-default
 		.panel-heading
