@@ -501,6 +501,34 @@ exports.play = function (req, res) {
 };
 
 /**
+ * Delete/unpublish Sketch by ID
+ */
+
+exports.delete = function (req, res) {
+	// find sketch
+	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+		if (err) return res.apiError('database error', err);
+		if (!item) return res.apiError('not found');
+
+		item.state = 'archived';
+		item.save(function(err) {
+			if(err) {
+				return res.err(err);
+			}
+			else
+			{
+				res.apiResponse({
+					success: true
+				});
+			}
+			
+		});
+	});
+};
+
+
+/**
  * Get sketch player status
  */
 
