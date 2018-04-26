@@ -501,6 +501,65 @@ exports.play = function (req, res) {
 };
 
 /**
+ * Update Sketch by ID
+ */
+
+exports.update = function (req, res) {
+	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+		if (err) return res.apiError('database error', err);
+		if (!item) return res.apiError('not found');
+
+		// get absolute file name
+		var saveName = res.locals.staticPath+item.localDir+'/index.html';
+		// get code from HTTP body
+		var code = req.body.code;
+		// save sketch
+		fs.writeFile(saveName, code, 'utf8', function(err){
+			if(err){
+				// error saving
+				// req.flash('warning', 'error saving html');
+				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+			}else{
+				// success saving
+				// req.flash('success', 'success saving html');
+				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				// save title
+				item.title = req.body.title;
+				item.save(function(err) {
+					if(err) {
+						return res.apiError('error saving', err);
+					}else{
+						res.apiResponse({
+							success: true
+						});
+					}
+				});
+
+			}
+		});
+		
+		// if (ipc.of.dplayeripc) {
+		// 	var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
+		// 	ipc.of.dplayeripc.emit('message', sketchPath);
+		// 	console.log('yes');
+
+		// 	res.apiResponse({
+		// 		success: true
+		// 	});
+		// } else {
+		// 	console.log('neswsfo');
+
+		// 	res.apiError({
+		// 		success: false
+		// 	});
+
+		// }
+
+	});
+};
+
+/**
  * Delete/unpublish Sketch by ID
  */
 
