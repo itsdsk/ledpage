@@ -7,7 +7,7 @@ exports = module.exports = function (req, res) {
 
     // locals.section is used to set the currently selected
     // item in the header navigation.
-    locals.section = 'display';
+    locals.section = 'setup';
 
     locals.boardTypes = [{
         value: "uno",
@@ -247,6 +247,6 @@ exports = module.exports = function (req, res) {
 
     // Render the view
     view.render('setup', {
-        section: 'display',
+        section: 'setup',
     });
 };

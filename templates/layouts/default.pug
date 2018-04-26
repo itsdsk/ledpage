@@ -47,19 +47,35 @@ html
 						span.icon-bar
 						span.icon-bar
 						span.icon-bar
-					a.navbar-brand(href='/browse/') ☉ Disks
+					a.navbar-brand(href='/') Disks
 				.collapse.navbar-collapse#navbar-collapse
 					ul.nav.navbar-nav.navbar-left
 						each link in navLinks
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
-						li: a
-							span(id='status-dot')
-							span &ensp; Status
+						//- li: a
+							//- span(id='status-dot')
+							//- span &thinsp; Status
+							//- 	each component in componentStatus
+							//- 		if !component.active
+							//- 			p.inactive-component.hidden=component.name
+					ul.nav.navbar-nav.navbar-right
+						li.dropdown
+							a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+								span(id='status-dot')
+								| &thinsp; Status
+								span.caret
+							ul.dropdown-menu
 								each component in componentStatus
 									if !component.active
-										p.inactive-component.hidden=component.name
-					ul.nav.navbar-nav.navbar-right
-						li: a(href='/setup') Setup
+										li.inactive-component
+											a=component.name
+												| &thinsp;(offline)
+									else
+										li
+											a=component.name
+												| &thinsp; (online)
+					//- ul.nav.navbar-nav.navbar-right
+					//- 	li: a(href='/setup') Setup
 					//- 	li: a(href='/keystone') Content
 			//- Customise your site's navigation by changing the navLinks Array in ./routes/middleware.js
 			//- ... or completely change this header to suit your design.

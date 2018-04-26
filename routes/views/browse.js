@@ -7,7 +7,7 @@ exports = module.exports = function (req, res) {
 	var locals = res.locals;
 
 	// Init locals
-	locals.section = 'browse';
+	locals.section = 'disks';
 	locals.filters = {
 		channel: req.params.channel,
 	};

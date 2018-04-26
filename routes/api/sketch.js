@@ -511,25 +511,25 @@ exports.update = function (req, res) {
 		if (!item) return res.apiError('not found');
 
 		// get absolute file name
-		var saveName = res.locals.staticPath+item.localDir+'/index.html';
+		var saveName = res.locals.staticPath + item.localDir + '/index.html';
 		// get code from HTTP body
 		var code = req.body.code;
 		// save sketch
-		fs.writeFile(saveName, code, 'utf8', function(err){
-			if(err){
+		fs.writeFile(saveName, code, 'utf8', function (err) {
+			if (err) {
 				// error saving
 				// req.flash('warning', 'error saving html');
 				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
-			}else{
+			} else {
 				// success saving
 				// req.flash('success', 'success saving html');
 				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
 				// save title
 				item.title = req.body.title;
-				item.save(function(err) {
-					if(err) {
+				item.save(function (err) {
+					if (err) {
 						return res.apiError('error saving', err);
-					}else{
+					} else {
 						res.apiResponse({
 							success: true
 						});
@@ -538,7 +538,7 @@ exports.update = function (req, res) {
 
 			}
 		});
-		
+
 		// if (ipc.of.dplayeripc) {
 		// 	var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
 		// 	ipc.of.dplayeripc.emit('message', sketchPath);
@@ -573,27 +573,27 @@ exports.channel = function (req, res) {
 		var sketchChannels = [];
 		var alreadyInChannel = false;
 		// add existing channels to array
-		for(var i=0; i<item.channels.length; i++){
+		for (var i = 0; i < item.channels.length; i++) {
 			// check if channel is already added
-			if(item.channels[i] == req.query._id){
+			if (item.channels[i] == req.query._id) {
 				alreadyInChannel = true; // skip adding
-			}else{
+			} else {
 				// keep current channel if not the same channel in request
 				sketchChannels.push(item.channels[i]);
 			}
 		}
 		// add new channel if it wasnt already added
-		if(alreadyInChannel == false){
+		if (alreadyInChannel == false) {
 			sketchChannels.push(req.query._id);
 		}
 		var data = {
 			channels: sketchChannels
 		};
 		// run the database update
-		item.getUpdateHandler(req).process(data, function(err) {
-			if(err){
+		item.getUpdateHandler(req).process(data, function (err) {
+			if (err) {
 				return res.apiError('error updating sketch channel', err);
-			}else{
+			} else {
 				res.apiResponse({
 					success: true
 				});
@@ -627,10 +627,10 @@ exports.subscribe = function (req, res) {
 	};
 	newUpdater.process(data, {
 		flashErrors: true
-	}, function(err) {
-		if(err){
+	}, function (err) {
+		if (err) {
 			return res.apiError('error subscribing to channel', err);
-		}else{
+		} else {
 			res.apiResponse({
 				success: true
 			});
@@ -718,25 +718,25 @@ exports.screenshot = function (req, res) {
 			// add screenshot filename to database
 			// Sketch.model.findById(locals.data.sketch.id).exec(function (err, item) {
 			// 	if (err) {
+			// req.flash('warning', 'not done');
+			// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+			// }
+			var imgs = {
+				thumbnails: item.thumbnails
+			};
+			imgs.thumbnails.push(uploadName);
+			Sketch.updateItem(item, imgs, {
+				fields: ["thumbnails"]
+			}, function (dberror) {
+				if (dberror) {
+					console.log('db error: ' + dberror);
+					return res.apiError({
+						success: false
+					});
 					// req.flash('warning', 'not done');
 					// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
-				// }
-				var imgs = {
-					thumbnails: item.thumbnails
-				};
-				imgs.thumbnails.push(uploadName);
-				Sketch.updateItem(item, imgs, {
-					fields: ["thumbnails"]
-				}, function (dberror) {
-					if (dberror) {
-						console.log('db error: ' + dberror);
-						return res.apiError({
-							success: false
-						});		
-						// req.flash('warning', 'not done');
-						// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
-					}
-				});
+				}
+			});
 			// })
 			// let updater = locals.data.sketch.getUpdateHandler(req, res, {
 			// 	errorMessage: 'error updating sketch with screenshot'
@@ -746,7 +746,7 @@ exports.screenshot = function (req, res) {
 			if (err) {
 				return res.apiError({
 					success: false
-				});		
+				});
 				// req.flash('warning', 'not done');
 				// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
 			} else {

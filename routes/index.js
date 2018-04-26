@@ -33,12 +33,12 @@ var routes = {
 };
 
 // redirect
-keystone.redirect('/', '/browse/');
+//keystone.redirect('/', '/browse/');
 
 // Setup Route Bindings
 exports = module.exports = function (app) {
 	// Views
-	//app.get('/', routes.views.index);
+	app.get('/', routes.views.browse);
 	app.get('/browse/:channel?', routes.views.browse);
 	app.all('/browse/sketch/:id', routes.views.sketch);
 	app.all('/upload', routes.views.upload);
