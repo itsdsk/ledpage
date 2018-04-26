@@ -14,6 +14,8 @@ html
 
 		//- Customise the stylesheet for your site by editing /public/styles/site.sass
 		link(href="/styles/site.css", rel="stylesheet")
+		link(href="/awesome-notifications/styles.css", rel="stylesheet")
+		script(src="/awesome-notifications/index.var.js")
 
 		//- This file provides the default styling for the KeystoneJS Content Editor
 		if user && user.canAccessKeystone
@@ -116,6 +118,14 @@ html
 
 		//- space body away from navbar
 		script.
+			var options = {
+				icons: {enabled: false},
+				labels: {
+					tip: "Your custom tip box label"
+				}
+			}
+			var notifier = new AWN(options);
+			notifier.success('success');
 			$('body')[0].style.paddingTop = $('.navbar').height() + 20 + 'px';
 
 
