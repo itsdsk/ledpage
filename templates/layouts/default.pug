@@ -116,8 +116,8 @@ html
 		//- them specifically here, instead of bootstrap-3.3.5.min.js
 		script(src='/js/bootstrap/bootstrap-3.3.5.min.js')
 
-		//- space body away from navbar
 		script.
+			// add awesome-notifications obj
 			var options = {
 				icons: {enabled: false},
 				labels: {
@@ -125,7 +125,14 @@ html
 				}
 			}
 			var notifier = new AWN(options);
-			notifier.success('success');
+			//- // add awesome-notifications async
+			//- function asyncFunc() {
+			//- 	return new Promise((resolve, reject) => {
+			//- 		setTimeout(() => resolve("test"), 2000);
+			//- 	})
+			//- }
+
+			// space body away from navbar
 			$('body')[0].style.paddingTop = $('.navbar').height() + 20 + 'px';
 
 
@@ -167,10 +174,12 @@ html
 					$.ajax({url: url, async: false,
 						error: function(result){
 							console.log('play sketch ajax error')
+							notifier.alert('Could not play sketch. Is the player connected?');
 							//console.log(result);
 						},
 						success: function(result){
 							console.log('play sketch ajax success')
+							notifier.success('Queued to display!');
 							//console.log(result);
 						}
 					});
