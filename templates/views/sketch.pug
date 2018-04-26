@@ -18,9 +18,9 @@ block content
 			.col-sm-4.col-md-4
 				.channel-heading
 					if data.sketch.ipfsHash
-						a(href='/api/sketch/' + data.sketch.id + '/sync').btn.btn-default.pull-right Update address
+						a(href='/api/sketch/' + data.sketch.id + '/sync', id='btn-share').btn.btn-default.pull-right Update address
 					else
-						a(href='/api/sketch/' + data.sketch.id + '/sync').btn.btn-default.pull-right Create address
+						a(href='/api/sketch/' + data.sketch.id + '/sync', id='btn-share').btn.btn-default.pull-right Create address
 					h2 Channels
 				.list-group
 					.list-group-item
@@ -189,12 +189,27 @@ block js
 					data: form_data
 				}).done(function(response){
 					if(response.success){
-						notifier.success('Update complete. Please ');
+						notifier.success('Update complete. Please refresh.');
 					}else{
-						notifier.alert('Error updating sketch');
+						notifier.alert('Error updating sketch.');
 					}
 					console.log(response);
 					//$('#body').html(response);
 				});
 			});
+			// share button
+			function shareButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+						notifier.alert('Could not share sketch. Is there P2P connection?');
+					},
+					success: function(result){
+						notifier.success('Uploaded to IPFS!');
+					}
+				});
+			}
+			$('#btn-share').click( shareButton );
 		});
