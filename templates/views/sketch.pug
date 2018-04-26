@@ -16,26 +16,83 @@ block content
 				div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
 					iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
 			.col-sm-4.col-md-4
-				//- iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
-				.panel.panel-default
-					.panel-heading
-						a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right Display
-						h3(class='panel-title')=data.sketch.title
-					.list-group
-						a(href='/api/sketch/' + data.sketch.id + '/sync').list-group-item Share with peers
-						.list-group-item
-							p Channels:
-							if data.channels && data.channels.length
-								ul.nav.nav-pills
-									each channel in data.channels
-										- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
-										li(class=(channelActive ? 'active' : ''))
-											a(href='?channel=true&_id='+channel._id)=channel.name
-						a(href='/view-static/' + data.sketch.localDir, target='_blank').list-group-item Preview on device
-						if data.sketch.ipfsHash
-							a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
-					.panel-footer
-						a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+				.channel-heading
+					if data.sketch.ipfsHash
+						a(href='/api/sketch/' + data.sketch.id + '/sync').btn.btn-default.pull-right Update address
+					else
+						a(href='/api/sketch/' + data.sketch.id + '/sync').btn.btn-default.pull-right Create address
+					h2 Channels
+				.list-group
+					.list-group-item
+						if data.channels && data.channels.length
+							ul.nav.nav-pills
+								each channel in data.channels
+									- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+									li(class=(channelActive ? 'active' : ''))
+										a(href='?channel=true&_id='+channel._id)=channel.name
+				.channel-sync
+					if data.sketch.ipfsHash
+						- var shortHash = data.sketch.ipfsHash.substring(0,24);
+						p Address:
+							code
+								a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank')=shortHash
+				hr
+				a(href='/view-static/' + data.sketch.localDir, target='_blank').btn.btn-default.pull-right Local
+				if data.sketch.ipfsHash
+					a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
+				h2 Preview
+				if data.sketch.prefThumb
+					h4 prefthumb avail
+				else
+					h4 prefthumb notavail
+				hr
+				a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+			.col-sm-8.col-md-8
+				.details-heading
+					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
+					h2 Details
+					form(method='post').form-horizontal
+						fieldset(disabled='disabled')
+							input(type='hidden', name='action', value='save')
+							.form-group(class=validationErrors.message ? 'has-error' : null)
+								label.col-sm-2.control-label Title
+								.col-sm-10
+									textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.sketch.title
+							.form-group(class=validationErrors.message ? 'has-error' : null)
+								label.col-sm-2.control-label index.html
+								.col-sm-10
+									textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+							.form-group
+								.col-sm-10.col-sm-offset-2
+									button(type='submit').btn.btn-primary Save
+
+			//- .col-sm-4.col-md-4
+			//- 	//- iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
+			//- 	if data.sketch.prefThumb
+			//- 		//- - var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
+			//- 		div(class='thumbnail')
+			//- 		h4 pls
+			//- 	else
+			//- 		h4 Select a preferred image
+			//- 	.panel.panel-default
+			//- 		.panel-heading
+			//- 			a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right Display
+			//- 			h3(class='panel-title')=data.sketch.title
+			//- 		.list-group
+			//- 			a(href='/api/sketch/' + data.sketch.id + '/sync').list-group-item Share with peers
+			//- 			.list-group-item
+			//- 				p Channels:
+			//- 				if data.channels && data.channels.length
+			//- 					ul.nav.nav-pills
+			//- 						each channel in data.channels
+			//- 							- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+			//- 							li(class=(channelActive ? 'active' : ''))
+			//- 								a(href='?channel=true&_id='+channel._id)=channel.name
+			//- 			a(href='/view-static/' + data.sketch.localDir, target='_blank').list-group-item Preview on device
+			//- 			if data.sketch.ipfsHash
+			//- 				a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
+			//- 		.panel-footer
+			//- 			a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 			.col-sm-8.col-md-8
 				.page-header
 					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
@@ -47,20 +104,20 @@ block content
 								img(src='/view-static/'+data.sketch.localDir+'/'+thumbnail).img-thumbnail
 				else
 					h4 No thumbnails
-				.page-header
-					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
-					h1 Source Code
-				form(method='post').form-horizontal
-					fieldset(disabled='disabled')
-						input(type='hidden', name='action', value='save')
-						.form-group(class=validationErrors.message ? 'has-error' : null)
-							label.col-sm-2.control-label index.html
-							.col-sm-10
-								textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
-						.form-group
-							.col-sm-10.col-sm-offset-2
-								p.help-block Note: others can see your
-								button(type='submit').btn.btn-primary Save
+				//- .page-header
+				//- 	a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
+				//- 	h1 Source Code
+				//- form(method='post').form-horizontal
+				//- 	fieldset(disabled='disabled')
+				//- 		input(type='hidden', name='action', value='save')
+				//- 		.form-group(class=validationErrors.message ? 'has-error' : null)
+				//- 			label.col-sm-2.control-label index.html
+				//- 			.col-sm-10
+				//- 				textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+				//- 		.form-group
+				//- 			.col-sm-10.col-sm-offset-2
+				//- 				p.help-block Note: others can see your
+				//- 				button(type='submit').btn.btn-primary Save
 
 				//- article
 				//- 	//- p: a(href='/browse') &larr; back to the sketches
