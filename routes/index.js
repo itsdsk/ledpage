@@ -51,6 +51,7 @@ exports = module.exports = function (app) {
 	app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
 	app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
 	app.all('/api/sketch/:id/update', keystone.middleware.api, routes.api.sketch.update); // update sketch
+	app.get('/api/sketch/:id/channel', keystone.middleware.api, routes.api.sketch.channel); // channel add/remove sketch
 	app.get('/api/sketch/:id/delete', keystone.middleware.api, routes.api.sketch.delete); // delete/unpublish sketch
 	app.get('/api/sketch/:id/screenshot', keystone.middleware.api, routes.api.sketch.screenshot); // save screenshot of sketch
 	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status

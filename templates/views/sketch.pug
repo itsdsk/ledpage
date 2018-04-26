@@ -29,7 +29,8 @@ block content
 								each channel in data.channels
 									- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 									li(class=(channelActive ? 'active' : ''))
-										a(href='?channel=true&_id='+channel._id)=channel.name
+										a(href='/api/sketch/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
+										//- a(href='?channel=true&_id='+channel._id)=channel.name
 				.channel-sync
 					if data.sketch.ipfsHash
 						- var shortHash = data.sketch.ipfsHash.substring(0,24);
@@ -212,4 +213,19 @@ block js
 				});
 			}
 			$('#btn-share').click( shareButton );
+			// channel button
+			function channelButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+						notifier.alert('Could not update sketch channels. Is there P2P connection?');
+					},
+					success: function(result){
+						notifier.success('Updated sketch channel! Pls refresh');
+					}
+				});
+			}
+			$('.btn-channel').click( channelButton );
 		});

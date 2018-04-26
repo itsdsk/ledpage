@@ -560,6 +560,61 @@ exports.update = function (req, res) {
 };
 
 /**
+ * Channel add/remove sketch by ID
+ */
+
+exports.channel = function (req, res) {
+	// find sketch
+	Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+		if (err) return res.apiError('database error', err);
+		if (!item) return res.apiError('not found');
+
+		var sketchChannels = [];
+		var alreadyInChannel = false;
+		// add existing channels to array
+		for(var i=0; i<item.channels.length; i++){
+			// check if channel is already added
+			if(item.channels[i] == req.query._id){
+				alreadyInChannel = true; // skip adding
+			}else{
+				// keep current channel if not the same channel in request
+				sketchChannels.push(item.channels[i]);
+			}
+		}
+		// add new channel if it wasnt already added
+		if(alreadyInChannel == false){
+			sketchChannels.push(req.query._id);
+		}
+		var data = {
+			channels: sketchChannels
+		};
+		// run the database update
+		item.getUpdateHandler(req).process(data, function(err) {
+			if(err){
+				return res.apiError('error updating sketch channel', err);
+			}else{
+				res.apiResponse({
+					success: true
+				});
+			}
+		});
+		// item.state = 'archived';
+		// item.save(function (err) {
+		// 	if (err) {
+		// 		return res.err(err);
+		// 	} else {
+		// 		res.apiResponse({
+		// 			success: true
+		// 		});
+		// 	}
+
+		// });
+	});
+};
+
+
+/**
  * Delete/unpublish Sketch by ID
  */
 
