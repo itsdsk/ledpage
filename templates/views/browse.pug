@@ -3,6 +3,8 @@ extends ../layouts/default
 mixin sketch(sketch)
 	//- .sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
 	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id }))
+		//- .panel-heading
+		//- 	label=sketch.title
 		//- h4.media-heading
 		//- .panel-heading
 		//- 	h3.panel-title= sketch.title
@@ -25,10 +27,14 @@ mixin sketch(sketch)
 						button(type='submit').display-btn.btn.btn-md ▶
 					a(href='/browse/sketch/' + sketch.slug)
 						button(type='submit').btn.btn-md ⋯
-					// display led svgs
-					//div(id='leds').list-group-item.led-svg
-					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
-					//iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).display-sketch
+	.panel.panel-default
+		.panel-heading
+			p.pull-right=sketch._.modifiedDate.format('D/M/Y')
+			h4.panel-title=sketch.title		
+					//- // display led svgs
+					//- //div(id='leds').list-group-item.led-svg
+					//- //iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
+					//- //iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).display-sketch
 
 		//- .media-bottom
 		//- .list-group
