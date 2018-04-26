@@ -61,16 +61,25 @@ setInterval(function () {
 }, 5000);
 
 exports.initLocals = function (req, res, next) {
+	// navigation bar items
 	res.locals.navLinks = [{
-		label: '☍ Upload',
+		label: '☍ Upload',
 		key: 'upload',
 		href: '/upload'
-	}, ];
+	},
+	{
+		label: '☌ Setup',
+		key: 'setup',
+		href: '/setup'
+	}];
+
+	// local directory constants
 	const publicPath = '/data/content/';
 	//const publicPath = './public/';
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
-	// check component status
+
+	// component status
 	res.locals.componentStatus = componentStatus;
 	res.locals.user = req.user;
 	next();
