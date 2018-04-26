@@ -193,10 +193,12 @@ html
 					$.ajax({url: url, async: false,
 						error: function(result){
 							console.log('play sketch ajax error')
+							notifier.alert('Could not play sketch. Is the player connected?');
 							//console.log(result);
 						},
 						success: function(result){
 							console.log('play sketch ajax success')
+							notifier.success('Queued to display!');
 							//console.log(result);
 						}
 					});

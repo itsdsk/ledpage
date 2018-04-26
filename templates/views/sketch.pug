@@ -5,8 +5,11 @@ block content
 		if !data.sketch
 			h2 Invalid Sketch.
 		else
+			.col-sm-12.col-md-12
+				div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
+					iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
 			.col-sm-4.col-md-4
-				iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
+				//- iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
 				.panel.panel-default
 					.panel-heading
 						a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right Display
@@ -21,7 +24,7 @@ block content
 										- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 										li(class=(channelActive ? 'active' : ''))
 											a(href='?channel=true&_id='+channel._id)=channel.name
-						a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on device
+						a(href='/view-static/' + data.sketch.localDir, target='_blank').list-group-item Preview on device
 						if data.sketch.ipfsHash
 							a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
 					.panel-footer
