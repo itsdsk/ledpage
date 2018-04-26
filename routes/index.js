@@ -51,6 +51,7 @@ exports = module.exports = function (app) {
 	app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
 	app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
 	app.get('/api/sketch/:id/delete', keystone.middleware.api, routes.api.sketch.delete); // delete/unpublish sketch
+	app.get('/api/sketch/:id/screenshot', keystone.middleware.api, routes.api.sketch.screenshot); // save screenshot of sketch
 	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status
 	app.all('/api/player/map', keystone.middleware.api, routes.api.sketch.mapleds); // update player led map
 	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs

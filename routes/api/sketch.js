@@ -512,19 +512,120 @@ exports.delete = function (req, res) {
 		if (!item) return res.apiError('not found');
 
 		item.state = 'archived';
-		item.save(function(err) {
-			if(err) {
+		item.save(function (err) {
+			if (err) {
 				return res.err(err);
-			}
-			else
-			{
+			} else {
 				res.apiResponse({
 					success: true
 				});
 			}
-			
+
 		});
 	});
+};
+
+/**
+ * Screenshot sketch by ID
+ */
+
+exports.screenshot = function (req, res) {
+	// no player
+	if (!isDplayerConnected) {
+		console.log('play error: player not connected');
+		return res.apiError({
+			success: false
+		});
+	}
+	// find sketch
+	Sketch.model.findById(req.params.id).exec(function (err, item) {
+		if (err) return res.apiError('database error', err);
+		if (!item) return res.apiError('not found');
+		// prep to save screenshot
+		var sys = require('sys');
+		var exec = require('child_process').exec;
+		var uploadName = 'screenshot_' + (Math.random().toString(36).substr(2, 6)) + '.png';
+		var uploadPath = res.locals.staticPath + item.localDir + '/' + uploadName;
+		var execCommand = 'import -window root -display :0.0 ' + uploadPath;
+		console.log('saving screenshot to: ' + uploadPath);
+		// save screenshot
+		exec(execCommand, function (err, stdout, stderr) {
+			console.log(stdout);
+			if (err) {
+				console.log('screenshot error: ');
+				return res.apiError({
+					success: false
+				});
+			};
+			// add screenshot filename to database
+			// Sketch.model.findById(locals.data.sketch.id).exec(function (err, item) {
+			// 	if (err) {
+					// req.flash('warning', 'not done');
+					// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+				// }
+				var imgs = {
+					thumbnails: item.thumbnails
+				};
+				imgs.thumbnails.push(uploadName);
+				Sketch.updateItem(item, imgs, {
+					fields: ["thumbnails"]
+				}, function (dberror) {
+					if (dberror) {
+						console.log('db error: ' + dberror);
+						return res.apiError({
+							success: false
+						});		
+						// req.flash('warning', 'not done');
+						// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+					}
+				});
+			// })
+			// let updater = locals.data.sketch.getUpdateHandler(req, res, {
+			// 	errorMessage: 'error updating sketch with screenshot'
+			// });
+			// updater.process()
+			console.log('thumbnails: ' + locals.data.sketch.thumbnails);
+			if (err) {
+				return res.apiError({
+					success: false
+				});		
+				// req.flash('warning', 'not done');
+				// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+			} else {
+				res.apiResponse({
+					success: true
+				});
+				// req.flash('success', 'done');
+				// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+			}
+		});
+
+	});
+
+
+	// Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+	// 	if (err) return res.apiError('database error', err);
+	// 	if (!item) return res.apiError('not found');
+
+	// 	if (ipc.of.dplayeripc) {
+	// 		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
+	// 		ipc.of.dplayeripc.emit('message', sketchPath);
+	// 		console.log('yes');
+
+	// 		res.apiResponse({
+	// 			success: true
+	// 		});
+	// 	} else {
+	// 		console.log('neswsfo');
+
+	// 		res.apiError({
+	// 			success: false
+	// 		});
+
+	// 	}
+
+	// });
 };
 
 
@@ -557,27 +658,34 @@ exports.mapleds = function (req, res) {
 	const newLeds = JSON.parse(req.body.leds);
 	// duplicate new led map into hyperion format
 	const newConfig = Array();
-	for (var i=0; i<newLeds.leds.length; i++){
-		var newConf = {index: i,
-			hscan: {mininum: newLeds.leds[i].x, maximum: (newLeds.leds[i].x+0.1111)},
-			vscan: {mininum: newLeds.leds[i].y, maximum: (newLeds.leds[i].y+0.1111)}
+	for (var i = 0; i < newLeds.leds.length; i++) {
+		var newConf = {
+			index: i,
+			hscan: {
+				mininum: newLeds.leds[i].x,
+				maximum: (newLeds.leds[i].x + 0.1111)
+			},
+			vscan: {
+				mininum: newLeds.leds[i].y,
+				maximum: (newLeds.leds[i].y + 0.1111)
+			}
 		};
 		newConfig.push(newConf);
 	}
 	// read hyperion config template then add new led coords and save
-	fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function(err, data){
-		if(err) {
-			console.log('wefaf'+err);
+	fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function (err, data) {
+		if (err) {
+			console.log('wefaf' + err);
 			return res.apiError({
 				success: false
-			});	
+			});
 		}
-		try{
+		try {
 			// save new hyperion config
 			const ledConfig = JSON.parse(data);
 			ledConfig.leds = newConfig;
 			const jsonLedConfig = JSON.stringify(ledConfig, null, 2);
-			fs.writeFile(res.locals.configStaticPath +'hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
+			fs.writeFile(res.locals.configStaticPath + 'hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
 				if (fserr) {
 					console.log(fserr);
 					res.apiResponse({
@@ -585,7 +693,7 @@ exports.mapleds = function (req, res) {
 						note: 'Error saving file...',
 						error: fserr
 					});
-				}else{
+				} else {
 					// save new leds.json
 					const jsonNewLeds = JSON.stringify(newLeds, null, 2);
 					fs.writeFile(res.locals.configStaticPath + 'leds.json', jsonNewLeds, 'utf8', (fserr) => {
@@ -596,7 +704,7 @@ exports.mapleds = function (req, res) {
 								note: 'Error saving file...',
 								error: fserr
 							});
-						}else{
+						} else {
 							console.log('File saved');
 						}
 					});
@@ -606,11 +714,11 @@ exports.mapleds = function (req, res) {
 			return res.apiResponse({
 				success: true
 			});
-		}catch(exception){
-			console.log('wedwddfaf'+exception);
+		} catch (exception) {
+			console.log('wedwddfaf' + exception);
 			return res.apiError({
 				success: false
-			});	
+			});
 		}
 	});
 	// console.log(ledConfig);
