@@ -6,6 +6,13 @@ block content
 			h2 Invalid Sketch.
 		else
 			.col-sm-12.col-md-12
+				.page-header
+					//- a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right ▶ Display
+					a(href='/api/sketch/' + data.sketch.id + '/play').pull-right
+						button(type='submit').display-btn.btn.btn-primary ▶ Display
+					- var title = data.sketch.title
+					- var date = data.sketch._.modifiedDate.format('D/M/Y')
+					h1 <strong>#{title}</strong> <small>#{date}</small>
 				div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
 					iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
 			.col-sm-4.col-md-4
