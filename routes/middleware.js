@@ -62,7 +62,7 @@ setInterval(function () {
 
 exports.initLocals = function (req, res, next) {
 	res.locals.navLinks = [{
-		label: '⁂ Upload',
+		label: '☍ Upload',
 		key: 'upload',
 		href: '/upload'
 	}, ];
