@@ -80,29 +80,29 @@ exports = module.exports = function (req, res) {
 		});
 	});
 
-	// subscribe to channel on ipfs
-	view.on('get', {
-		sub: 'true'
-	}, function(next){
-		//
-		var SketchChannel = keystone.list('SketchChannel');
-		var newChannel = new SketchChannel.model();
-		var newUpdater = newChannel.getUpdateHandler(req);
-		var data = {
-			name: req.query.channel
-		};
-		newUpdater.process(data, {
-			flashErrors: true
-		}, function(err) {
-			if(err){
-				req.flash('error', 'error subscribing to channel!');
-				return res.redirect('/browse');
-			}else{
-				req.flash('success', 'subscribed to channel!');
-				return res.redirect('/browse');
-			}
-		});
-	});
+	// // subscribe to channel on ipfs
+	// view.on('get', {
+	// 	sub: 'true'
+	// }, function(next){
+	// 	//
+	// 	var SketchChannel = keystone.list('SketchChannel');
+	// 	var newChannel = new SketchChannel.model();
+	// 	var newUpdater = newChannel.getUpdateHandler(req);
+	// 	var data = {
+	// 		name: req.query.channel
+	// 	};
+	// 	newUpdater.process(data, {
+	// 		flashErrors: true
+	// 	}, function(err) {
+	// 		if(err){
+	// 			req.flash('error', 'error subscribing to channel!');
+	// 			return res.redirect('/browse');
+	// 		}else{
+	// 			req.flash('success', 'subscribed to channel!');
+	// 			return res.redirect('/browse');
+	// 		}
+	// 	});
+	// });
 
 	// Render the view
 	view.render('browse');
