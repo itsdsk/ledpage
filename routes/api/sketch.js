@@ -613,6 +613,50 @@ exports.channel = function (req, res) {
 	});
 };
 
+/**
+ * Subscribe to channel
+ */
+
+exports.subscribe = function (req, res) {
+	//
+	var SketchChannel = keystone.list('SketchChannel');
+	var newChannel = new SketchChannel.model();
+	var newUpdater = newChannel.getUpdateHandler(req);
+	var data = {
+		name: req.query.name
+	};
+	newUpdater.process(data, {
+		flashErrors: true
+	}, function(err) {
+		if(err){
+			return res.apiError('error subscribing to channel', err);
+		}else{
+			res.apiResponse({
+				success: true
+			});
+		}
+	});
+	// // find sketch
+	// Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+	// 	if (err) return res.apiError('database error', err);
+	// 	if (!item) return res.apiError('not found');
+
+	// 	item.state = 'archived';
+	// 	item.save(function (err) {
+	// 		if (err) {
+	// 			return res.err(err);
+	// 		} else {
+	// 			res.apiResponse({
+	// 				success: true
+	// 			});
+	// 		}
+
+	// 	});
+	// });
+};
+
+
 
 /**
  * Delete/unpublish Sketch by ID

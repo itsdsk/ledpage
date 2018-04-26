@@ -47,7 +47,8 @@ block content
 				else
 					h4 prefthumb notavail
 				hr
-				a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+				a(href='/api/sketch/'+data.sketch.id+'/delete', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+				//- a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 			.col-sm-8.col-md-8
 				.details-heading
 					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
