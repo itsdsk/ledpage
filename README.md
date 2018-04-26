@@ -1,6 +1,11 @@
 # Project Title
 
-One Paragraph of project description goes here
+Project title is an LED display server for web graphics with a web interface. The main features of project title are:
+
+* Configure LED things with arbitrary 2D mappings
+* Display motion graphics supported by modern browsers
+* Freely upload and download motion graphics 'sketches' to and from subscribed peer-to-peer channels
+* Program automatic and responsive display behaviour
 
 ## Getting Started
 
