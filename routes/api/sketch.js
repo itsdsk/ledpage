@@ -584,7 +584,7 @@ exports.screenshot = function (req, res) {
 			// 	errorMessage: 'error updating sketch with screenshot'
 			// });
 			// updater.process()
-			console.log('thumbnails: ' + locals.data.sketch.thumbnails);
+			console.log('thumbnails: ' + item.thumbnails);
 			if (err) {
 				return res.apiError({
 					success: false
