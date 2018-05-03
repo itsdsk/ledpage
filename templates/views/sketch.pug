@@ -53,7 +53,7 @@ block content
 				.details-heading
 					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
 					h2 Details
-					form(action='/api/sketch/'+data.sketch.id+'/update' method='post' id='sketch-form').form-horizontal
+					form(action='/api/sketch/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
 						fieldset(disabled='disabled')
 							input(type='hidden', name='action', value='save')
 							.form-group(class=validationErrors.message ? 'has-error' : null)
@@ -179,26 +179,26 @@ block js
 			});
 			// initialise tooltip to appear on Delete button
 			$('[data-toggle="tooltip"]').tooltip(); 
-			// send form ajax
-			$('#sketch-form').submit(function(event){
-				event.preventDefault();
-				var post_url = $(this).attr('action');
-				var request_method = $(this).attr('method');
-				var form_data = $(this).serialize();
-				$.ajax({
-					url: post_url,
-					type: request_method,
-					data: form_data
-				}).done(function(response){
-					if(response.success){
-						notifier.success('Update complete. Please refresh.');
-					}else{
-						notifier.alert('Error updating sketch.');
-					}
-					console.log(response);
-					//$('#body').html(response);
-				});
-			});
+			//- // send form ajax
+			//- $('#sketch-form').submit(function(event){
+			//- 	event.preventDefault();
+			//- 	var post_url = $(this).attr('action');
+			//- 	var request_method = $(this).attr('method');
+			//- 	var form_data = $(this).serialize();
+			//- 	$.ajax({
+			//- 		url: post_url,
+			//- 		type: request_method,
+			//- 		data: form_data
+			//- 	}).done(function(response){
+			//- 		if(response.success){
+			//- 			notifier.success('Update complete. Please refresh.');
+			//- 		}else{
+			//- 			notifier.alert('Error updating sketch.');
+			//- 		}
+			//- 		console.log(response);
+			//- 		//$('#body').html(response);
+			//- 	});
+			//- });
 			// share button
 			function shareButton(e) {
 				//

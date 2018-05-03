@@ -507,8 +507,18 @@ exports.play = function (req, res) {
 exports.update = function (req, res) {
 	Sketch.model.findById(req.params.id).exec(function (err, item) {
 
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'database error'+ err
+			});
+		}
+		if (!item) {
+			return res.apiError({
+				success: false,
+				note: 'sketch ID not found'
+			});
+		}
 
 		// get absolute file name
 		var saveName = res.locals.staticPath + item.localDir + '/index.html';
@@ -520,6 +530,10 @@ exports.update = function (req, res) {
 				// error saving
 				// req.flash('warning', 'error saving html');
 				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				return res.apiError({
+					success: false,
+					note: 'error saving sketch file'
+				})
 			} else {
 				// success saving
 				// req.flash('success', 'success saving html');
@@ -528,10 +542,14 @@ exports.update = function (req, res) {
 				item.title = req.body.title;
 				item.save(function (err) {
 					if (err) {
-						return res.apiError('error saving', err);
+						return res.apiError({
+							success: false,
+							note: 'could not update database ' + err
+						});
 					} else {
 						res.apiResponse({
-							success: true
+							success: true,
+							note: 'sketch updated'
 						});
 					}
 				});
@@ -841,7 +859,8 @@ exports.mapleds = function (req, res) {
 		if (err) {
 			console.log('wefaf' + err);
 			return res.apiError({
-				success: false
+				success: false,
+				note: 'could not read config template (hyperion json)'
 			});
 		}
 		try {
