@@ -936,6 +936,26 @@ exports.configure = function (req, res) {
 			console.log('saved setup config json');
 		}
 	});
+	// check if arduino is installed (function from https://stackoverflow.com/a/33067955/9451349)
+	function moduleAvailable(name) {
+		try {
+			require.resolve(name);
+			return true;
+		} catch(e){}
+		return false;
+	}
+	if(moduleAvailable('arduino')){
+		console.log('arduino available');
+		return res.apiResponse({
+			success: true
+		});
+	}else{
+		console.log('arduino not available');
+		return res.apiError({
+			success: false
+		});
+	}
+
 	// setup arduino
 	if (true) {
 		// construct arduino file
