@@ -220,6 +220,29 @@ html
 					});
 				}
 				$('.display-link').click( displayLinked );
+				
+				// post form to server in background
+				$('.post-form-ajax').submit(function(event){
+					event.preventDefault();
+					var post_url = $(this).attr('action');
+					var request_method = $(this).attr('method');
+					var form_data = $(this).serialize();
+					$.ajax({
+						url: post_url,
+						type: request_method,
+						data: form_data,
+						error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+						},
+						success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+						}
+					});
+
+				})
+
 			});
 
 		//- FOOTER

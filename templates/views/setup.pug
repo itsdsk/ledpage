@@ -11,7 +11,7 @@ block content
 				.page-header
 					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
 					h1 Output
-				form(action='/api/display/configure' method='post' id='config-form').form-horizontal
+				form(action='/api/display/configure' method='post' class='post-form-ajax' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
 						.form-group
@@ -277,27 +277,27 @@ block js
 			}
 			$("#save-led-map").click(saveMap);
 
-			// post new output config to server in background
-			$('#config-form').submit(function(event){
-				event.preventDefault();
-				var post_url = $(this).attr('action');
-				var request_method = $(this).attr('method');
-				var form_data = $(this).serialize();
-				$.ajax({
-					url: post_url,
-					type: request_method,
-					data: form_data,
-					error: function(result){
-						console.log('error updating config');
-						notifier.alert('error updating config');
-					},
-					success: function(result){
-						console.log('updated config');
-						notifier.success('updated config');
-					}
-				});
+			//- // post new output config to server in background
+			//- $('#config-form').submit(function(event){
+			//- 	event.preventDefault();
+			//- 	var post_url = $(this).attr('action');
+			//- 	var request_method = $(this).attr('method');
+			//- 	var form_data = $(this).serialize();
+			//- 	$.ajax({
+			//- 		url: post_url,
+			//- 		type: request_method,
+			//- 		data: form_data,
+			//- 		error: function(result){
+			//- 			console.log('error updating config ' + JSON.stringify(result.responseJSON.error.note));
+			//- 			notifier.alert('error updating config' + result.responseJSON.error.note);
+			//- 		},
+			//- 		success: function(result){
+			//- 			console.log('updated config ' + JSON.stringify(result.note));
+			//- 			notifier.success('updated config ' + result.note);
+			//- 		}
+			//- 	});
 
-			})
+			//- })
 		});
 		$(function() {
 			// get existing settings from file
