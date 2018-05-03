@@ -1,7 +1,0 @@
-{
-	"ledcount": 32,
-	"chipset": "WS2812B",
-	"order": "RGB",
-	"platform": "uno",
-	"datapin": "5"
-}
