@@ -161,7 +161,8 @@ block js
 
 			// setbrightness slider
 			function setBrightness() {
-				var url = '/api/display/brightness/' + $(this).val();
+				//- var url = '/api/display/brightness/' + $(this).val();
+				var url = '/api/leds/set-brightness/' + $(this).val();
 				$.get(url, function() {
 					// success
 				});

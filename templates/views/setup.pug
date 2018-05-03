@@ -11,7 +11,8 @@ block content
 				.page-header
 					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
 					h1 Output
-				form(action='/api/display/configure' method='post' class='post-form-ajax' id='config-form').form-horizontal
+				//- form(action='/api/display/configure' method='post' class='post-form-ajax' id='config-form').form-horizontal
+				form(action='/api/leds/config-arduino' method='post' class='post-form-ajax' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
 						.form-group
@@ -268,7 +269,8 @@ block js
 					points.leds.push({x: d.x, y: d.y});
 				});
 
-				$.post('/api/player/map', '&leds=' + JSON.stringify(points), function (data) {
+				//- $.post('/api/player/map', '&leds=' + JSON.stringify(points), function (data) {
+				$.post('/api/leds/map-positions', '&leds=' + JSON.stringify(points), function (data) {
 					if (data.err) {
 						console.log('error solve');
 						return;
