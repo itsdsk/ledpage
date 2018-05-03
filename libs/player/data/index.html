@@ -1,20 +1,36 @@
 <html>
-  <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
-    <script>
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+  <script>
     function setup() {
-      createCanvas(1280, 720);
+      createCanvas(720, 720);
       frameRate(30);
+      noStroke();
       colorMode(HSB, 255);
     }
-    var c = 0;
+    // track time
+    var frame = 0;
+    // constants
+    var degree = Math.PI / 180;
+    var slice = 2 * (Math.PI / 3);
+
     function draw() {
-      ellipse(50, 50, 80, 80);
-      if (c >= 255)  c=0;  else  c++;
-      background(c, 255, 255);
+      // reset background and update angle
+      background(0);
+      var angle = (frame++) * degree;
+      // draw 3 rotating slices
+      fill(frame % 255, 255, 255);
+      arc(width / 2, height / 2, width, height, slice + angle, (2 * slice) + angle, PIE);
+      fill((frame + 85) % 255, 255, 255);
+      arc(width / 2, height / 2, width, height, (2 * slice) + angle, (3 * slice) + angle, PIE);
+      fill((frame + 170) % 255, 255, 255);
+      arc(width / 2, height / 2, width, height, (3 * slice) + angle, (4 * slice) + angle, PIE);
     }
-    </script>
-  </head>
-  <body>
-  </body>
+  </script>
+</head>
+
+<body>
+</body>
+
 </html>
