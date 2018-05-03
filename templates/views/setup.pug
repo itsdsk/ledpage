@@ -283,19 +283,18 @@ block js
 				var post_url = $(this).attr('action');
 				var request_method = $(this).attr('method');
 				var form_data = $(this).serialize();
-				console.log(form_data);
 				$.ajax({
 					url: post_url,
 					type: request_method,
-					data: form_data
-				}).done(function(response){
-					if(response.success){
-						notifier.success('Update complete. Please refresh.');
-					}else{
-						notifier.alert('Error updating sketch.');
+					data: form_data,
+					error: function(result){
+						console.log('error updating config');
+						notifier.alert('error updating config');
+					},
+					success: function(result){
+						console.log('updated config');
+						notifier.success('updated config');
 					}
-					console.log(response);
-					//$('#body').html(response);
 				});
 
 			})

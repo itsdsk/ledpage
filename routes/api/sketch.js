@@ -901,11 +901,116 @@ exports.mapleds = function (req, res) {
  */
 exports.configure = function (req, res) {
 	// get request body from HTTP post
-	const config = req.body;
-	console.log(config);
-	return res.apiResponse({
-		success: true
+	var config = {
+		"ledcount": parseInt(req.body.numLeds, 10),
+		"chipset": req.body.ledChip,
+		"order": req.body.ledOrder,
+		"platform": req.body.boardType,
+		"datapin": req.body.dataPin
+	};
+	if (req.body.clockPin) {
+		config.clockpin = req.body.clockPin;
+	}
+	// console.log(config);
+	// console.log(res.locals.configStaticPath);
+
+	// create config directory if doesnt exist
+	if(!fs.existsSync(res.locals.configStaticPath)){
+		console.log('creating config directory');
+		fs.mkdirSync(res.locals.configStaticPath);
+	}
+	// write config file
+	fs.writeFile(res.locals.configStaticPath+'setup.json', JSON.stringify(config, null, 4), 'utf8', function(err) {
+		if(err){
+			console.log('error saving setup json'+err);
+			return res.apiError({
+				success: false
+			});
+		}else{
+			console.log('saved setup config json');
+		}
 	});
+	// setup arduino
+	if (true) {
+		// construct arduino file
+		fs.writeFile("./libs/controller/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
+			if (err) {
+				console.log('error starting arduino file');
+				console.log(err);
+				return res.apiError({
+					success: false
+				});
+			}
+			var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
+			var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
+			var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
+			var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
+			var defines;
+			if (!req.body.clockPin) {
+				defines = define1.concat(define3, define4, define5);
+			} else if (req.body.clockPin) {
+				var define2 = '#define CLOCK_PIN ' + req.body.clockPin + '\n';
+				defines = define1.concat(define2, define3, define4, define5);
+			}
+			fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", defines, function (err) {
+				if (err) {
+					console.log('error adding defines to arduino file');
+					console.log(err);
+					return res.apiError({
+						success: false
+					});	
+				}
+				fs.readFile("./libs/controller/arduino_segments/template.txt", (err, contents) => {
+					if (err) {
+						console.log('error reading template arduino file');
+						console.log(err);
+						return res.apiError({
+							success: false
+						});		
+					}
+					fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", contents, function (err) {
+						if (err) {
+							console.log('error adding arduino template to file');
+							console.log(err);
+							return res.apiError({
+								success: false
+							});			
+						}
+						console.log('finished creating arduino file!');
+						// compile and upload new arduino file
+						const exec = require('child_process').exec;
+						console.log('starting arduino compile & upload');
+						var syncArduino = exec('./libs/controller/arduino_segments/compileupload.sh', (err, stdout, stderr) => {
+							console.log('out: '+`${stdout}`);
+							console.log('errors:'+`${stderr}`);
+							if (err !== null) {
+								console.log(`exec error: ${error}`);
+								return res.apiError({
+									success: false
+								});				
+							} // ref: https://stackoverflow.com/a/44667294
+							if(!err){
+								console.log('no erroi');
+								return res.apiResponse({
+									success: true
+								});
+							}else{
+								console.log('errors');
+								return res.apiError({
+									success: false
+								});				
+							}
+						});
+
+					});
+				});
+			});
+		});
+	}
+
+	// return res.apiResponse({
+	// 	success: true
+	// });
 
 	// if (!isDplayerConnected) {
 	// 	console.log('player error: player not connected');
