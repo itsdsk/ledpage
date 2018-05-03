@@ -955,29 +955,32 @@ exports.configure = function (req, res) {
 			console.log('saved setup config json');
 		}
 	});
-	// check if arduino is installed (function from https://stackoverflow.com/a/33067955/9451349)
-	function moduleAvailable(name) {
-		try {
-			require.resolve(name);
-			return true;
-		} catch(e){}
-		return false;
-	}
-	if(moduleAvailable('arduino')){
-		console.log('arduino available');
+	// check if arduino is installed
+	var commandExists = require('command-exists');
+	commandExists('arduino', function(err, commandExists) {
+		if(!commandExists){
+			console.log('arduino not available');
+			return res.apiError({
+				success: false,
+				note: 'arduino not available'
+			});
+		}else{
+	
+	// if(moduleAvailable('arduino')){
+	// 	console.log('arduino available');
 		// return res.apiResponse({
 		// 	success: true
 		// });
-	}else{
-		console.log('arduino not available');
-		return res.apiError({
-			success: false,
-			note: 'arduino not available'
-		});
-	}
+	// }else{
+		// console.log('arduino not available');
+		// return res.apiError({
+		// 	success: false,
+		// 	note: 'arduino not available'
+		// });
+	// }
 
 	// setup arduino
-	if (true) {
+	// if (true) {
 		// construct arduino file
 		fs.writeFile("./libs/controller/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
 			if (err) {
@@ -1060,6 +1063,7 @@ exports.configure = function (req, res) {
 			});
 		});
 	}
+});
 
 	// return res.apiResponse({
 	// 	success: true
