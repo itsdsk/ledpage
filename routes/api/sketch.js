@@ -897,6 +897,34 @@ exports.mapleds = function (req, res) {
 };
 
 /**
+ * Setup LED output configuration
+ */
+exports.configure = function (req, res) {
+	// get request body from HTTP post
+	const config = req.body;
+	console.log(config);
+	return res.apiResponse({
+		success: true
+	});
+
+	// if (!isDplayerConnected) {
+	// 	console.log('player error: player not connected');
+
+	// 	return res.apiError({
+	// 		success: false
+	// 	});
+
+	// } else {
+	// 	console.log('player is connected');
+
+	// 	return res.apiResponse({
+	// 		success: true
+	// 	});
+	// }
+};
+
+
+/**
  * Sync Sketch to IPFS
  */
 

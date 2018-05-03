@@ -11,7 +11,7 @@ block content
 				.page-header
 					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
 					h1 Output
-				form(method='post').form-horizontal
+				form(action='/api/display/configure' method='post' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
 						.form-group
@@ -55,7 +55,7 @@ block content
 										option(value=type.value selected=formData.clockPin === type.value)= type.label
 						.form-group
 							.col-sm-10.col-sm-offset-2
-								button(type='submit').btn.btn-primary Upload
+								button(type='submit' id='uploadConfigBtn').btn.btn-primary Upload
 			.col-sm-4.col-md-4
 				h4.list-group-item LEDs
 				// top left blue button
@@ -276,6 +276,29 @@ block js
 				});
 			}
 			$("#save-led-map").click(saveMap);
+
+			// post new output config to server in background
+			$('#config-form').submit(function(event){
+				event.preventDefault();
+				var post_url = $(this).attr('action');
+				var request_method = $(this).attr('method');
+				var form_data = $(this).serialize();
+				console.log(form_data);
+				$.ajax({
+					url: post_url,
+					type: request_method,
+					data: form_data
+				}).done(function(response){
+					if(response.success){
+						notifier.success('Update complete. Please refresh.');
+					}else{
+						notifier.alert('Error updating sketch.');
+					}
+					console.log(response);
+					//$('#body').html(response);
+				});
+
+			})
 		});
 		$(function() {
 			// get existing settings from file

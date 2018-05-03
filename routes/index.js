@@ -60,6 +60,7 @@ exports = module.exports = function (app) {
 	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
 	app.get('/api/display/brightness/:val', keystone.middleware.api, routes.api.sketch.setBrightness); // 
 	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
+	app.all('/api/display/configure', keystone.middleware.api, routes.api.sketch.configure); // setup led output configuration
 
 	app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
 
