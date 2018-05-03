@@ -830,6 +830,12 @@ exports.mapleds = function (req, res) {
 		};
 		newConfig.push(newConf);
 	}
+	// create config directory if doesnt exist
+	if(!fs.existsSync(res.locals.configStaticPath)){
+		console.log('creating config directory');
+		fs.mkdirSync(res.locals.configStaticPath);
+	}
+
 	// read hyperion config template then add new led coords and save
 	fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function (err, data) {
 		if (err) {
