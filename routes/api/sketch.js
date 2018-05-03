@@ -906,6 +906,7 @@ exports.mapleds = function (req, res) {
  * Setup LED output configuration
  */
 exports.configure = function (req, res) {
+
 	// get request body from HTTP post
 	var config = {
 		"ledcount": parseInt(req.body.numLeds, 10),
@@ -917,8 +918,6 @@ exports.configure = function (req, res) {
 	if (req.body.clockPin) {
 		config.clockpin = req.body.clockPin;
 	}
-	// console.log(config);
-	// console.log(res.locals.configStaticPath);
 
 	// create config directory if doesnt exist
 	if(!fs.existsSync(res.locals.configStaticPath)){
@@ -930,7 +929,8 @@ exports.configure = function (req, res) {
 		if(err){
 			console.log('error saving setup json'+err);
 			return res.apiError({
-				success: false
+				success: false,
+				note: 'couldnt save setup json'
 			});
 		}else{
 			console.log('saved setup config json');
@@ -946,13 +946,14 @@ exports.configure = function (req, res) {
 	}
 	if(moduleAvailable('arduino')){
 		console.log('arduino available');
-		return res.apiResponse({
-			success: true
-		});
+		// return res.apiResponse({
+		// 	success: true
+		// });
 	}else{
 		console.log('arduino not available');
 		return res.apiError({
-			success: false
+			success: false,
+			note: 'arduino not available'
 		});
 	}
 
@@ -964,7 +965,8 @@ exports.configure = function (req, res) {
 				console.log('error starting arduino file');
 				console.log(err);
 				return res.apiError({
-					success: false
+					success: false,
+					note: 'could not write arduino file'
 				});
 			}
 			var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
@@ -983,7 +985,8 @@ exports.configure = function (req, res) {
 					console.log('error adding defines to arduino file');
 					console.log(err);
 					return res.apiError({
-						success: false
+						success: false,
+						note: 'could not input settings to arduino file'
 					});	
 				}
 				fs.readFile("./libs/controller/arduino_segments/template.txt", (err, contents) => {
@@ -991,7 +994,8 @@ exports.configure = function (req, res) {
 						console.log('error reading template arduino file');
 						console.log(err);
 						return res.apiError({
-							success: false
+							success: false,
+							note: 'could not read arduino template file'
 						});		
 					}
 					fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", contents, function (err) {
@@ -999,7 +1003,8 @@ exports.configure = function (req, res) {
 							console.log('error adding arduino template to file');
 							console.log(err);
 							return res.apiError({
-								success: false
+								success: false,
+								note: 'could not add arduino template to file'
 							});			
 						}
 						console.log('finished creating arduino file!');
@@ -1012,18 +1017,21 @@ exports.configure = function (req, res) {
 							if (err !== null) {
 								console.log(`exec error: ${error}`);
 								return res.apiError({
-									success: false
+									success: false,
+									note: 'could not run arduino compile and upload script'
 								});				
 							} // ref: https://stackoverflow.com/a/44667294
 							if(!err){
 								console.log('no erroi');
 								return res.apiResponse({
-									success: true
+									success: true,
+									note: 'settings for arduino compiled and uploaded'
 								});
 							}else{
 								console.log('errors');
 								return res.apiError({
-									success: false
+									success: false,
+									note: 'could not run arduino compile and upload script'
 								});				
 							}
 						});
