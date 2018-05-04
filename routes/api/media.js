@@ -252,6 +252,60 @@ exports.play = function (req, res) {
 	});
 };
 
+
+/**
+ * Create new Sketch
+ */
+
+exports.create = function (req, res) {
+	var newModel = new Sketch.model();
+	var updater = newModel.getUpdateHandler(req);
+
+	// make folder
+	var saveDir = newModel.id;
+	var uploadPath = locals.viewStaticPath + saveDir;
+	try {
+		fs.mkdirSync(uploadPath);
+	} catch (err) {
+		if(fserr.code !== 'EEXIST') {
+			return res.apiError({
+				success: false,
+				note: 'could not create new directory for sketch'
+			});
+		}
+	}
+	// save file
+	var uploadName = uploadPath + '/index.html';
+	fs.writeFile(uploadName, req.body.sketch, 'utf8', (err) => {
+		if(err) {
+			return res.apiError({
+				success: false,
+				note: 'could not save HTML to storage'
+			});
+		}
+	});
+	// update database
+	var data = {
+		title: saveDir,
+		localDir: saveDir
+	};
+	updater.process(data, {
+		flashErrors: true
+	}, function (err) {
+		if(err) {
+			return res.apiError({
+				success: false,
+				note: 'could not save to database'
+			});
+		}else{
+			return res.apiResponse({
+				success: true,
+				note: 'uploaded new sketch'
+			});
+		}
+	});
+};
+
 /**
  * Update Sketch by ID
  */

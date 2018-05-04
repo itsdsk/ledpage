@@ -77,6 +77,7 @@ exports.initLocals = function (req, res, next) {
 	const publicPath = '/data/content/';
 	//const publicPath = './public/';
 	res.locals.staticPath = publicPath + "view-static/";
+	res.locals.viewStaticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
 
 	// component status

@@ -64,7 +64,7 @@ exports = module.exports = function (app) {
 	app.get('/api/media/list', keystone.middleware.api, routes.api.media.list); // list sketches
 	app.get('/api/media/:id', keystone.middleware.api, routes.api.media.get); // info on specific sketch
 	app.get('/api/media/:id/play', keystone.middleware.api, routes.api.media.play); // play sketch
-	// app.all('/api/media/:id/create', keystone.middleware.api, routes.api.media.create); // create new sketch
+	app.all('/api/media/:id/create', keystone.middleware.api, routes.api.media.create); // create new sketch
 	app.all('/api/media/:id/update', keystone.middleware.api, routes.api.media.update); // update sketch
 	app.get('/api/media/:id/channel', keystone.middleware.api, routes.api.media.channel); // channel add/remove sketch
 	app.get('/api/media/:id/remove', keystone.middleware.api, routes.api.media.remove); // delete/unpublish sketch
