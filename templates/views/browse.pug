@@ -119,9 +119,22 @@ block content
 		if data.channels.length
 			.col-sm-4.col-md-4
 				div(id='ledmap').led-map
+				hr
 				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
 				div.text-center
-					a(href='http://www.keystonejs.com/docs', target='_blank', title='KeystoneJS Documentation').btn.btn-lg.btn-primary Quick Options
+					a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-lg.btn-primary Quick Settings
+				div(id='quick-settings', class='modal fade', role='dialog')
+					.modal-dialog
+						.modal-content
+							.modal-header
+								button(type='button', class='close', data-dismiss='modal') &times;
+								h4.modal-title Quick Settings
+							.modal-body
+								p Brightness:
+								input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').brightnessSlider
+							.modal-footer
+								button(type='button', data-dismiss='modal').btn.btn-default Close
+
 				hr
 				.panel.panel-default
 					.panel-heading
@@ -150,16 +163,16 @@ block content
 					//- 	input(type='text', placeholder='Add channel', id='name', name='name').form-control
 					//- 	button(type='submit', id='submit').hidden
 				//- hr
-		.col-sm-4.col-md-4
-			// top bar same as other panels
-			h4.list-group-item LEDs
-			// top left blue button
-			//h4: h(href='').btn.btn-primary LEDs
-			.list-group
-				div(id='leds').list-group-item.led-svg
-				p.list-group-item Brightness:
-				input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').list-group-item.brightnessSlider
-				a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
+		//- .col-sm-4.col-md-4
+		//- 	// top bar same as other panels
+		//- 	h4.list-group-item LEDs
+		//- 	// top left blue button
+		//- 	//h4: h(href='').btn.btn-primary LEDs
+		//- 	.list-group
+		//- 		div(id='leds').list-group-item.led-svg
+		//- 		p.list-group-item Brightness:
+		//- 		input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').list-group-item.brightnessSlider
+		//- 		a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
 		//- .col-sm-4.col-md-4
 		//- 	h4 Network
 		//- 	div(id='leds')
