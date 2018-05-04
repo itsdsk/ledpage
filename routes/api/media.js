@@ -1,4 +1,4 @@
-//var async = require('async'),
+var async = require('async');
 var keystone = require('keystone');
 
 // http
@@ -723,4 +723,42 @@ exports.queue = function (req, res) {
 	// 	}
 
 	// });
+};
+
+/**
+ * Drop database and rebuild after scanning directories
+ */
+
+exports.initialise = function(req, res) {
+	// drop sketches in database
+	Sketch.model.find(function (err, items) {
+
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not get sketches from database: '+ err
+			});
+		}
+		console.log(items.length);
+
+		// item.state = 'archived';
+		// item.save(function (err) {
+		// 	if (err) {
+		// 		return res.err(err);
+		// 	} else {
+		// 		res.apiResponse({
+		// 			success: true
+		// 		});
+		// 	}
+
+		// });
+
+
+		res.apiResponse({
+			success: true,
+			note: 'ye'
+		});
+
+	});
+
 };
