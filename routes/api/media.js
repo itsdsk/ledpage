@@ -739,26 +739,67 @@ exports.initialise = function(req, res) {
 				note: 'could not get sketches from database: '+ err
 			});
 		}
-		console.log(items.length);
-
-		// item.state = 'archived';
-		// item.save(function (err) {
-		// 	if (err) {
-		// 		return res.err(err);
-		// 	} else {
-		// 		res.apiResponse({
-		// 			success: true
-		// 		});
-		// 	}
-
-		// });
-
-
-		res.apiResponse({
-			success: true,
-			note: 'ye'
-		});
-
+		// console.log(items.length);
+		for(var i=0; i<items.length; i++){
+			items[i].state = 'archived';
+			items[i].save(function(err) {
+				if(err) {
+					return res.apiError({
+						success: false,
+						note: 'could not drop sketch from database'
+					});
+				}
+			})
+		}
 	});
+	// drop channels in database
+	//
+	// scan sketch directory
+	var newItems = {
+		SketchChannel: [{
+			'name': 'sketches',
+			'__ref': 'sketches'
+		}],
+		Sketch: []
+	};
+	fs.readdir(res.locals.viewStaticPath, function(err, files) {
+		if(err){
+			return res.apiError({
+				success: false,
+				note: 'could not read sketch folder'
+			});
+		}
+		//
+		try{
+			files.forEach(function(file) {
+				// console.log(file);
+				newItems.Sketch.push({
+					'title': file,
+					'state': 'published',
+					'localDir': file,
+				});
+			// var newSketch = new Sketch.model();
+			// var updater = newSketch.getUpdateHandler(req);
+			res.apiResponse({
+				success: true,
+				note: 'ye ',
+				list: newItems,
+			});
+		
+			});
+		} catch(err){
+			return res.apiError({
+				success: false,
+				note: 'could not add sketches to database'
+			});
+		}
+	});
+	console.log(JSON.stringify(newItems, null, 4));
+	
+	// res.apiResponse({
+	// 	success: true,
+	// 	note: 'ye ',
+	// 	list: newItems,
+	// });
 
 };
