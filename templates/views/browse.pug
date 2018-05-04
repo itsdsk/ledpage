@@ -73,8 +73,8 @@ mixin sketch(sketch)
 //- 		h1= data.channel ? data.channel.name : 'Select a Sketch'
 
 block content
-	.container
-		div(id='ledmap').led-map
+	//- .container
+	//- 	div(id='ledmap').led-map
 	.container: .row 
 		.col-sm-8.col-md-8
 			if filters.channel && !data.channel 
@@ -118,18 +118,38 @@ block content
 						h3.text-muted There are no sketches yet.
 		if data.channels.length
 			.col-sm-4.col-md-4
+				div(id='ledmap').led-map
 				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
-				h4 Subscribed
-				.list-group
-					//- a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
-					each channel in data.channels
-						a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
-					//- form(action='/browse?subscribe=true', method='GET').list-group-item
-					form(action='/api/channels/subscribe', method='GET').list-group-item
-						input(type='text', id='sub', name='sub', value='true').hidden
-						input(type='text', placeholder='Add channel', id='name', name='name').form-control
-						button(type='submit', id='submit').hidden
+				div.text-center
+					a(href='http://www.keystonejs.com/docs', target='_blank', title='KeystoneJS Documentation').btn.btn-lg.btn-primary Quick Options
 				hr
+				.panel.panel-default
+					.panel-heading
+						h3.panel-title Subscribed
+
+					.list-group
+						each channel in data.channels
+							a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+						form(action='/api/channels/subscribe', method='GET').list-group-item
+							input(type='text', id='sub', name='sub', value='true').hidden
+							input(type='text', placeholder='Add channel', id='name', name='name').form-control
+							button(type='submit', id='submit').hidden
+
+					//- .panel-body
+					//- 	form(action='/api/channels/subscribe', method='GET')
+					//- 		input(type='text', id='sub', name='sub', value='true').hidden
+					//- 		input(type='text', placeholder='Add channel', id='name', name='name').form-control
+					//- 		button(type='submit', id='submit').hidden
+
+					//- a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
+						each channel in data.channels
+							a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+					//- form(action='/browse?subscribe=true', method='GET').list-group-item
+					//- form(action='/api/channels/subscribe', method='GET').list-group-item
+					//- 	input(type='text', id='sub', name='sub', value='true').hidden
+					//- 	input(type='text', placeholder='Add channel', id='name', name='name').form-control
+					//- 	button(type='submit', id='submit').hidden
+				//- hr
 		.col-sm-4.col-md-4
 			// top bar same as other panels
 			h4.list-group-item LEDs
