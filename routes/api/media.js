@@ -9,6 +9,7 @@ var fs = require('fs');
 var path = require('path');
 
 var Sketch = keystone.list('Sketch');
+var SketchChannel = keystone.list('SketchChannel');
 
 // ipfs connection
 var ipfsAPI = require('ipfs-api');
@@ -741,19 +742,57 @@ exports.initialise = function(req, res) {
 		}
 		// console.log(items.length);
 		for(var i=0; i<items.length; i++){
-			items[i].state = 'archived';
-			items[i].save(function(err) {
-				if(err) {
+			items[i].remove(function(err){
+				if(err){
 					return res.apiError({
 						success: false,
 						note: 'could not drop sketch from database'
 					});
 				}
-			})
+
+			});
+			// items[i].state = 'archived';
+			// items[i].save(function(err) {
+			// 	if(err) {
+			// 		return res.apiError({
+			// 			success: false,
+			// 			note: 'could not drop sketch from database'
+			// 		});
+			// 	}
+			// })
 		}
 	});
 	// drop channels in database
-	//
+	SketchChannel.model.find(function (err, items) {
+
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not get channels from database: '+ err
+			});
+		}
+		// console.log(items.length);
+		for(var i=0; i<items.length; i++){
+			items[i].remove(function(err){
+				if(err){
+					return res.apiError({
+						success: false,
+						note: 'could not drop channel from database'
+					});
+				}
+				// 
+			});
+			// items[i].state = 'archived';
+			// items[i].save(function(err) {
+			// 	if(err) {
+			// 		return res.apiError({
+			// 			success: false,
+			// 			note: 'could not drop sketch from database'
+			// 		});
+			// 	}
+			// })
+		}
+	});
 	// scan sketch directory
 	var newItems = {
 		SketchChannel: [{
