@@ -150,15 +150,36 @@ block content
 				.lead.text-muted Subscribed
 				ul.nav.nav-pills.nav-stacked
 					each channel in data.channels
+						//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
+						//- 	| &ensp;
+						//- 	span.badge=channel.sketchCount
 						li(role='presentation' class=data.channel && data.channel.id == channel.id ? 'active' : null)
-							a(href='/browse/'+channel.key)
-								=channel.name
-								if channel.sketchCount
-									span.badge.pull-right= channel.sketchCount
-				form(action='/api/channels/subscribe', method='GET')
-					input(type='text', id='sub', name='sub', value='true').hidden
-					input(type='text', placeholder='Add channel', id='name', name='name').form-control
-					button(type='submit', id='submit').hidden
+							//- button(type='button').btn.pull-right Del
+							//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
+							//- 	| &ensp;
+							//- 	span.badge=channel.sketchCount
+							.btn-group.btn-group-justified
+								a(href='/browse/'+channel.key).btn=channel.name
+								a(href='#').btn.btn-primary Play
+									| &ensp;
+									span.badge=channel.sketchCount
+								.btn-group
+									a(href='#' data-toggle='dropdown').btn.btn-primary.dropdown-toggle
+										span.caret
+									ul(role='menu').dropdown-menu
+										li
+											a(href='#') Delete
+								//- a(href='#').btn.btn-primary &times;
+
+							//- a(href='/browse/'+channel.key)
+							//- 	=channel.name
+								//- span.badge.pull-right= channel.sketchCount
+								//- span.badge.pull-left= channel.sketchCount
+					li(role='presentation')
+						form(action='/api/channels/subscribe', method='GET')
+							input(type='text', id='sub', name='sub', value='true').hidden
+							input(type='text', placeholder='Add channel', id='name', name='name').form-control
+							button(type='submit', id='submit').hidden
 
 					//- .panel-body
 					//- 	form(action='/api/channels/subscribe', method='GET')
