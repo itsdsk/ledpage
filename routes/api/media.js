@@ -658,3 +658,69 @@ exports.share = function (req, res) {
 		});
 	});
 };
+
+/**
+ * Play Sketch by URL
+ */
+
+exports.queue = function (req, res) {
+	
+	// console.log(JSON.stringify(req.body.address));
+
+	if (!isDplayerConnected) {
+		console.log('play error: player not connected');
+
+		return res.apiError({
+			success: false,
+			note: 'renderer not connected'
+		});
+
+	}
+
+	// console.log(JSON.stringify(req.body));
+
+	// return res.apiResponse({
+	// 	success: true,
+	// 	note: 'ye'
+	// });
+
+	if (ipc.of.dplayeripc) {
+		var sketchPath = JSON.stringify(req.body.address);
+		ipc.of.dplayeripc.emit('message', sketchPath);
+		return res.apiResponse({
+			success: true,
+			note: 'queued sketch URL'
+		});
+	} else {
+
+		return res.apiError({
+			success: false,
+			note: 'could not queue sketch URL'
+		});
+
+	}
+
+	// Sketch.model.findById(req.params.id).exec(function (err, item) {
+
+	// 	if (err) return res.apiError('database error', err);
+	// 	if (!item) return res.apiError('not found');
+
+	// 	if (ipc.of.dplayeripc) {
+	// 		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
+	// 		ipc.of.dplayeripc.emit('message', sketchPath);
+	// 		console.log('yes');
+
+	// 		res.apiResponse({
+	// 			success: true
+	// 		});
+	// 	} else {
+	// 		console.log('neswsfo');
+
+	// 		res.apiError({
+	// 			success: false
+	// 		});
+
+	// 	}
+
+	// });
+};
