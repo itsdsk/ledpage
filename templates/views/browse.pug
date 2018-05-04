@@ -181,7 +181,8 @@ block content
 								//- span.badge.pull-right= channel.sketchCount
 								//- span.badge.pull-left= channel.sketchCount
 					li(role='presentation')
-						form(action='/api/channels/subscribe', method='GET')
+						//- form(action='/api/channels/subscribe', method='GET')
+						form(action='/api/media/channel/subscribe', method='GET').post-form-ajax
 							input(type='text', id='sub', name='sub', value='true').hidden
 							input(type='text', placeholder='Add channel', id='name', name='name').form-control
 							button(type='submit', id='submit').hidden
