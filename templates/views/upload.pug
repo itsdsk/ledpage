@@ -4,7 +4,8 @@ block content
 	.container
 		.page-header
 			h1 Add Sketch
-		form(method='post').form-horizontal
+		//- form(method='post').form-horizontal
+		form(action='/api/media/create' method='post' class='post-form-ajax').form-horizontal
 			input(type='hidden', name='action', value='upload')
 			//- .form-group(class=validationErrors.name ? 'has-error' : null)
 				//- label.col-sm-2.text-left.control-label Name

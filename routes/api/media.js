@@ -263,7 +263,7 @@ exports.create = function (req, res) {
 
 	// make folder
 	var saveDir = newModel.id;
-	var uploadPath = locals.viewStaticPath + saveDir;
+	var uploadPath = res.locals.viewStaticPath + saveDir;
 	try {
 		fs.mkdirSync(uploadPath);
 	} catch (err) {
