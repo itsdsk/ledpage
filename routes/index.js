@@ -58,10 +58,7 @@ exports = module.exports = function (app) {
 	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
 
 	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status
-	app.all('/api/player/map', keystone.middleware.api, routes.api.sketch.mapleds); // update player led map
-	app.get('/api/display/brightness/:val', keystone.middleware.api, routes.api.sketch.setBrightness); // 
 	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
-	app.all('/api/display/configure', keystone.middleware.api, routes.api.sketch.configure); // setup led output configuration
 
 	// LED display routes
 	app.all('/api/leds/map-positions', keystone.middleware.api, routes.api.leds.map_positions); // update player led map
