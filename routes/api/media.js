@@ -762,6 +762,7 @@ exports.initialise = function(req, res) {
 		}],
 		Sketch: []
 	};
+	// scan sketch directory
 	fs.readdir(res.locals.viewStaticPath, function(err, files) {
 		if(err){
 			return res.apiError({
@@ -769,37 +770,33 @@ exports.initialise = function(req, res) {
 				note: 'could not read sketch folder'
 			});
 		}
-		//
-		try{
-			files.forEach(function(file) {
-				// console.log(file);
+		// iterate through each sketch directory
+		for(var i=0; i<=files.length; i++){
+			// store sketch db info
+			if(i < files.length){
 				newItems.Sketch.push({
-					'title': file,
+					'title': files[i],
 					'state': 'published',
-					'localDir': file,
+					'localDir': files[i],
+					'channels': 'sketches',
 				});
-			// var newSketch = new Sketch.model();
-			// var updater = newSketch.getUpdateHandler(req);
-			res.apiResponse({
-				success: true,
-				note: 'ye ',
-				list: newItems,
-			});
-		
-			});
-		} catch(err){
-			return res.apiError({
-				success: false,
-				note: 'could not add sketches to database'
-			});
+			}else{
+				// add to database when all sketches are added
+				keystone.createItems(newItems, function(err, stats) {
+					if(err){
+						return res.apiError({
+							success: false,
+							note: 'could not update database'
+						});
+					}else{
+						res.apiResponse({
+							success: true,
+							note: 'added sketches to database',
+							list: newItems,
+						});
+					}
+				});				
+			}
 		}
 	});
-	console.log(JSON.stringify(newItems, null, 4));
-	
-	// res.apiResponse({
-	// 	success: true,
-	// 	note: 'ye ',
-	// 	list: newItems,
-	// });
-
 };
