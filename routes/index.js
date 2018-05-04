@@ -46,21 +46,34 @@ exports = module.exports = function (app) {
 
 	// public API
 	app.all('/api*', keystone.middleware.api);
-	app.get('/api/sketch/list', keystone.middleware.api, routes.api.sketch.list); // list sketches
+	// app.get('/api/sketch/list', keystone.middleware.api, routes.api.sketch.list); // list sketches
 	app.get('/api/sketch/:ipfs/add', keystone.middleware.api, routes.api.sketch.add); // try add ipfs hash
-	app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
-	app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
-	app.all('/api/sketch/:id/update', keystone.middleware.api, routes.api.sketch.update); // update sketch
-	app.get('/api/sketch/:id/channel', keystone.middleware.api, routes.api.sketch.channel); // channel add/remove sketch
-	app.get('/api/sketch/:id/delete', keystone.middleware.api, routes.api.sketch.delete); // delete/unpublish sketch
-	app.get('/api/sketch/:id/screenshot', keystone.middleware.api, routes.api.sketch.screenshot); // save screenshot of sketch
-	app.get('/api/channels/subscribe', keystone.middleware.api, routes.api.sketch.subscribe); // subscribe to new channel
-	app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
+	// app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
+	// app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
+	// app.all('/api/sketch/:id/update', keystone.middleware.api, routes.api.sketch.update); // update sketch
+	// app.get('/api/sketch/:id/channel', keystone.middleware.api, routes.api.sketch.channel); // channel add/remove sketch
+	// app.get('/api/sketch/:id/delete', keystone.middleware.api, routes.api.sketch.delete); // delete/unpublish sketch
+	// app.get('/api/sketch/:id/screenshot', keystone.middleware.api, routes.api.sketch.screenshot); // save screenshot of sketch
+	// app.get('/api/channels/subscribe', keystone.middleware.api, routes.api.sketch.subscribe); // subscribe to new channel
+	// app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
 
 	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status
 	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
 
-	// LED display routes
+	// Media routes
+	app.get('/api/media/list', keystone.middleware.api, routes.api.media.list); // list sketches
+	app.get('/api/media/:id', keystone.middleware.api, routes.api.media.get); // info on specific sketch
+	app.get('/api/media/:id/play', keystone.middleware.api, routes.api.media.play); // play sketch
+	// app.all('/api/media/:id/create', keystone.middleware.api, routes.api.media.create); // create new sketch
+	app.all('/api/media/:id/update', keystone.middleware.api, routes.api.media.update); // update sketch
+	app.get('/api/media/:id/channel', keystone.middleware.api, routes.api.media.channel); // channel add/remove sketch
+	app.get('/api/media/:id/remove', keystone.middleware.api, routes.api.media.remove); // delete/unpublish sketch
+	app.get('/api/media/:id/screenshot', keystone.middleware.api, routes.api.media.screenshot); // save screenshot of sketch
+	app.get('/api/media/:id/share', keystone.middleware.api, routes.api.media.share); // upload sketch to ipfs
+	app.get('/api/media/channel/subscribe', keystone.middleware.api, routes.api.media.subscribe); // subscribe to new channel
+
+
+	// LED routes
 	app.all('/api/leds/map-positions', keystone.middleware.api, routes.api.leds.map_positions); // update player led map
 	app.get('/api/leds/set-brightness/:val', keystone.middleware.api, routes.api.leds.set_brightness); // 
 	app.all('/api/leds/config-arduino', keystone.middleware.api, routes.api.leds.config_arduino); // setup led output configuration
