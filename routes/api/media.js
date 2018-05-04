@@ -454,10 +454,14 @@ exports.subscribe = function (req, res) {
 		flashErrors: true
 	}, function (err) {
 		if (err) {
-			return res.apiError('error subscribing to channel', err);
-		} else {
-			res.apiResponse({
-				success: true
+			return res.apiError({
+				success: false,
+				note: 'could not subscribe to channel'
+			});
+		}else{
+			return res.apiResponse({
+				success: true,
+				note: 'subscribed to channel'
 			});
 		}
 	});
@@ -478,6 +482,57 @@ exports.subscribe = function (req, res) {
 	// 		}
 
 	// 	});
+	// });
+};
+
+/**
+ * Unsubscribe to channel
+ */
+
+exports.unsubscribe = function (req, res) {
+	//
+	//var SketchChannel = keystone.list('SketchChannel');
+	SketchChannel.model.findById(req.params.id).exec(function(err, item) {
+		if(err) {
+			return apiError({
+				success: false,
+				note: 'could not find channel in database'
+			});
+		}
+		if(!item) {
+			return res.apiError({
+				success: false,
+				note: 'could not get channel from database'
+			});
+		}
+		item.remove(function(err) {
+			if(err) {
+				return res.apiError({
+					success: false,
+					note: 'could not remove channel from database'
+				});
+			}
+			return res.apiResponse({
+				success: true,
+				note: 'deleted channel'
+			});
+		});
+	});
+	// var newChannel = new SketchChannel.model();
+	// var newUpdater = newChannel.getUpdateHandler(req);
+	// var data = {
+	// 	name: req.query.name
+	// };
+	// newUpdater.process(data, {
+	// 	flashErrors: true
+	// }, function (err) {
+	// 	if (err) {
+	// 		return res.apiError('error subscribing to channel', err);
+	// 	} else {
+	// 		res.apiResponse({
+	// 			success: true
+	// 		});
+	// 	}
 	// });
 };
 

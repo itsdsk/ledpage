@@ -173,7 +173,9 @@ block content
 										span.caret
 									ul(role='menu').dropdown-menu
 										li
-											a(href='#') Delete
+											//- form(action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax
+											//- 	button(type='submit') Delete
+											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax Delete
 								//- a(href='#').btn.btn-primary &times;
 
 							//- a(href='/browse/'+channel.key)
