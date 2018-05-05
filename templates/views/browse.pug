@@ -121,7 +121,7 @@ block content
 				div(id='ledmap').led-map
 				//- hr
 				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
-				a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-block.btn-primary Quick Settings
+				//- a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-block.btn-primary Quick Settings
 				div(id='quick-settings', class='modal fade', role='dialog')
 					.modal-dialog
 						.modal-content
@@ -140,7 +140,7 @@ block content
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
 
-				hr
+				//- hr
 				//- .panel.panel-default
 				//- 	.panel-heading
 				//- 		h3.panel-title Subscribed
@@ -152,8 +152,18 @@ block content
 				//- 			input(type='text', id='sub', name='sub', value='true').hidden
 				//- 			input(type='text', placeholder='Add channel', id='name', name='name').form-control
 				//- 			button(type='submit', id='submit').hidden
-				.lead.text-muted Subscribed
+				//- .lead.text-muted Subscribed
 				ul.nav.nav-pills.nav-stacked
+					li(role='presentation')
+						//- form(action='/api/channels/subscribe', method='GET')
+						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
+							//- input(type='text', id='sub', name='sub', value='true').hidden
+							.input-group.input-group-lg
+								span.input-group-addon
+									i.glyphicon.glyphicon-globe
+									//- | &ensp;Subscribed
+								input(type='text', placeholder='Subscribed', id='name', name='name' required).form-control
+							button(type='submit', id='submit').hidden
 					each channel in data.channels
 						//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
 						//- 	| &ensp;
@@ -182,12 +192,12 @@ block content
 							//- 	=channel.name
 								//- span.badge.pull-right= channel.sketchCount
 								//- span.badge.pull-left= channel.sketchCount
-					li(role='presentation')
-						//- form(action='/api/channels/subscribe', method='GET')
-						form(action='/api/media/channel/subscribe', method='GET').post-form-ajax
-							input(type='text', id='sub', name='sub', value='true').hidden
-							input(type='text', placeholder='Add channel', id='name', name='name').form-control
-							button(type='submit', id='submit').hidden
+					//- li(role='presentation')
+					//- 	//- form(action='/api/channels/subscribe', method='GET')
+					//- 	form(action='/api/media/channel/subscribe', method='GET').post-form-ajax
+					//- 		input(type='text', id='sub', name='sub', value='true').hidden
+					//- 		input(type='text', placeholder='Add channel', id='name', name='name').form-control
+					//- 		button(type='submit', id='submit').hidden
 
 					//- .panel-body
 					//- 	form(action='/api/channels/subscribe', method='GET')
