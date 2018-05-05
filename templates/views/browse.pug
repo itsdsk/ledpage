@@ -292,6 +292,25 @@ block js
 				});
 			}
 			$(".brightnessSlider").change( setBrightness );
+
+			// ajax button GET
+			function apiGetButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+					},
+					success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+					}
+				});
+			}
+			$('.api-get-btn').click( apiGetButton );
+
 		});
 
 	script(src='https://d3js.org/d3.v5.js')

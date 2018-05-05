@@ -241,14 +241,25 @@ exports.play = function (req, res) {
 		console.log('play error: player not connected');
 
 		return res.apiError({
-			success: false
+			success: false,
+			note: 'renderer not active'
 		});
 
 	}
 	Sketch.model.findById(req.params.id).exec(function (err, item) {
 
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not find sketch in database'
+			});
+		}
+		if (!item) {
+			return res.apiError({
+				success: false,
+				note: 'could not get sketch from database'
+			});
+		}
 
 		if (ipc.of.dplayeripc) {
 			var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
@@ -256,13 +267,15 @@ exports.play = function (req, res) {
 			console.log('yes');
 
 			res.apiResponse({
-				success: true
+				success: true,
+				note: 'queued media to display'
 			});
 		} else {
 			console.log('neswsfo');
 
 			res.apiError({
-				success: false
+				success: false,
+				note: 'failed to queue sketch to display'
 			});
 
 		}
