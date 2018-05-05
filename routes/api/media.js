@@ -912,19 +912,60 @@ exports.initialise = function(req, res) {
 		for(var i=0; i<=files.length; i++){
 			// store sketch db info
 			if(i < files.length){
-				newItems.Sketch.push({
-					'title': files[i],
-					'state': 'published',
-					'localDir': files[i],
-					'channels': 'sketches',
-				});
+				// check for disk.json
+				var diskJSONpath = path.join(res.locals.viewStaticPath + files[i] + '/disk.json');
+				console.log(diskJSONpath);
+				var exists = fs.existsSync(diskJSONpath);
+				if(exists){
+					// read json
+					// fs.readFile(diskJSONpath, 'utf8', function(err, data) {
+					var rawDiskJSON = fs.readFileSync(diskJSONpath);
+						if(!rawDiskJSON) {
+							//
+							// console.log(diskJSONpath);
+							// console.log(err);
+							console.log('ereroret');
+							// newItems.Sketch.push({
+							// 	"title": files[i],
+							// 	"state": "published",
+							// 	"localDir": files[i],
+							// 	"channels": "sketches",
+							// });
+	
+						}else{
+							var obj = JSON.parse(rawDiskJSON);
+							console.log('werafewarrf '+obj.disk.title);
+							// add sketch to db
+							newItems.Sketch.push({
+								"title": obj.disk.title,
+								"state": "published",
+								"localDir": files[i],
+								"channels": "sketches",
+							});
+						}
+							// console.log(obj);
+					// });
+				}else{
+					// TODO make disk.json
+					// add sketch to db
+					console.log(files[i]);
+					newItems.Sketch.push({
+						"title": files[i],
+						"state": "published",
+						"localDir": files[i],
+						"channels": "sketches",
+					});
+		}
+				
+
 			}else{
 				// add to database when all sketches are added
+				console.log(newItems);
 				keystone.createItems(newItems, function(err, stats) {
 					if(err){
 						return res.apiError({
 							success: false,
-							note: 'could not update database'
+							note: 'could not update database '+err
 						});
 					}else{
 						res.apiResponse({
