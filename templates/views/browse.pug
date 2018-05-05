@@ -144,8 +144,10 @@ block content
 						h3.text-muted There are no sketches in the channel #{data.channel.name}.
 					else
 						h3.text-muted There are no sketches yet.
-		if data.channels.length
+		//- if data.channels.length
+		if true
 			.col-sm-4.col-md-4
+				hr
 				a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings')
 					div(id='ledmap').led-map
 				//- hr

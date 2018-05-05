@@ -24,7 +24,7 @@ app.on('ready', () => {
     height: 720,
     frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
     kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
-    backgroundColor: '#09f911', // set backgrounnd
+    backgroundColor: '#000000', // set backgrounnd
     webPreferences: {
       sandbox: false,
       nodeIntegration: false,
@@ -54,7 +54,7 @@ app.on('ready', () => {
         'message',
         function (data, socket) {
           //ipc.log('got a message : '.debug, data);
-          //console.log(data);
+          console.log('electron load URL: '+data);
           window.loadURL(data); // display recieved URI
           //ipc.server.emit(
           //  socket,
