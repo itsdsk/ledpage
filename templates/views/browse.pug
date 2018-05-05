@@ -174,15 +174,20 @@ block content
 							//- 	| &ensp;
 							//- 	span.badge=channel.sketchCount
 							.btn-group.btn-group-justified
-								a(href='/browse/'+channel.key, style='width:5%').btn.btn-primary=channel.name
-									| &ensp;
-									span.badge=channel.sketchCount
+								a(href='/browse/'+channel.key, style='width:5%').btn.btn-default
+									.text-left
+										span.badge=channel.sketchCount
+										| &ensp;
+										=channel.name
+									//- | &ensp;
+									//- span.badge=channel.sketchCount
 								//- a(href='#').btn.btn-primary ▶ 
 								//- 	| &ensp;
 								//- 	span.badge=channel.sketchCount
-								a(href='#').btn.btn-primary ▶ 
+								a(href='#').btn.btn-default
+									span.glyphicon.glyphicon-play
 								.btn-group
-									a(href='#' data-toggle='dropdown').btn.btn-primary.dropdown-toggle
+									a(href='#' data-toggle='dropdown').btn.btn-default.dropdown-toggle
 										span.caret
 									ul(role='menu').dropdown-menu
 										li
