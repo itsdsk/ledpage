@@ -68,9 +68,34 @@ exports.map_positions = function (req, res) {
                     console.log('File saved');
                 }
             });
-            return res.apiResponse({
-                success: true
+            // restart hyperion
+            var sys = require('sys');
+            var exec = require('child_process').exec;
+            var execCommand = 'systemctl restart hyperion.service';
+            // save screenshot
+            exec(execCommand, function (err, stdout, stderr) {
+                console.log(stdout);
+                if (err) {
+                    return res.apiError({
+                        success: false,
+                        note: 'could not update led interface'
+                    });
+                } else {
+                    return res.apiResponse({
+                        success: true,
+                        note: 'updated led interface'
+                    });
+                }
             });
+    
+            //
+            //
+            //
+            //
+
+            // return res.apiResponse({
+            //     success: true
+            // });
         } catch (exception) {
             console.log('wedwddfaf' + exception);
             return res.apiError({

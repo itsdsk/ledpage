@@ -324,19 +324,24 @@ block js
 			function saveMap(e) {
 
 				e.preventDefault();
-
+				// serialise led coords
 				var points = {"leds": []};
-
 				d3.selectAll('.ledNode').each(function (d, i) {
 					points.leds.push({x: d.x, y: d.y});
 				});
-
-				//- $.post('/api/player/map', '&leds=' + JSON.stringify(points), function (data) {
-				$.post('/api/leds/map-positions', '&leds=' + JSON.stringify(points), function (data) {
-					if (data.err) {
-						console.log('error solve');
-						return;
-					}
+				// send coords to server
+				$.ajax({
+					url: '/api/leds/map-positions',
+					type: 'POST',
+					data: '&leds=' + JSON.stringify(points),
+						error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+						},
+						success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+						}
 				});
 			}
 			$("#save-led-map").click(saveMap);
