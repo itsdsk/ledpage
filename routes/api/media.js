@@ -914,53 +914,41 @@ exports.initialise = function(req, res) {
 			if(i < files.length){
 				// check for disk.json
 				var diskJSONpath = path.join(res.locals.viewStaticPath + files[i] + '/disk.json');
-				console.log(diskJSONpath);
 				var exists = fs.existsSync(diskJSONpath);
 				if(exists){
 					// read json
-					// fs.readFile(diskJSONpath, 'utf8', function(err, data) {
 					var rawDiskJSON = fs.readFileSync(diskJSONpath);
-						if(!rawDiskJSON) {
-							//
-							// console.log(diskJSONpath);
-							// console.log(err);
-							console.log('ereroret');
-							// newItems.Sketch.push({
-							// 	"title": files[i],
-							// 	"state": "published",
-							// 	"localDir": files[i],
-							// 	"channels": "sketches",
-							// });
-	
-						}else{
-							var obj = JSON.parse(rawDiskJSON);
-							console.log('werafewarrf '+obj.disk.title);
-							// add sketch to db
-							newItems.Sketch.push({
-								"title": obj.disk.title,
-								"state": "published",
-								"localDir": files[i],
-								"channels": "sketches",
-							});
-						}
-							// console.log(obj);
-					// });
+					if(!rawDiskJSON) {
+						console.log('could not read media details');
+						return res.apiError({
+							success: false,
+							note: 'could not read media details'
+						});
+					}else{
+						// add sketch to database
+						var obj = JSON.parse(rawDiskJSON);
+						newItems.Sketch.push({
+							"title": obj.disk.title?obj.disk.title:files[i],
+							"modifiedDate": obj.disk.modifiedDate?obj.disk.modifiedDate:"2018-1-1",
+							"prefThumb":obj.disk.prefThumb?obj.disk.prefThumb:null,
+							"state": obj.disk.state?obj.disk.state:"published",
+							"ipfsHash": obj.disk.ipfsHash?obj.disk.ipfsHash:null,
+							"localDir": files[i],
+							"channels": obj.disk.channels?obj.disk.channels:"sketches",
+						});
+					}
 				}else{
 					// TODO make disk.json
 					// add sketch to db
-					console.log(files[i]);
 					newItems.Sketch.push({
 						"title": files[i],
 						"state": "published",
 						"localDir": files[i],
 						"channels": "sketches",
 					});
-		}
-				
-
+				}
 			}else{
 				// add to database when all sketches are added
-				console.log(newItems);
 				keystone.createItems(newItems, function(err, stats) {
 					if(err){
 						return res.apiError({
