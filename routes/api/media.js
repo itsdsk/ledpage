@@ -507,9 +507,9 @@ exports.subscribe = function (req, res) {
  */
 
 exports.unsubscribe = function (req, res) {
-	//
-	//var SketchChannel = keystone.list('SketchChannel');
-	SketchChannel.model.findById(req.params.id).exec(function(err, item) {
+	// TODO: find and remove sketches in channel before deleting channel
+	// remove channel from database
+	SketchChannel.model.findById(req.query.id).exec(function(err, item) {
 		if(err) {
 			return apiError({
 				success: false,
@@ -535,22 +535,6 @@ exports.unsubscribe = function (req, res) {
 			});
 		});
 	});
-	// var newChannel = new SketchChannel.model();
-	// var newUpdater = newChannel.getUpdateHandler(req);
-	// var data = {
-	// 	name: req.query.name
-	// };
-	// newUpdater.process(data, {
-	// 	flashErrors: true
-	// }, function (err) {
-	// 	if (err) {
-	// 		return res.apiError('error subscribing to channel', err);
-	// 	} else {
-	// 		res.apiResponse({
-	// 			success: true
-	// 		});
-	// 	}
-	// });
 };
 
 
