@@ -29,15 +29,15 @@ mixin sketch(sketch)
 								- var sketchid = sketch.id.slice(-6);
 								h4.modal-title <strong>Media ID#</strong>#{sketchid}
 							.modal-body
-								a(href='#').btn.btn-success.btn-lg.btn-block
+								a(href='/api/media/' + sketch.id + '/play').btn.btn-success.btn-lg.btn-block.api-get-btn
 									span.glyphicon.glyphicon-play
 									| &ensp; Play
 								hr
 								.btn-group.btn-group-justified
-									a(href='#').btn.btn-info.btn-lg
+									a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-info.btn-lg
 										span.glyphicon.glyphicon-eye-open
 										| &ensp; Preview
-									a(href='#').btn.btn-info.btn-lg
+									a(href='/browse/sketch/'+sketch._id, target='_blank').btn.btn-info.btn-lg
 										span.glyphicon.glyphicon-tasks
 										| &ensp; More
 							.modal-footer
