@@ -174,10 +174,13 @@ block content
 							//- 	| &ensp;
 							//- 	span.badge=channel.sketchCount
 							.btn-group.btn-group-justified
-								a(href='/browse/'+channel.key).btn=channel.name
-								a(href='#').btn.btn-primary Play
+								a(href='/browse/'+channel.key, style='width:5%').btn.btn-primary=channel.name
 									| &ensp;
 									span.badge=channel.sketchCount
+								//- a(href='#').btn.btn-primary ▶ 
+								//- 	| &ensp;
+								//- 	span.badge=channel.sketchCount
+								a(href='#').btn.btn-primary ▶ 
 								.btn-group
 									a(href='#' data-toggle='dropdown').btn.btn-primary.dropdown-toggle
 										span.caret
@@ -186,8 +189,10 @@ block content
 											//- form(action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax
 											//- 	button(type='submit') Delete
 											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax Delete
+							//- a(href='/browse/'+channel.key).btn.btn-link=channel.name
 								//- a(href='#').btn.btn-primary &times;
-
+							//- a(href='/browse/'+channel.key)=channel.name
+							
 							//- a(href='/browse/'+channel.key)
 							//- 	=channel.name
 								//- span.badge.pull-right= channel.sketchCount
