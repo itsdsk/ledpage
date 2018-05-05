@@ -14,23 +14,51 @@ mixin sketch(sketch)
 			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')
 			//- a(href='/api/sketch/' + sketch.id + '/play')
 			.img-wrapper(style='position:relative')
+				a(data-toggle="modal", data-target='#modal-'+sketch.id)
+					if sketch.prefThumb
+						- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
+						//- img(src=imgThumb)
+						div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
+					else
+						img(src="http://placehold.it/300x300").img-responsive
+				div(id='modal-'+sketch.id, role='dialog').modal.fade
+					.modal-dialog.modal-sm
+						.modal-content
+							.modal-header
+								button(type='button', class='close', data-dismiss='modal') &times;
+								- var sketchid = sketch.id.slice(-6);
+								h4.modal-title <strong>Media ID#</strong>#{sketchid}
+							.modal-body
+								a(href='#').btn.btn-success.btn-lg.btn-block
+									span.glyphicon.glyphicon-play
+									| &ensp; Play
+								hr
+								.btn-group.btn-group-justified
+									a(href='#').btn.btn-info.btn-lg
+										span.glyphicon.glyphicon-eye-open
+										| &ensp; Preview
+									a(href='#').btn.btn-info.btn-lg
+										span.glyphicon.glyphicon-tasks
+										| &ensp; More
+							.modal-footer
+								button(type='button', data-dismiss='modal').btn.btn-default Close
 				//- if sketch.image.exists
 				//- 	img(src=sketch._.image.fit(300,300)).img-responsive
-				if sketch.prefThumb
-					- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
+				//- if sketch.prefThumb
+				//- 	- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
 					//- img(src=imgThumb)
 					div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
-				else
-					img(src="http://placehold.it/300x300").img-responsive
-				.img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
-					a(href='/api/sketch/' + sketch.id + '/play')
-						button(type='submit').display-btn.btn.btn-md ▶
-					a(href='/browse/sketch/' + sketch._id)
-						button(type='submit').btn.btn-md ⋯
-	.panel.panel-default
-		.panel-heading
-			p.pull-right=sketch._.modifiedDate.format('D/M/Y')
-			h4.panel-title=sketch.title		
+				//- else
+				//- 	img(src="http://placehold.it/300x300").img-responsive
+				//- .img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
+				//- 	a(href='/api/sketch/' + sketch.id + '/play')
+				//- 		button(type='submit').display-btn.btn.btn-md ▶
+				//- 	a(href='/browse/sketch/' + sketch._id)
+				//- 		button(type='submit').btn.btn-md ⋯
+	//- .panel.panel-default
+	//- 	.panel-heading
+	//- 		p.pull-right=sketch._.modifiedDate.format('D/M/Y')
+	//- 		h4.panel-title=sketch.title		
 					//- // display led svgs
 					//- //div(id='leds').list-group-item.led-svg
 					//- //iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
@@ -118,7 +146,8 @@ block content
 						h3.text-muted There are no sketches yet.
 		if data.channels.length
 			.col-sm-4.col-md-4
-				div(id='ledmap').led-map
+				a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings')
+					div(id='ledmap').led-map
 				//- hr
 				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
 				//- a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-block.btn-primary Quick Settings
@@ -153,6 +182,7 @@ block content
 				//- 			input(type='text', placeholder='Add channel', id='name', name='name').form-control
 				//- 			button(type='submit', id='submit').hidden
 				//- .lead.text-muted Subscribed
+				hr
 				ul.nav.nav-pills.nav-stacked
 					li(role='presentation')
 						//- form(action='/api/channels/subscribe', method='GET')
