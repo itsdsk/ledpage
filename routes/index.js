@@ -61,7 +61,7 @@ exports = module.exports = function (app) {
 	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
 
 	// Media routes
-	app.get('/api/media/list', keystone.middleware.api, routes.api.media.list); // list sketches
+	app.get('/api/media/list', keystone.middleware.api, routes.api.media.list); // list sketches and channels
 	app.get('/api/media/:id', keystone.middleware.api, routes.api.media.get); // info on specific sketch
 	app.get('/api/media/:id/play', keystone.middleware.api, routes.api.media.play); // play sketch
 	app.all('/api/media/create', keystone.middleware.api, routes.api.media.create); // create new sketch

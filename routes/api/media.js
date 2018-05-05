@@ -203,14 +203,31 @@ exports.get = function (req, res) {
  * List Sketches
  */
 exports.list = function (req, res) {
-	Sketch.model.find(function (err, items) {
+	Sketch.model.find(function (err, sketchList) {
 
-		if (err) return res.apiError('database error', err);
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not get sketches from database'
+			});
+		}
 
-		res.apiResponse({
-			sketches: items
+		// list channels
+		SketchChannel.model.find(function(err, channelList) {
+
+			if (err) {
+				return res.apiError({
+					success: false,
+					note: 'could not get channels from database'
+				});
+			}
+			res.apiResponse({
+				success: true,
+				note: 'retrieved media list from database',
+				sketches: sketchList,
+				channels: channelList,
+			});	
 		});
-
 	});
 };
 

@@ -8,7 +8,7 @@ block content
 			.col-sm-12.col-md-12
 				.page-header
 					//- a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right ▶ Display
-					a(href='/api/sketch/' + data.sketch.id + '/play').pull-right
+					a(href='/api/media/' + data.sketch.id + '/play').pull-right
 						button(type='submit').display-btn.btn.btn-primary ▶ Display
 					- var title = data.sketch.title
 					- var date = data.sketch._.modifiedDate.format('D/M/Y')
@@ -18,9 +18,9 @@ block content
 			.col-sm-4.col-md-4
 				.channel-heading
 					if data.sketch.ipfsHash
-						a(href='/api/sketch/' + data.sketch.id + '/sync', id='btn-share').btn.btn-default.pull-right Update address
+						a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Update address
 					else
-						a(href='/api/sketch/' + data.sketch.id + '/sync', id='btn-share').btn.btn-default.pull-right Create address
+						a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Create address
 					h2 Channels
 				.list-group
 					.list-group-item
@@ -29,7 +29,7 @@ block content
 								each channel in data.channels
 									- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 									li(class=(channelActive ? 'active' : ''))
-										a(href='/api/sketch/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
+										a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
 										//- a(href='?channel=true&_id='+channel._id)=channel.name
 				.channel-sync
 					if data.sketch.ipfsHash
@@ -47,13 +47,13 @@ block content
 				else
 					h4 prefthumb notavail
 				hr
-				a(href='/api/sketch/'+data.sketch.id+'/delete', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+				a(href='/api/media/'+data.sketch.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 				//- a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 			.col-sm-8.col-md-8
 				.details-heading
 					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
 					h2 Details
-					form(action='/api/sketch/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
+					form(action='/api/media/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
 						fieldset(disabled='disabled')
 							input(type='hidden', name='action', value='save')
 							.form-group(class=validationErrors.message ? 'has-error' : null)
