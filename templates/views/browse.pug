@@ -166,6 +166,8 @@ block content
 									.input-group-btn
 										button(type='submit').btn.btn-default
 											i.glyphicon.glyphicon-search
+								hr
+								a(href='/api/media/list/init').btn.btn-warning.api-get-btn Initialise Media
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
 
@@ -223,7 +225,7 @@ block content
 										li
 											//- form(action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax
 											//- 	button(type='submit') Delete
-											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').post-form-ajax Delete
+											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').api-get-btn Delete
 							//- a(href='/browse/'+channel.key).btn.btn-link=channel.name
 								//- a(href='#').btn.btn-primary &times;
 							//- a(href='/browse/'+channel.key)=channel.name
