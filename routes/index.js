@@ -73,6 +73,7 @@ exports = module.exports = function (app) {
 	app.get('/api/media/channel/subscribe', keystone.middleware.api, routes.api.media.subscribe); // subscribe to new channel
 	app.get('/api/media/channel/unsubscribe', keystone.middleware.api, routes.api.media.unsubscribe); // unsubscribe from channel
 	app.all('/api/media/queue', keystone.middleware.api, routes.api.media.queue); // display URL
+	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot
 	app.get('/api/media/list/init', keystone.middleware.api, routes.api.media.initialise); // drop db and scan sketch dir
 
 

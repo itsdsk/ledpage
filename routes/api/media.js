@@ -681,6 +681,45 @@ exports.screenshot = function (req, res) {
 };
 
 /**
+ * Screenshot renderer
+ */
+
+exports.savescreen = function (req, res) {
+	// no player
+	if (!isDplayerConnected) {
+		console.log('play error: player not connected');
+		return res.apiError({
+			success: false,
+			note: 'renderer not active'
+		});
+	}
+	// prep to save screenshot
+	var sys = require('sys');
+	var exec = require('child_process').exec;
+	var uploadName = 'screenshot.png';
+	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
+	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
+	console.log('saving screenshot to: ' + uploadPath);
+	// save screenshot
+	exec(execCommand, function (err, stdout, stderr) {
+		console.log(stdout);
+		if (err) {
+			console.log('screenshot error: ');
+			return res.apiError({
+				success: false,
+				note: 'could not save screenshot'
+			});
+		} else {
+			return res.apiResponse({
+				success: true,
+				note: 'saved screenshot'
+			});
+		}
+	});
+};
+
+
+/**
  * Sync Sketch to IPFS
  */
 
