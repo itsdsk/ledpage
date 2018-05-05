@@ -735,8 +735,6 @@ exports.share = function (req, res) {
 
 exports.queue = function (req, res) {
 	
-	// console.log(JSON.stringify(req.body.address));
-
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 
@@ -747,15 +745,8 @@ exports.queue = function (req, res) {
 
 	}
 
-	// console.log(JSON.stringify(req.body));
-
-	// return res.apiResponse({
-	// 	success: true,
-	// 	note: 'ye'
-	// });
-
 	if (ipc.of.dplayeripc) {
-		var sketchPath = JSON.stringify(req.body.address);
+		var sketchPath = req.body.address;
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		return res.apiResponse({
 			success: true,
