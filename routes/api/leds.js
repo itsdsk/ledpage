@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 
 /**
  * Set media player LED coord mapping
@@ -124,7 +125,31 @@ exports.map_positions = function (req, res) {
  * Calibrate colour order and values
  */
 exports.calibrate = function (req, res) {
-    // update profile in database
+    // get hyperion config
+    var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
+    var hyperionConfExists = fs.existsSync(hyperionConfigPath);
+    if(hyperionConfExists){
+        var hyperionConfig = fs.readFileSync(hyperionConfigPath);
+        if(!hyperionConfig){
+            // error
+        }else{
+            var hyperionConfigJSON = JSON.parse(hyperionConfig);
+            // save settings
+            var calibVals = req.body; // shorthand
+            hyperionConfigJSON.device.colorOrder = calibVals.colOrder;
+            var hyperionChannels = hyperionConfigJSON.color.channelAdjustment[0];
+            hyperionChannels.pureRed.redChannel = parseInt(calibVals.redR);
+            hyperionChannels.pureRed.greenChannel = parseInt(calibVals.redG);
+            hyperionChannels.pureRed.blueChannel = parseInt(calibVals.redB);
+            hyperionChannels.pureGreen.redChannel = parseInt(calibVals.greenR);
+            hyperionChannels.pureGreen.greenChannel = parseInt(calibVals.greenG);
+            hyperionChannels.pureGreen.blueChannel = parseInt(calibVals.greenB);
+            hyperionChannels.pureBlue.redChannel = parseInt(calibVals.blueR);
+            hyperionChannels.pureBlue.greenChannel = parseInt(calibVals.blueG);
+            hyperionChannels.pureBlue.blueChannel = parseInt(calibVals.blueB);
+            // write new hyperion config
+            fs.writeFileSync(hyperionConfigPath, JSON.stringify(hyperionConfigJSON, null, 2));
+                // update profile in database
     require('keystone').list('Profile').model.find().exec(function (err, results) {
 
         if (err || !results.length) {
@@ -135,7 +160,6 @@ exports.calibrate = function (req, res) {
         }
         // shorthand for profile and new settings
         var profile = results[0];
-        var calibVals = req.body;
         // set new settings in database
         profile.colOrder = calibVals.colOrder;
         profile.redR = calibVals.redR;
@@ -162,6 +186,9 @@ exports.calibrate = function (req, res) {
             }
         });
     });
+
+        }
+    }
 
 
 };
