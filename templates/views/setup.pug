@@ -329,8 +329,46 @@ block js
 					switch(uploadFileName) {
 						case 'xml':
 							try{
-								const xmlRes = d3.xml.parse(txtRes);
-								visualiseLeds(xmlRes);
+								//- const xmlRes = d3.xmlParse(txtRes);
+								function xmlToJson(xml){ // credit: https://davidwalsh.name/convert-xml-json
+									var obj = {};
+									if(xml.nodeType == 1) { // element
+										if(xml.attributes.length > 0){
+											obj["@attributes"] = {};
+											for(var j=0; j<xml.attributes.length; j++){ // attribute
+												var attribute = xml.attributes.item(j);
+												obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+											}
+										}
+									} else if (xml.nodeType == 3) { // text
+										obj = xml.nodeValue;
+									}
+									// do children
+									if(xml.hasChildNodes()) {
+										for(var i=0; i<xml.childNodes.length; i++){
+											var item = xml.childNodes.item(i);
+											var nodeName = item.nodeName;
+											if(typeof(obj[nodeName]) == "undefined"){
+												obj[nodeName] = xmlToJson(item);
+											}else{
+												if (typeof(obj[nodeName].push) == "undefined") {
+													var old = obj[nodeName];
+													obj[nodeName] = [];
+													obj[nodeName].push(old);
+												}
+												obj[nodeName].push(xmlToJson(item));
+											}
+										}
+									}
+									return obj;
+								}
+								var parser = new DOMParser();
+								var obj = parser.parseFromString(txtRes, "text/xml");
+								//var xmlRes = 
+								//console.log(txtRes);
+								const xmlRes = xmlToJson(obj);
+								console.log(xmlRes);
+								//visualiseLeds(xmlRes);
 							}catch(err){
 								window.alert('Error parsing XML map: ' + err);
 								return;
