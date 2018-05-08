@@ -1,7 +1,7 @@
 var keystone = require('keystone');
 
 exports.create = {
-    SketchChannel: [{
+    MediaChannel: [{
         'name': 'sketches',
         __ref: 'sketches'
     }],

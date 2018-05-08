@@ -39,7 +39,7 @@ exports = module.exports = function (req, res) {
 	// Load all channels
 	view.on('init', function (next) {
 
-		keystone.list('SketchChannel').model.find().sort('name').exec(function (err, results) {
+		keystone.list('MediaChannel').model.find().sort('name').exec(function (err, results) {
 
 			if (err || !results.length) {
 				return next(err);

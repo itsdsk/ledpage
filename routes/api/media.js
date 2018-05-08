@@ -9,7 +9,7 @@ var fs = require('fs');
 var path = require('path');
 
 var Sketch = keystone.list('Sketch');
-var SketchChannel = keystone.list('SketchChannel');
+var MediaChannel = keystone.list('MediaChannel');
 
 // ipfs connection
 var ipfsAPI = require('ipfs-api');
@@ -55,7 +55,7 @@ var ipfsInit = () => {
 				}, 15000);
 			}
 		} else {
-			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
 					console.log('error: no channels');
@@ -102,7 +102,7 @@ setInterval(function () {
 			}
 		} else {
 			// find channels
-			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
 					console.log('error finding sketch categories to sync with ipfs');
@@ -213,7 +213,7 @@ exports.list = function (req, res) {
 		}
 
 		// list channels
-		SketchChannel.model.find(function(err, channelList) {
+		MediaChannel.model.find(function(err, channelList) {
 
 			if (err) {
 				return res.apiError({
@@ -474,8 +474,8 @@ exports.channel = function (req, res) {
 
 exports.subscribe = function (req, res) {
 	//
-	var SketchChannel = keystone.list('SketchChannel');
-	var newChannel = new SketchChannel.model();
+	//var MediaChannel = keystone.list('MediaChannel');
+	var newChannel = new MediaChannel.model();
 	var newUpdater = newChannel.getUpdateHandler(req);
 	var data = {
 		name: req.query.name
@@ -522,7 +522,7 @@ exports.subscribe = function (req, res) {
 exports.unsubscribe = function (req, res) {
 	// TODO: find and remove sketches in channel before deleting channel
 	// remove channel from database
-	SketchChannel.model.findById(req.query.id).exec(function(err, item) {
+	MediaChannel.model.findById(req.query.id).exec(function(err, item) {
 		if(err) {
 			return apiError({
 				success: false,
@@ -862,7 +862,7 @@ exports.initialise = function(req, res) {
 		}
 	});
 	// drop channels in database
-	SketchChannel.model.find(function (err, items) {
+	MediaChannel.model.find(function (err, items) {
 
 		if (err) {
 			return res.apiError({
@@ -894,7 +894,7 @@ exports.initialise = function(req, res) {
 	});
 	// scan sketch directory
 	var newItems = {
-		SketchChannel: [{
+		MediaChannel: [{
 			'name': 'sketches',
 			'__ref': 'sketches'
 		}],

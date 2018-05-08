@@ -19,7 +19,7 @@ exports = module.exports = function (req, res) {
 	// Load all channels
 	view.on('init', function (next) {
 
-		keystone.list('SketchChannel').model.find().sort('name').exec(function (err, results) {
+		keystone.list('MediaChannel').model.find().sort('name').exec(function (err, results) {
 
 			if (err || !results.length) {
 				return next(err);
@@ -45,7 +45,7 @@ exports = module.exports = function (req, res) {
 	view.on('init', function (next) {
 
 		if (req.params.channel) {
-			keystone.list('SketchChannel').model.findOne({
+			keystone.list('MediaChannel').model.findOne({
 				key: locals.filters.channel
 			}).exec(function (err, result) {
 				locals.data.channel = result;
@@ -85,8 +85,8 @@ exports = module.exports = function (req, res) {
 	// 	sub: 'true'
 	// }, function(next){
 	// 	//
-	// 	var SketchChannel = keystone.list('SketchChannel');
-	// 	var newChannel = new SketchChannel.model();
+	// 	var MediaChannel = keystone.list('MediaChannel');
+	// 	var newChannel = new MediaChannel.model();
 	// 	var newUpdater = newChannel.getUpdateHandler(req);
 	// 	var data = {
 	// 		name: req.query.channel

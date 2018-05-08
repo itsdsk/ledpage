@@ -33,7 +33,7 @@ Sketch.add({
 		type: Types.File,
 		storage: myStorage
 	},
-	channels: { type: Types.Relationship, ref: 'SketchChannel', many: true },
+	channels: { type: Types.Relationship, ref: 'MediaChannel', many: true },
 
 
 	state: { type: Types.Select, options: 'draft, published, archived', default: 'published', index: true },

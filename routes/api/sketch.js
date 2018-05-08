@@ -54,7 +54,7 @@ var ipfsInit = () => {
 				}, 15000);
 			}
 		} else {
-			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
 					console.log('error: no channels');
@@ -101,7 +101,7 @@ setInterval(function () {
 			}
 		} else {
 			// find channels
-			keystone.list('SketchChannel').model.find().sort('name').exec(function (err, channels) {
+			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
 					console.log('error finding sketch categories to sync with ipfs');
@@ -572,8 +572,8 @@ exports.channel = function (req, res) {
 
 exports.subscribe = function (req, res) {
 	//
-	var SketchChannel = keystone.list('SketchChannel');
-	var newChannel = new SketchChannel.model();
+	var MediaChannel = keystone.list('MediaChannel');
+	var newChannel = new MediaChannel.model();
 	var newUpdater = newChannel.getUpdateHandler(req);
 	var data = {
 		name: req.query.name
