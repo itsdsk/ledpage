@@ -56,4 +56,7 @@ keystone.set('locals', {
 // Load your project's Routes
 keystone.set('routes', require('./routes'));
 
-keystone.start();
+keystone.start(function(){
+  // initialise database
+  require('http').get('http://0.0.0.0:8081/api/media/list/init');
+});
