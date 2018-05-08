@@ -20,12 +20,12 @@ app.on('ready', () => {
   'use strict';
   // here we actually configure the behavour of electronJS
   const windowA = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: 1366,
+    height: 768,
     center: true,
-    resizable: true,
+    // resizable: true,
     show: false,
-    useContentSize: true,
+    // useContentSize: true,
     frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
     kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
     backgroundColor: '#000000', // set backgrounnd
@@ -40,6 +40,7 @@ app.on('ready', () => {
       windowA.center();
       windowA.show();
       windowB.hide();
+      windowB.setEnabled(false);
       console.log('getbounds');
       console.log(JSON.stringify(windowA.getBounds()));
       console.log('getcontentbounds');
@@ -56,12 +57,12 @@ app.on('ready', () => {
   });
 
   const windowB = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: 1366,
+    height: 768,
     center: true,
-    resizable: true,
+    // resizable: true,
     show: false,
-    useContentSize: true,
+    // useContentSize: true,
     frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
     kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
     backgroundColor: '#000000', // set backgrounnd
@@ -77,6 +78,7 @@ app.on('ready', () => {
       windowB.center();
       windowB.show();
       windowA.hide();
+      windowA.setEnabled(false);
       console.log('getbounds');
       console.log(JSON.stringify(windowB.getBounds()));
       console.log('getcontentbounds');
@@ -114,8 +116,10 @@ app.on('ready', () => {
           //ipc.log('got a message : '.debug, data);
           console.log('electron load URL: '+data);
           if(flipWindow){
+            windowB.setEnabled(true);
             windowB.loadURL(data); // display recieved URI
           }else{
+            windowA.setEnabled(true);
             windowA.loadURL(data); // display recieved URI
           }
           flipWindow = !flipWindow;
