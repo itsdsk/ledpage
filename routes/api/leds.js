@@ -124,11 +124,46 @@ exports.map_positions = function (req, res) {
  * Calibrate colour order and values
  */
 exports.calibrate = function (req, res) {
-    console.log(JSON.stringify(req.body));
-    return res.apiResponse({
-        success: true,
-        note: 'calibrated'
+    // update profile in database
+    require('keystone').list('Profile').model.find().exec(function (err, results) {
+
+        if (err || !results.length) {
+            return res.apiError({
+                success: false,
+                note: 'could not fetch profile from database'
+            });
+        }
+        // shorthand for profile and new settings
+        var profile = results[0];
+        var calibVals = req.body;
+        // set new settings in database
+        profile.colOrder = calibVals.colOrder;
+        profile.redR = calibVals.redR;
+        profile.redG = calibVals.redG;
+        profile.redB = calibVals.redB;
+        profile.greenR = calibVals.greenR;
+        profile.greenG = calibVals.greenG;
+        profile.greenB = calibVals.greenB;
+        profile.blueR = calibVals.blueR;
+        profile.blueG = calibVals.blueG;
+        profile.blueB = calibVals.blueB;
+        // save new settings to database
+        profile.save(function(err) {
+            if(err){
+                return res.apiError({
+                    success: false,
+                    note: 'could not update profile in database'
+                });
+            } else {
+                return res.apiResponse({
+                    success: true,
+                    note: 'calibrated'
+                });
+            }
+        });
     });
+
+
 };
 
 
