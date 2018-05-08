@@ -73,7 +73,6 @@ exports.map_positions = function (req, res) {
             var sys = require('sys');
             var exec = require('child_process').exec;
             var execCommand = 'systemctl restart hyperion.service';
-            // save screenshot
             exec(execCommand, function (err, stdout, stderr) {
                 console.log(stdout);
                 if (err) {
@@ -131,7 +130,10 @@ exports.calibrate = function (req, res) {
     if(hyperionConfExists){
         var hyperionConfig = fs.readFileSync(hyperionConfigPath);
         if(!hyperionConfig){
-            // error
+            return res.apiError({
+                success: false,
+                note: 'could not find config file'
+            });
         }else{
             var hyperionConfigJSON = JSON.parse(hyperionConfig);
             // save settings
@@ -179,10 +181,24 @@ exports.calibrate = function (req, res) {
                     note: 'could not update profile in database'
                 });
             } else {
-                return res.apiResponse({
-                    success: true,
-                    note: 'calibrated'
-                });
+            // restart hyperion
+            var sys = require('sys');
+            var exec = require('child_process').exec;
+            var execCommand = 'systemctl restart hyperion.service';
+            exec(execCommand, function (err, stdout, stderr) {
+                console.log(stdout);
+                if (err) {
+                    return res.apiError({
+                        success: false,
+                        note: 'updated colour calibration but could not restart interface'
+                    });
+                } else {
+                    return res.apiResponse({
+                        success: true,
+                        note: 'updated colour calibration and restarted interface'
+                    });
+                }
+            });
             }
         });
     });
