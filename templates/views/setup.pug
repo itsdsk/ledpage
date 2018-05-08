@@ -159,7 +159,11 @@ block content
 					| 0.75,0.75
 				kbd XML:
 				pre
-					| 
+					| <&#8203;data>
+					|     <&#8203;led> <&#8203;x>0.25<&#8203;/x> <&#8203;y>0.25<&#8203;/y> <&#8203;/led>
+					|     <&#8203;led> <&#8203;x>0.50<&#8203;/x> <&#8203;y>0.50<&#8203;/y> <&#8203;/led>
+					|     <&#8203;led> <&#8203;x>0.75<&#8203;/x> <&#8203;y>0.75<&#8203;/y> <&#8203;/led>
+					| <&#8203;/data>
 				form(action='/api/leds/config-arduino' method='post' class='post-form-ajax' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
@@ -329,46 +333,17 @@ block js
 					switch(uploadFileName) {
 						case 'xml':
 							try{
-								//- const xmlRes = d3.xmlParse(txtRes);
-								function xmlToJson(xml){ // credit: https://davidwalsh.name/convert-xml-json
-									var obj = {};
-									if(xml.nodeType == 1) { // element
-										if(xml.attributes.length > 0){
-											obj["@attributes"] = {};
-											for(var j=0; j<xml.attributes.length; j++){ // attribute
-												var attribute = xml.attributes.item(j);
-												obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-											}
-										}
-									} else if (xml.nodeType == 3) { // text
-										obj = xml.nodeValue;
-									}
-									// do children
-									if(xml.hasChildNodes()) {
-										for(var i=0; i<xml.childNodes.length; i++){
-											var item = xml.childNodes.item(i);
-											var nodeName = item.nodeName;
-											if(typeof(obj[nodeName]) == "undefined"){
-												obj[nodeName] = xmlToJson(item);
-											}else{
-												if (typeof(obj[nodeName].push) == "undefined") {
-													var old = obj[nodeName];
-													obj[nodeName] = [];
-													obj[nodeName].push(old);
-												}
-												obj[nodeName].push(xmlToJson(item));
-											}
-										}
-									}
-									return obj;
-								}
+								// parse contents of file into an XML document
 								var parser = new DOMParser();
-								var obj = parser.parseFromString(txtRes, "text/xml");
-								//var xmlRes = 
-								//console.log(txtRes);
-								const xmlRes = xmlToJson(obj);
-								console.log(xmlRes);
-								//visualiseLeds(xmlRes);
+								var xmlRes = parser.parseFromString(txtRes, "text/xml");
+								// convert XML document into an array of objects
+								xmlRes = [].map.call(xmlRes.querySelectorAll("led"), function(led) {
+									return {
+										x: +led.querySelector("x").textContent,
+										y: +led.querySelector("y").textContent
+									}
+								});
+								visualiseLeds(xmlRes);
 							}catch(err){
 								window.alert('Error parsing XML map: ' + err);
 								return;
