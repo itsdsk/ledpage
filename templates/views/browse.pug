@@ -27,19 +27,22 @@ mixin sketch(sketch)
 							.modal-header
 								button(type='button', class='close', data-dismiss='modal') &times;
 								- var sketchid = sketch.id.slice(-6);
-								h4.modal-title <strong>Media ID#</strong>#{sketchid}
+								h4.modal-title <strong>Disk </strong><i><small>##{sketchid}</small></i>
 							.modal-body
-								a(href='/api/media/' + sketch.id + '/play').btn.btn-success.btn-lg.btn-block.api-get-btn
+								a(href='/api/media/' + sketch.id + '/play').btn.btn-primary.btn-lg.btn-block.api-get-btn
 									span.glyphicon.glyphicon-play
-									| &ensp; Play
-								hr
-								.btn-group.btn-group-justified
-									a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-info.btn-lg
-										span.glyphicon.glyphicon-eye-open
-										| &ensp; Preview
-									a(href='/browse/sketch/'+sketch._id, target='_blank').btn.btn-info.btn-lg
-										span.glyphicon.glyphicon-tasks
-										| &ensp; More
+								a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-default.btn-lg.btn-block
+									.text-left
+										| Preview
+								a(href='/browse/sketch/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
+									.text-left
+										| Edit
+								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block.api-get-btn
+									.text-left
+										| Share
+								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block
+									.text-left
+										| View on IPFS
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
 				//- if sketch.image.exists
@@ -150,6 +153,7 @@ block content
 				hr
 				a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings')
 					div(id='ledmap').led-map
+				input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').brightnessSlider
 				//- hr
 				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
 				//- a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-block.btn-primary Quick Settings
@@ -188,17 +192,8 @@ block content
 				//- 			button(type='submit', id='submit').hidden
 				//- .lead.text-muted Subscribed
 				hr
+				.lead.text-muted Subscribed
 				ul.nav.nav-pills.nav-stacked
-					li(role='presentation')
-						//- form(action='/api/channels/subscribe', method='GET')
-						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
-							//- input(type='text', id='sub', name='sub', value='true').hidden
-							.input-group.input-group-lg
-								span.input-group-addon
-									i.glyphicon.glyphicon-globe
-									//- | &ensp;Subscribed
-								input(type='text', placeholder='Subscribed', id='name', name='name' required).form-control
-							button(type='submit', id='submit').hidden
 					each channel in data.channels
 						//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
 						//- 	| &ensp;
@@ -229,6 +224,17 @@ block content
 											//- form(action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax
 											//- 	button(type='submit') Delete
 											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').api-get-btn Delete
+					li(role='presentation')
+						//- form(action='/api/channels/subscribe', method='GET')
+						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
+							//- input(type='text', id='sub', name='sub', value='true').hidden
+							.input-group.input-group-lg
+								span.input-group-addon
+									i.glyphicon.glyphicon-globe
+									//- | &ensp;Subscribed
+								input(type='text', placeholder='Add Channel', id='name', name='name' required).form-control
+							button(type='submit', id='submit').hidden
+
 							//- a(href='/browse/'+channel.key).btn.btn-link=channel.name
 								//- a(href='#').btn.btn-primary &times;
 							//- a(href='/browse/'+channel.key)=channel.name
