@@ -830,6 +830,48 @@ exports.queue = function (req, res) {
  */
 
 exports.initialise = function(req, res) {
+	// load Profile (colour calibration/hyperion config)
+	var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
+	var hyperionConfExists = fs.existsSync(hyperionConfigPath);
+	if(hyperionConfExists){
+		var hyperionConfig = fs.readFileSync(hyperionConfigPath);
+        if(!hyperionConfig){
+			//
+			console.log('could not find hyperion config file in media init');
+        }else{
+			var hyperionConfigJSON = JSON.parse(hyperionConfig);
+			keystone.list('Profile').model.find().exec(function (err, results) {
+				if (err || !results.length) {
+					console.log('could not get Profile from database');
+				}
+				// shorthand
+				var profile = results[0];
+				var hyperionChannels = hyperionConfigJSON.color.channelAdjustment[0];
+				// set profile from JSON
+				profile.colOrder = hyperionConfigJSON.device.colorOrder;
+				profile.redR = hyperionChannels.pureRed.redChannel;
+				profile.redG = hyperionChannels.pureRed.greenChannel;
+				profile.redB = hyperionChannels.pureRed.blueChannel;
+				profile.greenR = hyperionChannels.pureGreen.redChannel;
+				profile.greenG = hyperionChannels.pureGreen.greenChannel;
+				profile.greenB = hyperionChannels.pureGreen.blueChannel;
+				profile.blueR = hyperionChannels.pureBlue.redChannel;
+				profile.blueG = hyperionChannels.pureBlue.greenChannel;
+				profile.blueb = hyperionChannels.pureBlue.blueChannel;
+				// save profile
+				profile.save(function(err) {
+					if(err){
+						return res.apiError({
+							success: false,
+							note: 'could not initialise profile'
+						});
+					}else{
+						console.log('initialised profile from saved config');
+					}
+				});
+			});
+		}
+	}
 	// drop sketches in database
 	Media.model.find(function (err, items) {
 
