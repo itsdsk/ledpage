@@ -23,7 +23,7 @@ exports = module.exports = function (req, res) {
 	// Load the current sketch
 	view.on('init', function (next) {
 
-		var q = keystone.list('Sketch').model.findOne({
+		var q = keystone.list('Media').model.findOne({
 			state: 'published',
 			_id: locals.filters.id,
 			// slug: locals.filters.sketch,
@@ -95,7 +95,7 @@ exports = module.exports = function (req, res) {
 	// Load other sketches
 	view.on('init', function (next) {
 
-		var q = keystone.list('Sketch').model.find().where('state', 'published').sort('-publishedDate').populate('author').limit('4');
+		var q = keystone.list('Media').model.find().where('state', 'published').sort('-publishedDate').populate('author').limit('4');
 
 		q.exec(function (err, results) {
 			locals.data.sketches = results;

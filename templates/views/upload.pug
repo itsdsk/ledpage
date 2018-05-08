@@ -3,7 +3,7 @@ extends ../layouts/default
 block content
 	.container
 		.page-header
-			h1 Add Sketch
+			h1 Upload
 		//- form(method='post').form-horizontal
 		form(action='/api/media/create' method='post' class='post-form-ajax').form-horizontal
 			input(type='hidden', name='action', value='upload')
@@ -27,9 +27,9 @@ block content
 			//- 			each type in enquiryTypes
 			//- 				option(value=type.value selected=formData.enquiryType === type.value)= type.label
 			.form-group(class=validationErrors.message ? 'has-error' : null)
-				label.col-sm-2.control-label Sketch
+				label.col-sm-2.control-label Media
 				.col-sm-10
-					textarea(name='sketch' placeholder='Enter HTML sketch...' rows=24 required).form-control= formData.sketch
+					textarea(name='sketch' placeholder='Enter HTML media...' rows=24 required).form-control= formData.sketch
 			.form-group
 				.col-sm-10.col-sm-offset-2
 					//- p.help-block Note: others can see your enquiry in the <a href='/keystone/enquiries'>Admin UI</a>

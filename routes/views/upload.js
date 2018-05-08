@@ -1,7 +1,7 @@
 var keystone = require('keystone');
 var async = require('async');
 
-var Sketch = keystone.list('Sketch');
+var Media = keystone.list('Media');
 var fs = require('fs');
 var path = require('path');
 
@@ -19,8 +19,8 @@ exports = module.exports = function (req, res) {
         action: 'upload'
     }, function (next) {
 
-        var application = new Sketch.model();
-        console.log('made new sketch id:');
+        var application = new Media.model();
+        console.log('made new media id:');
         console.log(application.id);
         var updater = application.getUpdateHandler(req);
 

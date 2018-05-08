@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 /**
- * Set sketch player LED coord mapping
+ * Set media player LED coord mapping
  */
 exports.map_positions = function (req, res) {
     // get new led map from HTTP post body

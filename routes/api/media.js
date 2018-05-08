@@ -8,7 +8,7 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 
-var Sketch = keystone.list('Sketch');
+var Media = keystone.list('Media');
 var MediaChannel = keystone.list('MediaChannel');
 
 // ipfs connection
@@ -93,7 +93,7 @@ ipfsInit();
 // Periodically show peers
 setInterval(function () {
 	//console.log('syncing with ipfs');
-	// share sketches on ipfs
+	// share media on ipfs
 	ipfs.id(function (err, identity) {
 		if (err) {
 			if (ipfsInitAttempts < 3) {
@@ -105,15 +105,15 @@ setInterval(function () {
 			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 
 				if (err || !channels.length) {
-					console.log('error finding sketch categories to sync with ipfs');
+					console.log('error finding media categories to sync with ipfs');
 				}
 				// loop through channels
 				channels.forEach((channel) => {
 					console.log('adding channel:');
 					var ipfsTopic = channel.name;
 					console.log(ipfsTopic);
-					// loop through sketches
-					keystone.list('Sketch').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
+					// loop through media
+					keystone.list('Media').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
 						if (err) console.log(err);
 						sketchesToShare.forEach((sketchToShare) => {
 							if (sketchToShare.ipfsHash) {
@@ -123,7 +123,7 @@ setInterval(function () {
 								console.log(channel.name);
 								ipfs.pubsub.publish(channel.name, new Buffer(sketchToShare.ipfsHash), (err) => {
 									if (err) {
-										console.log('error trying to publish sketch');
+										console.log('error trying to publish media');
 										console.log(err);
 										throw err;
 									}
@@ -182,11 +182,11 @@ ipc.connectTo(
 	});
 
 /**
- * Get Sketch by ID
+ * Get Media by ID
  */
 
 exports.get = function (req, res) {
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
@@ -200,15 +200,15 @@ exports.get = function (req, res) {
 
 
 /**
- * List Sketches
+ * List Media
  */
 exports.list = function (req, res) {
-	Sketch.model.find(function (err, sketchList) {
+	Media.model.find(function (err, sketchList) {
 
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not get sketches from database'
+				note: 'could not get media from database'
 			});
 		}
 
@@ -233,7 +233,7 @@ exports.list = function (req, res) {
 
 
 /**
- * Play Sketch by ID
+ * Play Media by ID
  */
 
 exports.play = function (req, res) {
@@ -246,18 +246,18 @@ exports.play = function (req, res) {
 		});
 
 	}
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not find sketch in database'
+				note: 'could not find media in database'
 			});
 		}
 		if (!item) {
 			return res.apiError({
 				success: false,
-				note: 'could not get sketch from database'
+				note: 'could not get media from database'
 			});
 		}
 
@@ -275,7 +275,7 @@ exports.play = function (req, res) {
 
 			res.apiError({
 				success: false,
-				note: 'failed to queue sketch to display'
+				note: 'failed to queue media to display'
 			});
 
 		}
@@ -289,7 +289,7 @@ exports.play = function (req, res) {
  */
 
 exports.create = function (req, res) {
-	var newModel = new Sketch.model();
+	var newModel = new Media.model();
 	var updater = newModel.getUpdateHandler(req);
 
 	// make folder
@@ -301,7 +301,7 @@ exports.create = function (req, res) {
 		if(fserr.code !== 'EEXIST') {
 			return res.apiError({
 				success: false,
-				note: 'could not create new directory for sketch'
+				note: 'could not create new directory for media'
 			});
 		}
 	}
@@ -331,7 +331,7 @@ exports.create = function (req, res) {
 		}else{
 			return res.apiResponse({
 				success: true,
-				note: 'uploaded new sketch'
+				note: 'uploaded new media'
 			});
 		}
 	});
@@ -342,7 +342,7 @@ exports.create = function (req, res) {
  */
 
 exports.update = function (req, res) {
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) {
 			return res.apiError({
@@ -420,7 +420,7 @@ exports.update = function (req, res) {
 
 exports.channel = function (req, res) {
 	// find sketch
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
@@ -447,7 +447,7 @@ exports.channel = function (req, res) {
 		// run the database update
 		item.getUpdateHandler(req).process(data, function (err) {
 			if (err) {
-				return res.apiError('error updating sketch channel', err);
+				return res.apiError('error updating media channel', err);
 			} else {
 				res.apiResponse({
 					success: true
@@ -558,7 +558,7 @@ exports.unsubscribe = function (req, res) {
 
 exports.remove = function (req, res) {
 	// find sketch
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
@@ -590,7 +590,7 @@ exports.screenshot = function (req, res) {
 		});
 	}
 	// find sketch
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
 		// prep to save screenshot
@@ -619,7 +619,7 @@ exports.screenshot = function (req, res) {
 				thumbnails: item.thumbnails
 			};
 			imgs.thumbnails.push(uploadName);
-			Sketch.updateItem(item, imgs, {
+			Media.updateItem(item, imgs, {
 				fields: ["thumbnails"]
 			}, function (dberror) {
 				if (dberror) {
@@ -724,7 +724,7 @@ exports.savescreen = function (req, res) {
  */
 
 exports.share = function (req, res) {
-	Sketch.model.findById(req.params.id).exec(function (err, item) {
+	Media.model.findById(req.params.id).exec(function (err, item) {
 
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
@@ -752,7 +752,7 @@ exports.share = function (req, res) {
 					ipfsHash: files[files.length - 1].hash
 				};
 
-				Sketch.updateItem(item, data, {
+				Media.updateItem(item, data, {
 					fields: ["ipfsHash"]
 				}, function (dberror) {
 					if (dberror) console.log(dberror);
@@ -831,12 +831,12 @@ exports.queue = function (req, res) {
 
 exports.initialise = function(req, res) {
 	// drop sketches in database
-	Sketch.model.find(function (err, items) {
+	Media.model.find(function (err, items) {
 
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not get sketches from database: '+ err
+				note: 'could not get media from database: '+ err
 			});
 		}
 		// console.log(items.length);
@@ -845,7 +845,7 @@ exports.initialise = function(req, res) {
 				if(err){
 					return res.apiError({
 						success: false,
-						note: 'could not drop sketch from database'
+						note: 'could not drop media from database'
 					});
 				}
 
@@ -898,14 +898,14 @@ exports.initialise = function(req, res) {
 			'name': 'sketches',
 			'__ref': 'sketches'
 		}],
-		Sketch: []
+		Media: []
 	};
 	// scan sketch directory
 	fs.readdir(res.locals.viewStaticPath, function(err, files) {
 		if(err){
 			return res.apiError({
 				success: false,
-				note: 'could not read sketch folder'
+				note: 'could not read media folder'
 			});
 		}
 		// iterate through each sketch directory
@@ -927,7 +927,7 @@ exports.initialise = function(req, res) {
 					}else{
 						// add sketch to database
 						var obj = JSON.parse(rawDiskJSON);
-						newItems.Sketch.push({
+						newItems.Media.push({
 							"title": obj.disk.title?obj.disk.title:files[i],
 							"modifiedDate": obj.disk.modifiedDate?obj.disk.modifiedDate:"2018-1-1",
 							"prefThumb":obj.disk.prefThumb?obj.disk.prefThumb:null,
@@ -940,7 +940,7 @@ exports.initialise = function(req, res) {
 				}else{
 					// TODO make disk.json
 					// add sketch to db
-					newItems.Sketch.push({
+					newItems.Media.push({
 						"title": files[i],
 						"state": "published",
 						"localDir": files[i],

@@ -30,7 +30,7 @@ exports = module.exports = function (req, res) {
 			// Load the counts for each channel
 			async.each(locals.data.channels, function (channel, next) {
 
-				keystone.list('Sketch').model.count().where('channels').in([channel.id]).exec(function (err, count) {
+				keystone.list('Media').model.count().where('channels').in([channel.id]).exec(function (err, count) {
 					channel.sketchCount = count;
 					next(err);
 				});
@@ -56,10 +56,10 @@ exports = module.exports = function (req, res) {
 		}
 	});
 
-	// Load the sketches
+	// Load media
 	view.on('init', function (next) {
 
-		var q = keystone.list('Sketch').paginate({
+		var q = keystone.list('Media').paginate({
 				page: req.query.page || 1,
 				perPage: 10,
 				maxPages: 10,

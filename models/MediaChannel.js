@@ -13,6 +13,6 @@ MediaChannel.add({
 	name: { type: String, required: true },
 });
 
-MediaChannel.relationship({ ref: 'Sketch', path: 'sketches', refPath: 'channels' });
+MediaChannel.relationship({ ref: 'Media', path: 'sketches', refPath: 'channels' });
 
 MediaChannel.register();

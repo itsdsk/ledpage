@@ -2,11 +2,11 @@ var keystone = require('keystone');
 var Types = keystone.Field.Types;
 
 /**
- * Sketch Model
+ * Media Model
  * ==========
  */
 
-var Sketch = new keystone.List('Sketch', {
+var Media = new keystone.List('Media', {
 	map: { name: 'title' },
 	autokey: { path: 'slug', from: 'title', unique: true },
 });
@@ -20,7 +20,7 @@ var myStorage = new keystone.Storage({
 	}
   });
 
-Sketch.add({
+Media.add({
 	title: { type: String, required: true },
 	modifiedDate: { type: Types.Date, index: true },
 	//localPath: { type: String },
@@ -46,10 +46,10 @@ Sketch.add({
 	//},
 });
 
-//Sketch.schema.virtual('content.full').get(function () {
+//Media.schema.virtual('content.full').get(function () {
 //	//return this.content.extended || this.content.brief;
 //	return this.localPath;
 //});
 
-Sketch.defaultColumns = 'title, state|20%, author|20%, publishedDate|20%';
-Sketch.register();
+Media.defaultColumns = 'title, state|20%, author|20%, publishedDate|20%';
+Media.register();
