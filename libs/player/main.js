@@ -20,8 +20,8 @@ app.on('ready', () => {
   'use strict';
   // here we actually configure the behavour of electronJS
   const windowA = new BrowserWindow({
-    width: 1366,
-    height: 768,
+    width: 1920,
+    height: 1080,
     center: true,
     // resizable: true,
     show: false,
@@ -61,8 +61,8 @@ app.on('ready', () => {
   });
 
   const windowB = new BrowserWindow({
-    width: 1366,
-    height: 768,
+    width: 1920,
+    height: 1080,
     center: true,
     // resizable: true,
     show: false,
