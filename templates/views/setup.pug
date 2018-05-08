@@ -20,9 +20,12 @@ block content
 						.form-group
 							label(for='colourOrder') Colour Order:
 							select(id='colourOrder').form-control
-								option RGB
-								option GRB
-								option BGR
+								option(value='rgb' selected=profile.colOrder==='rgb') RGB
+								option(value='rbg' selected=profile.colOrder==='rbg') RBG
+								option(value='brg' selected=profile.colOrder==='brg') BRG
+								option(value='bgr' selected=profile.colOrder==='bgr') BGR
+								option(value='grb' selected=profile.colOrder==='grb') GRB
+								option(value='gbr' selected=profile.colOrder==='gbr') GBR
 						label Colour Calibration:
 						.panel-group(id='colourAdjust')
 							.panel.panel-default
@@ -33,11 +36,11 @@ block content
 								.panel-collapse.collapse(id='redAdjust')
 									.panel-body
 										label(for='redAdjR') R:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjR')
+										input(type='range', min='0', max='255', step='1', value=profile.redR, class='slider', id='redAdjR')
 										label(for='redAdjG') G:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjG')
+										input(type='range', min='0', max='255', step='1', value=profile.redG, class='slider', id='redAdjG')
 										label(for='redAdjB') B:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjB')
+										input(type='range', min='0', max='255', step='1', value=profile.redB, class='slider', id='redAdjB')
 							.panel.panel-default
 								.panel-heading
 									h4.panel-title
@@ -46,11 +49,11 @@ block content
 								.panel-collapse.collapse(id='greenAdjust')
 									.panel-body
 										label(for='greenAdjR') R:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjR')
+										input(type='range', min='0', max='255', step='1', value=profile.greenR, class='slider', id='greenAdjR')
 										label(for='greenAdjG') G:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjG')
+										input(type='range', min='0', max='255', step='1', value=profile.greenG, class='slider', id='greenAdjG')
 										label(for='greenAdjB') B:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjB')
+										input(type='range', min='0', max='255', step='1', value=profile.greenB, class='slider', id='greenAdjB')
 							.panel.panel-default
 								.panel-heading
 									h4.panel-title
@@ -59,11 +62,11 @@ block content
 								.panel-collapse.collapse(id='blueAdjust')
 									.panel-body
 										label(for='blueAdjR') R:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjR')
+										input(type='range', min='0', max='255', step='1', value=profile.blueR, class='slider', id='blueAdjR')
 										label(for='blueAdjG') G:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjG')
+										input(type='range', min='0', max='255', step='1', value=profile.blueG, class='slider', id='blueAdjG')
 										label(for='blueAdjB') B:
-										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjB')
+										input(type='range', min='0', max='255', step='1', value=profile.blueB, class='slider', id='blueAdjB')
 						.btn-group-vertical.btn-block
 							a.btn.btn-default.btn-lg.btn-block
 								.text-left Update Colours
