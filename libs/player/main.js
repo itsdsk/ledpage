@@ -37,8 +37,21 @@ app.on('ready', () => {
   });
   windowA.webContents.on('did-finish-load', () => {
     setTimeout(() => {
+      windowA.center();
       windowA.show();
       windowB.hide();
+      console.log('getbounds');
+      console.log(JSON.stringify(windowA.getBounds()));
+      console.log('getcontentbounds');
+      console.log(JSON.stringify(windowA.getContentBounds()));
+      console.log('getsize');
+      console.log(JSON.stringify(windowA.getSize()));
+      console.log('getcontentsize');
+      console.log(JSON.stringify(windowA.getContentSize()));
+      console.log('getminimumsize');
+      console.log(JSON.stringify(windowA.getMinimumSize()));
+      console.log('getminimumsize');
+      console.log(JSON.stringify(windowA.getMinimumSize()));
     }, 300);
   });
 
@@ -61,8 +74,22 @@ app.on('ready', () => {
 
   windowB.webContents.on('did-finish-load', () => {
     setTimeout(() => {
+      windowB.center();
       windowB.show();
       windowA.hide();
+      console.log('getbounds');
+      console.log(JSON.stringify(windowB.getBounds()));
+      console.log('getcontentbounds');
+      console.log(JSON.stringify(windowB.getContentBounds()));
+      console.log('getsize');
+      console.log(JSON.stringify(windowB.getSize()));
+      console.log('getcontentsize');
+      console.log(JSON.stringify(windowB.getContentSize()));
+      console.log('getminimumsize');
+      console.log(JSON.stringify(windowB.getMinimumSize()));
+      console.log('getminimumsize');
+      console.log(JSON.stringify(windowB.getMinimumSize()));
+
     }, 300);
   });
 
