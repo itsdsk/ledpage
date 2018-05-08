@@ -144,6 +144,19 @@ exports = module.exports = function (req, res) {
     locals.validationErrors = {};
     locals.setupSubmitted = false;
 
+    // load profile
+	view.on('init', function (next) {
+
+        keystone.list('Profile').model.find().exec(function (err, results) {
+
+            if (err || !results.length) {
+                console.log('errore getting profile');
+            }
+            locals.profile = results[0];
+            next(err);
+        });
+	});
+
     view.on('post', {
         action: 'setup'
     }, function (next) {

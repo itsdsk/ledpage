@@ -82,7 +82,6 @@ exports.initLocals = function (req, res, next) {
 
 	// component status
 	res.locals.componentStatus = componentStatus;
-	res.locals.user = req.user;
 	next();
 };
 
@@ -104,14 +103,14 @@ exports.flashMessages = function (req, res, next) {
 };
 
 
-/**
-	Prevents people from accessing protected pages when they're not signed in
- */
-exports.requireUser = function (req, res, next) {
-	if (!req.user) {
-		req.flash('error', 'Please sign in to access this page.');
-		res.redirect('/keystone/signin');
-	} else {
-		next();
-	}
-};
+// /**
+// 	Prevents people from accessing protected pages when they're not signed in
+//  */
+// exports.requireUser = function (req, res, next) {
+// 	if (!req.user) {
+// 		req.flash('error', 'Please sign in to access this page.');
+// 		res.redirect('/keystone/signin');
+// 	} else {
+// 		next();
+// 	}
+// };

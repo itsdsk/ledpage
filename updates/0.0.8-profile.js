@@ -7,26 +7,46 @@
  * module.exports = function(done) { ... }
  */
 
-exports.create = {
-	Profile: [{
-		'colOrder': 'rgb',
-		'redR': 255,
-		'redG': 255,
-		'redB': 255,
-		'greenR': 255,
-		'greenG': 255,
-		'greenB': 255,
-		'blueR': 255,
-		'blueG': 255,
-		'blueB': 255,
-		'name': 'defaultProfile'
-		// 'name.first': 'Admin',
-		// 'name.last': 'User',
-		// 'email': 'user@keystonejs.com',
-		// 'password': 'admin',
-		// 'isAdmin': true
-	}, ],
+var keystone = require('keystone');
+var Profile = keystone.list('Profile');
+
+module.exports = function (done) {
+	Profile.model.find(function (err, items) {
+		for(var i=0; i<items.length; i++){
+			items[i].remove();
+		}
+	});
+	new Profile.model({
+		colOrder: 'rgb',
+		redR: 255,
+		redG: 255,
+		redB: 255,
+		greenR: 255,
+		greenG: 255,
+		greenB: 255,
+		blueR: 255,
+		blueG: 255,
+		blueB: 255,
+		name: 'defaultProfile'
+	})
+	.save(done);
 };
+
+// exports.create = {
+// 	Profile: [{
+// 		'colOrder': 'rgb',
+// 		'redR': 255,
+// 		'redG': 255,
+// 		'redB': 255,
+// 		'greenR': 255,
+// 		'greenG': 255,
+// 		'greenB': 255,
+// 		'blueR': 255,
+// 		'blueG': 255,
+// 		'blueB': 255,
+// 		'name': 'defaultProfile'
+// 	}, ],
+// };
 
 /*
 

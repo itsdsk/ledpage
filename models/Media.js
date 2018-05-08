@@ -51,5 +51,5 @@ Media.add({
 //	return this.localPath;
 //});
 
-Media.defaultColumns = 'title, state|20%, author|20%, publishedDate|20%';
+// Media.defaultColumns = 'title, state|20%, author|20%, publishedDate|20%';
 Media.register();

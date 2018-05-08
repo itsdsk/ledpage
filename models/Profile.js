@@ -72,24 +72,24 @@ Profile.add({
 	// },
 });
 
-// Provide access to Keystone
-Profile.schema.virtual('canAccessKeystone').get(function () {
-	return this.isAdmin;
-});
+// // Provide access to Keystone
+// Profile.schema.virtual('canAccessKeystone').get(function () {
+// 	return this.isAdmin;
+// });
 
 
 /**
  * Relationships
  */
-Profile.relationship({
-	ref: 'Media',
-	path: 'sketches',
-	refPath: 'author'
-});
+// Profile.relationship({
+// 	ref: 'Media',
+// 	path: 'sketches',
+// 	refPath: 'author'
+// });
 
 
 /**
  * Registration
  */
-Profile.defaultColumns = 'name, email, isAdmin';
+// Profile.defaultColumns = 'name, email, isAdmin';
 Profile.register();
