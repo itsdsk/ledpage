@@ -8,7 +8,7 @@
  */
 
 exports.create = {
-	User: [
+	Profile: [
 		{ 'name.first': 'Admin', 'name.last': 'User', 'email': 'user@keystonejs.com', 'password': 'admin', 'isAdmin': true },
 	],
 };

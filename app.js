@@ -23,7 +23,7 @@ keystone.init({
   'auto update': true,
   'session': false,
   'auth': false,
-  'user model': 'User',
+  'user model': 'Profile',
 });
 
 // Load your project's Models
