@@ -38,9 +38,13 @@ app.on('ready', () => {
   windowA.webContents.on('did-finish-load', () => {
     setTimeout(() => {
       windowA.center();
+      if(windowA.isMinimized()){
+        windowA.restore();
+      }
       windowA.show();
       windowB.hide();
-      windowB.setEnabled(false);
+      windowB.minimize();
+      // windowB.setEnabled(false);
       console.log('getbounds');
       console.log(JSON.stringify(windowA.getBounds()));
       console.log('getcontentbounds');
@@ -76,9 +80,13 @@ app.on('ready', () => {
   windowB.webContents.on('did-finish-load', () => {
     setTimeout(() => {
       windowB.center();
+      if(windowB.isMinimized()){
+        windowB.restore();
+      }
       windowB.show();
       windowA.hide();
-      windowA.setEnabled(false);
+      windowA.minimize();
+      // windowA.setEnabled(false);
       console.log('getbounds');
       console.log(JSON.stringify(windowB.getBounds()));
       console.log('getcontentbounds');
@@ -116,10 +124,10 @@ app.on('ready', () => {
           //ipc.log('got a message : '.debug, data);
           console.log('electron load URL: '+data);
           if(flipWindow){
-            windowB.setEnabled(true);
+            // windowB.setEnabled(true);
             windowB.loadURL(data); // display recieved URI
           }else{
-            windowA.setEnabled(true);
+            // windowA.setEnabled(true);
             windowA.loadURL(data); // display recieved URI
           }
           flipWindow = !flipWindow;
