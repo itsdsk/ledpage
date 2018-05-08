@@ -76,6 +76,7 @@ exports = module.exports = function (app) {
 
 	// LED routes
 	app.all('/api/leds/map-positions', keystone.middleware.api, routes.api.leds.map_positions); // update player led map
+	app.all('/api/leds/calibrate', keystone.middleware.api, routes.api.leds.calibrate); // update colour calibration
 	app.get('/api/leds/set-brightness/:val', keystone.middleware.api, routes.api.leds.set_brightness); // 
 	app.all('/api/leds/config-arduino', keystone.middleware.api, routes.api.leds.config_arduino); // setup led output configuration
 

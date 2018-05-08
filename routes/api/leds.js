@@ -121,6 +121,18 @@ exports.map_positions = function (req, res) {
 };
 
 /**
+ * Calibrate colour order and values
+ */
+exports.calibrate = function (req, res) {
+    console.log(JSON.stringify(req.body));
+    return res.apiResponse({
+        success: true,
+        note: 'calibrated'
+    });
+};
+
+
+/**
  * Setup LED output configuration
  */
 exports.config_arduino = function (req, res) {
