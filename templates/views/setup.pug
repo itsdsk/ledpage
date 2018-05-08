@@ -263,14 +263,14 @@ block js
 
 		// load leds.json and visualise
 		d3.json('/config-static/leds.json').then( function(data) {
-			visualiseLeds(data)
+			visualiseLeds(data.leds)
 		});
 		function visualiseLeds(data) {
 			// get range of data
-			var minX = d3.min(data.leds, function(d) {return d.x});
-			var maxX = d3.max(data.leds, function(d) {return d.x});
-			var minY = d3.min(data.leds, function(d) {return d.y});
-			var maxY = d3.max(data.leds, function(d) {return d.y});
+			var minX = d3.min(data, function(d) {return d.x});
+			var maxX = d3.max(data, function(d) {return d.x});
+			var minY = d3.min(data, function(d) {return d.y});
+			var maxY = d3.max(data, function(d) {return d.y});
 			var scaleX = d3.scaleLinear()
 				.domain([minX,maxX])
 				.range([padding, width-padding]);
@@ -292,13 +292,13 @@ block js
 				.attr('fill', 'none')
 				.attr('stroke', '#337ab7')
 				.attr('stroke-width', 0.5*padding)
-				.attr('d', line(data.leds));
+				.attr('d', line(data));
 			new_path.merge(path)
-				.attr('d', line(data.leds));
+				.attr('d', line(data));
 
 			// draw leds
 			var circles = svgContainer.selectAll('.ledNode')
-				.data(data.leds);
+				.data(data);
 			circles.exit().remove();
 			var new_circles = circles.enter()
 				.append('circle')
@@ -339,7 +339,7 @@ block js
 						case 'json':
 							try{
 								const jsonRes = JSON.parse(txtRes);
-								visualiseLeds(jsonRes);
+								visualiseLeds(jsonRes.leds);
 							}catch(err){
 								window.alert('Error parsing JSON map: ' + err);
 								return;
