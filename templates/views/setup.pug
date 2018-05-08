@@ -347,9 +347,13 @@ block js
 							break;
 						case 'csv':
 							try{
-								const csvRes = d3.csv.parse(txtRes);
+								const csvRes = d3.csvParse(txtRes);
+								// parse ints
+								for(var i=0; i<csvRes.length; i++){
+									csvRes[i].x = parseFloat(csvRes[i].x);
+									csvRes[i].y = parseFloat(csvRes[i].y);
+								}
 								visualiseLeds(csvRes);
-								// check file properties https://stackoverflow.com/questions/36079390/parse-uploaded-csv-file-using-d3-js
 							}catch(err){
 								window.alert('Error parsing CSV map: ' + err);
 								return;
