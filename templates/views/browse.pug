@@ -88,7 +88,7 @@ mixin sketch(sketch)
 			//- if sketch.channels && sketch.channels.length
 			//- 	| in 
 			//- 	each channel, i in sketch.channels
-			//- 		a(href='/browse/' + channel.key)= channel.name
+			//- 		a(href='/channel/' + channel.key)= channel.name
 			//- 		if i < sketch.channels.length - 1
 			//- 			| , 
 			//- 		else
@@ -185,7 +185,7 @@ block content
 
 				//- 	.list-group
 				//- 		each channel in data.channels
-				//- 			a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+				//- 			a(href='/channel/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
 				//- 		form(action='/api/channels/subscribe', method='GET').list-group-item
 				//- 			input(type='text', id='sub', name='sub', value='true').hidden
 				//- 			input(type='text', placeholder='Add channel', id='name', name='name').form-control
@@ -204,7 +204,7 @@ block content
 							//- 	| &ensp;
 							//- 	span.badge=channel.sketchCount
 							.btn-group.btn-group-justified
-								a(href='/browse/'+channel.key, style='width:5%').btn.btn-default
+								a(href='/channel/'+channel.key, style='width:5%').btn.btn-default
 									.text-left
 										span.badge=channel.sketchCount
 										| &ensp;
@@ -235,11 +235,11 @@ block content
 								input(type='text', placeholder='Add Channel', id='name', name='name' required).form-control
 							button(type='submit', id='submit').hidden
 
-							//- a(href='/browse/'+channel.key).btn.btn-link=channel.name
+							//- a(href='/channel/'+channel.key).btn.btn-link=channel.name
 								//- a(href='#').btn.btn-primary &times;
-							//- a(href='/browse/'+channel.key)=channel.name
+							//- a(href='/channel/'+channel.key)=channel.name
 							
-							//- a(href='/browse/'+channel.key)
+							//- a(href='/channel/'+channel.key)
 							//- 	=channel.name
 								//- span.badge.pull-right= channel.sketchCount
 								//- span.badge.pull-left= channel.sketchCount
@@ -258,7 +258,7 @@ block content
 
 					//- a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
 						each channel in data.channels
-							a(href='/browse/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
+							a(href='/channel/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
 					//- form(action='/browse?subscribe=true', method='GET').list-group-item
 					//- form(action='/api/channels/subscribe', method='GET').list-group-item
 					//- 	input(type='text', id='sub', name='sub', value='true').hidden
