@@ -64,11 +64,11 @@ exports = module.exports = function (req, res) {
 	// 		if(err){
 	// 			// error saving
 	// 			req.flash('warning', 'error saving html');
-	// 			return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 			return res.redirect('/media/'+locals.data.sketch.slug);
 	// 		}else{
 	// 			// success saving
 	// 			req.flash('success', 'success saving html');
-	// 			return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 			return res.redirect('/media/'+locals.data.sketch.slug);
 	// 		}
 	// 	});
 	// });
@@ -203,12 +203,12 @@ exports = module.exports = function (req, res) {
 	// 		console.log(stdout);
 	// 		if(err){
 	// 			req.flash('warning', 'not done');
-	// 			return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 			return res.redirect('/media/'+locals.data.sketch.slug);
 	// 		};
 	// 		keystone.list('Sketch').model.findById(locals.data.sketch.id).exec(function(err, item) {
 	// 			if(err){
 	// 				req.flash('warning', 'not done');
-	// 				return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 				return res.redirect('/media/'+locals.data.sketch.slug);
 	// 			}	
 	// 			var imgs = {
 	// 				thumbnails: locals.data.sketch.thumbnails
@@ -220,7 +220,7 @@ exports = module.exports = function (req, res) {
 	// 				if(dberror) {
 	// 					console.log('db error: ' + dberror);
 	// 					req.flash('warning', 'not done');
-	// 					return res.redirect('/browse/sketch/'+locals.data.sketch.slug);		
+	// 					return res.redirect('/media/'+locals.data.sketch.slug);		
 	// 				}
 	// 			});
 	// 		})
@@ -231,10 +231,10 @@ exports = module.exports = function (req, res) {
 	// 		console.log('thumbnails: '+locals.data.sketch.thumbnails);
 	// 		if(err){
 	// 			req.flash('warning', 'not done');
-	// 			return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 			return res.redirect('/media/'+locals.data.sketch.slug);
 	// 		}else{
 	// 			req.flash('success', 'done');
-	// 			return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+	// 			return res.redirect('/media/'+locals.data.sketch.slug);
 	// 		}
 	// 		next(err);
 	// 	});

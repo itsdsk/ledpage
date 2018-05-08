@@ -8,10 +8,10 @@ mixin sketch(sketch)
 		//- h4.media-heading
 		//- .panel-heading
 		//- 	h3.panel-title= sketch.title
-			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
+			//- a(href='/media/' + sketch.slug + '?display=on')= sketch.title
 		//- .media-middle
 		.sketch-thumbnail
-			//- a(href='/browse/sketch/' + sketch.slug + '?display=on')
+			//- a(href='/media/' + sketch.slug + '?display=on')
 			//- a(href='/api/sketch/' + sketch.id + '/play')
 			.img-wrapper(style='position:relative')
 				a(data-toggle="modal", data-target='#modal-'+sketch.id)
@@ -34,7 +34,7 @@ mixin sketch(sketch)
 								a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Preview
-								a(href='/browse/sketch/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
+								a(href='/media/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Edit
 								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block.api-get-btn
@@ -56,7 +56,7 @@ mixin sketch(sketch)
 				//- .img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
 				//- 	a(href='/api/sketch/' + sketch.id + '/play')
 				//- 		button(type='submit').display-btn.btn.btn-md ▶
-				//- 	a(href='/browse/sketch/' + sketch._id)
+				//- 	a(href='/media/' + sketch._id)
 				//- 		button(type='submit').btn.btn-md ⋯
 	//- .panel.panel-default
 	//- 	.panel-heading
@@ -81,7 +81,7 @@ mixin sketch(sketch)
 		//- 		a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
 			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
 			//- h2.media-heading
-			//- 	a(href='/browse/sketch/' + sketch.slug + '?display=on')= sketch.title
+			//- 	a(href='/media/' + sketch.slug + '?display=on')= sketch.title
 			//- p.lead.text-muted Posted 
 			//- if sketch.publishedDate
 			//- 	| on #{sketch._.publishedDate.format('MMMM Do, YYYY')} 
@@ -97,7 +97,7 @@ mixin sketch(sketch)
 			//- 	| by #{sketch.author.name.first}
 		//p!= sketch.content.brief
 		//if sketch.content.extended
-		//	p.read-more: a(href='/browse/sketch/' + sketch.slug) Read more...
+		//	p.read-more: a(href='/media/' + sketch.slug) Read more...
 
 //- block intro
 //- 	.container

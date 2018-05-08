@@ -366,7 +366,7 @@ exports.update = function (req, res) {
 			if (err) {
 				// error saving
 				// req.flash('warning', 'error saving html');
-				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				// return res.redirect('/media/'+locals.data.sketch.slug);
 				return res.apiError({
 					success: false,
 					note: 'error saving sketch file'
@@ -374,7 +374,7 @@ exports.update = function (req, res) {
 			} else {
 				// success saving
 				// req.flash('success', 'success saving html');
-				// return res.redirect('/browse/sketch/'+locals.data.sketch.slug);
+				// return res.redirect('/media/'+locals.data.sketch.slug);
 				// save title
 				item.title = req.body.title;
 				item.save(function (err) {
@@ -613,7 +613,7 @@ exports.screenshot = function (req, res) {
 			// Sketch.model.findById(locals.data.sketch.id).exec(function (err, item) {
 			// 	if (err) {
 			// req.flash('warning', 'not done');
-			// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+			// return res.redirect('/media/' + locals.data.sketch.slug);
 			// }
 			var imgs = {
 				thumbnails: item.thumbnails
@@ -628,7 +628,7 @@ exports.screenshot = function (req, res) {
 						success: false
 					});
 					// req.flash('warning', 'not done');
-					// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+					// return res.redirect('/media/' + locals.data.sketch.slug);
 				}
 			});
 			// })
@@ -642,13 +642,13 @@ exports.screenshot = function (req, res) {
 					success: false
 				});
 				// req.flash('warning', 'not done');
-				// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+				// return res.redirect('/media/' + locals.data.sketch.slug);
 			} else {
 				res.apiResponse({
 					success: true
 				});
 				// req.flash('success', 'done');
-				// return res.redirect('/browse/sketch/' + locals.data.sketch.slug);
+				// return res.redirect('/media/' + locals.data.sketch.slug);
 			}
 		});
 
