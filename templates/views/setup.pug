@@ -101,11 +101,11 @@ block content
 						h4
 							span.glyphicon.glyphicon-magnet
 						.btn-group-vertical.btn-block
-							a.btn.btn-default.btn-lg.btn-block
+							a(href='/api/screenshot').btn.btn-default.btn-lg.btn-block.api-get-btn
 								.text-left Screenshot
-							a.btn.btn-default.btn-lg.btn-block
+							a(href='/api/media/list/init').btn.btn-default.btn-lg.btn-block.api-get-btn
 								.text-left Rescan Media
-							a.btn.btn-default.btn-block.btn-lg
+							a(href='/api/addresses').btn.btn-default.btn-lg.btn-block.api-get-btn
 								.text-left Get IPFS Addresses
 
 
@@ -431,6 +431,25 @@ block js
 				});
 			}
 			$("#save-led-map").click(saveMap);
+
+			// ajax button GET
+			function apiGetButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+					},
+					success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+					}
+				});
+			}
+			$('.api-get-btn').click( apiGetButton );
+
 
 			//- // post new output config to server in background
 			//- $('#config-form').submit(function(event){

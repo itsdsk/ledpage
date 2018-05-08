@@ -1009,3 +1009,23 @@ exports.initialise = function(req, res) {
 		}
 	});
 };
+
+/**
+ * Get IPFS addresses
+ */
+exports.addresses = function (req, res) {
+
+	ipfs.id(function (err, identity) {
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'ipfs error'
+			});
+		} else {
+			return res.apiResponse({
+				success: true,
+				note: identity,
+			});
+		}
+	});
+};

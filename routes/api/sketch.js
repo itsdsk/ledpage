@@ -212,26 +212,26 @@ exports.getBrightness = function (req, res) {
 };
 
 
-/**
- * List IPFS id
- */
-exports.ipfs = function (req, res) {
+// /**
+//  * List IPFS id
+//  */
+// exports.ipfs = function (req, res) {
 
-	ipfs.id(function (err, identity) {
-		if (err) {
-			console.log('ipfs error (no connection?)');
-			//console.log(err);
-			return res.apiError('ipfs error', err);
-		} else {
-			console.log("Identity:");
-			console.log(identity);
-			res.apiResponse({
-				id: identity
-			});
+// 	ipfs.id(function (err, identity) {
+// 		if (err) {
+// 			console.log('ipfs error (no connection?)');
+// 			//console.log(err);
+// 			return res.apiError('ipfs error', err);
+// 		} else {
+// 			console.log("Identity:");
+// 			console.log(identity);
+// 			res.apiResponse({
+// 				id: identity
+// 			});
 
-		}
-	});
-};
+// 		}
+// 	});
+// };
 
 /**
  * Get Media by ID

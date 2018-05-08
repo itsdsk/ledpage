@@ -72,6 +72,7 @@ exports = module.exports = function (app) {
 	app.all('/api/media/queue', keystone.middleware.api, routes.api.media.queue); // display URL
 	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot
 	app.get('/api/media/list/init', keystone.middleware.api, routes.api.media.initialise); // drop db and scan sketch dir
+	app.get('/api/addresses', keystone.middleware.api, routes.api.media.addresses); // get IPFS addresses
 
 
 	// LED routes
@@ -80,7 +81,7 @@ exports = module.exports = function (app) {
 	app.get('/api/leds/set-brightness/:val', keystone.middleware.api, routes.api.leds.set_brightness); // 
 	app.all('/api/leds/config-arduino', keystone.middleware.api, routes.api.leds.config_arduino); // setup led output configuration
 
-	app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
+	// app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
 
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);
