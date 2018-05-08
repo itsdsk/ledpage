@@ -1011,9 +1011,9 @@ exports.initialise = function(req, res) {
 };
 
 /**
- * Get IPFS addresses
+ * Get IPFS identity
  */
-exports.addresses = function (req, res) {
+exports.identity = function (req, res) {
 
 	ipfs.id(function (err, identity) {
 		if (err) {
@@ -1024,7 +1024,7 @@ exports.addresses = function (req, res) {
 		} else {
 			return res.apiResponse({
 				success: true,
-				note: identity,
+				note: 'ID: '+identity.id,
 			});
 		}
 	});

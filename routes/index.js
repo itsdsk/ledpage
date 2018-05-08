@@ -72,7 +72,7 @@ exports = module.exports = function (app) {
 	app.all('/api/media/queue', keystone.middleware.api, routes.api.media.queue); // display URL
 	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot
 	app.get('/api/media/list/init', keystone.middleware.api, routes.api.media.initialise); // drop db and scan sketch dir
-	app.get('/api/addresses', keystone.middleware.api, routes.api.media.addresses); // get IPFS addresses
+	app.get('/api/identity', keystone.middleware.api, routes.api.media.identity); // get IPFS identity
 
 
 	// LED routes

@@ -19,13 +19,13 @@ module.exports = function (done) {
 	new Profile.model({
 		colOrder: 'rgb',
 		redR: 255,
-		redG: 255,
-		redB: 255,
-		greenR: 255,
+		redG: 0,
+		redB: 0,
+		greenR: 0,
 		greenG: 255,
-		greenB: 255,
-		blueR: 255,
-		blueG: 255,
+		greenB: 0,
+		blueR: 0,
+		blueG: 0,
 		blueB: 255,
 		name: 'defaultProfile'
 	})
