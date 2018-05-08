@@ -8,9 +8,24 @@
  */
 
 exports.create = {
-	Profile: [
-		{ 'name.first': 'Admin', 'name.last': 'User', 'email': 'user@keystonejs.com', 'password': 'admin', 'isAdmin': true },
-	],
+	Profile: [{
+		'colOrder': 'rgb',
+		'redR': 255,
+		'redG': 255,
+		'redB': 255,
+		'greenR': 255,
+		'greenG': 255,
+		'greenB': 255,
+		'blueR': 255,
+		'blueG': 255,
+		'blueB': 255,
+		'name': 'defaultProfile'
+		// 'name.first': 'Admin',
+		// 'name.last': 'User',
+		// 'email': 'user@keystonejs.com',
+		// 'password': 'admin',
+		// 'isAdmin': true
+	}, ],
 };
 
 /*
