@@ -19,9 +19,36 @@ app.disableHardwareAcceleration();
 app.on('ready', () => {
   'use strict';
   // here we actually configure the behavour of electronJS
-  const window = new BrowserWindow({
-    width: 720,
+  const windowA = new BrowserWindow({
+    width: 1280,
     height: 720,
+    center: true,
+    resizable: true,
+    show: false,
+    useContentSize: true,
+    frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
+    kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
+    backgroundColor: '#000000', // set backgrounnd
+    webPreferences: {
+      sandbox: false,
+      nodeIntegration: false,
+      overlayScrollbars: false,
+    },
+  });
+  windowA.webContents.on('did-finish-load', () => {
+    setTimeout(() => {
+      windowA.show();
+      windowB.hide();
+    }, 300);
+  });
+
+  const windowB = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    center: true,
+    resizable: true,
+    show: false,
+    useContentSize: true,
     frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
     kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
     backgroundColor: '#000000', // set backgrounnd
@@ -32,18 +59,22 @@ app.on('ready', () => {
     },
   });
 
-  window.webContents.on('did-finish-load', () => {
+  windowB.webContents.on('did-finish-load', () => {
     setTimeout(() => {
-      window.show();
+      windowB.show();
+      windowA.hide();
     }, 300);
   });
+
+  // flipping state to say which window to loadurl to
+  var flipWindow = true;
 
   process.on('uncaughtException', function (err) {
     console.log(err);
   });
   // the big red button, here we go
   var initialURL = `file:///${path.join(__dirname, 'data', 'index.html')}`;
-  window.loadURL(initialURL);
+  windowA.loadURL(initialURL);
 
   // recieve URI to display
   ipc.config.id = 'dplayeripc';
@@ -55,7 +86,12 @@ app.on('ready', () => {
         function (data, socket) {
           //ipc.log('got a message : '.debug, data);
           console.log('electron load URL: '+data);
-          window.loadURL(data); // display recieved URI
+          if(flipWindow){
+            windowB.loadURL(data); // display recieved URI
+          }else{
+            windowA.loadURL(data); // display recieved URI
+          }
+          flipWindow = !flipWindow;
           //ipc.server.emit(
           //  socket,
           //  'message', //this can be anything you want so long as
