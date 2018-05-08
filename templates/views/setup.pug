@@ -17,22 +17,73 @@ block content
 						//- h4 Display
 						h4
 							span.glyphicon.glyphicon-asterisk
-						.list-group-item
-							.form-group
-								//- | Brightness:
-								//- input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
-								| Red:
-								input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
-								| Green:
-								input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
-								| Blue:
-								input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
-								hr
-								| Colour Order:
-								select.form-control
-									option RGB
-									option GRB
-									option BGR
+						.form-group
+							label(for='colourOrder') Colour Order:
+							select(id='colourOrder').form-control
+								option RGB
+								option GRB
+								option BGR
+						label Colour Calibration:
+						.panel-group(id='colourAdjust')
+							.panel.panel-default
+								.panel-heading
+									h4.panel-title
+										a(data-toggle='collapse' data-parent='#colourAdjust' href='#redAdjust')
+											| Red
+								.panel-collapse.collapse(id='redAdjust')
+									.panel-body
+										label(for='redAdjR') R:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjR')
+										label(for='redAdjG') G:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjG')
+										label(for='redAdjB') B:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='redAdjB')
+							.panel.panel-default
+								.panel-heading
+									h4.panel-title
+										a(data-toggle='collapse' data-parent='#colourAdjust' href='#greenAdjust')
+											| Green
+								.panel-collapse.collapse(id='greenAdjust')
+									.panel-body
+										label(for='greenAdjR') R:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjR')
+										label(for='greenAdjG') G:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjG')
+										label(for='greenAdjB') B:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='greenAdjB')
+							.panel.panel-default
+								.panel-heading
+									h4.panel-title
+										a(data-toggle='collapse' data-parent='#colourAdjust' href='#blueAdjust')
+											| Blue
+								.panel-collapse.collapse(id='blueAdjust')
+									.panel-body
+										label(for='blueAdjR') R:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjR')
+										label(for='blueAdjG') G:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjG')
+										label(for='blueAdjB') B:
+										input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='blueAdjB')
+						.btn-group-vertical.btn-block
+							a.btn.btn-default.btn-lg.btn-block
+								.text-left Update Colours
+
+						//- .list-group-item
+						//- 	.form-group
+						//- 		//- | Brightness:
+						//- 		//- input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
+						//- 		| Red:
+						//- 		input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
+						//- 		| Green:
+						//- 		input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
+						//- 		| Blue:
+						//- 		input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider').brightnessSlider
+						//- 		hr
+						//- 		| Colour Order:
+						//- 		select.form-control
+						//- 			option RGB
+						//- 			option GRB
+						//- 			option BGR
 						h4
 							span.glyphicon.glyphicon-random
 							//- h4 Output
