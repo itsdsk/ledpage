@@ -31,10 +31,11 @@ mixin sketch(sketch)
 							.modal-body
 								a(href='/api/media/' + sketch.id + '/play').btn.btn-primary.btn-lg.btn-block.api-get-btn
 									span.glyphicon.glyphicon-play
-								a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-default.btn-lg.btn-block
+								//- a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-default.btn-lg.btn-block
+								a(href='/media/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Preview
-								a(href='/media/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
+								a(href='/media/'+sketch._id+'#details', target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Edit
 								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block.api-get-btn

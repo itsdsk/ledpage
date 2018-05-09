@@ -6,6 +6,17 @@ block content
 			h2 Invalid Sketch.
 		else
 			.col-sm-12.col-md-12
+				ul(id='mediaTabs').nav-nav-tabs
+					li.active
+						a(data-toggle='tab' href='#preview') Preview
+					li
+						a(data-toggle='tab' href='#details') Details
+				.tab-content
+					div(id='preview').tab-pane.active
+						p preview tab
+					div(id='details').tab-pane
+						p details pane
+
 				.page-header
 					//- a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right ▶ Display
 					a(href='/api/media/' + data.sketch.id + '/play').pull-right
@@ -229,4 +240,7 @@ block js
 				});
 			}
 			$('.btn-channel').click( channelButton );
+
+			// change tab
+			$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')
 		});
