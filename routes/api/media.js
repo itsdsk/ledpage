@@ -639,7 +639,10 @@ exports.screenshot = function (req, res) {
 			// };
 			// imgs.thumbnails.push(uploadName);
 			// Media.updateItem(item, imgs, {
-			Media.updateItem(item, uploadName, {
+			var thumbEntry = {
+				prefThumb: uploadName
+			};
+			Media.updateItem(item, thumbEntry, {
 				// fields: ["thumbnails"]
 				fields: ["prefThumb"]
 			}, function (dberror) {
