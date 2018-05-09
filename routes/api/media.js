@@ -170,6 +170,7 @@ ipc.config.id = 'dremoteipc';
 ipc.config.retry = 5000;
 ipc.config.maxRetries = 3;
 ipc.config.silent = true;
+var screenshotID = null;
 ipc.connectTo(
 	'dplayeripc',
 	function () {
@@ -179,11 +180,15 @@ ipc.connectTo(
 				isDplayerConnected = true;
 			}
 		);
+		// screenshot sketch
 		ipc.of.dplayeripc.on(
 			'message',
 			function (data, socket) {
-				console.log('recieved msg');
-				console.log(data);
+				if(screenshotID != null){
+					var apiAddress = 'http://0.0.0.0:8081/api/media/'+screenshotID+'/screenshot';
+					http.get(apiAddress);
+					screenshotID = null;
+				}
 			}
 		);
 	});
@@ -272,6 +277,12 @@ exports.play = function (req, res) {
 			var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
 			ipc.of.dplayeripc.emit('message', sketchPath);
 			console.log('yes');
+			// check if sketch has thumbnail
+			if(item.prefThumb.length > 0) {
+				screenshotID = null; // dont save thumbnail
+			}else{
+				screenshotID = req.params.id; // save media ID to take thumbnail
+			}
 
 			res.apiResponse({
 				success: true,
@@ -613,7 +624,8 @@ exports.screenshot = function (req, res) {
 			if (err) {
 				console.log('screenshot error: ');
 				return res.apiError({
-					success: false
+					success: false,
+					note: 'could not take screenshot'
 				});
 			};
 			// add screenshot filename to database
@@ -622,12 +634,14 @@ exports.screenshot = function (req, res) {
 			// req.flash('warning', 'not done');
 			// return res.redirect('/media/' + locals.data.sketch.slug);
 			// }
-			var imgs = {
-				thumbnails: item.thumbnails
-			};
-			imgs.thumbnails.push(uploadName);
-			Media.updateItem(item, imgs, {
-				fields: ["thumbnails"]
+			// var imgs = {
+			// 	thumbnails: item.thumbnails
+			// };
+			// imgs.thumbnails.push(uploadName);
+			// Media.updateItem(item, imgs, {
+			Media.updateItem(item, uploadName, {
+				// fields: ["thumbnails"]
+				fields: ["prefThumb"]
 			}, function (dberror) {
 				if (dberror) {
 					console.log('db error: ' + dberror);
@@ -636,6 +650,12 @@ exports.screenshot = function (req, res) {
 					});
 					// req.flash('warning', 'not done');
 					// return res.redirect('/media/' + locals.data.sketch.slug);
+				} else {
+					return res.apiResponse({
+						success: true,
+						note: 'screenshot saved to db'
+					});
+	
 				}
 			});
 			// })
@@ -643,20 +663,20 @@ exports.screenshot = function (req, res) {
 			// 	errorMessage: 'error updating sketch with screenshot'
 			// });
 			// updater.process()
-			console.log('thumbnails: ' + item.thumbnails);
-			if (err) {
-				return res.apiError({
-					success: false
-				});
-				// req.flash('warning', 'not done');
-				// return res.redirect('/media/' + locals.data.sketch.slug);
-			} else {
-				res.apiResponse({
-					success: true
-				});
-				// req.flash('success', 'done');
-				// return res.redirect('/media/' + locals.data.sketch.slug);
-			}
+			// console.log('thumbnails: ' + item.thumbnails);
+			// if (err) {
+			// 	return res.apiError({
+			// 		success: false
+			// 	});
+			// 	// req.flash('warning', 'not done');
+			// 	// return res.redirect('/media/' + locals.data.sketch.slug);
+			// } else {
+			// 	res.apiResponse({
+			// 		success: true
+			// 	});
+			// 	// req.flash('success', 'done');
+			// 	// return res.redirect('/media/' + locals.data.sketch.slug);
+			// }
 		});
 
 	});
