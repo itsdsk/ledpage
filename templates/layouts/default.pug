@@ -49,12 +49,19 @@ html
 						span.icon-bar
 					a.navbar-brand(href='/') ☉ Disks
 					.navbar-left
-						form(action='/api/media/queue' method='post' class='post-form-ajax' role='search').navbar-form
-							.input-group
-								input(name='address' type='text', placeholder='Enter URL to Display' required).form-control
-								.input-group-btn
-									button(type='submit').btn.btn-default
-										i.glyphicon.glyphicon-play-circle
+						if data.sketch
+							ul(id='mediaTabs').nav.navbar-nav.navbar-left
+								li.active
+									a(data-toggle='tab' href='#preview') Preview
+								li
+									a(data-toggle='tab' href='#details') Details
+						else
+							form(action='/api/media/queue' method='post' class='post-form-ajax' role='search').navbar-form
+								.input-group
+									input(name='address' type='text', placeholder='Enter URL to Display' required).form-control
+									.input-group-btn
+										button(type='submit').btn.btn-default
+											i.glyphicon.glyphicon-play-circle
 				.collapse.navbar-collapse#navbar-collapse
 					ul.nav.navbar-nav.navbar-right
 						each link in navLinks
