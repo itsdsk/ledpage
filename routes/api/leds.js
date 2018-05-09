@@ -439,3 +439,116 @@ exports.set_brightness = function (req, res) {
     // 	})
     // })
 };
+
+
+/**
+ * Reboot device
+ */
+exports.reboot = function (req, res) {
+    // check resin supervisor exists
+    const exec = require('child_process').exec;
+    var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
+        console.log('out: ' + `${stdout}`);
+        console.log('errors:' + `${stderr}`);
+        if (err !== null) {
+            console.log(`exec error: ${err}`);
+            return res.apiError({
+                success: false,
+                note: 'could not send reboot signal'
+            });
+        }
+        if (stdout.length > 0) { // exists
+            // command for resin supervisor reboot
+            var cmd = 'curl -X POST --header "Content-Type:application/json" "$RESIN_SUPERVISOR_ADDRESS/v1/reboot?apikey=$RESIN_SUPERVISOR_API_KEY"';
+            // send reboot signal
+            var reboot = exec(cmd, (err, stdout, stderr) => {
+                console.log('out: ' + `${stdout}`);
+                console.log('errors:' + `${stderr}`);
+                if (err !== null) {
+                    console.log(`exec error: ${err}`);
+                    return res.apiError({
+                        success: false,
+                        note: 'could not send reboot signal'
+                    });
+                }
+                if (!err) {
+                    console.log('no erroi');
+                    return res.apiResponse({
+                        success: true,
+                        note: 'queued system to reboot'
+                    });
+                } else {
+                    console.log('errors');
+                    return res.apiError({
+                        success: false,
+                        note: 'could not reboot'
+                    });
+                }
+            });
+
+        } else { // supervisor doesnt exist
+            console.log('errors');
+            return res.apiError({
+                success: false,
+                note: 'could not talk to supervisor'
+            });
+        }
+    });
+};
+
+/**
+ * Shutdown device
+ */
+exports.shutdown = function (req, res) {
+    // check resin supervisor exists
+    const exec = require('child_process').exec;
+    var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
+        console.log('out: ' + `${stdout}`);
+        console.log('errors:' + `${stderr}`);
+        if (err !== null) {
+            console.log(`exec error: ${err}`);
+            return res.apiError({
+                success: false,
+                note: 'could not send reboot signal'
+            });
+        }
+        if (stdout.length > 0) { // exists
+            // command for resin supervisor shutdown
+            var cmd = 'curl -X POST --header "Content-Type:application/json" "$RESIN_SUPERVISOR_ADDRESS/v1/shutdown?apikey=$RESIN_SUPERVISOR_API_KEY"';
+            // send shutdown signal
+            const exec = require('child_process').exec;
+            var reboot = exec(cmd, (err, stdout, stderr) => {
+                console.log('out: ' + `${stdout}`);
+                console.log('errors:' + `${stderr}`);
+                if (err !== null) {
+                    console.log(`exec error: ${err}`);
+                    return res.apiError({
+                        success: false,
+                        note: 'could not send shutdown signal'
+                    });
+                }
+                if (!err) {
+                    console.log('no erroi');
+                    return res.apiResponse({
+                        success: true,
+                        note: 'queued system to shutdown'
+                    });
+                } else {
+                    console.log('errors');
+                    return res.apiError({
+                        success: false,
+                        note: 'could not shutdown'
+                    });
+                }
+            });
+
+        } else { // supervisor doesnt exist
+            console.log('errors');
+            return res.apiError({
+                success: false,
+                note: 'could not talk to supervisor'
+            });
+        }
+    });
+
+};
