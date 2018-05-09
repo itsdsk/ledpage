@@ -231,14 +231,14 @@ block js
 				.attr('class', 'ledNode')
 				.attr('cx', function(d) { return scaleX(d.x); })
 				.attr('cy', function(d) { return scaleY(d.y); })
-				.attr('r', function(d) { return 0.7*padding; })
+				.attr('r', function(d) { return scaleX(2.5*d.r); })
 				.attr('stroke', '#337ab7')
 				.attr('stroke-width', 0.33*padding)
 				.attr('fill', 'white');
 			new_circles.merge(circles)
 				.attr('cx', function(d) { return scaleX(d.x); })
 				.attr('cy', function(d) { return scaleY(d.y); })
-				.attr('r', function(d) { return 0.7*padding; })
+				.attr('r', function(d) { return scaleX(2.5*d.r); })
 		}
 		// led mapping file upload
 		d3.select('#upload-map').on('click', function(){
@@ -262,7 +262,8 @@ block js
 								xmlRes = [].map.call(xmlRes.querySelectorAll("led"), function(led) {
 									return {
 										x: +led.querySelector("x").textContent,
-										y: +led.querySelector("y").textContent
+										y: +led.querySelector("y").textContent,
+										r: +led.querySelector("r").textContent
 									}
 								});
 								visualiseLeds(xmlRes);
@@ -287,6 +288,7 @@ block js
 								for(var i=0; i<csvRes.length; i++){
 									csvRes[i].x = parseFloat(csvRes[i].x);
 									csvRes[i].y = parseFloat(csvRes[i].y);
+									csvRes[i].r = parseFloat(csvRes[i].r);
 								}
 								visualiseLeds(csvRes);
 							}catch(err){
@@ -329,7 +331,7 @@ block js
 				// serialise led coords
 				var points = {"leds": []};
 				d3.selectAll('.ledNode').each(function (d, i) {
-					points.leds.push({x: d.x, y: d.y});
+					points.leds.push({x: d.x, y: d.y, r: d.r});
 				});
 				// send coords to server
 				$.ajax({
