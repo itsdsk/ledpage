@@ -276,9 +276,9 @@ exports.play = function (req, res) {
 		if (ipc.of.dplayeripc) {
 			var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
 			ipc.of.dplayeripc.emit('message', sketchPath);
-			console.log('yes');
+			console.log(JSON.stringify(item));
 			// check if sketch has thumbnail
-			if(item.prefThumb.length > 0) {
+			if(item.prefThumb) {
 				screenshotID = null; // dont save thumbnail
 			}else{
 				screenshotID = req.params.id; // save media ID to take thumbnail
