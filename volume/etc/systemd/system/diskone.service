@@ -1,0 +1,11 @@
+[Unit]
+Description=Disk1 Process
+After=network.target
+Wants=mongod.service
+
+[Service]
+ExecStart=/usr/local/bin/node /usr/src/app/app.js
+Restart=always
+
+[Install]
+WantedBy=default.target
