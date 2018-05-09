@@ -39,7 +39,6 @@ setInterval(function () {
 			componentStatus[0].active = true;
 		}
 	});
-
 	// ipfs
 	exec("lsof -i :5001", function (err, stdout, stderr) {
 		if (stdout.length == 0) {
@@ -48,7 +47,6 @@ setInterval(function () {
 			componentStatus[1].active = true;
 		}
 	});
-
 	// hyperion
 	exec("lsof -i :19444", function (err, stdout, stderr) {
 		if (stdout.length == 0) {
@@ -57,7 +55,6 @@ setInterval(function () {
 			componentStatus[2].active = true;
 		}
 	});
-
 }, 5000);
 
 exports.initLocals = function (req, res, next) {
@@ -73,7 +70,6 @@ exports.initLocals = function (req, res, next) {
 			href: '/setup'
 		}
 	];
-
 	// local directory constants
 	const publicPath = '/data/content/';
 	//const publicPath = '/home/dsk/Documents/Year_3/Disk/resin-electronjs/public/';
@@ -85,7 +81,6 @@ exports.initLocals = function (req, res, next) {
 	res.locals.componentStatus = componentStatus;
 	next();
 };
-
 
 /**
 	Fetches and clears the flashMessages before a view is rendered
@@ -102,16 +97,3 @@ exports.flashMessages = function (req, res, next) {
 	}) ? flashMessages : false;
 	next();
 };
-
-
-// /**
-// 	Prevents people from accessing protected pages when they're not signed in
-//  */
-// exports.requireUser = function (req, res, next) {
-// 	if (!req.user) {
-// 		req.flash('error', 'Please sign in to access this page.');
-// 		res.redirect('/keystone/signin');
-// 	} else {
-// 		next();
-// 	}
-// };
