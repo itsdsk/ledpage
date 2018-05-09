@@ -122,13 +122,13 @@ app.on('ready', () => {
         'message',
         function (data, socket) {
           //ipc.log('got a message : '.debug, data);
-          console.log('electron load URL: '+data);
+          console.log('electron load URL: ' + data);
           // if(flipWindow){
-            // windowB.setEnabled(true);
+          // windowB.setEnabled(true);
           //   windowB.loadURL(data); // display recieved URI
           // }else{
-            // windowA.setEnabled(true);
-            windowA.loadURL(data); // display recieved URI
+          // windowA.setEnabled(true);
+          windowA.loadURL(data); // display recieved URI
           // }
           // flipWindow = !flipWindow;
           //ipc.server.emit(

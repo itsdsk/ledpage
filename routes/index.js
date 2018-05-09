@@ -77,7 +77,7 @@ exports = module.exports = function (app) {
 	app.all('/api/leds/calibrate', keystone.middleware.api, routes.api.leds.calibrate); // update colour calibration
 	app.get('/api/leds/set-brightness/:val', keystone.middleware.api, routes.api.leds.set_brightness); // 
 	app.all('/api/leds/config-arduino', keystone.middleware.api, routes.api.leds.config_arduino); // setup led output configuration
-	
+
 	// Other
 	app.get('/api/identity', keystone.middleware.api, routes.api.media.identity); // get IPFS identity
 	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot

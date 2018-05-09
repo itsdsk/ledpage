@@ -213,7 +213,7 @@ exports.list = function (req, res) {
 		}
 
 		// list channels
-		MediaChannel.model.find(function(err, channelList) {
+		MediaChannel.model.find(function (err, channelList) {
 
 			if (err) {
 				return res.apiError({
@@ -226,7 +226,7 @@ exports.list = function (req, res) {
 				note: 'retrieved media list from database',
 				sketches: sketchList,
 				channels: channelList,
-			});	
+			});
 		});
 	});
 };
@@ -298,7 +298,7 @@ exports.create = function (req, res) {
 	try {
 		fs.mkdirSync(uploadPath);
 	} catch (err) {
-		if(fserr.code !== 'EEXIST') {
+		if (fserr.code !== 'EEXIST') {
 			return res.apiError({
 				success: false,
 				note: 'could not create new directory for media'
@@ -308,7 +308,7 @@ exports.create = function (req, res) {
 	// save file
 	var uploadName = uploadPath + '/index.html';
 	fs.writeFile(uploadName, req.body.sketch, 'utf8', (err) => {
-		if(err) {
+		if (err) {
 			return res.apiError({
 				success: false,
 				note: 'could not save HTML to storage'
@@ -323,12 +323,12 @@ exports.create = function (req, res) {
 	updater.process(data, {
 		flashErrors: true
 	}, function (err) {
-		if(err) {
+		if (err) {
 			return res.apiError({
 				success: false,
 				note: 'could not save to database'
 			});
-		}else{
+		} else {
 			return res.apiResponse({
 				success: true,
 				note: 'uploaded new media'
@@ -347,7 +347,7 @@ exports.update = function (req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'database error'+ err
+				note: 'database error' + err
 			});
 		}
 		if (!item) {
@@ -488,7 +488,7 @@ exports.subscribe = function (req, res) {
 				success: false,
 				note: 'could not subscribe to channel'
 			});
-		}else{
+		} else {
 			return res.apiResponse({
 				success: true,
 				note: 'subscribed to channel'
@@ -522,21 +522,21 @@ exports.subscribe = function (req, res) {
 exports.unsubscribe = function (req, res) {
 	// TODO: find and remove sketches in channel before deleting channel
 	// remove channel from database
-	MediaChannel.model.findById(req.query.id).exec(function(err, item) {
-		if(err) {
+	MediaChannel.model.findById(req.query.id).exec(function (err, item) {
+		if (err) {
 			return apiError({
 				success: false,
 				note: 'could not find channel in database'
 			});
 		}
-		if(!item) {
+		if (!item) {
 			return res.apiError({
 				success: false,
 				note: 'could not get channel from database'
 			});
 		}
-		item.remove(function(err) {
-			if(err) {
+		item.remove(function (err) {
+			if (err) {
 				return res.apiError({
 					success: false,
 					note: 'could not remove channel from database'
@@ -773,7 +773,7 @@ exports.share = function (req, res) {
  */
 
 exports.queue = function (req, res) {
-	
+
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 
@@ -829,16 +829,16 @@ exports.queue = function (req, res) {
  * Drop database and rebuild after scanning directories
  */
 
-exports.initialise = function(req, res) {
+exports.initialise = function (req, res) {
 	// load Profile (colour calibration/hyperion config)
 	var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
 	var hyperionConfExists = fs.existsSync(hyperionConfigPath);
-	if(hyperionConfExists){
+	if (hyperionConfExists) {
 		var hyperionConfig = fs.readFileSync(hyperionConfigPath);
-        if(!hyperionConfig){
+		if (!hyperionConfig) {
 			//
 			console.log('could not find hyperion config file in media init');
-        }else{
+		} else {
 			var hyperionConfigJSON = JSON.parse(hyperionConfig);
 			keystone.list('Profile').model.find().exec(function (err, results) {
 				if (err || !results.length) {
@@ -859,13 +859,13 @@ exports.initialise = function(req, res) {
 				profile.blueG = hyperionChannels.pureBlue.greenChannel;
 				profile.blueb = hyperionChannels.pureBlue.blueChannel;
 				// save profile
-				profile.save(function(err) {
-					if(err){
+				profile.save(function (err) {
+					if (err) {
 						return res.apiError({
 							success: false,
 							note: 'could not initialise profile'
 						});
-					}else{
+					} else {
 						console.log('initialised profile from saved config');
 					}
 				});
@@ -878,13 +878,13 @@ exports.initialise = function(req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not get media from database: '+ err
+				note: 'could not get media from database: ' + err
 			});
 		}
 		// console.log(items.length);
-		for(var i=0; i<items.length; i++){
-			items[i].remove(function(err){
-				if(err){
+		for (var i = 0; i < items.length; i++) {
+			items[i].remove(function (err) {
+				if (err) {
 					return res.apiError({
 						success: false,
 						note: 'could not drop media from database'
@@ -909,13 +909,13 @@ exports.initialise = function(req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not get channels from database: '+ err
+				note: 'could not get channels from database: ' + err
 			});
 		}
 		// console.log(items.length);
-		for(var i=0; i<items.length; i++){
-			items[i].remove(function(err){
-				if(err){
+		for (var i = 0; i < items.length; i++) {
+			items[i].remove(function (err) {
+				if (err) {
 					return res.apiError({
 						success: false,
 						note: 'could not drop channel from database'
@@ -943,43 +943,43 @@ exports.initialise = function(req, res) {
 		Media: []
 	};
 	// scan sketch directory
-	fs.readdir(res.locals.viewStaticPath, function(err, files) {
-		if(err){
+	fs.readdir(res.locals.viewStaticPath, function (err, files) {
+		if (err) {
 			return res.apiError({
 				success: false,
 				note: 'could not read media folder'
 			});
 		}
 		// iterate through each sketch directory
-		for(var i=0; i<=files.length; i++){
+		for (var i = 0; i <= files.length; i++) {
 			// store sketch db info
-			if(i < files.length){
+			if (i < files.length) {
 				// check for disk.json
 				var diskJSONpath = path.join(res.locals.viewStaticPath + files[i] + '/disk.json');
 				var exists = fs.existsSync(diskJSONpath);
-				if(exists){
+				if (exists) {
 					// read json
 					var rawDiskJSON = fs.readFileSync(diskJSONpath);
-					if(!rawDiskJSON) {
+					if (!rawDiskJSON) {
 						console.log('could not read media details');
 						return res.apiError({
 							success: false,
 							note: 'could not read media details'
 						});
-					}else{
+					} else {
 						// add sketch to database
 						var obj = JSON.parse(rawDiskJSON);
 						newItems.Media.push({
-							"title": obj.disk.title?obj.disk.title:files[i],
-							"modifiedDate": obj.disk.modifiedDate?obj.disk.modifiedDate:"2018-1-1",
-							"prefThumb":obj.disk.prefThumb?obj.disk.prefThumb:null,
-							"state": obj.disk.state?obj.disk.state:"published",
-							"ipfsHash": obj.disk.ipfsHash?obj.disk.ipfsHash:null,
+							"title": obj.disk.title ? obj.disk.title : files[i],
+							"modifiedDate": obj.disk.modifiedDate ? obj.disk.modifiedDate : "2018-1-1",
+							"prefThumb": obj.disk.prefThumb ? obj.disk.prefThumb : null,
+							"state": obj.disk.state ? obj.disk.state : "published",
+							"ipfsHash": obj.disk.ipfsHash ? obj.disk.ipfsHash : null,
 							"localDir": files[i],
-							"channels": obj.disk.channels?obj.disk.channels:"sketches",
+							"channels": obj.disk.channels ? obj.disk.channels : "sketches",
 						});
 					}
-				}else{
+				} else {
 					// TODO make disk.json
 					// add sketch to db
 					newItems.Media.push({
@@ -989,22 +989,22 @@ exports.initialise = function(req, res) {
 						"channels": "sketches",
 					});
 				}
-			}else{
+			} else {
 				// add to database when all sketches are added
-				keystone.createItems(newItems, function(err, stats) {
-					if(err){
+				keystone.createItems(newItems, function (err, stats) {
+					if (err) {
 						return res.apiError({
 							success: false,
-							note: 'could not update database '+err
+							note: 'could not update database ' + err
 						});
-					}else{
+					} else {
 						res.apiResponse({
 							success: true,
 							note: 'added sketches to database',
 							list: newItems,
 						});
 					}
-				});				
+				});
 			}
 		}
 	});
@@ -1024,7 +1024,7 @@ exports.identity = function (req, res) {
 		} else {
 			return res.apiResponse({
 				success: true,
-				note: 'ID: '+identity.id,
+				note: 'ID: ' + identity.id,
 			});
 		}
 	});

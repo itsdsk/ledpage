@@ -87,7 +87,7 @@ exports.map_positions = function (req, res) {
                     });
                 }
             });
-    
+
             //
             //
             //
@@ -127,14 +127,14 @@ exports.calibrate = function (req, res) {
     // get hyperion config
     var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
     var hyperionConfExists = fs.existsSync(hyperionConfigPath);
-    if(hyperionConfExists){
+    if (hyperionConfExists) {
         var hyperionConfig = fs.readFileSync(hyperionConfigPath);
-        if(!hyperionConfig){
+        if (!hyperionConfig) {
             return res.apiError({
                 success: false,
                 note: 'could not find config file'
             });
-        }else{
+        } else {
             var hyperionConfigJSON = JSON.parse(hyperionConfig);
             // save settings
             var calibVals = req.body; // shorthand
@@ -151,57 +151,57 @@ exports.calibrate = function (req, res) {
             hyperionChannels.pureBlue.blueChannel = parseInt(calibVals.blueB);
             // write new hyperion config
             fs.writeFileSync(hyperionConfigPath, JSON.stringify(hyperionConfigJSON, null, 2));
-                // update profile in database
-    require('keystone').list('Profile').model.find().exec(function (err, results) {
+            // update profile in database
+            require('keystone').list('Profile').model.find().exec(function (err, results) {
 
-        if (err || !results.length) {
-            return res.apiError({
-                success: false,
-                note: 'could not fetch profile from database'
-            });
-        }
-        // shorthand for profile and new settings
-        var profile = results[0];
-        // set new settings in database
-        profile.colOrder = calibVals.colOrder;
-        profile.redR = calibVals.redR;
-        profile.redG = calibVals.redG;
-        profile.redB = calibVals.redB;
-        profile.greenR = calibVals.greenR;
-        profile.greenG = calibVals.greenG;
-        profile.greenB = calibVals.greenB;
-        profile.blueR = calibVals.blueR;
-        profile.blueG = calibVals.blueG;
-        profile.blueB = calibVals.blueB;
-        // save new settings to database
-        profile.save(function(err) {
-            if(err){
-                return res.apiError({
-                    success: false,
-                    note: 'could not update profile in database'
-                });
-            } else {
-            // restart hyperion
-            var sys = require('sys');
-            var exec = require('child_process').exec;
-            var execCommand = 'systemctl restart hyperion.service';
-            exec(execCommand, function (err, stdout, stderr) {
-                console.log(stdout);
-                if (err) {
+                if (err || !results.length) {
                     return res.apiError({
                         success: false,
-                        note: 'updated colour calibration but could not restart interface'
-                    });
-                } else {
-                    return res.apiResponse({
-                        success: true,
-                        note: 'updated colour calibration and restarted interface'
+                        note: 'could not fetch profile from database'
                     });
                 }
+                // shorthand for profile and new settings
+                var profile = results[0];
+                // set new settings in database
+                profile.colOrder = calibVals.colOrder;
+                profile.redR = calibVals.redR;
+                profile.redG = calibVals.redG;
+                profile.redB = calibVals.redB;
+                profile.greenR = calibVals.greenR;
+                profile.greenG = calibVals.greenG;
+                profile.greenB = calibVals.greenB;
+                profile.blueR = calibVals.blueR;
+                profile.blueG = calibVals.blueG;
+                profile.blueB = calibVals.blueB;
+                // save new settings to database
+                profile.save(function (err) {
+                    if (err) {
+                        return res.apiError({
+                            success: false,
+                            note: 'could not update profile in database'
+                        });
+                    } else {
+                        // restart hyperion
+                        var sys = require('sys');
+                        var exec = require('child_process').exec;
+                        var execCommand = 'systemctl restart hyperion.service';
+                        exec(execCommand, function (err, stdout, stderr) {
+                            console.log(stdout);
+                            if (err) {
+                                return res.apiError({
+                                    success: false,
+                                    note: 'updated colour calibration but could not restart interface'
+                                });
+                            } else {
+                                return res.apiResponse({
+                                    success: true,
+                                    note: 'updated colour calibration and restarted interface'
+                                });
+                            }
+                        });
+                    }
+                });
             });
-            }
-        });
-    });
 
         }
     }
@@ -326,7 +326,7 @@ exports.config_arduino = function (req, res) {
                                 console.log('out: ' + `${stdout}`);
                                 console.log('errors:' + `${stderr}`);
                                 if (err !== null) {
-                                    console.log(`exec error: ${error}`);
+                                    console.log(`exec error: ${err}`);
                                     return res.apiError({
                                         success: false,
                                         note: 'could not run arduino compile and upload script'

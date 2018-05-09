@@ -12,24 +12,24 @@ var Profile = keystone.list('Profile');
 
 module.exports = function (done) {
 	Profile.model.find(function (err, items) {
-		for(var i=0; i<items.length; i++){
+		for (var i = 0; i < items.length; i++) {
 			items[i].remove();
 		}
 	});
 	new Profile.model({
-		colOrder: 'rgb',
-		redR: 255,
-		redG: 0,
-		redB: 0,
-		greenR: 0,
-		greenG: 255,
-		greenB: 0,
-		blueR: 0,
-		blueG: 0,
-		blueB: 255,
-		name: 'defaultProfile'
-	})
-	.save(done);
+			colOrder: 'rgb',
+			redR: 255,
+			redG: 0,
+			redB: 0,
+			greenR: 0,
+			greenG: 255,
+			greenB: 0,
+			blueR: 0,
+			blueG: 0,
+			blueB: 255,
+			name: 'defaultProfile'
+		})
+		.save(done);
 };
 
 // exports.create = {

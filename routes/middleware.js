@@ -63,15 +63,16 @@ setInterval(function () {
 exports.initLocals = function (req, res, next) {
 	// navigation bar items
 	res.locals.navLinks = [{
-		label: '☍ Upload',
-		key: 'upload',
-		href: '/upload'
-	},
-	{
-		label: '☌ Setup',
-		key: 'setup',
-		href: '/setup'
-	}];
+			label: '☍ Upload',
+			key: 'upload',
+			href: '/upload'
+		},
+		{
+			label: '☌ Setup',
+			key: 'setup',
+			href: '/setup'
+		}
+	];
 
 	// local directory constants
 	const publicPath = '/data/content/';
