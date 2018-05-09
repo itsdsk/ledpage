@@ -42,7 +42,7 @@ app.on('ready', () => {
       //   windowA.restore();
       // }
       windowA.show();
-      ipc.of.dremoteipc.emit('message', 'test');
+      ipc.server.broadcast('message', 'test');
 
       // windowB.hide();
       // windowB.minimize();
