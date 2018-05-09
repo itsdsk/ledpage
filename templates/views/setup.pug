@@ -12,10 +12,15 @@ block content
 			.col-sm-4.col-md-4
 				.panel.panel-default
 					.panel-heading
-						h3.panel-title Settings
+						label(for='brightness-slider')
+							span.glyphicon.glyphicon-adjust
+							input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-slider').brightnessSlider
+						//- h3.panel-title Settings
 					.panel-body
 						//- h4 Display
 						h4
+							button(type='submit').btn.btn-info.btn-sm.pull-right
+								.text-left Update Colour Values
 							span.glyphicon.glyphicon-asterisk
 						form(method='POST' action='/api/leds/calibrate').post-form-ajax
 							.form-group
@@ -33,7 +38,7 @@ block content
 									.panel-heading
 										h4.panel-title
 											a(data-toggle='collapse' data-parent='#colourAdjust' href='#redAdjust')
-												| Red
+												| Pure Red
 									.panel-collapse.collapse(id='redAdjust')
 										.panel-body
 											label(for='redAdjR') R:
@@ -46,7 +51,7 @@ block content
 									.panel-heading
 										h4.panel-title
 											a(data-toggle='collapse' data-parent='#colourAdjust' href='#greenAdjust')
-												| Green
+												| Pure Green
 									.panel-collapse.collapse(id='greenAdjust')
 										.panel-body
 											label(for='greenAdjR') R:
@@ -59,7 +64,7 @@ block content
 									.panel-heading
 										h4.panel-title
 											a(data-toggle='collapse' data-parent='#colourAdjust' href='#blueAdjust')
-												| Blue
+												| Pure Blue
 									.panel-collapse.collapse(id='blueAdjust')
 										.panel-body
 											label(for='blueAdjR') R:
@@ -68,9 +73,9 @@ block content
 											input(type='range', min='0', max='255', step='1', value=profile.blueG, name='blueG', class='slider', id='blueAdjG')
 											label(for='blueAdjB') B:
 											input(type='range', min='0', max='255', step='1', value=profile.blueB, name='blueB', class='slider', id='blueAdjB')
-							.btn-group-vertical.btn-block
-								button(type='submit').btn.btn-default.btn-lg.btn-block
-									.text-left Update Colours
+							//- .btn-group-vertical.btn-block
+							//- 	button(type='submit').btn.btn-link.btn-md.btn-block
+							//- 		.text-left Update Colour Values
 
 						//- .list-group-item
 						//- 	.form-group
@@ -136,34 +141,11 @@ block content
 				//- 			//input(id='upload-map' type='image' title='upload map' src='upload-icon.png' alt='upload map')
 				//- 	a(data-toggle='collapse' href='#collapse1').btn.btn-primary.pull-right= 'Map positions'
 
-			.col-sm-12.col-md-12
+			.col-sm-8.col-md-8
 				.page-header
 					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
 					h1 Output
 				//- form(action='/api/display/configure' method='post' class='post-form-ajax' id='config-form').form-horizontal
-				p Positions are uploaded as ordered lists of 2D points using the formats below...
-				kbd JSON:
-				pre
-					| {
-					|   "leds": [
-					|     { "x": 0.25, "y": 0.25 },
-					|     { "x": 0.50, "y": 0.50 },
-					|     { "x": 0.75, "y": 0.75 }
-					|   ]
-					| }
-				kbd CSV:
-				pre
-					| x,y
-					| 0.25,0.25
-					| 0.50,0.50
-					| 0.75,0.75
-				kbd XML:
-				pre
-					| <&#8203;data>
-					|     <&#8203;led> <&#8203;x>0.25<&#8203;/x> <&#8203;y>0.25<&#8203;/y> <&#8203;/led>
-					|     <&#8203;led> <&#8203;x>0.50<&#8203;/x> <&#8203;y>0.50<&#8203;/y> <&#8203;/led>
-					|     <&#8203;led> <&#8203;x>0.75<&#8203;/x> <&#8203;y>0.75<&#8203;/y> <&#8203;/led>
-					| <&#8203;/data>
 				form(action='/api/leds/config-arduino' method='post' class='post-form-ajax' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
@@ -209,6 +191,31 @@ block content
 						.form-group
 							.col-sm-10.col-sm-offset-2
 								button(type='submit' id='uploadConfigBtn').btn.btn-primary Upload
+			.col-sm-4.col-md-4
+				.panel.panel-default
+					.panel-body
+						kbd JSON:
+						pre
+							| {
+							|   "leds": [
+							|     { "x": 0.25, "y": 0.25 },
+							|     { "x": 0.50, "y": 0.50 },
+							|     { "x": 0.75, "y": 0.75 }
+							|   ]
+							| }
+						kbd CSV:
+						pre
+							| x,y
+							| 0.25,0.25
+							| 0.50,0.50
+							| 0.75,0.75
+						kbd XML:
+						pre
+							| <&#8203;data>
+							|     <&#8203;led> <&#8203;x>0.25<&#8203;/x> <&#8203;y>0.25<&#8203;/y> <&#8203;/led>
+							|     <&#8203;led> <&#8203;x>0.50<&#8203;/x> <&#8203;y>0.50<&#8203;/y> <&#8203;/led>
+							|     <&#8203;led> <&#8203;x>0.75<&#8203;/x> <&#8203;y>0.75<&#8203;/y> <&#8203;/led>
+							| <&#8203;/data>
 			//- .col-sm-4.col-md-4
 			//- 	h4.list-group-item LEDs
 			//- 	// top left blue button
