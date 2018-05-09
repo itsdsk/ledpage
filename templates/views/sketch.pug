@@ -12,72 +12,128 @@ block content
 				//- 	li
 				//- 		a(data-toggle='tab' href='#details') Details
 				.tab-content
-					div(id='preview').tab-pane.active
-						p preview tab
-					div(id='details').tab-pane
-						p details pane
+					div(id='preview').tab-pane.active.fade
+						div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
+							iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
+					div(id='details').tab-pane.fade
+						.page-header
+							a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
+							a(href='/api/media/' + data.sketch.id + '/play').pull-right
+								button(type='submit').display-btn.btn.btn-primary ▶ Display
+							- var title = data.sketch.title
+							- var date = data.sketch._.modifiedDate.format('D/M/Y')
+							h1 <strong>#{title}</strong> <small>#{date}</small>
+						.details-heading
+							//- a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
+							form(action='/api/media/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
+								fieldset(disabled='disabled')
+									input(type='hidden', name='action', value='save')
+									.form-group(class=validationErrors.message ? 'has-error' : null)
+										label.col-sm-2.control-label Title
+										.col-sm-10
+											textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.sketch.title
+									.form-group(class=validationErrors.message ? 'has-error' : null)
+										label.col-sm-2.control-label index.html
+										.col-sm-10
+											textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+									.form-group
+										.col-sm-10.col-sm-offset-2
+											button(type='submit').btn.btn-primary Save
+								.channel-heading
+							if data.sketch.ipfsHash
+								a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
+								a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Update address
+							else
+								a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Create address
+							h2 Channels
+						.list-group
+							.list-group-item
+								if data.channels && data.channels.length
+									ul.nav.nav-pills
+										each channel in data.channels
+											- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+											li(class=(channelActive ? 'active' : ''))
+												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
+												//- a(href='?channel=true&_id='+channel._id)=channel.name
+						.channel-sync
+							if data.sketch.ipfsHash
+								- var shortHash = data.sketch.ipfsHash.substring(0,24);
+								p Address:
+									code
+										a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank')=shortHash
+						//- hr
+						//- a(href='/view-static/' + data.sketch.localDir, target='_blank').btn.btn-default.pull-right Local
+						//- if data.sketch.ipfsHash
+						//- 	a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
+						//- h2 Preview
+						//- if data.sketch.prefThumb
+						//- 	h4 prefthumb avail
+						//- else
+						//- 	h4 prefthumb notavail
+						hr
+						a(href='/api/media/'+data.sketch.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 
-				.page-header
-					//- a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right ▶ Display
-					a(href='/api/media/' + data.sketch.id + '/play').pull-right
-						button(type='submit').display-btn.btn.btn-primary ▶ Display
-					- var title = data.sketch.title
-					- var date = data.sketch._.modifiedDate.format('D/M/Y')
-					h1 <strong>#{title}</strong> <small>#{date}</small>
-				div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
-					iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
+				//- .page-header
+				//- 	//- a(href='/api/sketch/' + data.sketch.id + '/play').display-link.pull-right ▶ Display
+				//- 	a(href='/api/media/' + data.sketch.id + '/play').pull-right
+				//- 		button(type='submit').display-btn.btn.btn-primary ▶ Display
+				//- 	- var title = data.sketch.title
+				//- 	- var date = data.sketch._.modifiedDate.format('D/M/Y')
+				//- 	h1 <strong>#{title}</strong> <small>#{date}</small>
+				//- div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
+				//- 	iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
 			.col-sm-4.col-md-4
-				.channel-heading
-					if data.sketch.ipfsHash
-						a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Update address
-					else
-						a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Create address
-					h2 Channels
-				.list-group
-					.list-group-item
-						if data.channels && data.channels.length
-							ul.nav.nav-pills
-								each channel in data.channels
-									- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
-									li(class=(channelActive ? 'active' : ''))
-										a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
-										//- a(href='?channel=true&_id='+channel._id)=channel.name
-				.channel-sync
-					if data.sketch.ipfsHash
-						- var shortHash = data.sketch.ipfsHash.substring(0,24);
-						p Address:
-							code
-								a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank')=shortHash
-				hr
-				a(href='/view-static/' + data.sketch.localDir, target='_blank').btn.btn-default.pull-right Local
-				if data.sketch.ipfsHash
-					a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
-				h2 Preview
-				if data.sketch.prefThumb
-					h4 prefthumb avail
-				else
-					h4 prefthumb notavail
-				hr
-				a(href='/api/media/'+data.sketch.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+				//- .channel-heading
+				//- 	if data.sketch.ipfsHash
+				//- 		a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Update address
+				//- 	else
+				//- 		a(href='/api/media/' + data.sketch.id + '/share', id='btn-share').btn.btn-default.pull-right Create address
+				//- 	h2 Channels
+				//- .list-group
+				//- 	.list-group-item
+				//- 		if data.channels && data.channels.length
+				//- 			ul.nav.nav-pills
+				//- 				each channel in data.channels
+				//- 					- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+				//- 					li(class=(channelActive ? 'active' : ''))
+				//- 						a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
+				//- 						//- a(href='?channel=true&_id='+channel._id)=channel.name
+				//- .channel-sync
+				//- 	if data.sketch.ipfsHash
+				//- 		- var shortHash = data.sketch.ipfsHash.substring(0,24);
+				//- 		p Address:
+				//- 			code
+				//- 				a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank')=shortHash
+				//- hr
+				//- a(href='/view-static/' + data.sketch.localDir, target='_blank').btn.btn-default.pull-right Local
+				//- if data.sketch.ipfsHash
+				//- 	a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
+				//- h2 Preview
+				//- if data.sketch.prefThumb
+				//- 	h4 prefthumb avail
+				//- else
+				//- 	h4 prefthumb notavail
+				//- hr
+				//- a(href='/api/media/'+data.sketch.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 				//- a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
-			.col-sm-8.col-md-8
-				.details-heading
-					a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
-					h2 Details
-					form(action='/api/media/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
-						fieldset(disabled='disabled')
-							input(type='hidden', name='action', value='save')
-							.form-group(class=validationErrors.message ? 'has-error' : null)
-								label.col-sm-2.control-label Title
-								.col-sm-10
-									textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.sketch.title
-							.form-group(class=validationErrors.message ? 'has-error' : null)
-								label.col-sm-2.control-label index.html
-								.col-sm-10
-									textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
-							.form-group
-								.col-sm-10.col-sm-offset-2
-									button(type='submit').btn.btn-primary Save
+			//- .col-sm-8.col-md-8
+			//- 	.details-heading
+			//- 		a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
+			//- 		h2 Details
+			//- 		form(action='/api/media/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
+			//- 			fieldset(disabled='disabled')
+			//- 				input(type='hidden', name='action', value='save')
+			//- 				.form-group(class=validationErrors.message ? 'has-error' : null)
+			//- 					label.col-sm-2.control-label Title
+			//- 					.col-sm-10
+			//- 						textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.sketch.title
+			//- 				.form-group(class=validationErrors.message ? 'has-error' : null)
+			//- 					label.col-sm-2.control-label index.html
+			//- 					.col-sm-10
+			//- 						textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+			//- 				.form-group
+			//- 					.col-sm-10.col-sm-offset-2
+			//- 						button(type='submit').btn.btn-primary Save
 
 			//- .col-sm-4.col-md-4
 			//- 	//- iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+data.sketch.localDir).img-responsive
@@ -106,17 +162,17 @@ block content
 			//- 				a(href='/api/sketch/' + data.sketch.id + '/play', target='_blank').list-group-item Preview on gateway
 			//- 		.panel-footer
 			//- 			a(href='?delete=true', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
-			.col-sm-8.col-md-8
-				.page-header
-					a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
-					h1 Saved Images
-				if data.thumbnails.length
-					.row
-						each thumbnail in data.thumbnails
-							.col-xs-2
-								img(src='/view-static/'+data.sketch.localDir+'/'+thumbnail).img-thumbnail
-				else
-					h4 No thumbnails
+			//- .col-sm-8.col-md-8
+			//- 	.page-header
+			//- 		a(href='?screenshot=true' id='make-editable').btn.btn-default.pull-right 📷&emsp;Screenshot
+			//- 		h1 Saved Images
+			//- 	if data.thumbnails.length
+			//- 		.row
+			//- 			each thumbnail in data.thumbnails
+			//- 				.col-xs-2
+			//- 					img(src='/view-static/'+data.sketch.localDir+'/'+thumbnail).img-thumbnail
+			//- 	else
+			//- 		h4 No thumbnails
 				//- .page-header
 				//- 	a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
 				//- 	h1 Source Code
@@ -241,6 +297,6 @@ block js
 			}
 			$('.btn-channel').click( channelButton );
 
-			// change tab
-			$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')
+			// change tab according to query string (after page loads otherwise the media iframe doesn't...)
+			setTimeout(function(){$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')}, 3000);
 		});
