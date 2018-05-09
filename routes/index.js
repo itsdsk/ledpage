@@ -41,21 +41,12 @@ exports = module.exports = function (app) {
 	app.all('/upload', routes.views.upload);
 	app.all('/setup', routes.views.setup);
 
-	// public API
+	// API
 	app.all('/api*', keystone.middleware.api);
-	// app.get('/api/sketch/list', keystone.middleware.api, routes.api.sketch.list); // list sketches
-	app.get('/api/sketch/:ipfs/add', keystone.middleware.api, routes.api.sketch.add); // try add ipfs hash
-	// app.get('/api/sketch/:id', keystone.middleware.api, routes.api.sketch.getSketch); // info on specific sketch
-	// app.get('/api/sketch/:id/play', keystone.middleware.api, routes.api.sketch.play); // play sketch
-	// app.all('/api/sketch/:id/update', keystone.middleware.api, routes.api.sketch.update); // update sketch
-	// app.get('/api/sketch/:id/channel', keystone.middleware.api, routes.api.sketch.channel); // channel add/remove sketch
-	// app.get('/api/sketch/:id/delete', keystone.middleware.api, routes.api.sketch.delete); // delete/unpublish sketch
-	// app.get('/api/sketch/:id/screenshot', keystone.middleware.api, routes.api.sketch.screenshot); // save screenshot of sketch
-	// app.get('/api/channels/subscribe', keystone.middleware.api, routes.api.sketch.subscribe); // subscribe to new channel
-	// app.get('/api/sketch/:id/sync', keystone.middleware.api, routes.api.sketch.sync); // upload sketch to ipfs
-
-	app.get('/api/player', keystone.middleware.api, routes.api.sketch.player); // player status
-	app.get('/api/display/brightness', keystone.middleware.api, routes.api.sketch.getBrightness); // 
+	app.get('/api/identity', keystone.middleware.api, routes.api.media.identity); // get IPFS identity
+	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot
+	app.get('/api/system/reboot', keystone.middleware.api, routes.api.leds.reboot); // reboot device
+	app.get('/api/system/shutdown', keystone.middleware.api, routes.api.leds.shutdown); // shutdown device
 
 	// Media routes
 	app.all('/api/media/create', keystone.middleware.api, routes.api.media.create); // create new sketch
@@ -69,6 +60,7 @@ exports = module.exports = function (app) {
 	app.get('/api/media/:id/remove', keystone.middleware.api, routes.api.media.remove); // delete/unpublish sketch
 	app.get('/api/media/:id/screenshot', keystone.middleware.api, routes.api.media.screenshot); // save screenshot of sketch
 	app.get('/api/media/:id/share', keystone.middleware.api, routes.api.media.share); // upload sketch to ipfs
+	app.get('/api/media/:ipfs/download', keystone.middleware.api, routes.api.media.download); // download media from ipfs hash
 	app.get('/api/media/channel/subscribe', keystone.middleware.api, routes.api.media.subscribe); // subscribe to new channel
 	app.get('/api/media/channel/unsubscribe', keystone.middleware.api, routes.api.media.unsubscribe); // unsubscribe from channel
 
@@ -77,17 +69,4 @@ exports = module.exports = function (app) {
 	app.all('/api/leds/calibrate', keystone.middleware.api, routes.api.leds.calibrate); // update colour calibration
 	app.get('/api/leds/set-brightness/:val', keystone.middleware.api, routes.api.leds.set_brightness); // 
 	app.all('/api/leds/config-arduino', keystone.middleware.api, routes.api.leds.config_arduino); // setup led output configuration
-
-	// Other
-	app.get('/api/identity', keystone.middleware.api, routes.api.media.identity); // get IPFS identity
-	app.all('/api/screenshot', keystone.middleware.api, routes.api.media.savescreen); // save screenshot
-	app.get('/api/system/reboot', keystone.middleware.api, routes.api.leds.reboot); // reboot device
-	app.get('/api/system/shutdown', keystone.middleware.api, routes.api.leds.shutdown); // shutdown device
-
-
-	// app.get('/api/ipfs', keystone.middleware.api, routes.api.sketch.ipfs);
-
-	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
-	// app.get('/protected', middleware.requireUser, routes.views.protected);
-
 };
