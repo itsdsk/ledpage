@@ -4,33 +4,12 @@ block content
 	.container
 		.page-header
 			h1 Upload
-		//- form(method='post').form-horizontal
 		form(action='/api/media/create' method='post' class='post-form-ajax').form-horizontal
 			input(type='hidden', name='action', value='upload')
-			//- .form-group(class=validationErrors.name ? 'has-error' : null)
-				//- label.col-sm-2.text-left.control-label Name
-				//- .col-sm-10
-				//- 	input(type='text' name='title' value=formData['title'] required placeholder="Sketch Title").form-control
-			//- .form-group(class=validationErrors.email ? 'has-error' : null)
-			//- 	label.col-sm-2.control-label Email
-			//- 	.col-sm-10
-			//- 		input(type='email' name='email' value=formData.email required placeholder="name@domain.com").form-control
-			//- .form-group
-			//- 	label.col-sm-2.control-label Phone
-			//- 	.col-sm-10
-			//- 		input(type='text' name='phone' value=formData.phone placeholder='(optional)').form-control
-			//- .form-group(class=validationErrors.enquiryType ? 'has-error' : null required)
-			//- 	label.col-sm-2.control-label Regarding
-			//- 	.col-sm-10
-			//- 		select(name='enquiryType').form-control
-			//- 			option(value='') (required)
-			//- 			each type in enquiryTypes
-			//- 				option(value=type.value selected=formData.enquiryType === type.value)= type.label
 			.form-group(class=validationErrors.message ? 'has-error' : null)
 				label.col-sm-2.control-label Media
 				.col-sm-10
 					textarea(name='sketch' placeholder='Enter HTML media...' rows=24 required).form-control= formData.sketch
 			.form-group
 				.col-sm-10.col-sm-offset-2
-					//- p.help-block Note: others can see your enquiry in the <a href='/keystone/enquiries'>Admin UI</a>
 					button(type='submit').btn.btn-primary Upload

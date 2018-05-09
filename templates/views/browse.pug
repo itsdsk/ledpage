@@ -1,23 +1,12 @@
 extends ../layouts/default
 
 mixin sketch(sketch)
-	//- .sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id })).media
 	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id }))
-		//- .panel-heading
-		//- 	label=sketch.title
-		//- h4.media-heading
-		//- .panel-heading
-		//- 	h3.panel-title= sketch.title
-			//- a(href='/media/' + sketch.slug + '?display=on')= sketch.title
-		//- .media-middle
 		.sketch-thumbnail
-			//- a(href='/media/' + sketch.slug + '?display=on')
-			//- a(href='/api/sketch/' + sketch.id + '/play')
 			.img-wrapper(style='position:relative')
 				a(data-toggle="modal", data-target='#modal-'+sketch.id)
 					if sketch.prefThumb
 						- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
-						//- img(src=imgThumb)
 						div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
 					else
 						img(src="http://placehold.it/300x300").img-responsive
@@ -31,7 +20,6 @@ mixin sketch(sketch)
 							.modal-body
 								a(href='/api/media/' + sketch.id + '/play').btn.btn-primary.btn-lg.btn-block.api-get-btn
 									span.glyphicon.glyphicon-play
-								//- a(href='/view-static/'+sketch.localDir, target='_blank').btn.btn-default.btn-lg.btn-block
 								a(href='/media/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Preview
@@ -46,90 +34,19 @@ mixin sketch(sketch)
 										| View on IPFS
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
-				//- if sketch.image.exists
-				//- 	img(src=sketch._.image.fit(300,300)).img-responsive
-				//- if sketch.prefThumb
-				//- 	- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
-					//- img(src=imgThumb)
-					div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
-				//- else
-				//- 	img(src="http://placehold.it/300x300").img-responsive
-				//- .img-overlay(style='position:absolute;top:0;bottom:0;left:0;right:0;text-align:center')
-				//- 	a(href='/api/sketch/' + sketch.id + '/play')
-				//- 		button(type='submit').display-btn.btn.btn-md ▶
-				//- 	a(href='/media/' + sketch._id)
-				//- 		button(type='submit').btn.btn-md ⋯
-	//- .panel.panel-default
-	//- 	.panel-heading
-	//- 		p.pull-right=sketch._.modifiedDate.format('D/M/Y')
-	//- 		h4.panel-title=sketch.title		
-					//- // display led svgs
-					//- //div(id='leds').list-group-item.led-svg
-					//- //iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).img-responsive
-					//- //iframe(width="750px" height="750px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="/view-static/"+sketch.localDir).display-sketch
-
-		//- .media-bottom
-		//- .list-group
-		//- 	//- a(href='/api/' + sketch.id + '/play').btn.btn-default Display
-		//- 	a(href='/api/sketch/' + sketch.id + '/play').list-group-item.display-sketch Display
-		//- 	if sketch.ipfsHash
-		//- 		//- a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).btn.btn-default Preview IPFS
-		//- 		a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash ).list-group-item Preview IPFS
-		//- 	else
-		//- 		//- a(href='/api/' + sketch.id + '/sync' ).btn.btn-default Sync to IPFS
-		//- 		a(href='/api/sketch/' + sketch.id + '/sync' ).list-group-item Sync to IPFS
-		//- 		//- a(href='/view-static/' + sketch.localDir ).btn.btn-default Preview Local
-		//- 		a(href='/view-static/' + sketch.localDir ).list-group-item Preview Local
-			//a(href='https://gateway.ipfs.io/ipns/' + sketch.ipnsHash ).btn.btn-default Preview IPNS
-			//- h2.media-heading
-			//- 	a(href='/media/' + sketch.slug + '?display=on')= sketch.title
-			//- p.lead.text-muted Posted 
-			//- if sketch.publishedDate
-			//- 	| on #{sketch._.publishedDate.format('MMMM Do, YYYY')} 
-			//- if sketch.channels && sketch.channels.length
-			//- 	| in 
-			//- 	each channel, i in sketch.channels
-			//- 		a(href='/channel/' + channel.key)= channel.name
-			//- 		if i < sketch.channels.length - 1
-			//- 			| , 
-			//- 		else
-			//- 			|  
-			//- if sketch.author
-			//- 	| by #{sketch.author.name.first}
-		//p!= sketch.content.brief
-		//if sketch.content.extended
-		//	p.read-more: a(href='/media/' + sketch.slug) Read more...
-
-//- block intro
-//- 	.container
-//- 		h1= data.channel ? data.channel.name : 'Select a Sketch'
-
 block content
-	//- .container
-	//- 	div(id='ledmap').led-map
 	.container: .row 
 		.col-sm-8.col-md-8
 			if filters.channel && !data.channel 
 				h3.text-muted Invalid channel. 
 			else
 				if data.sketches.results.length
-					//- if data.sketches.totalPages > 1
-					//- 	h4.text-weight-normal Showing 
-					//- 		strong #{data.sketches.first}
-					//- 		|  to 
-					//- 		strong #{data.sketches.last}
-					//- 		|  of 
-					//- 		strong #{data.sketches.total}
-					//- 		|  sketches.
-					//- else
-					//- 	h4.text-weight-normal Showing #{utils.plural(data.sketches.results.length, '* sketch')}.
 					.row.browse
 						style .img-overlay:before {content: ' ';display:block;height:50%;}
 						style .sq-thumb {float:left;position: relative;width: 100%;padding-bottom : 100%;margin:0%;background-position:center center;background-repeat:no-repeat;background-size:cover;}
 						each sketch in data.sketches.results
 							.col-xs-4(style="padding: 1px;")
 								+sketch(sketch)
-				
 					if data.sketches.totalPages > 1
 						ul.pagination
 							if data.sketches.previous
@@ -148,16 +65,12 @@ block content
 						h3.text-muted There are no sketches in the channel #{data.channel.name}.
 					else
 						h3.text-muted There are no sketches yet.
-		//- if data.channels.length
 		if true
 			.col-sm-4.col-md-4
 				hr
 				a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings')
 					div(id='ledmap').led-map
 				input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').brightnessSlider
-				//- hr
-				//- a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
-				//- a(data-toggle='modal', data-target='#quick-settings', title='Quick Settings').btn.btn-block.btn-primary Quick Settings
 				div(id='quick-settings', class='modal fade', role='dialog')
 					.modal-dialog
 						.modal-content
@@ -178,43 +91,17 @@ block content
 								a(href='/api/screenshot').btn.btn-warning.api-get-btn Screenshot
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
-
-				//- hr
-				//- .panel.panel-default
-				//- 	.panel-heading
-				//- 		h3.panel-title Subscribed
-
-				//- 	.list-group
-				//- 		each channel in data.channels
-				//- 			a(href='/channel/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
-				//- 		form(action='/api/channels/subscribe', method='GET').list-group-item
-				//- 			input(type='text', id='sub', name='sub', value='true').hidden
-				//- 			input(type='text', placeholder='Add channel', id='name', name='name').form-control
-				//- 			button(type='submit', id='submit').hidden
-				//- .lead.text-muted Subscribed
 				hr
 				.lead.text-muted Subscribed
 				ul.nav.nav-pills.nav-stacked
 					each channel in data.channels
-						//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
-						//- 	| &ensp;
-						//- 	span.badge=channel.sketchCount
 						li(role='presentation' class=data.channel && data.channel.id == channel.id ? 'active' : null)
-							//- button(type='button').btn.pull-right Del
-							//- button(href='/api/hi' type='button').btn.btn-default.pull-right Play
-							//- 	| &ensp;
-							//- 	span.badge=channel.sketchCount
 							.btn-group.btn-group-justified
 								a(href='/channel/'+channel.key, style='width:5%').btn.btn-default
 									.text-left
 										span.badge=channel.sketchCount
 										| &ensp;
 										=channel.name
-									//- | &ensp;
-									//- span.badge=channel.sketchCount
-								//- a(href='#').btn.btn-primary ▶ 
-								//- 	| &ensp;
-								//- 	span.badge=channel.sketchCount
 								a(href='#').btn.btn-default
 									span.glyphicon.glyphicon-play
 								.btn-group
@@ -222,63 +109,14 @@ block content
 										span.caret
 									ul(role='menu').dropdown-menu
 										li
-											//- form(action='/api/media/channel/unsubscribe?name='+channel.id, method='GET').post-form-ajax
-											//- 	button(type='submit') Delete
 											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').api-get-btn Delete
 					li(role='presentation')
-						//- form(action='/api/channels/subscribe', method='GET')
 						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
-							//- input(type='text', id='sub', name='sub', value='true').hidden
 							.input-group.input-group-lg
 								span.input-group-addon
 									i.glyphicon.glyphicon-globe
-									//- | &ensp;Subscribed
 								input(type='text', placeholder='Add Channel', id='name', name='name' required).form-control
 							button(type='submit', id='submit').hidden
-
-							//- a(href='/channel/'+channel.key).btn.btn-link=channel.name
-								//- a(href='#').btn.btn-primary &times;
-							//- a(href='/channel/'+channel.key)=channel.name
-							
-							//- a(href='/channel/'+channel.key)
-							//- 	=channel.name
-								//- span.badge.pull-right= channel.sketchCount
-								//- span.badge.pull-left= channel.sketchCount
-					//- li(role='presentation')
-					//- 	//- form(action='/api/channels/subscribe', method='GET')
-					//- 	form(action='/api/media/channel/subscribe', method='GET').post-form-ajax
-					//- 		input(type='text', id='sub', name='sub', value='true').hidden
-					//- 		input(type='text', placeholder='Add channel', id='name', name='name').form-control
-					//- 		button(type='submit', id='submit').hidden
-
-					//- .panel-body
-					//- 	form(action='/api/channels/subscribe', method='GET')
-					//- 		input(type='text', id='sub', name='sub', value='true').hidden
-					//- 		input(type='text', placeholder='Add channel', id='name', name='name').form-control
-					//- 		button(type='submit', id='submit').hidden
-
-					//- a(href='/browse', class=!data.channel ? 'active' : false).list-group-item All Channels
-						each channel in data.channels
-							a(href='/channel/' + channel.key, class=data.channel && data.channel.id == channel.id ? 'active' : false).list-group-item= channel.name
-					//- form(action='/browse?subscribe=true', method='GET').list-group-item
-					//- form(action='/api/channels/subscribe', method='GET').list-group-item
-					//- 	input(type='text', id='sub', name='sub', value='true').hidden
-					//- 	input(type='text', placeholder='Add channel', id='name', name='name').form-control
-					//- 	button(type='submit', id='submit').hidden
-				//- hr
-		//- .col-sm-4.col-md-4
-		//- 	// top bar same as other panels
-		//- 	h4.list-group-item LEDs
-		//- 	// top left blue button
-		//- 	//h4: h(href='').btn.btn-primary LEDs
-		//- 	.list-group
-		//- 		div(id='leds').list-group-item.led-svg
-		//- 		p.list-group-item Brightness:
-		//- 		input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', style='height:50px').list-group-item.brightnessSlider
-		//- 		a(href='/keystone/galleries?new').btn.btn-primary.pull-right= 'More'
-		//- .col-sm-4.col-md-4
-		//- 	h4 Network
-		//- 	div(id='leds')
 block js
 	script.
 		jQuery(function($) {
@@ -294,17 +132,14 @@ block js
 				});
 			}
 			$(".display-sketch").click( playSketch );
-
 			// setbrightness slider
 			function setBrightness() {
-				//- var url = '/api/display/brightness/' + $(this).val();
 				var url = '/api/leds/set-brightness/' + $(this).val();
 				$.get(url, function() {
 					// success
 				});
 			}
 			$(".brightnessSlider").change( setBrightness );
-
 			// ajax button GET
 			function apiGetButton(e) {
 				//
@@ -322,34 +157,23 @@ block js
 				});
 			}
 			$('.api-get-btn').click( apiGetButton );
-
 		});
-
 	script(src='https://d3js.org/d3.v5.js')
-
 	script.
-
 		d3.json('/config-static/leds.json').then(function(data) {
-
 			var width = 1280,
 				height = 720,
 				padding = 15;
-			
 			var svgContainer = d3.selectAll('.led-map').append('svg')
 				.attr('viewBox', '0 0 ' + width + ' ' + height);
-				//- .attr("width", width)
-				//- .attr("height", height);
-
 			svgContainer.append('rect')
 				.attr('width', '100%')
 				.attr('height', '100%')
 				.attr('fill', 'white');
-				
 			var minX = d3.min(data.leds, function(d) {return d.x});
 			var maxX = d3.max(data.leds, function(d) {return d.x});
 			var minY = d3.min(data.leds, function(d) {return d.y});
 			var maxY = d3.max(data.leds, function(d) {return d.y});
-
 			// flat line of points (same number as led map)
 			var initCoords = [];
 			for(var i=0; i<data.leds.length; i++){
@@ -357,19 +181,16 @@ block js
 				var initX = minX + ((i/data.leds.length)*(maxX-minX));
 				initCoords.push({'x': initX, 'y': initY});
 			}
-
 			var scaleX = d3.scaleLinear()
 				.domain([minX,maxX])
 				.range([padding, width-padding]);
 			var scaleY = d3.scaleLinear()
 				.domain([minY,maxY])
 				.range([padding, height-padding]);
-
 			var line = d3.line()
 				.curve(d3.curveLinear)
 				.x(function(d) { return scaleX(d.x); })
 				.y(function(d) { return scaleY(d.y); });
-
 			var path = svgContainer.append('path')
 				.attr('fill', 'none')
 				.attr('stroke', '#337ab7')
@@ -381,7 +202,6 @@ block js
 				.attrTween('d', function() {
 					return d3.interpolate(line(initCoords), line(data.leds));
 				});
-
 			var circles = svgContainer.selectAll('circle')
 				.data(data.leds)
 				.enter()
@@ -396,60 +216,4 @@ block js
 				.delay(750)
 				.duration(250)
 				.attr('r', function(d) { return 0.7*padding; });
-
 		})
-
-		//- d3.json('/config-static/leds.json').then(function(data) {
-
-		//- 	var width = 500,
-		//- 		height = 500,
-		//- 		padding = 15;
-			
-		//- 	var svgContainer = d3.selectAll('.led-svg').append('svg')
-		//- 		.attr('viewBox', '0 0 ' + width + ' ' + height);
-		//- 		//- .attr("width", width)
-		//- 		//- .attr("height", height);
-
-		//- 	svgContainer.append('rect')
-		//- 		.attr('width', '100%')
-		//- 		.attr('height', '100%')
-		//- 		.attr('fill', 'white');
-				
-		//- 	var minX = d3.min(data.leds, function(d) {return d.x});
-		//- 	var maxX = d3.max(data.leds, function(d) {return d.x});
-		//- 	var minY = d3.min(data.leds, function(d) {return d.y});
-		//- 	var maxY = d3.max(data.leds, function(d) {return d.y});
-
-		//- 	var scaleX = d3.scaleLinear()
-		//- 		.domain([minX,maxX])
-		//- 		.range([padding, width-padding]);
-		//- 	var scaleY = d3.scaleLinear()
-		//- 		.domain([minY,maxY])
-		//- 		.range([padding, height-padding]);
-
-		//- 	var line = d3.line()
-		//- 		.curve(d3.curveLinear)
-		//- 		.x(function(d) { return scaleX(d.x); })
-		//- 		.y(function(d) { return scaleY(d.y); });
-
-		//- 	var path = svgContainer.append('path')
-		//- 		.attr('fill', 'none')
-		//- 		.attr('stroke', '#337ab7')
-		//- 		.attr('stroke-width', 0.5*padding)
-		//- 		.attr('d', line(data.leds));
-
-		//- 	var circles = svgContainer.selectAll('circle')
-		//- 		.data(data.leds)
-		//- 		.enter()
-		//- 		.append("circle");
-
-		//- 	var circleAttr = circles
-		//- 		.attr('cx', function(d) { return scaleX(d.x); })
-		//- 		.attr('cy', function(d) { return scaleY(d.y); })
-		//- 		.attr('r', function(d) { return 0.7*padding; })
-		//- 		.attr('stroke', '#337ab7')
-		//- 		.attr('stroke-width', 0.33*padding)
-		//- 		.attr('fill', 'white');
-
-
-		//- })
