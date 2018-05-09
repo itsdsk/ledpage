@@ -179,6 +179,13 @@ ipc.connectTo(
 				isDplayerConnected = true;
 			}
 		);
+		ipc.of.dplayeripc.on(
+			'message',
+			function (data, socket) {
+				console.log('recieved msg');
+				console.log(data);
+			}
+		);
 	});
 
 /**

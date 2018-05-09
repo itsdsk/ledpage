@@ -42,6 +42,8 @@ app.on('ready', () => {
       //   windowA.restore();
       // }
       windowA.show();
+      ipc.of.dremoteipc.emit('message', 'test');
+
       // windowB.hide();
       // windowB.minimize();
       // windowB.setEnabled(false);
