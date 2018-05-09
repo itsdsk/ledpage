@@ -17,8 +17,7 @@ block content
 							input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-slider').brightnessSlider
 					.panel-body
 						h4
-							button(type='submit').btn.btn-info.btn-sm.pull-right
-								.text-left Update Colour Values
+							button(type='submit').btn.btn-info.btn-sm.pull-right Update Colour Values
 							span.glyphicon.glyphicon-asterisk
 						form(method='POST' action='/api/leds/calibrate').post-form-ajax
 							.form-group
@@ -72,6 +71,7 @@ block content
 											label(for='blueAdjB') B:
 											input(type='range', min='0', max='255', step='1', value=profile.blueB, name='blueB', class='slider', id='blueAdjB')
 						h4
+							button(type='button' data-toggle='modal' data-target='#formatInfo').btn.btn-link.btn-sm.pull-right See accepted formats
 							span.glyphicon.glyphicon-random
 						input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
 						.btn-group-vertical.btn-block
@@ -80,6 +80,7 @@ block content
 							a(id='save-led-map').btn.btn-default.btn-block.btn-lg
 								.text-left Restart LED Interface
 						h4
+							a(href='/screenshot.png' target='_blank').btn.btn-link.btn-sm.pull-right View last screenshot
 							span.glyphicon.glyphicon-magnet
 						.btn-group-vertical.btn-block
 							a(href='/api/screenshot').btn.btn-default.btn-lg.btn-block.api-get-btn
@@ -95,10 +96,10 @@ block content
 								.text-left Reboot
 							a(href='/api/system/shutdown').btn.btn-default.btn-lg.btn-block.api-get-btn
 								.text-left Shutdown
-			.col-sm-8.col-md-8
+			.col-sm-12.col-md-12
 				.page-header
 					a(href='/setup' id='make-editable').btn.btn-default.pull-right 🔓&emsp;Configure
-					h1 Output
+					h1 Hardware
 				form(action='/api/leds/config-arduino' method='post' class='post-form-ajax' id='config-form').form-horizontal
 					fieldset(disabled='disabled')
 						input(type='hidden', name='action', value='setup')
@@ -144,31 +145,37 @@ block content
 						.form-group
 							.col-sm-10.col-sm-offset-2
 								button(type='submit' id='uploadConfigBtn').btn.btn-primary Upload
-			.col-sm-4.col-md-4
-				.panel.panel-default
-					.panel-body
-						kbd JSON:
-						pre
-							| {
-							|   "leds": [
-							|     { "x": 0.25, "y": 0.25 },
-							|     { "x": 0.50, "y": 0.50 },
-							|     { "x": 0.75, "y": 0.75 }
-							|   ]
-							| }
-						kbd CSV:
-						pre
-							| x,y
-							| 0.25,0.25
-							| 0.50,0.50
-							| 0.75,0.75
-						kbd XML:
-						pre
-							| <&#8203;data>
-							|     <&#8203;led> <&#8203;x>0.25<&#8203;/x> <&#8203;y>0.25<&#8203;/y> <&#8203;/led>
-							|     <&#8203;led> <&#8203;x>0.50<&#8203;/x> <&#8203;y>0.50<&#8203;/y> <&#8203;/led>
-							|     <&#8203;led> <&#8203;x>0.75<&#8203;/x> <&#8203;y>0.75<&#8203;/y> <&#8203;/led>
-							| <&#8203;/data>
+			div(id='formatInfo' role='dialog').modal.fade
+				.modal-dialog
+					.modal-content
+						.modal-header
+							.button(type='button' data-dismiss='modal').close &times;
+							h4.modal-title Accepted LED Mapping Formats
+						.modal-body
+							kbd JSON:
+							pre
+								| {
+								|   "leds": [
+								|     { "x": 0.25, "y": 0.25, "r": 0.1 },
+								|     { "x": 0.50, "y": 0.50, "r": 0.1 },
+								|     { "x": 0.75, "y": 0.75, "r": 0.1 }
+								|   ]
+								| }
+							kbd CSV:
+							pre
+								| x,y,r
+								| 0.25,0.25,0.1
+								| 0.50,0.50,0.1
+								| 0.75,0.75,0.1
+							kbd XML:
+							pre
+								| <&#8203;data>
+								|     <&#8203;led> <&#8203;x>0.25<&#8203;/x> <&#8203;y>0.25<&#8203;/y> <&#8203;r>0.1<&#8203;/r> <&#8203;/led>
+								|     <&#8203;led> <&#8203;x>0.50<&#8203;/x> <&#8203;y>0.50<&#8203;/y> <&#8203;r>0.1<&#8203;/r> <&#8203;/led>
+								|     <&#8203;led> <&#8203;x>0.75<&#8203;/x> <&#8203;y>0.75<&#8203;/y> <&#8203;r>0.1<&#8203;/r> <&#8203;/led>
+								| <&#8203;/data>
+						.modal-footer
+							button(type='button' data-dismiss='modal').btn.btn-default Close
 block js
 	script(src='https://d3js.org/d3.v5.js')
 	script.
