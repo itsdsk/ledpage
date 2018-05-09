@@ -347,6 +347,10 @@ exports.create = function (req, res) {
 				note: 'could not save to database'
 			});
 		} else {
+			// play new sketch
+			var playURL = 'http://0.0.0.0:8081/api/media/'+newModel.id+'/play';
+			http.get(playURL);
+			// finished
 			return res.apiResponse({
 				success: true,
 				note: 'uploaded new media'
