@@ -19,15 +19,15 @@ Profile.add({
 	},
 	redG: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	redB: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	greenR: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	greenG: {
 		type: Types.Number,
@@ -35,15 +35,15 @@ Profile.add({
 	},
 	greenB: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	blueR: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	blueG: {
 		type: Types.Number,
-		default: 255
+		default: 0
 	},
 	blueB: {
 		type: Types.Number,
