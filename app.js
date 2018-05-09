@@ -13,7 +13,7 @@ var keystone = require('keystone');
 keystone.init({
   'cookie secret': '05f8261c27d0ac4751627b469d7e2d9b84246bbbc4b68edc3c5b530af1010560ac63182ff59adce22e5ff44ab6e66075bd460e89803a818c183c9f4f2049e260',
   'name': 'Disks',
-  'port': 8081,
+  'port': 80,
   'sass': 'public',
   'static': ['public', '/data/content'],
   'favicon': 'public/favicon.ico',
@@ -58,5 +58,5 @@ keystone.set('routes', require('./routes'));
 
 keystone.start(function () {
   // initialise database
-  require('http').get('http://0.0.0.0:8081/api/media/list/init');
+  require('http').get('http://0.0.0.0:80/api/media/list/init');
 });

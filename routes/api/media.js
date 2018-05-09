@@ -164,7 +164,7 @@ ipc.connectTo(
 			'message',
 			function (data, socket) {
 				if(screenshotID != null){
-					var apiAddress = 'http://0.0.0.0:8081/api/media/'+screenshotID+'/screenshot';
+					var apiAddress = 'http://0.0.0.0:80/api/media/'+screenshotID+'/screenshot';
 					http.get(apiAddress);
 					screenshotID = null;
 				}
@@ -306,7 +306,7 @@ exports.create = function (req, res) {
 			});
 		} else {
 			// play new sketch
-			var playURL = 'http://0.0.0.0:8081/api/media/'+newModel.id+'/play';
+			var playURL = 'http://0.0.0.0:80/api/media/'+newModel.id+'/play';
 			http.get(playURL);
 			// finished
 			return res.apiResponse({
