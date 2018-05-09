@@ -10,15 +10,16 @@ exports.map_positions = function (req, res) {
     // duplicate new led map into hyperion format
     const newConfig = Array();
     for (var i = 0; i < newLeds.leds.length; i++) {
+        var ledAreaOffset = 0.66*newLeds.leds[i].r;
         var newConf = {
             index: i,
             hscan: {
-                mininum: newLeds.leds[i].x,
-                maximum: (newLeds.leds[i].x + 0.1111)
+                mininum: newLeds.leds[i].x - ledAreaOffset,
+                maximum: newLeds.leds[i].x + ledAreaOffset
             },
             vscan: {
-                mininum: newLeds.leds[i].y,
-                maximum: (newLeds.leds[i].y + 0.1111)
+                mininum: newLeds.leds[i].y - ledAreaOffset,
+                maximum: newLeds.leds[i].y + ledAreaOffset
             }
         };
         newConfig.push(newConf);
