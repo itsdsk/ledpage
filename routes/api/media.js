@@ -34,7 +34,6 @@ const channelMsg = (msg) => {
 			body += d;
 		});
 		response.on('end', function () {
-
 			// Data reception is done, do whatever with it!
 			var parsed = JSON.parse(body);
 			console.log('added');
@@ -56,15 +55,11 @@ var ipfsInit = () => {
 			}
 		} else {
 			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
-
 				if (err || !channels.length) {
 					console.log('error: no channels');
 				}
-
 				channels.forEach((channel) => {
-					//console.log('adding channel:')
 					var topic = channel.name;
-					//console.log(topic);
 					ipfs.pubsub.subscribe(topic, channelMsg, (suberr) => {
 						if (suberr) {
 							console.log('Could not subscribe..');
@@ -77,33 +72,25 @@ var ipfsInit = () => {
 			ipfs.pubsub.ls((err, topics) => {
 				if (err) {
 					console.log('ipfs pubsub ls err');
-					//console.log(err);
 					throw err;
 				}
-				//console.log("Subscribed topics:");
-				//console.log(topics);
 			});
-
 		}
 	});
 };
-
 ipfsInit();
 
 // Periodically show peers
 setInterval(function () {
-	//console.log('syncing with ipfs');
 	// share media on ipfs
 	ipfs.id(function (err, identity) {
 		if (err) {
 			if (ipfsInitAttempts < 3) {
 				console.log('connection error trying to sync with ipfs');
-				//console.log(err);
 			}
 		} else {
 			// find channels
 			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
-
 				if (err || !channels.length) {
 					console.log('error finding media categories to sync with ipfs');
 				}
@@ -131,13 +118,10 @@ setInterval(function () {
 							}
 						});
 					});
-
 				});
 			});
 		}
 	});
-
-
 	// // periodically show peers
 	// ipfs.pubsub.ls((err, topics) => {
 	// 	if (err) {
@@ -155,13 +139,9 @@ setInterval(function () {
 	// 			console.log("Peers:");
 	// 			console.log(peerIds);
 	// 		});
-
 	// 	})
 	// });
-
-	// ipfs.pubsub.publish(topic, new Buffer('banana'), () => {})
 }, 900000); // 15 min timer
-
 
 // ipc connection
 const ipc = require('node-ipc');
@@ -196,37 +176,29 @@ ipc.connectTo(
 /**
  * Get Media by ID
  */
-
 exports.get = function (req, res) {
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
-
 		res.apiResponse({
 			sketch: item
 		});
-
 	});
 };
-
 
 /**
  * List Media
  */
 exports.list = function (req, res) {
 	Media.model.find(function (err, sketchList) {
-
 		if (err) {
 			return res.apiError({
 				success: false,
 				note: 'could not get media from database'
 			});
 		}
-
 		// list channels
 		MediaChannel.model.find(function (err, channelList) {
-
 			if (err) {
 				return res.apiError({
 					success: false,
@@ -247,19 +219,15 @@ exports.list = function (req, res) {
 /**
  * Play Media by ID
  */
-
 exports.play = function (req, res) {
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
-
 		return res.apiError({
 			success: false,
 			note: 'renderer not active'
 		});
-
 	}
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) {
 			return res.apiError({
 				success: false,
@@ -272,7 +240,6 @@ exports.play = function (req, res) {
 				note: 'could not get media from database'
 			});
 		}
-
 		if (ipc.of.dplayeripc) {
 			var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
 			ipc.of.dplayeripc.emit('message', sketchPath);
@@ -283,33 +250,25 @@ exports.play = function (req, res) {
 			}else{
 				screenshotID = req.params.id; // save media ID to take thumbnail
 			}
-
 			res.apiResponse({
 				success: true,
 				note: 'queued media to display'
 			});
 		} else {
-			console.log('neswsfo');
-
 			res.apiError({
 				success: false,
 				note: 'failed to queue media to display'
 			});
-
 		}
-
 	});
 };
-
 
 /**
  * Create new Sketch
  */
-
 exports.create = function (req, res) {
 	var newModel = new Media.model();
 	var updater = newModel.getUpdateHandler(req);
-
 	// make folder
 	var saveDir = newModel.id;
 	var uploadPath = res.locals.viewStaticPath + saveDir;
@@ -362,10 +321,8 @@ exports.create = function (req, res) {
 /**
  * Update Sketch by ID
  */
-
 exports.update = function (req, res) {
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) {
 			return res.apiError({
 				success: false,
@@ -378,7 +335,6 @@ exports.update = function (req, res) {
 				note: 'sketch ID not found'
 			});
 		}
-
 		// get absolute file name
 		var saveName = res.locals.staticPath + item.localDir + '/index.html';
 		// get code from HTTP body
@@ -387,16 +343,11 @@ exports.update = function (req, res) {
 		fs.writeFile(saveName, code, 'utf8', function (err) {
 			if (err) {
 				// error saving
-				// req.flash('warning', 'error saving html');
-				// return res.redirect('/media/'+locals.data.sketch.slug);
 				return res.apiError({
 					success: false,
 					note: 'error saving sketch file'
-				})
+				});
 			} else {
-				// success saving
-				// req.flash('success', 'success saving html');
-				// return res.redirect('/media/'+locals.data.sketch.slug);
 				// save title
 				item.title = req.body.title;
 				item.save(function (err) {
@@ -412,41 +363,19 @@ exports.update = function (req, res) {
 						});
 					}
 				});
-
 			}
 		});
-
-		// if (ipc.of.dplayeripc) {
-		// 	var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
-		// 	ipc.of.dplayeripc.emit('message', sketchPath);
-		// 	console.log('yes');
-
-		// 	res.apiResponse({
-		// 		success: true
-		// 	});
-		// } else {
-		// 	console.log('neswsfo');
-
-		// 	res.apiError({
-		// 		success: false
-		// 	});
-
-		// }
-
 	});
 };
 
 /**
  * Channel add/remove sketch by ID
  */
-
 exports.channel = function (req, res) {
 	// find sketch
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
-
 		var sketchChannels = [];
 		var alreadyInChannel = false;
 		// add existing channels to array
@@ -476,27 +405,14 @@ exports.channel = function (req, res) {
 				});
 			}
 		});
-		// item.state = 'archived';
-		// item.save(function (err) {
-		// 	if (err) {
-		// 		return res.err(err);
-		// 	} else {
-		// 		res.apiResponse({
-		// 			success: true
-		// 		});
-		// 	}
-
-		// });
 	});
 };
 
 /**
  * Subscribe to channel
  */
-
 exports.subscribe = function (req, res) {
 	//
-	//var MediaChannel = keystone.list('MediaChannel');
 	var newChannel = new MediaChannel.model();
 	var newUpdater = newChannel.getUpdateHandler(req);
 	var data = {
@@ -517,24 +433,6 @@ exports.subscribe = function (req, res) {
 			});
 		}
 	});
-	// // find sketch
-	// Sketch.model.findById(req.params.id).exec(function (err, item) {
-
-	// 	if (err) return res.apiError('database error', err);
-	// 	if (!item) return res.apiError('not found');
-
-	// 	item.state = 'archived';
-	// 	item.save(function (err) {
-	// 		if (err) {
-	// 			return res.err(err);
-	// 		} else {
-	// 			res.apiResponse({
-	// 				success: true
-	// 			});
-	// 		}
-
-	// 	});
-	// });
 };
 
 /**
@@ -572,19 +470,14 @@ exports.unsubscribe = function (req, res) {
 	});
 };
 
-
-
 /**
  * Delete/unpublish Sketch by ID
  */
-
 exports.remove = function (req, res) {
 	// find sketch
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
-
 		item.state = 'archived';
 		item.save(function (err) {
 			if (err) {
@@ -594,7 +487,6 @@ exports.remove = function (req, res) {
 					success: true
 				});
 			}
-
 		});
 	});
 };
@@ -602,7 +494,6 @@ exports.remove = function (req, res) {
 /**
  * Screenshot sketch by ID
  */
-
 exports.screenshot = function (req, res) {
 	// no player
 	if (!isDplayerConnected) {
@@ -632,22 +523,11 @@ exports.screenshot = function (req, res) {
 					note: 'could not take screenshot'
 				});
 			};
-			// add screenshot filename to database
-			// Sketch.model.findById(locals.data.sketch.id).exec(function (err, item) {
-			// 	if (err) {
-			// req.flash('warning', 'not done');
-			// return res.redirect('/media/' + locals.data.sketch.slug);
-			// }
-			// var imgs = {
-			// 	thumbnails: item.thumbnails
-			// };
-			// imgs.thumbnails.push(uploadName);
-			// Media.updateItem(item, imgs, {
+			// add thumbnail to database
 			var thumbEntry = {
 				prefThumb: uploadName
 			};
 			Media.updateItem(item, thumbEntry, {
-				// fields: ["thumbnails"]
 				fields: ["prefThumb"]
 			}, function (dberror) {
 				if (dberror) {
@@ -655,69 +535,20 @@ exports.screenshot = function (req, res) {
 					return res.apiError({
 						success: false
 					});
-					// req.flash('warning', 'not done');
-					// return res.redirect('/media/' + locals.data.sketch.slug);
 				} else {
 					return res.apiResponse({
 						success: true,
 						note: 'screenshot saved to db'
 					});
-	
 				}
 			});
-			// })
-			// let updater = locals.data.sketch.getUpdateHandler(req, res, {
-			// 	errorMessage: 'error updating sketch with screenshot'
-			// });
-			// updater.process()
-			// console.log('thumbnails: ' + item.thumbnails);
-			// if (err) {
-			// 	return res.apiError({
-			// 		success: false
-			// 	});
-			// 	// req.flash('warning', 'not done');
-			// 	// return res.redirect('/media/' + locals.data.sketch.slug);
-			// } else {
-			// 	res.apiResponse({
-			// 		success: true
-			// 	});
-			// 	// req.flash('success', 'done');
-			// 	// return res.redirect('/media/' + locals.data.sketch.slug);
-			// }
 		});
-
 	});
-
-
-	// Sketch.model.findById(req.params.id).exec(function (err, item) {
-
-	// 	if (err) return res.apiError('database error', err);
-	// 	if (!item) return res.apiError('not found');
-
-	// 	if (ipc.of.dplayeripc) {
-	// 		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
-	// 		ipc.of.dplayeripc.emit('message', sketchPath);
-	// 		console.log('yes');
-
-	// 		res.apiResponse({
-	// 			success: true
-	// 		});
-	// 	} else {
-	// 		console.log('neswsfo');
-
-	// 		res.apiError({
-	// 			success: false
-	// 		});
-
-	// 	}
-
-	// });
 };
 
 /**
  * Screenshot renderer
  */
-
 exports.savescreen = function (req, res) {
 	// no player
 	if (!isDplayerConnected) {
@@ -752,27 +583,20 @@ exports.savescreen = function (req, res) {
 	});
 };
 
-
 /**
  * Sync Sketch to IPFS
  */
-
 exports.share = function (req, res) {
 	Media.model.findById(req.params.id).exec(function (err, item) {
-
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
-
-		//var okSketchPath = ["/data/sketches/view-static/sketch1"];
 		var sketchPath = [];
 		sketchPath.push(path.join(res.locals.staticPath, item.localDir));
-
 		ipfs.files.add(sketchPath, {
 			recursive: true
 		}, function (ipfserr, files) {
 			if (ipfserr) {
 				console.log('ipfs file add error');
-				//console.log(ipfserr);
 				return res.apiError('ipfs error', ipfserr);
 			} else {
 				console.log("Added:");
@@ -781,22 +605,17 @@ exports.share = function (req, res) {
 					console.log(file.hash);
 					console.log(file.size);
 				});
-
 				var data = {
 					ipfsHash: files[files.length - 1].hash
 				};
-
 				Media.updateItem(item, data, {
 					fields: ["ipfsHash"]
 				}, function (dberror) {
 					if (dberror) console.log(dberror);
-
 				});
-
 				res.apiResponse({
 					files: files
 				});
-
 			}
 		});
 	});
@@ -805,19 +624,14 @@ exports.share = function (req, res) {
 /**
  * Play Sketch by URL
  */
-
 exports.queue = function (req, res) {
-
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
-
 		return res.apiError({
 			success: false,
 			note: 'renderer not connected'
 		});
-
 	}
-
 	if (ipc.of.dplayeripc) {
 		var sketchPath = req.body.address;
 		ipc.of.dplayeripc.emit('message', sketchPath);
@@ -826,43 +640,16 @@ exports.queue = function (req, res) {
 			note: 'queued sketch URL'
 		});
 	} else {
-
 		return res.apiError({
 			success: false,
 			note: 'could not queue sketch URL'
 		});
-
 	}
-
-	// Sketch.model.findById(req.params.id).exec(function (err, item) {
-
-	// 	if (err) return res.apiError('database error', err);
-	// 	if (!item) return res.apiError('not found');
-
-	// 	if (ipc.of.dplayeripc) {
-	// 		var sketchPath = 'file:///' + res.locals.staticPath + item.localDir + '/index.html';
-	// 		ipc.of.dplayeripc.emit('message', sketchPath);
-	// 		console.log('yes');
-
-	// 		res.apiResponse({
-	// 			success: true
-	// 		});
-	// 	} else {
-	// 		console.log('neswsfo');
-
-	// 		res.apiError({
-	// 			success: false
-	// 		});
-
-	// 	}
-
-	// });
 };
 
 /**
  * Drop database and rebuild after scanning directories
  */
-
 exports.initialise = function (req, res) {
 	// load Profile (colour calibration/hyperion config)
 	var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
@@ -908,7 +695,6 @@ exports.initialise = function (req, res) {
 	}
 	// drop sketches in database
 	Media.model.find(function (err, items) {
-
 		if (err) {
 			return res.apiError({
 				success: false,
@@ -924,29 +710,17 @@ exports.initialise = function (req, res) {
 						note: 'could not drop media from database'
 					});
 				}
-
 			});
-			// items[i].state = 'archived';
-			// items[i].save(function(err) {
-			// 	if(err) {
-			// 		return res.apiError({
-			// 			success: false,
-			// 			note: 'could not drop sketch from database'
-			// 		});
-			// 	}
-			// })
 		}
 	});
 	// drop channels in database
 	MediaChannel.model.find(function (err, items) {
-
 		if (err) {
 			return res.apiError({
 				success: false,
 				note: 'could not get channels from database: ' + err
 			});
 		}
-		// console.log(items.length);
 		for (var i = 0; i < items.length; i++) {
 			items[i].remove(function (err) {
 				if (err) {
@@ -955,17 +729,7 @@ exports.initialise = function (req, res) {
 						note: 'could not drop channel from database'
 					});
 				}
-				// 
 			});
-			// items[i].state = 'archived';
-			// items[i].save(function(err) {
-			// 	if(err) {
-			// 		return res.apiError({
-			// 			success: false,
-			// 			note: 'could not drop sketch from database'
-			// 		});
-			// 	}
-			// })
 		}
 	});
 	// scan sketch directory
@@ -1048,7 +812,6 @@ exports.initialise = function (req, res) {
  * Get IPFS identity
  */
 exports.identity = function (req, res) {
-
 	ipfs.id(function (err, identity) {
 		if (err) {
 			return res.apiError({
@@ -1068,7 +831,6 @@ exports.identity = function (req, res) {
  * Download Media from IPFS
  */
 exports.download = function (req, res) {
-
 	if (req.params.ipfs) {
 		// // check if hash is already in database
 		// Sketch.model.findOne({
@@ -1081,25 +843,16 @@ exports.download = function (req, res) {
 		// 		});
 		// 	}
 		// });
-		// // try add IPFS hash
-		// res.apiResponse({
-		// 	success: true,
-		// 	ipfsHash: req.params.ipfs
-		// });
-
 		// try add IPFS hash
-		var ipfsURI = '/ipfs/' + req.params.ipfs; //'/ipfs/' + ipfsHash;
+		var ipfsURI = '/ipfs/' + req.params.ipfs;
 		ipfs.files.get(ipfsURI, function (err, files) {
 			if (err) {
-				//console.log('not workng')
 				console.log(err);
 				res.apiResponse({
 					success: false,
 					error: err
 				});
-
 			} else {
-
 				// check existing database
 				Media.model.findOne({
 					ipfsHash: req.params.ipfs
@@ -1109,18 +862,14 @@ exports.download = function (req, res) {
 							success: false,
 							duplicates: result
 						});
-
 					} else {
 						// save each file
 						var saveDir = req.params.ipfs;
 						var sketchPath = res.locals.staticPath + saveDir;
 						files.forEach((file) => {
 							if (file.content) {
-
-								//console.log(file.path);
 								var fileName = file.path.slice(46); // trim ipfs hash
 								var fileDir = path.dirname(fileName);
-								//var filePath = sketchPath + fileDir; // full directory
 								fileDir
 									.split(path.sep)
 									.reduce((currentPath, folder) => {
@@ -1137,7 +886,6 @@ exports.download = function (req, res) {
 										return currentPath;
 									}, '');
 								var fileURI = sketchPath + fileName;
-								//console.log(fileURI);
 								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
 									if (fserr) {
 										console.log(fserr);
@@ -1147,7 +895,6 @@ exports.download = function (req, res) {
 											error: fserr
 										});
 									}
-									//else console.log('File saved')
 								});
 							}
 						});
@@ -1173,23 +920,17 @@ exports.download = function (req, res) {
 									success: true,
 									sketch: files
 								});
-
 							}
 						});
-
-
 					}
 				});
-
 			}
 		});
-
 	} else {
 		// no IPFS key added
 		res.apiResponse({
 			success: false,
 			error: "no ipfs key aded"
 		});
-
 	}
 };

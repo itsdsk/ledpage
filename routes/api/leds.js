@@ -28,7 +28,6 @@ exports.map_positions = function (req, res) {
         console.log('creating config directory');
         fs.mkdirSync(res.locals.configStaticPath);
     }
-
     // read hyperion config template then add new led coords and save
     fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function (err, data) {
         if (err) {
@@ -87,15 +86,6 @@ exports.map_positions = function (req, res) {
                     });
                 }
             });
-
-            //
-            //
-            //
-            //
-
-            // return res.apiResponse({
-            //     success: true
-            // });
         } catch (exception) {
             console.log('wedwddfaf' + exception);
             return res.apiError({
@@ -103,21 +93,6 @@ exports.map_positions = function (req, res) {
             });
         }
     });
-    // console.log(ledConfig);
-    // if (!isDplayerConnected) {
-    // 	console.log('no');
-
-    // 	return res.apiError({
-    // 		success: false
-    // 	});
-
-    // } else {
-    // 	console.log('yes');
-
-    // 	return res.apiResponse({
-    // 		success: true
-    // 	});
-    // }
 };
 
 /**
@@ -202,11 +177,8 @@ exports.calibrate = function (req, res) {
                     }
                 });
             });
-
         }
     }
-
-
 };
 
 
@@ -214,7 +186,6 @@ exports.calibrate = function (req, res) {
  * Setup LED output configuration
  */
 exports.config_arduino = function (req, res) {
-
     // get request body from HTTP post
     var config = {
         "ledcount": parseInt(req.body.numLeds, 10),
@@ -226,7 +197,6 @@ exports.config_arduino = function (req, res) {
     if (req.body.clockPin) {
         config.clockpin = req.body.clockPin;
     }
-
     // create config directory if doesnt exist
     if (!fs.existsSync(res.locals.configStaticPath)) {
         console.log('creating config directory');
@@ -254,22 +224,6 @@ exports.config_arduino = function (req, res) {
                 note: 'arduino not available'
             });
         } else {
-
-            // if(moduleAvailable('arduino')){
-            // 	console.log('arduino available');
-            // return res.apiResponse({
-            // 	success: true
-            // });
-            // }else{
-            // console.log('arduino not available');
-            // return res.apiError({
-            // 	success: false,
-            // 	note: 'arduino not available'
-            // });
-            // }
-
-            // setup arduino
-            // if (true) {
             // construct arduino file
             fs.writeFile("./libs/controller/arduino_segments/form_setup.ino", '#include "FastLED.h"\n', function (err) {
                 if (err) {
@@ -346,32 +300,12 @@ exports.config_arduino = function (req, res) {
                                     });
                                 }
                             });
-
                         });
                     });
                 });
             });
         }
     });
-
-    // return res.apiResponse({
-    // 	success: true
-    // });
-
-    // if (!isDplayerConnected) {
-    // 	console.log('player error: player not connected');
-
-    // 	return res.apiError({
-    // 		success: false
-    // 	});
-
-    // } else {
-    // 	console.log('player is connected');
-
-    // 	return res.apiResponse({
-    // 		success: true
-    // 	});
-    // }
 };
 
 const net = require('net');
@@ -379,16 +313,13 @@ const net = require('net');
  * Set hyperion brightness
  */
 exports.set_brightness = function (req, res) {
-
     var val = parseFloat(req.params.val);
-
     var jsonCommand = {
         command: "transform",
         transform: {
             luminanceGain: val
         }
     };
-
     var client = new net.Socket();
     client.setTimeout(1500);
     client.connect(19444, 'localhost', function () {
@@ -396,7 +327,6 @@ exports.set_brightness = function (req, res) {
         const string = JSON.stringify(jsonCommand) + "\n";
         client.write(string);
     });
-
     client.on('error', (error) => {
         console.log('error setting brightness');
         console.log(error);
@@ -404,7 +334,6 @@ exports.set_brightness = function (req, res) {
             error: error
         });
     });
-
     client.on('data', function (data) {
         console.log('Received: ' + data);
         client.destroy(); // kill client after server's response
@@ -413,31 +342,6 @@ exports.set_brightness = function (req, res) {
             response: data
         });
     });
-
-    // hyperion.getOn((error, response) => {
-    // 	if (error) {
-    // 		console.log('error setting hyperion brightness - no connection?');
-    // 		console.log(error);
-    // 		return res.apiResponse({
-    // 			error: error
-    // 		})
-    // 	}
-
-    // 	const col = hyperion.color.rgb(val, val, val);
-    // 	hyperion.setBrightness(col.value(), (error, response) => {
-    // 		if (error) {
-    // 			console.log('error setting hyperion brightness - no connection?');
-    // 			console.log(error);
-    // 			return res.apiResponse({
-    // 				error: error
-    // 			})
-    // 		}
-    // 		res.apiResponse({
-    // 			success: true,
-    // 			response: response
-    // 		})
-    // 	})
-    // })
 };
 
 
@@ -485,7 +389,6 @@ exports.reboot = function (req, res) {
                     });
                 }
             });
-
         } else { // supervisor doesnt exist
             console.log('errors');
             return res.apiError({
@@ -541,7 +444,6 @@ exports.shutdown = function (req, res) {
                     });
                 }
             });
-
         } else { // supervisor doesnt exist
             console.log('errors');
             return res.apiError({
@@ -550,5 +452,4 @@ exports.shutdown = function (req, res) {
             });
         }
     });
-
 };
