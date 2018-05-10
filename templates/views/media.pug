@@ -47,7 +47,7 @@ block content
 										each channel in data.channels
 											- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 											li(class=(channelActive ? 'active' : ''))
-												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.key
+												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id).api-get-btn=channel.key
 						.channel-sync
 							if data.sketch.ipfsHash
 								- var shortHash = data.sketch.ipfsHash.substring(0,24);
@@ -107,6 +107,26 @@ block js
 				});
 			}
 			$('.btn-channel').click( channelButton );
+
+			//
+			// ajax button GET
+			function apiGetButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+					},
+					success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+					}
+				});
+			}
+			$('.api-get-btn').click( apiGetButton );
+
 			// change tab according to query string (after page loads otherwise the media iframe doesn't...)
 			setTimeout(function(){$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')}, 3000);
 		});
