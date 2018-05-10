@@ -355,11 +355,11 @@ exports.reboot = function (req, res) {
     var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
         console.log('out: ' + `${stdout}`);
         console.log('errors:' + `${stderr}`);
-        if (err !== null) {
+        if (err) {
             console.log(`exec error: ${err}`);
             return res.apiError({
                 success: false,
-                note: 'could not send reboot signal'
+                note: 'could not find system supervisor'
             });
         }
         if (stdout.length > 0) { // exists
@@ -409,11 +409,11 @@ exports.shutdown = function (req, res) {
     var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
         console.log('out: ' + `${stdout}`);
         console.log('errors:' + `${stderr}`);
-        if (err !== null) {
+        if (err) {
             console.log(`exec error: ${err}`);
             return res.apiError({
                 success: false,
-                note: 'could not send reboot signal'
+                note: 'could not find system supervisor'
             });
         }
         if (stdout.length > 0) { // exists
