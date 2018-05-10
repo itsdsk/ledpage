@@ -1,7 +1,7 @@
 require('dotenv').config();
 var async = require('async');
 var keystone = require('keystone');
-
+var cmd = require('node-cmd');
 // http
 var http = require('http');
 
@@ -578,15 +578,14 @@ exports.savescreen = function (req, res) {
 	// prep to save screenshot
 	// var exec = require('child_process').exec;
 	// const { exec } = require('child_process');
-	var cmd = require('node-cmd');
+	
 	var uploadName = 'screenshot.png';
 	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
 	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
 	console.log('saving screenshot to: ' + uploadPath);
 	// save screenshot
 	cmd.get(
-		// execCommand,
-		'whoami',
+		execCommand,
 		function(err, stdout, stderr){
 			if (err) {
 				console.log('screenshot error: '+JSON.stringify(err));

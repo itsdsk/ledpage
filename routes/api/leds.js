@@ -357,10 +357,10 @@ exports.reboot = function (req, res) {
     cmd.get(
         'printenv RESIN_SUPERVISOR_API_KEY',
         function(err, stdout, stderr){
-            console.log('out: ' + `${stdout}`);
-            console.log('errors:' + `${stderr}`);
+            console.log('out: ', stdout);
+            console.log('errors:', stderr);
             if (err) {
-                console.log(`exec error: ${err}`);
+                console.log('exec error:', JSON.stringify(err));
                 return res.apiError({
                     success: false,
                     note: 'could not find system supervisor'
