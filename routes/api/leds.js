@@ -353,11 +353,25 @@ exports.set_brightness = function (req, res) {
  */
 exports.reboot = function (req, res) {
     // check resin supervisor exists
-    var shell = require('shelljs');
     // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
     //const exec = require('child_process').exec;
-    console.log(process.env.RESIN_SUPERVISOR_API_KEY);
-    var supervisorCheck = shell.exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr) {
+    var child_process = require('child_process');
+    if(child_process.execSync('printenv RESIN_SUPERVISOR_API_KEY').toString().length > 0){
+        console.log('pass1');
+        return res.apiResponse({
+            success: true,
+            note: 'queued system to reboot'
+        });
+    }else{
+        console.log('pass2');
+        console.log('out: ', stdout);
+        console.log('errors:', stderr);
+            return res.apiError({
+            success: false,
+            note: 'could not talk to supervisor'
+        });
+    }
+    // var supervisorCheck = shell.exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr) {
             // if (stderr) {
             //     console.log('exec error:', JSON.stringify(err));
             //     console.log('out: ', stdout);
@@ -366,24 +380,24 @@ exports.reboot = function (req, res) {
             //         success: false,
             //         note: 'could not find system supervisor'
             //     });
-            if(stdout.length > 0){ // supervisor exists
-                console.log('out: ', stdout);
-                console.log('errors:', stderr);
-                return res.apiResponse({
-                    success: true,
-                    note: 'queued system to reboot'
-                });
+    //         if(stdout.length > 0){ // supervisor exists
+    //             console.log('out: ', stdout);
+    //             console.log('errors:', stderr);
+    //             return res.apiResponse({
+    //                 success: true,
+    //                 note: 'queued system to reboot'
+    //             });
 
-            }else{ // supervisor doesnt exist
-                console.log('out: ', stdout);
-                console.log('errors:', stderr);
-                    return res.apiError({
-                    success: false,
-                    note: 'could not talk to supervisor'
-                });
-            }
-        }
-    );
+    //         }else{ // supervisor doesnt exist
+    //             console.log('out: ', stdout);
+    //             console.log('errors:', stderr);
+    //                 return res.apiError({
+    //                 success: false,
+    //                 note: 'could not talk to supervisor'
+    //             });
+    //         }
+    //     }
+    // );
         // console.log('out: ' + `${stdout}`);
         // console.log('errors:' + `${stderr}`);
         // if (err) {
