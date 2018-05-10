@@ -586,7 +586,9 @@ exports.savescreen = function (req, res) {
 	exec(execCommand, (err, stdout, stderr)  => {
 		console.log(stdout);
 		if (err) {
-			console.log('screenshot error: ');
+			console.log('screenshot error: '+JSON.stringify(err));
+			console.log('stdout: '+stdout);
+			console.log('stderr: '+stderr);
 			return res.apiError({
 				success: false,
 				note: 'could not save screenshot'
