@@ -97,7 +97,7 @@ block content
 					each channel in data.channels
 						li(role='presentation' class=data.channel && data.channel.id == channel.id ? 'active' : null)
 							.btn-group.btn-group-justified
-								a(href='/channel/'+channel.key, style='width:5%').btn.btn-default
+								a(href='/channel/'+channel.key, style='width:5%').btn.btn-default.btn-lg
 									.text-left
 										span.badge=channel.sketchCount
 										| &ensp;
@@ -105,14 +105,14 @@ block content
 								a(href='#').btn.btn-default
 									span.glyphicon.glyphicon-play
 								.btn-group
-									a(href='#' data-toggle='dropdown').btn.btn-default.dropdown-toggle
+									a(href='#' data-toggle='dropdown').btn.btn-default.dropdown-toggle.btn-lg
 										span.caret
 									ul(role='menu').dropdown-menu
 										li
 											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').api-get-btn Delete
 					li(role='presentation')
 						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
-							.input-group.input-group-lg
+							.input-group.input-group-md
 								span.input-group-addon
 									i.glyphicon.glyphicon-globe
 								input(type='text', placeholder='Add Channel', id='name', name='name' required).form-control
