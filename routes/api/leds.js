@@ -356,6 +356,7 @@ exports.reboot = function (req, res) {
     var shell = require('shelljs');
     // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
     //const exec = require('child_process').exec;
+    console.log(process.env.RESIN_SUPERVISOR_API_KEY);
     var supervisorCheck = shell.exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr) {
             // if (stderr) {
             //     console.log('exec error:', JSON.stringify(err));
