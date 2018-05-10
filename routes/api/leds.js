@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var cmd = require('node-cmd');
 
 /**
  * Set media player LED coord mapping
@@ -352,11 +351,9 @@ exports.set_brightness = function (req, res) {
  */
 exports.reboot = function (req, res) {
     // check resin supervisor exists
-    //const exec = require('child_process').exec;
+    var exec = require('child_process').exec;
     // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
-    cmd.get(
-        'printenv RESIN_SUPERVISOR_API_KEY',
-        function(err, stdout, stderr){
+    exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr){
             console.log('out: ', stdout);
             console.log('errors:', stderr);
             if (err) {
