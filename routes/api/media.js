@@ -818,10 +818,7 @@ exports.initialise = function (req, res) {
 	});
 	// scan sketch directory
 	var newItems = {
-		MediaChannel: [{
-			'name': 'sketches',
-			'__ref': 'sketches'
-		}],
+		MediaChannel: [],
 		Media: []
 	};
 	// scan sketch directory
@@ -866,7 +863,7 @@ exports.initialise = function (req, res) {
 							"state": obj.disk.state ? obj.disk.state : "published",
 							"ipfsHash": obj.disk.ipfsHash ? obj.disk.ipfsHash : null,
 							"localDir": files[i],
-							"channels": obj.disk.channels ? obj.disk.channels : "sketches",
+							"channels": obj.disk.channels ? obj.disk.channels : null,
 						});
 					}
 				} else {
@@ -876,7 +873,6 @@ exports.initialise = function (req, res) {
 						"title": files[i],
 						"state": "published",
 						"localDir": files[i],
-						"channels": "sketches",
 					});
 				}
 			} else {
