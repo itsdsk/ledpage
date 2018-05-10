@@ -10,12 +10,10 @@ var keystone = require('keystone');
 // See http://keystonejs.com/guide/config for available options
 // and documentation.
 
-var port = 8081;
-
 keystone.init({
   'cookie secret': '05f8261c27d0ac4751627b469d7e2d9b84246bbbc4b68edc3c5b530af1010560ac63182ff59adce22e5ff44ab6e66075bd460e89803a818c183c9f4f2049e260',
   'name': 'Disks',
-  'port': port,
+  'port': parseInt(process.env.PORT || 80, 10),
   'sass': 'public',
   'static': ['public', '/data/content'],
   'favicon': 'public/favicon.ico',
@@ -60,6 +58,6 @@ keystone.set('routes', require('./routes'));
 
 keystone.start(function () {
   // initialise database
-  var initurl = 'http://0.0.0.0:'+port+'/api/media/list/init';
+  var initurl = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/list/init';
   require('http').get(initurl);
 });

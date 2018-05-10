@@ -1,3 +1,4 @@
+require('dotenv').config();
 var async = require('async');
 var keystone = require('keystone');
 
@@ -164,7 +165,7 @@ ipc.connectTo(
 			'message',
 			function (data, socket) {
 				if(screenshotID != null){
-					var apiAddress = 'http://0.0.0.0:80/api/media/'+screenshotID+'/screenshot';
+					var apiAddress = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+screenshotID+'/screenshot';
 					http.get(apiAddress);
 					screenshotID = null;
 				}
@@ -322,7 +323,7 @@ exports.create = function (req, res) {
 					});
 				}
 				// play new sketch
-				var playURL = 'http://0.0.0.0:80/api/media/'+newModel.id+'/play';
+				var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+newModel.id+'/play';
 				http.get(playURL);
 				// finished
 				return res.apiResponse({
