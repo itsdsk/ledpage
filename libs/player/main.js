@@ -16,10 +16,11 @@ const {
  we initialize our application display as a callback of the electronJS "ready" event
  */
 app.on('ready', () => {
-  // here we actually configure the behavour of electronJS
-  mainWindow = new BrowserWindow({
+  // window options (electronJS)
+  const windowOpts = {
     width: 720,
     height: 720,
+    show: false,
     // center: true,
     // useContentSize: true,
     frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
@@ -30,10 +31,35 @@ app.on('ready', () => {
       nodeIntegration: false,
       overlayScrollbars: false,
     },
-  });
-  mainWindow.webContents.on('did-finish-load', () => {
+  };
+  // create 2 windows
+  mainWindowA = new BrowserWindow(windowOpts);
+  mainWindowB = new BrowserWindow(windowOpts);
+
+  // behaviour on pageload
+  mainWindowA.webContents.on('did-finish-load', () => {
     setTimeout(() => {
-      mainWindow.show();
+      // show newly opened window
+      if(mainWindowA.isMinimized()){
+        mainWindowA.restore();
+      }
+      mainWindowA.show();
+      // hide previous window
+      mainWindowB.hide();
+      mainWindowB.minimize();
+      ipc.server.broadcast('message', 'test');
+    }, 300);
+  });
+  mainWindowB.webContents.on('did-finish-load', () => {
+    setTimeout(() => {
+      // show newly opened window
+      if(mainWindowB.isMinimized()){
+        mainWindowB.restore();
+      }
+      mainWindowB.show();
+      // hide previous window
+      mainWindowA.hide();
+      mainWindowA.minimize();
       ipc.server.broadcast('message', 'test');
     }, 300);
   });
@@ -42,9 +68,12 @@ app.on('ready', () => {
     console.log(err);
   });
 
-  // the big red button, here we go
+  // initial page load
   var initialURL = `file:///${path.join(__dirname, 'data', 'index.html')}`;
-  mainWindow.loadURL(initialURL);
+  mainWindowA.loadURL(initialURL);
+
+  // bool state to say which window to load to
+  var flipWindow = false;
 
   // recieve URI to display
   ipc.config.id = 'dplayeripc';
@@ -55,7 +84,14 @@ app.on('ready', () => {
         'message',
         function (data, socket) {
           console.log('electron load URL: ' + data);
-          mainWindow.loadURL(data); // display recieved URI
+          // display recieved URI
+          if(flipWindow){
+            mainWindowA.loadURL(data);
+          }else{
+            mainWindowB.loadURL(data);
+          }
+          // flip window to display on
+          flipWindow = !flipWindow;
         }
       );
       ipc.server.on(
