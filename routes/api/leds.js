@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-
+const { exec } = require('child_process');
 /**
  * Set media player LED coord mapping
  */
@@ -351,14 +351,14 @@ exports.set_brightness = function (req, res) {
  */
 exports.reboot = function (req, res) {
     // check resin supervisor exists
-    var exec = require('child_process').exec;
+    
     // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
-    exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr){
-            console.log('out: ', stdout);
-            console.log('errors:', stderr);
+    exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
             if (err) {
                 console.log('exec error:', JSON.stringify(err));
-                return res.apiError({
+                console.log('out: ', stdout);
+                console.log('errors:', stderr);
+                    return res.apiError({
                     success: false,
                     note: 'could not find system supervisor'
                 });
@@ -369,7 +369,9 @@ exports.reboot = function (req, res) {
                 });
 
             }else{ // supervisor doesnt exist
-                return res.apiError({
+                console.log('out: ', stdout);
+                console.log('errors:', stderr);
+                    return res.apiError({
                     success: false,
                     note: 'could not talk to supervisor'
                 });
