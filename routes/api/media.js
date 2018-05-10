@@ -576,9 +576,8 @@ exports.savescreen = function (req, res) {
 		});
 	}
 	// prep to save screenshot
-	var sys = require('sys');
 	// var exec = require('child_process').exec;
-	var { exec } = require('child_process');
+	const { exec } = require('child_process');
 	var uploadName = 'screenshot.png';
 	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
 	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
@@ -592,12 +591,11 @@ exports.savescreen = function (req, res) {
 				success: false,
 				note: 'could not save screenshot'
 			});
-		} else {
-			return res.apiResponse({
-				success: true,
-				note: 'saved screenshot'
-			});
 		}
+		return res.apiResponse({
+			success: true,
+			note: 'saved screenshot'
+		});
 	});
 };
 
