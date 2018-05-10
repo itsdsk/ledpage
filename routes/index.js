@@ -63,6 +63,7 @@ exports = module.exports = function (app) {
 	app.get('/api/media/:ipfs/download', keystone.middleware.api, routes.api.media.download); // download media from ipfs hash
 	app.get('/api/media/channel/subscribe', keystone.middleware.api, routes.api.media.subscribe); // subscribe to new channel
 	app.get('/api/media/channel/unsubscribe', keystone.middleware.api, routes.api.media.unsubscribe); // unsubscribe from channel
+	app.get('/api/media/channel/autoplay', keystone.middleware.api, routes.api.media.autoplay); // display collection of media cyclically
 
 	// LED routes
 	app.all('/api/leds/map-positions', keystone.middleware.api, routes.api.leds.map_positions); // update player led map

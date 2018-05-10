@@ -102,7 +102,7 @@ block content
 										span.badge=channel.sketchCount
 										| &ensp;
 										=channel.key
-								a(href='#').btn.btn-default
+								a(href='/api/media/channel/autoplay?secs=20&channel='+channel.id).btn.btn-default
 									span.glyphicon.glyphicon-play
 								.btn-group
 									a(href='#' data-toggle='dropdown').btn.btn-default.dropdown-toggle.btn-lg

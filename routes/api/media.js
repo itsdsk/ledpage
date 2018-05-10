@@ -220,6 +220,11 @@ exports.list = function (req, res) {
  * Play Media by ID
  */
 exports.play = function (req, res) {
+	// stop autoplay
+	if(autoplay){
+		clearInterval(autoplay);
+	}
+	
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 		return res.apiError({
@@ -790,6 +795,10 @@ exports.share = function (req, res) {
  * Play Sketch by URL
  */
 exports.queue = function (req, res) {
+	// stop autoplay
+	if(autoplay){
+		clearInterval(autoplay);
+	}
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 		return res.apiError({
@@ -1103,3 +1112,57 @@ exports.download = function (req, res) {
 		});
 	}
 };
+
+/**
+ * Play collection of media cyclically
+ */
+var autoplay;
+var autoplayCount = 0;
+exports.autoplay = function (req, res) {
+	var mediaArray = ["wafd", "aewf"];
+	if(!req.query.secs){
+			return res.apiError({
+				success: false,
+				note: 'no interval set'
+			});
+	}else{
+		// get interval in ms
+		var interval = req.query.secs * 1000;
+		// get media array
+		if(!req.query.channel){
+			return res.apiError({
+				success: false,
+				note: 'no channel set'
+			});
+		}else{
+			// query database
+			Media.model.find().where('state','published').sort('-publishedDate').populate('channels').where('channels').in([req.query.channel]).exec(function(err, results) {
+				if(err) {
+					//
+				}else{
+					var mediaArray = [];
+					for(var i=0; i<results.length; i++){
+						mediaArray.push(results[i].localDir);
+					}
+					autoplayMedia = mediaArray;
+					console.log(mediaArray);
+					autoplay = setInterval(function(media) {
+						// media to play
+						var currentMedia = media[autoplayCount%media.length];
+						var mediaPath = 'file:///' + res.locals.staticPath + currentMedia + '/index.html';
+						console.log(mediaPath);
+						if (isDplayerConnected) {
+							ipc.of.dplayeripc.emit('message', mediaPath);
+						}
+						autoplayCount++;
+					}, interval, mediaArray);
+					return res.apiResponse({
+						success: true,
+						note: 'werarfe'
+					});
+				}
+			});
+		}
+	}
+};
+
