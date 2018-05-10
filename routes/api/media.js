@@ -632,10 +632,41 @@ exports.screenshot = function (req, res) {
 						success: false
 					});
 				} else {
-					return res.apiResponse({
-						success: true,
-						note: 'screenshot saved to db'
-					});
+					// save prefthumb to metadata file
+						// update metadata file
+						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
+						var diskJSONexists = fs.existsSync(diskJSONpath);
+						if(diskJSONexists){
+							// read json with metadata
+							var rawDiskJSON = fs.readFileSync(diskJSONpath);
+							if(!rawDiskJSON) {
+								console.log('could not read updated media metadata');
+								return res.apiError({
+									success: false,
+									note: 'could not read media metadata file'
+								});
+							} else {
+								// add new metadata to loaded object
+								var obj = JSON.parse(rawDiskJSON);
+								obj.disk.prefThumb = uploadName;
+								// save new metadata
+								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
+									if(err){
+										console.log('error saving setup json' + err);
+										return res.apiError({
+											success: false,
+											note: 'could not save screenshot to metadata file'
+										});					
+									}else{
+										// finished
+										return res.apiResponse({
+											success: true,
+											note: 'screenshot saved to db'
+										});
+									}
+								})
+							}
+						}
 				}
 			});
 		});
