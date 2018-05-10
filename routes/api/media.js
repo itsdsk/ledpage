@@ -1,7 +1,7 @@
 require('dotenv').config();
 var async = require('async');
 var keystone = require('keystone');
-var cmd = require('node-cmd');
+
 // http
 var http = require('http');
 
@@ -543,7 +543,7 @@ exports.screenshot = function (req, res) {
 			// add thumbnail to database
 			var thumbEntry = {
 				prefThumb: uploadName
-			};
+			}; 
 			Media.updateItem(item, thumbEntry, {
 				fields: ["prefThumb"]
 			}, function (dberror) {
@@ -576,51 +576,28 @@ exports.savescreen = function (req, res) {
 		});
 	}
 	// prep to save screenshot
-	// var exec = require('child_process').exec;
-	// const { exec } = require('child_process');
-	
+	var sys = require('sys');
+	var exec = require('child_process').exec;
 	var uploadName = 'screenshot.png';
 	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
 	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
 	console.log('saving screenshot to: ' + uploadPath);
 	// save screenshot
-	cmd.get(
-		execCommand,
-		function(err, stdout, stderr){
-			if (err) {
-				console.log('screenshot error: '+JSON.stringify(err));
-				console.log('stdout: '+stdout);
-				console.log('stderr: '+stderr);
-				return res.apiError({
-					success: false,
-					note: 'could not save screenshot'
-				});
-			}else{
-				console.log('stdout: '+stdout);
-				console.log('stderr: '+stderr);
-				return res.apiResponse({
-					success: true,
-					note: 'saved screenshot'
-				});
-			}
+	exec(execCommand, function (err, stdout, stderr) {
+		console.log(stdout);
+		if (err) {
+			console.log('screenshot error: ');
+			return res.apiError({
+				success: false,
+				note: 'could not save screenshot'
+			});
+		} else {
+			return res.apiResponse({
+				success: true,
+				note: 'saved screenshot'
+			});
 		}
-	);
-	// exec(execCommand, (err, stdout, stderr)  => {
-	// 	console.log(stdout);
-	// 	if (err) {
-	// 		console.log('screenshot error: '+JSON.stringify(err));
-	// 		console.log('stdout: '+stdout);
-	// 		console.log('stderr: '+stderr);
-	// 		return res.apiError({
-	// 			success: false,
-	// 			note: 'could not save screenshot'
-	// 		});
-	// 	}
-	// 	return res.apiResponse({
-	// 		success: true,
-	// 		note: 'saved screenshot'
-	// 	});
-	// });
+	});
 };
 
 /**
