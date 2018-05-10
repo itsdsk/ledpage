@@ -13,6 +13,7 @@
     "node-ipc": "^9.1.1",
     "ipfs-api": "^20.0.0",
     "command-exists": "1.2.6",
+    "shelljs": "0.8.2",
     "node-cmd": "3.0.0"
   },
   "devDependencies": {
