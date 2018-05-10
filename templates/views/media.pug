@@ -47,7 +47,7 @@ block content
 										each channel in data.channels
 											- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
 											li(class=(channelActive ? 'active' : ''))
-												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.name
+												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id, class='btn-channel')=channel.key
 						.channel-sync
 							if data.sketch.ipfsHash
 								- var shortHash = data.sketch.ipfsHash.substring(0,24);

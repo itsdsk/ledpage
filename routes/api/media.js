@@ -463,28 +463,40 @@ exports.channel = function (req, res) {
 							note: 'updated media but failed to find metadata file'
 						});
 					} else {
-						// add new metadata to loaded object
-						var obj = JSON.parse(rawDiskJSON);
-						obj.disk.channels.push(req.query._id);
-						// save new metadata
-						fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
-							if(err){
-								console.log('error saving setup json' + err);
-								return res.apiError({
-									success: false,
-									note: 'updated but failed to save metadata file'
-								});					
+						// get channel key (name as string) from id
+						MediaChannel.model.findById(req.query._id).exec(function(err, updatedChannel){
+							if (err) return res.apiError('database error', err);
+							if (!updatedChannel) return res.apiError('not found');
+							// add new metadata to loaded object
+							var obj = JSON.parse(rawDiskJSON);
+							if(alreadyInChannel == false){
+								obj.disk.channels.push(updatedChannel.key);
 							}else{
-								// play new sketch
-								var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+req.params.id+'/play';
-								http.get(playURL);
-								// finished
-								return res.apiResponse({
-									success: true,
-									note: 'added media to channel'
-								});
+								var channelIdx = obj.disk.channels.indexOf(updatedChannel.key);
+								if(channelIdx > -1){
+									obj.disk.channels.splice(channelIdx, 1);
+								}
 							}
-						})
+							// save new metadata
+							fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
+								if(err){
+									console.log('error saving setup json' + err);
+									return res.apiError({
+										success: false,
+										note: 'updated but failed to save metadata file'
+									});					
+								}else{
+									// play new sketch
+									var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+req.params.id+'/play';
+									http.get(playURL);
+									// finished
+									return res.apiResponse({
+										success: true,
+										note: 'added media to channel'
+									});
+								}
+							});
+						});
 					}
 				}
 			}
