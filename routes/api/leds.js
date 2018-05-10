@@ -353,96 +353,53 @@ exports.set_brightness = function (req, res) {
  */
 exports.reboot = function (req, res) {
     // check resin supervisor exists
-    // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
-    //const exec = require('child_process').exec;
-    var child_process = require('child_process');
-    if(child_process.execSync('printenv RESIN_SUPERVISOR_API_KEY').toString().length > 0){
-        console.log('pass1');
-        return res.apiResponse({
-            success: true,
-            note: 'queued system to reboot'
-        });
-    }else{
-        console.log('pass2');
-        console.log('out: ', stdout);
-        console.log('errors:', stderr);
+    const exec = require('child_process').exec;
+    var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
+        console.log('out: ' + `${stdout}`);
+        console.log('errors:' + `${stderr}`);
+        if (err !== null) {
+            console.log(`exec error: ${err}`);
             return res.apiError({
-            success: false,
-            note: 'could not talk to supervisor'
-        });
-    }
-    // var supervisorCheck = shell.exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr) {
-            // if (stderr) {
-            //     console.log('exec error:', JSON.stringify(err));
-            //     console.log('out: ', stdout);
-            //     console.log('errors:', stderr);
-            //         return res.apiError({
-            //         success: false,
-            //         note: 'could not find system supervisor'
-            //     });
-    //         if(stdout.length > 0){ // supervisor exists
-    //             console.log('out: ', stdout);
-    //             console.log('errors:', stderr);
-    //             return res.apiResponse({
-    //                 success: true,
-    //                 note: 'queued system to reboot'
-    //             });
-
-    //         }else{ // supervisor doesnt exist
-    //             console.log('out: ', stdout);
-    //             console.log('errors:', stderr);
-    //                 return res.apiError({
-    //                 success: false,
-    //                 note: 'could not talk to supervisor'
-    //             });
-    //         }
-    //     }
-    // );
-        // console.log('out: ' + `${stdout}`);
-        // console.log('errors:' + `${stderr}`);
-        // if (err) {
-        //     console.log(`exec error: ${err}`);
-        //     return res.apiError({
-        //         success: false,
-        //         note: 'could not find system supervisor'
-        //     });
-        // }
-    //     if (stdout.length > 0) { // exists
-    //         // command for resin supervisor reboot
-    //         var cmd = 'curl -X POST --header "Content-Type:application/json" "$RESIN_SUPERVISOR_ADDRESS/v1/reboot?apikey=$RESIN_SUPERVISOR_API_KEY"';
-    //         // send reboot signal
-    //         var reboot = exec(cmd, (err, stdout, stderr) => {
-    //             console.log('out: ' + `${stdout}`);
-    //             console.log('errors:' + `${stderr}`);
-    //             // if (err !== null) {
-    //             //     console.log(`exec error: ${err}`);
-    //             //     return res.apiError({
-    //             //         success: false,
-    //             //         note: 'could not send reboot signal'
-    //             //     });
-    //             // }
-    //             if (!err) {
-    //                 console.log('no erroi');
-    //                 return res.apiResponse({
-    //                     success: true,
-    //                     note: 'queued system to reboot'
-    //                 });
-    //             } else {
-    //                 console.log('errors');
-    //                 return res.apiError({
-    //                     success: false,
-    //                     note: 'could not reboot'
-    //                 });
-    //             }
-    //         });
-    //     } else { // supervisor doesnt exist
-    //         console.log('errors');
-    //         return res.apiError({
-    //             success: false,
-    //             note: 'could not talk to supervisor'
-    //         });
-    //     }
-    // });
+                success: false,
+                note: 'could not send reboot signal'
+            });
+        }
+        if (stdout.length > 0) { // exists
+            // command for resin supervisor reboot
+            var cmd = 'curl -X POST --header "Content-Type:application/json" "$RESIN_SUPERVISOR_ADDRESS/v1/reboot?apikey=$RESIN_SUPERVISOR_API_KEY"';
+            // send reboot signal
+            var reboot = exec(cmd, (err, stdout, stderr) => {
+                console.log('out: ' + `${stdout}`);
+                console.log('errors:' + `${stderr}`);
+                if (err !== null) {
+                    console.log(`exec error: ${err}`);
+                    return res.apiError({
+                        success: false,
+                        note: 'could not send reboot signal'
+                    });
+                }
+                if (!err) {
+                    console.log('no erroi');
+                    return res.apiResponse({
+                        success: true,
+                        note: 'queued system to reboot'
+                    });
+                } else {
+                    console.log('errors');
+                    return res.apiError({
+                        success: false,
+                        note: 'could not reboot'
+                    });
+                }
+            });
+        } else { // supervisor doesnt exist
+            console.log('errors');
+            return res.apiError({
+                success: false,
+                note: 'could not talk to supervisor'
+            });
+        }
+    });
 };
 
 /**
@@ -454,11 +411,11 @@ exports.shutdown = function (req, res) {
     var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
         console.log('out: ' + `${stdout}`);
         console.log('errors:' + `${stderr}`);
-        if (err) {
+        if (err !== null) {
             console.log(`exec error: ${err}`);
             return res.apiError({
                 success: false,
-                note: 'could not find system supervisor'
+                note: 'could not send reboot signal'
             });
         }
         if (stdout.length > 0) { // exists
@@ -469,13 +426,13 @@ exports.shutdown = function (req, res) {
             var reboot = exec(cmd, (err, stdout, stderr) => {
                 console.log('out: ' + `${stdout}`);
                 console.log('errors:' + `${stderr}`);
-                // if (err !== null) {
-                //     console.log(`exec error: ${err}`);
-                //     return res.apiError({
-                //         success: false,
-                //         note: 'could not send shutdown signal'
-                //     });
-                // }
+                if (err !== null) {
+                    console.log(`exec error: ${err}`);
+                    return res.apiError({
+                        success: false,
+                        note: 'could not send shutdown signal'
+                    });
+                }
                 if (!err) {
                     console.log('no erroi');
                     return res.apiResponse({
