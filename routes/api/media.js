@@ -596,11 +596,14 @@ exports.savescreen = function (req, res) {
 					success: false,
 					note: 'could not save screenshot'
 				});
+			}else{
+				console.log('stdout: '+stdout);
+				console.log('stderr: '+stderr);
+				return res.apiResponse({
+					success: true,
+					note: 'saved screenshot'
+				});
 			}
-			return res.apiResponse({
-				success: true,
-				note: 'saved screenshot'
-			});
 		}
 	);
 	// exec(execCommand, (err, stdout, stderr)  => {
