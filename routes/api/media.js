@@ -374,10 +374,43 @@ exports.update = function (req, res) {
 							note: 'could not update database ' + err
 						});
 					} else {
-						res.apiResponse({
-							success: true,
-							note: 'sketch updated'
-						});
+						// update metadata file
+						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
+						var diskJSONexists = fs.existsSync(diskJSONpath);
+						if(diskJSONexists){
+							// read json with metadata
+							var rawDiskJSON = fs.readFileSync(diskJSONpath);
+							if(!rawDiskJSON) {
+								console.log('could not read updated media metadata');
+								return res.apiError({
+									success: false,
+									note: 'updated media but failed to find metadata file'
+								});
+							} else {
+								// add new metadata to loaded object
+								var obj = JSON.parse(rawDiskJSON);
+								obj.disk.title = req.body.title;
+								// save new metadata
+								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
+									if(err){
+										console.log('error saving setup json' + err);
+										return res.apiError({
+											success: false,
+											note: 'updated but failed to save metadata file'
+										});					
+									}else{
+										// play new sketch
+										var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+req.params.id+'/play';
+										http.get(playURL);
+										// finished
+										return res.apiResponse({
+											success: true,
+											note: 'updated media'
+										});
+									}
+								})
+							}
+						}
 					}
 				});
 			}
