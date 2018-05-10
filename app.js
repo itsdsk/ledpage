@@ -4,7 +4,6 @@ require('dotenv').config();
 
 // Require keystone
 var keystone = require('keystone');
-//const ipc = require('node-ipc');
 
 // Initialise Keystone with your project's configuration.
 // See http://keystonejs.com/guide/config for available options
@@ -19,7 +18,6 @@ keystone.init({
   'favicon': 'public/favicon.ico',
   'views': 'templates/views',
   'view engine': 'pug',
-
   'auto update': true,
   'session': false,
   'auth': false,
@@ -38,26 +36,27 @@ keystone.set('locals', {
   editable: keystone.content.editable,
 });
 
-// // ipc
-// ipc.config.id = 'dremoteipc';
-// ipc.config.retry = 1500;
-// ipc.connectTo(
-//   'dplayeripc',
-//   function () {
-//     ipc.of.dplayeripc.on(
-//       'connect',
-//       function () {
-//         console.log("IPC connected");
-//       }
-//     )
-//   });
-
-
 // Load your project's Routes
 keystone.set('routes', require('./routes'));
 
 keystone.start(function () {
-  // initialise database
-  var initurl = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/list/init';
-  require('http').get(initurl);
+  // check media on app launch
+  var mediaListURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10) + '/api/media/list';
+  var http = require('http');
+  http.get(mediaListURL, (response) => {
+    // recieve media list
+    let data = '';
+    response.on('data', (chunk) => {
+      data += chunk;
+    });
+    // whole response has been recieved
+    response.on('end', () => {
+      var mediaList = JSON.parse(data);
+      if(mediaList.media.length < 1){
+        http.get(mediaListURL+'/init');
+      }else{
+        console.log('Loaded ' + mediaList.media.length + ' items in ' + mediaList.channels.length + ' channels');
+      }
+    });
+  });
 });

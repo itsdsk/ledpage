@@ -190,7 +190,7 @@ exports.get = function (req, res) {
  * List Media
  */
 exports.list = function (req, res) {
-	Media.model.find(function (err, sketchList) {
+	Media.model.find(function (err, mediaList) {
 		if (err) {
 			return res.apiError({
 				success: false,
@@ -208,7 +208,7 @@ exports.list = function (req, res) {
 			res.apiResponse({
 				success: true,
 				note: 'retrieved media list from database',
-				sketches: sketchList,
+				media: mediaList,
 				channels: channelList,
 			});
 		});
