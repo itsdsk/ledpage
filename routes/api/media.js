@@ -585,7 +585,8 @@ exports.savescreen = function (req, res) {
 	console.log('saving screenshot to: ' + uploadPath);
 	// save screenshot
 	cmd.get(
-		execCommand,
+		// execCommand,
+		'whoami',
 		function(err, stdout, stderr){
 			if (err) {
 				console.log('screenshot error: '+JSON.stringify(err));
