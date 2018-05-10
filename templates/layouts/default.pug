@@ -31,7 +31,7 @@ html
 						span.icon-bar
 					a.navbar-brand(href='/') ☉ Disks
 					.navbar-left
-						if data
+						if section == "media"
 							ul(id='mediaTabs').nav.navbar-nav.navbar-left
 								li.active
 									a(data-toggle='tab' href='#preview') Preview
