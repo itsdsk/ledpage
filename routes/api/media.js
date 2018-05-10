@@ -305,13 +305,30 @@ exports.create = function (req, res) {
 				note: 'could not save to database'
 			});
 		} else {
-			// play new sketch
-			var playURL = 'http://0.0.0.0:80/api/media/'+newModel.id+'/play';
-			http.get(playURL);
-			// finished
-			return res.apiResponse({
-				success: true,
-				note: 'uploaded new media'
+			// format media metadata
+			var diskJSON = {
+				"disk": {
+					"title":saveDir,
+					"state":"published"
+				}
+			};
+			// save metadata with media
+			fs.writeFile(uploadPath + '/disk.json', JSON.stringify(diskJSON, null, 4), 'utf8', function (err) {
+				if (err) {
+					console.log('error saving setup json' + err);
+					return res.apiError({
+						success: false,
+						note: 'could not save media metadata'
+					});
+				}
+				// play new sketch
+				var playURL = 'http://0.0.0.0:80/api/media/'+newModel.id+'/play';
+				http.get(playURL);
+				// finished
+				return res.apiResponse({
+					success: true,
+					note: 'uploaded new media'
+				});
 			});
 		}
 	});
