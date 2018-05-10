@@ -4,7 +4,7 @@ After=network.target
 Wants=mongod.service
 
 [Service]
-ExecStart=/usr/local/bin/node /usr/src/app/app.js
+ExecStart=node /usr/src/app/app.js
 Restart=always
 
 [Install]
