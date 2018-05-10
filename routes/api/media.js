@@ -577,13 +577,14 @@ exports.savescreen = function (req, res) {
 	}
 	// prep to save screenshot
 	var sys = require('sys');
-	var exec = require('child_process').exec;
+	// var exec = require('child_process').exec;
+	var { exec } = require('child_process');
 	var uploadName = 'screenshot.png';
 	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
 	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
 	console.log('saving screenshot to: ' + uploadPath);
 	// save screenshot
-	exec(execCommand, function (err, stdout, stderr) {
+	exec(execCommand, (err, stdout, stderr)  => {
 		console.log(stdout);
 		if (err) {
 			console.log('screenshot error: ');
