@@ -353,19 +353,21 @@ exports.set_brightness = function (req, res) {
  */
 exports.reboot = function (req, res) {
     // check resin supervisor exists
-
+    var shell = require('shelljs');
     // var checkSupervisor = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
-    const exec = require('child_process').exec;
-    var supervisorCheck = exec('printenv RESIN_SUPERVISOR_API_KEY', (err, stdout, stderr) => {
-            if (err) {
-                console.log('exec error:', JSON.stringify(err));
+    //const exec = require('child_process').exec;
+    var supervisorCheck = shell.exec('printenv RESIN_SUPERVISOR_API_KEY', function(err, stdout, stderr) {
+            // if (stderr) {
+            //     console.log('exec error:', JSON.stringify(err));
+            //     console.log('out: ', stdout);
+            //     console.log('errors:', stderr);
+            //         return res.apiError({
+            //         success: false,
+            //         note: 'could not find system supervisor'
+            //     });
+            if(stdout.length > 0){ // supervisor exists
                 console.log('out: ', stdout);
                 console.log('errors:', stderr);
-                    return res.apiError({
-                    success: false,
-                    note: 'could not find system supervisor'
-                });
-            }else if(stdout.length > 0){ // supervisor exists
                 return res.apiResponse({
                     success: true,
                     note: 'queued system to reboot'
