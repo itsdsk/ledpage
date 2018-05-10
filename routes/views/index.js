@@ -5,7 +5,7 @@ exports = module.exports = function (req, res) {
 	var view = new keystone.View(req, res);
 	var locals = res.locals;
 	// Init locals
-	locals.section = 'disks';
+	locals.section = 'index';
 	locals.filters = {
 		channel: req.params.channel,
 	};
@@ -65,5 +65,5 @@ exports = module.exports = function (req, res) {
 		});
 	});
 	// Render the view
-	view.render('browse');
+	view.render('index');
 };
