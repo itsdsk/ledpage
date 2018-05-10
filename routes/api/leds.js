@@ -30,7 +30,9 @@ exports.map_positions = function (req, res) {
         fs.mkdirSync(res.locals.configStaticPath);
     }
     // read hyperion config template then add new led coords and save
-    fs.readFile('./libs/controller/hyperion_segments/hyperion.template.json', function (err, data) {
+    var cfgTemplatePath = path.join(__dirname, '/../../libs/controller/hyperion_segments/hyperion.template.json');
+    console.log(cfgTemplatePath);
+    fs.readFile(cfgTemplatePath, function (err, data) {
         if (err) {
             console.log('wefaf' + err);
             return res.apiError({
