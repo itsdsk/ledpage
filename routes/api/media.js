@@ -470,7 +470,11 @@ exports.channel = function (req, res) {
 							// add new metadata to loaded object
 							var obj = JSON.parse(rawDiskJSON);
 							if(alreadyInChannel == false){
-								obj.disk.channels.push(updatedChannel.key);
+								if(obj.disk.channels){
+									obj.disk.channels.push(updatedChannel.key);
+								}else{
+									obj.disk.channels = [updatedChannel.key];
+								}
 							}else{
 								var channelIdx = obj.disk.channels.indexOf(updatedChannel.key);
 								if(channelIdx > -1){
@@ -486,9 +490,6 @@ exports.channel = function (req, res) {
 										note: 'updated but failed to save metadata file'
 									});					
 								}else{
-									// play new sketch
-									var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+req.params.id+'/play';
-									http.get(playURL);
 									// finished
 									return res.apiResponse({
 										success: true,
@@ -498,6 +499,8 @@ exports.channel = function (req, res) {
 							});
 						});
 					}
+				}else{
+					// disk.json doesnt exist
 				}
 			}
 		});
