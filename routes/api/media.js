@@ -741,10 +741,45 @@ exports.share = function (req, res) {
 				Media.updateItem(item, data, {
 					fields: ["ipfsHash"]
 				}, function (dberror) {
-					if (dberror) console.log(dberror);
-				});
-				res.apiResponse({
-					files: files
+					if (dberror) {
+						console.log(dberror);
+					}else{
+						// update metadata file
+						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
+						var diskJSONexists = fs.existsSync(diskJSONpath);
+						if(diskJSONexists){
+							// read json with metadata
+							var rawDiskJSON = fs.readFileSync(diskJSONpath);
+							if(!rawDiskJSON) {
+								console.log('could not read updated media metadata');
+								return res.apiError({
+									success: false,
+									note: 'could not read media metadata file'
+								});
+							} else {
+								// add new metadata to loaded object
+								var obj = JSON.parse(rawDiskJSON);
+								obj.disk.ipfsHash = files[files.length - 1].hash;
+								// save new metadata
+								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
+									if(err){
+										console.log('error saving setup json' + err);
+										return res.apiError({
+											success: false,
+											note: 'could not update media with shared hash'
+										});					
+									}else{
+										// finished
+										return res.apiResponse({
+											success: true,
+											note: 'shared media'
+										});
+									}
+								})
+							}
+						}
+
+					}
 				});
 			}
 		});
