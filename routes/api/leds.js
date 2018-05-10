@@ -369,13 +369,13 @@ exports.reboot = function (req, res) {
             var reboot = exec(cmd, (err, stdout, stderr) => {
                 console.log('out: ' + `${stdout}`);
                 console.log('errors:' + `${stderr}`);
-                if (err !== null) {
-                    console.log(`exec error: ${err}`);
-                    return res.apiError({
-                        success: false,
-                        note: 'could not send reboot signal'
-                    });
-                }
+                // if (err !== null) {
+                //     console.log(`exec error: ${err}`);
+                //     return res.apiError({
+                //         success: false,
+                //         note: 'could not send reboot signal'
+                //     });
+                // }
                 if (!err) {
                     console.log('no erroi');
                     return res.apiResponse({
@@ -424,13 +424,13 @@ exports.shutdown = function (req, res) {
             var reboot = exec(cmd, (err, stdout, stderr) => {
                 console.log('out: ' + `${stdout}`);
                 console.log('errors:' + `${stderr}`);
-                if (err !== null) {
-                    console.log(`exec error: ${err}`);
-                    return res.apiError({
-                        success: false,
-                        note: 'could not send shutdown signal'
-                    });
-                }
+                // if (err !== null) {
+                //     console.log(`exec error: ${err}`);
+                //     return res.apiError({
+                //         success: false,
+                //         note: 'could not send shutdown signal'
+                //     });
+                // }
                 if (!err) {
                     console.log('no erroi');
                     return res.apiResponse({
