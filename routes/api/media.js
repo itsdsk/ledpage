@@ -783,11 +783,13 @@ exports.initialise = function (req, res) {
 					} else {
 						// add sketch to database
 						var obj = JSON.parse(rawDiskJSON);
-						for(var k=0; k<obj.disk.channels.length; k++){
-							newItems.MediaChannel.push({
-								"name": obj.disk.channels[k],
-								"__ref": obj.disk.channels[k]
-							});
+						if(obj.disk.channels){
+							for(var k=0; k<obj.disk.channels.length; k++){
+								newItems.MediaChannel.push({
+									"name": obj.disk.channels[k],
+									"__ref": obj.disk.channels[k]
+								});
+							}
 						}
 						newItems.Media.push({
 							"title": obj.disk.title ? obj.disk.title : files[i],
