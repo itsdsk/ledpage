@@ -12,7 +12,8 @@
     "async": "2.1.4",
     "node-ipc": "^9.1.1",
     "ipfs-api": "^20.0.0",
-    "command-exists": "1.2.6"
+    "command-exists": "1.2.6",
+    "node-cmd": "3.0.0"
   },
   "devDependencies": {
     "eslint": "3.15.0",

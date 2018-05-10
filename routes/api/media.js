@@ -577,28 +577,47 @@ exports.savescreen = function (req, res) {
 	}
 	// prep to save screenshot
 	// var exec = require('child_process').exec;
-	const { exec } = require('child_process');
+	// const { exec } = require('child_process');
+	var cmd = require('node-cmd');
 	var uploadName = 'screenshot.png';
 	var uploadPath = path.join(__dirname, './../../public') + '/' + uploadName;
 	var execCommand = 'import -window root -display :0.0 ' + uploadPath;
 	console.log('saving screenshot to: ' + uploadPath);
 	// save screenshot
-	exec(execCommand, (err, stdout, stderr)  => {
-		console.log(stdout);
-		if (err) {
-			console.log('screenshot error: '+JSON.stringify(err));
-			console.log('stdout: '+stdout);
-			console.log('stderr: '+stderr);
-			return res.apiError({
-				success: false,
-				note: 'could not save screenshot'
+	cmd.get(
+		execCommand,
+		function(err, stdout, stderr){
+			if (err) {
+				console.log('screenshot error: '+JSON.stringify(err));
+				console.log('stdout: '+stdout);
+				console.log('stderr: '+stderr);
+				return res.apiError({
+					success: false,
+					note: 'could not save screenshot'
+				});
+			}
+			return res.apiResponse({
+				success: true,
+				note: 'saved screenshot'
 			});
 		}
-		return res.apiResponse({
-			success: true,
-			note: 'saved screenshot'
-		});
-	});
+	);
+	// exec(execCommand, (err, stdout, stderr)  => {
+	// 	console.log(stdout);
+	// 	if (err) {
+	// 		console.log('screenshot error: '+JSON.stringify(err));
+	// 		console.log('stdout: '+stdout);
+	// 		console.log('stderr: '+stderr);
+	// 		return res.apiError({
+	// 			success: false,
+	// 			note: 'could not save screenshot'
+	// 		});
+	// 	}
+	// 	return res.apiResponse({
+	// 		success: true,
+	// 		note: 'saved screenshot'
+	// 	});
+	// });
 };
 
 /**
