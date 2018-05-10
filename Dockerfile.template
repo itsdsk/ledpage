@@ -62,6 +62,7 @@ COPY ./libs/player/package.json ./libs/player/
 RUN JOBS=MAX npm install --unsafe-perm --production \
   && npm cache clean --force && rm -rf /tmp/* \
   && cd ./libs/player/ && JOBS=MAX npm install --unsafe-perm --production \
+  && npm install pm2 -g \
   && npm cache clean --force && rm -rf /tmp/* \
   && node_modules/.bin/electron-rebuild
 
@@ -78,7 +79,7 @@ COPY /volume/etc/systemd/system /etc/systemd/system/
 
 # start systemd services
 RUN systemctl enable ipfs.service && systemctl enable hyperion.service \
-  && systemctl enable mongod.service && systemctl enable diskone.service
+  && systemctl enable mongod.service
 
 # move app to filesystem
 COPY ./app.js ./
