@@ -38,6 +38,16 @@ block content
 				h3.text-muted Invalid channel. 
 			else
 				if data.media.results.length
+					if data.media.totalPages > 1
+						.lead.text-muted Showing 
+							strong #{data.media.first} 
+							| to 
+							strong #{data.media.last} 
+							| of 
+							strong #{data.media.total} 
+							| items
+					else
+						.lead.text-muted Showing #{utils.plural(data.media.results.length, '* item')}
 					.row
 						each item in data.media.results
 							.col-xs-4(style="padding: 1px;")
@@ -97,14 +107,14 @@ block content
 										span.badge=channel.mediaCount
 										| &ensp;
 										=channel.key
-								a(href='/api/media/channel/autoplay?secs=20&channel='+channel.id).btn.btn-default
+								a(href='/api/media/channel/autoplay?secs=20&channel='+channel.id).btn.btn-default.api-get-btn
 									span.glyphicon.glyphicon-play
 								.btn-group
 									a(href='#' data-toggle='dropdown').btn.btn-default.dropdown-toggle.btn-lg
 										span.caret
 									ul(role='menu').dropdown-menu
 										li
-											a(href='/api/media/channel/unsubscribe?id='+channel.id, action='/api/media/channel/unsubscribe?id='+channel.id, method='GET').api-get-btn Delete
+											a(href='/api/media/channel/unsubscribe?id='+channel.id).api-get-btn Delete
 					li(role='presentation')
 						form(action='/api/media/channel/subscribe', method='GET').form-horizontal.post-form-ajax
 							.input-group.input-group-md
