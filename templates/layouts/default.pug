@@ -67,6 +67,7 @@ html
 			block intro
 			+flash-messages(messages)
 			block content
+		script(src='https://d3js.org/d3.v5.js')
 		script(src='/js/jquery/jquery-2.1.4.min.js')
 		script(src='/js/bootstrap/bootstrap-3.3.5.min.js')
 		script.
@@ -110,36 +111,6 @@ html
 				}else{
 					$('#status-dot').attr('style', dotStyle+'green;');
 				}
-				// play sketch
-				function displayClicked(e) {
-					//
-					e.preventDefault();
-					var url = $(this).parent().attr('href');
-					$.ajax({url: url, async: false,
-						error: function(result){
-							notifier.alert('Could not play sketch. Is the player connected?');
-						},
-						success: function(result){
-							notifier.success('Queued to display!');
-						}
-					});
-				}
-				$('.display-btn').click( displayClicked );
-				// play linked sketch
-				function displayLinked(e) {
-					//
-					e.preventDefault();
-					var url = $(this).attr('href');
-					$.ajax({url: url, async: false,
-						error: function(result){
-							notifier.alert('Could not play sketch. Is the player connected?');
-						},
-						success: function(result){
-							notifier.success('Queued to display!');
-						}
-					});
-				}
-				$('.display-link').click( displayLinked );
 				
 				// post form to server in background
 				$('.post-form-ajax').submit(function(event){

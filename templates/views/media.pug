@@ -13,8 +13,7 @@ block content
 					div(id='details').tab-pane.fade
 						.page-header
 							a(href='/view-static/'+data.sketch.localDir+'/index.html' id='edit-html').btn.btn-default.pull-right ⌨&emsp;Edit
-							a(href='/api/media/' + data.sketch.id + '/play').pull-right
-								button(type='submit').display-btn.btn.btn-primary ▶ Display
+							a(href='/api/media/' + data.sketch.id + '/play').pull-right.api-get-btn.btn.btn-primary ▶ Display
 							- var title = data.sketch.title
 							- var date = data.sketch._.modifiedDate.format('D/M/Y')
 							h1 <strong>#{title}</strong> <small>#{date}</small>
@@ -108,24 +107,6 @@ block js
 			}
 			$('.btn-channel').click( channelButton );
 
-			//
-			// ajax button GET
-			function apiGetButton(e) {
-				//
-				e.preventDefault();
-				var url = $(this).attr('href');
-				$.ajax({url: url, async: false,
-					error: function(result){
-							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
-							notifier.alert(result.responseJSON.error.note);
-					},
-					success: function(result){
-							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							notifier.success(result.note);
-					}
-				});
-			}
-			$('.api-get-btn').click( apiGetButton );
 
 			// change tab according to query string (after page loads otherwise the media iframe doesn't...)
 			setTimeout(function(){$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')}, 3000);
