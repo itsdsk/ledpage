@@ -119,7 +119,6 @@ block content
 								input(type='text', placeholder='Subscribe', id='name', name='name' required).form-control
 							button(type='submit', id='submit').hidden
 block js
-	script(src='https://d3js.org/d3.v5.js')
 	script.
 		d3.json('/config-static/leds.json').then(function(data) {
 			var width = 720,
