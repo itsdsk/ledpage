@@ -153,7 +153,11 @@ html
 				$.ajax({url: url, async: false,
 					error: function(result){
 							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
-							notifier.alert(result.responseJSON.error.note);
+							if(result.responseJSON.error.note){
+								notifier.alert(result.responseJSON.error.note);
+							}else{
+								notifier.alert('unknown error');
+							}
 					},
 					success: function(result){
 							console.log('SUCCESS: ' + JSON.stringify(result.note));
