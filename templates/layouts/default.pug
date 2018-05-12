@@ -50,7 +50,10 @@ html
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
 						li.dropdown
 							a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-								span(id='status-dot')
+								if componentsDown
+									span(id='status-dot' style='height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color:red')
+								else
+									span(id='status-dot' style='height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color:green')
 								| &thinsp; Status
 								span.caret
 							ul.dropdown-menu
@@ -82,8 +85,8 @@ html
 			// space body away from navbar
 			$('body')[0].style.paddingTop = $('.navbar').height() + 20 + 'px';
 			// component status
-			var dotStyle = 'height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color: '
-			$('#status-dot').attr('style', dotStyle+'gray;');
+			//- var dotStyle = 'height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color: '
+			//- $('#status-dot').attr('style', dotStyle+'gray;');
 			var flashMsgDiv = '<div id="flash-messages" class="container"></div>';
 			$('#body').prepend(flashMsgDiv);
 			$(function() {
@@ -94,7 +97,7 @@ html
 					badConnections.push(p.textContent);
 				})
 				if(!(badConnections.length === 0)){
-					$('#status-dot').attr('style', dotStyle+'red;');
+					//- $('#status-dot').attr('style', dotStyle+'red;');
 					var flashMsg = '<div class="alert alert-danger">ⓘ&emsp;Connection to the ';
 					if(badConnections.length === 1){
 						flashMsg += badConnections[0] + ' component ';
@@ -109,7 +112,7 @@ html
 					flashMsg += 'is unavailable.';
 					$('#flash-messages').prepend(flashMsg+'</div>');
 				}else{
-					$('#status-dot').attr('style', dotStyle+'green;');
+					//- $('#status-dot').attr('style', dotStyle+'green;');
 				}
 				
 				// post form to server in background

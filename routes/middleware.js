@@ -56,6 +56,7 @@ setInterval(function () {
 		}
 	});
 }, 5000);
+const publicPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
 
 exports.initLocals = function (req, res, next) {
 	// navigation bar items
@@ -71,13 +72,21 @@ exports.initLocals = function (req, res, next) {
 		}
 	];
 	// local directory constants
-	const publicPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.viewStaticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";
 
 	// component status
 	res.locals.componentStatus = componentStatus;
+	res.locals.componentsOnline = [];
+	res.locals.componentsDown = [];
+	for(var i=0; i<3; i++){
+		if(componentStatus[i].active){
+			res.locals.componentsOnline.push(componentStatus[i].name);
+		}else{
+			res.locals.componentsDown.push(componentStatus[i].name);
+		}
+	}
 	next();
 };
 
