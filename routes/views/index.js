@@ -50,7 +50,7 @@ exports = module.exports = function (req, res) {
 	view.on('init', function (next) {
 		var paginateOpts = {
 			page: req.query.page || 1,
-			perPage: 10,
+			perPage: 15,
 			maxPages: 10,
 			filters: {
 				state: 'published',
