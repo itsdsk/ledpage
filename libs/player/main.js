@@ -20,8 +20,7 @@ app.on('ready', () => {
   const windowOpts = {
     width: 720,
     height: 720,
-    minWidth: 720,
-    minHeight: 720,
+    useContentSize: true,
     show: false,
     // center: true,
     // useContentSize: true,
