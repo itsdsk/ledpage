@@ -26,12 +26,13 @@ mixin sketch(sketch)
 								a(href='/media/'+sketch._id+'#details', target='_blank').btn.btn-default.btn-lg.btn-block
 									.text-left
 										| Edit
-								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block.api-get-btn
+								a(href='/api/media/' + sketch.id + '/share').btn.btn-default.btn-lg.btn-block.api-get-btn
 									.text-left
 										| Share
-								a(href='/api/media/' + sketch.id + '/play').btn.btn-default.btn-lg.btn-block
-									.text-left
-										| View on IPFS
+								if sketch.ipfsHash
+									a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash, target='_blank').btn.btn-default.btn-lg.btn-block
+										.text-left
+											| View on IPFS
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
 block content
