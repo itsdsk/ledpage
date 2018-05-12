@@ -39,7 +39,7 @@ exports = module.exports = function (app) {
 	app.get('/channel/:channel?', routes.views.index);
 	app.get('/media/:id', routes.views.media);
 	app.get('/upload', routes.views.upload);
-	app.all('/setup', routes.views.setup);
+	app.get('/setup', routes.views.setup);
 
 	// API
 	app.all('/api*', keystone.middleware.api);

@@ -12,9 +12,9 @@ block content
 			.col-sm-4.col-md-4
 				.panel.panel-default
 					.panel-heading
-						label(for='brightness-range')
+						h4
 							span.glyphicon.glyphicon-adjust
-							input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-range').brightnessSlider
+						input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-range')
 					.panel-body
 						h4
 							button(type='submit').btn.btn-info.btn-sm.pull-right Update Colour Values
@@ -106,38 +106,38 @@ block content
 						.form-group
 							label.col-sm-2.control-label LED Count
 							.col-sm-10
-								input(type='number' name='numLeds' id='numLedsInput' value=formData.numLeds required placeholder='(required)').form-control
-						.form-group(class=validationErrors.ledChip ? 'has-error' : null required)
+								input(type='number' name='numLeds' id='numLedsInput' required placeholder='(required)').form-control
+						.form-group(required)
 							label.col-sm-2.control-label LED Chipset
 							.col-sm-10
 								select(name='ledChip' id='ledChip' required).form-control
 									option(value='' class = '') (required)
 									each type in ledChips
-										option(value=type.value class=type.pins selected=formData.ledChip === type.value)= type.label
-						.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+										option(value=type.value class=type.pins )= type.label
+						.form-group(required)
 							label.col-sm-2.control-label Platform
 							.col-sm-10
 								select(name='boardType' id='platformInput' required).form-control
 									option(value='') (required)
 									each type in boardTypes
-										option(value=type.value selected=formData.boardType === type.value)= type.label
-						.form-group(class=validationErrors.boardType ? 'has-error' : null required)
+										option(value=type.value)= type.label
+						.form-group(required)
 							label.col-sm-2.control-label Data Pin
 							.col-sm-10
 								select(name='dataPin' id='dataPinInput' required).form-control
 									option(value='') (required)
 									each type in dataPins
-										option(value=type.value selected=formData.dataPin === type.value)= type.label
-						.form-group(class=validationErrors.boardType ? 'has-error' : null id='clockPinDiv').hidden
+										option(value=type.value)= type.label
+						.form-group(id='clockPinDiv').hidden
 							label.col-sm-2.control-label Clock Pin
 							.col-sm-10
 								select(name='clockPin' id='clockPinSelect').form-control
 									option(value='') (required)
 									each type in clockPins
-										option(value=type.value selected=formData.clockPin === type.value)= type.label
+										option(value=type.value)= type.label
 						.form-group
 							.col-sm-10.col-sm-offset-2
-								button(type='submit' id='uploadConfigBtn').btn.btn-primary Upload
+								button(type='submit' id='uploadConfigBtn').btn.btn-primary Upload (takes 60 secs avg)
 			div(id='formatInfo' role='dialog').modal.fade
 				.modal-dialog
 					.modal-content
