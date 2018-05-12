@@ -21,6 +21,7 @@ app.on('ready', () => {
     width: 720,
     height: 720,
     useContentSize: true,
+    fullscreen: true,
     show: false,
     // center: true,
     // useContentSize: true,
