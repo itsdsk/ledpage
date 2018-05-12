@@ -71,8 +71,7 @@ exports.initLocals = function (req, res, next) {
 		}
 	];
 	// local directory constants
-	const publicPath = '/data/content/';
-	//const publicPath = '/home/dsk/Documents/Year_3/Disk/resin-electronjs/public/';
+	const publicPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
 	res.locals.staticPath = publicPath + "view-static/";
 	res.locals.viewStaticPath = publicPath + "view-static/";
 	res.locals.configStaticPath = publicPath + "config-static/";

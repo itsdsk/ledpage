@@ -825,6 +825,32 @@ exports.queue = function (req, res) {
  * Drop database and rebuild after scanning directories
  */
 exports.initialise = function (req, res) {
+	// check data paths exist
+	var dataPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
+	var dataPathExists = fs.existsSync(dataPath);
+	if(!dataPathExists){
+		if(process.env.D1_DATA_PATH){
+			return res.apiError({
+				success: false,
+				note: 'data path does not exist'
+			});	
+		}else{
+			// create data directories
+			try{
+			fs.mkdirSync('/data/content');
+			fs.mkdirSync('/data/content/view-static');
+			fs.mkdirSync('/data/content/config-static');
+			} catch (err) {
+				if(err.code !== 'EEXIST') {
+					return res.apiError({
+						success: false,
+						note: 'could not create content directories while initialising'
+					});			
+				}
+			}
+		}
+	}
+
 	// load Profile (colour calibration/hyperion config)
 	var hyperionConfigPath = path.join(res.locals.configStaticPath, '/hyperion.config.json');
 	var hyperionConfExists = fs.existsSync(hyperionConfigPath);
