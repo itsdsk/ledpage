@@ -10,7 +10,7 @@ exports = module.exports = function (req, res) {
 		channel: req.params.channel,
 	};
 	locals.data = {
-		sketches: [],
+		media: [],
 		channels: [],
 	};
 	// Load all channels
@@ -23,7 +23,7 @@ exports = module.exports = function (req, res) {
 			// Load the counts for each channel
 			async.each(locals.data.channels, function (channel, next) {
 				keystone.list('Media').model.count().where('channels').in([channel.id]).exec(function (err, count) {
-					channel.sketchCount = count;
+					channel.mediaCount = count;
 					next(err);
 				});
 			}, function (err) {
@@ -60,7 +60,7 @@ exports = module.exports = function (req, res) {
 			q.where('channels').in([locals.data.channel]);
 		}
 		q.exec(function (err, results) {
-			locals.data.sketches = results;
+			locals.data.media = results;
 			next(err);
 		});
 	});

@@ -41,31 +41,31 @@ block content
 			if filters.channel && !data.channel 
 				h3.text-muted Invalid channel. 
 			else
-				if data.sketches.results.length
+				if data.media.results.length
 					.row.browse
 						style .img-overlay:before {content: ' ';display:block;height:50%;}
 						style .sq-thumb {float:left;position: relative;width: 100%;padding-bottom : 100%;margin:0%;background-position:center center;background-repeat:no-repeat;background-size:cover;}
-						each sketch in data.sketches.results
+						each item in data.media.results
 							.col-xs-4(style="padding: 1px;")
-								+sketch(sketch)
-					if data.sketches.totalPages > 1
+								+sketch(item)
+					if data.media.totalPages > 1
 						ul.pagination
-							if data.sketches.previous
-								li: a(href='?page=' + data.sketches.previous): span.glyphicon.glyphicon-chevron-left
+							if data.media.previous
+								li: a(href='?page=' + data.media.previous): span.glyphicon.glyphicon-chevron-left
 							else
 								li.disabled: a(href='?page=' + 1): span.glyphicon.glyphicon-chevron-left
-							each p, i in data.sketches.pages
-								li(class=data.sketches.currentPage == p ? 'active' : null)
-									a(href='?page=' + (p == '...' ? (i ? data.sketches.totalPages : 1) : p ))= p
-							if data.sketches.next
-								li: a(href='?page=' + data.sketches.next): span.glyphicon.glyphicon-chevron-right
+							each p, i in data.media.pages
+								li(class=data.media.currentPage == p ? 'active' : null)
+									a(href='?page=' + (p == '...' ? (i ? data.media.totalPages : 1) : p ))= p
+							if data.media.next
+								li: a(href='?page=' + data.media.next): span.glyphicon.glyphicon-chevron-right
 							else
-								li.disabled: a(href='?page=' + data.sketches.totalPages): span.entypo.glyphicon.glyphicon-chevron-right
+								li.disabled: a(href='?page=' + data.media.totalPages): span.entypo.glyphicon.glyphicon-chevron-right
 				else
 					if data.channel
-						h3.text-muted There are no sketches in the channel #{data.channel.name}.
+						h3.text-muted There is no media in the channel #{data.channel.name}.
 					else
-						h3.text-muted There are no sketches yet.
+						h3.text-muted There is no media yet.
 		if true
 			.col-sm-4.col-md-4
 				hr
@@ -100,7 +100,7 @@ block content
 							.btn-group.btn-group-justified
 								a(href='/channel/'+channel.key, style='width:5%').btn.btn-default.btn-lg
 									.text-left
-										span.badge=channel.sketchCount
+										span.badge=channel.mediaCount
 										| &ensp;
 										=channel.key
 								a(href='/api/media/channel/autoplay?secs=20&channel='+channel.id).btn.btn-default
