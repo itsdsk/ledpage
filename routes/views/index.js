@@ -1,5 +1,7 @@
 var keystone = require('keystone');
 var async = require('async');
+var Media = keystone.list('Media');
+var MediaChannel = keystone.list('MediaChannel');
 
 exports = module.exports = function (req, res) {
 	var view = new keystone.View(req, res);
@@ -15,14 +17,14 @@ exports = module.exports = function (req, res) {
 	};
 	// Load all channels
 	view.on('init', function (next) {
-		keystone.list('MediaChannel').model.find().sort('name').exec(function (err, results) {
+		MediaChannel.model.find().sort('name').exec(function (err, results) {
 			if (err || !results.length) {
 				return next(err);
 			}
 			locals.data.channels = results;
 			// Load the counts for each channel
 			async.each(locals.data.channels, function (channel, next) {
-				keystone.list('Media').model.count().where('channels').in([channel.id]).exec(function (err, count) {
+				Media.model.count().where('channels').in([channel.id]).exec(function (err, count) {
 					channel.mediaCount = count;
 					next(err);
 				});
@@ -34,7 +36,7 @@ exports = module.exports = function (req, res) {
 	// Load the current channel filter
 	view.on('init', function (next) {
 		if (req.params.channel) {
-			keystone.list('MediaChannel').model.findOne({
+			MediaChannel.model.findOne({
 				key: locals.filters.channel
 			}).exec(function (err, result) {
 				locals.data.channel = result;
@@ -46,19 +48,21 @@ exports = module.exports = function (req, res) {
 	});
 	// Load media
 	view.on('init', function (next) {
-		var q = keystone.list('Media').paginate({
-				page: req.query.page || 1,
-				perPage: 10,
-				maxPages: 10,
-				filters: {
-					state: 'published',
-				},
-			})
-			.sort('-publishedDate')
-			.populate('author channels');
-		if (locals.data.channel) {
-			q.where('channels').in([locals.data.channel]);
+		var paginateOpts = {
+			page: req.query.page || 1,
+			perPage: 10,
+			maxPages: 10,
+			filters: {
+				state: 'published',
+			}
+		};
+		// filter channel
+		if(locals.data.channel){
+			paginateOpts.filters.channels = locals.data.channel;
 		}
+		var q = Media.paginate(paginateOpts)
+			.sort('-publishedDate')
+			.populate('channels');
 		q.exec(function (err, results) {
 			locals.data.media = results;
 			next(err);
