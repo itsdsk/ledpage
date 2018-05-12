@@ -2,14 +2,13 @@ extends ../layouts/default
 
 block content
 	.container
-		.page-header
-			h1 Upload
+		h1 <strong>Upload Code</strong>
+		hr
 		form(action='/api/media/create' method='post' class='post-form-ajax').form-horizontal
 			input(type='hidden', name='action', value='upload')
-			.form-group(class=validationErrors.message ? 'has-error' : null)
-				label.col-sm-2.control-label Media
-				.col-sm-10
-					textarea(name='sketch' placeholder='Enter HTML media...' rows=24 required).form-control= formData.sketch
 			.form-group
-				.col-sm-10.col-sm-offset-2
-					button(type='submit').btn.btn-primary Upload
+				.col-sm-12
+					textarea(name='sketch' placeholder='Enter HTML' style='font-family:monospace;' rows=24 required).form-control
+			.form-group
+				.col-sm-12
+					button(type='submit').btn.btn-primary.btn-lg.btn-block Submit

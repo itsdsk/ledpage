@@ -38,7 +38,7 @@ exports = module.exports = function (app) {
 	app.get('/', routes.views.index);
 	app.get('/channel/:channel?', routes.views.index);
 	app.get('/media/:id', routes.views.media);
-	app.all('/upload', routes.views.upload);
+	app.get('/upload', routes.views.upload);
 	app.all('/setup', routes.views.setup);
 
 	// API
