@@ -77,7 +77,6 @@ exports.initLocals = function (req, res, next) {
 	res.locals.configStaticPath = publicPath + "config-static/";
 
 	// component status
-	res.locals.componentStatus = componentStatus;
 	res.locals.componentsOnline = [];
 	res.locals.componentsDown = [];
 	for(var i=0; i<3; i++){

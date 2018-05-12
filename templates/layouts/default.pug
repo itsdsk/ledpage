@@ -50,22 +50,25 @@ html
 							li(class=(section == link.key ? 'active' : null)): a(href=link.href)= link.label
 						li.dropdown
 							a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-								if componentsDown
+								if componentsDown.length > 0
 									span(id='status-dot' style='height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color:red')
 								else
 									span(id='status-dot' style='height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color:green')
 								| &thinsp; Status
 								span.caret
 							ul.dropdown-menu
-								each component in componentStatus
-									if !component.active
-										li.inactive-component
-											a=component.name
-												| &thinsp;(offline)
-									else
+								if componentsDown.length > 0
+									li
+										a <strong>Offline:</strong>
+									each component in componentsDown
 										li
-											a=component.name
-												| &thinsp;(online)
+											a=component
+								if componentsOnline.length > 0
+									li
+										a <strong>Online:</strong>
+									each component in componentsOnline
+										li
+											a=component
 		#body
 			block intro
 			+flash-messages(messages)
@@ -84,37 +87,7 @@ html
 			var notifier = new AWN(options);
 			// space body away from navbar
 			$('body')[0].style.paddingTop = $('.navbar').height() + 20 + 'px';
-			// component status
-			//- var dotStyle = 'height: 10px;  width: 10px;  border-radius: 50%;  display: inline-block; background-color: '
-			//- $('#status-dot').attr('style', dotStyle+'gray;');
-			var flashMsgDiv = '<div id="flash-messages" class="container"></div>';
-			$('#body').prepend(flashMsgDiv);
-			$(function() {
-				// status check
-				var badConnections = new Array();
-				// get names of inactive components from HTML elements
-				$('.inactive-component').each(function(i, p) {
-					badConnections.push(p.textContent);
-				})
-				if(!(badConnections.length === 0)){
-					//- $('#status-dot').attr('style', dotStyle+'red;');
-					var flashMsg = '<div class="alert alert-danger">ⓘ&emsp;Connection to the ';
-					if(badConnections.length === 1){
-						flashMsg += badConnections[0] + ' component ';
-					}else{
-						for(var i=0; i<badConnections.length-1; i++)
-						{
-							flashMsg += (badConnections[i] + ', ');
-						};
-						flashMsg = flashMsg.slice(0, -2);
-						flashMsg += ' and ' + badConnections[badConnections.length-1] + ' components ';
-					}
-					flashMsg += 'is unavailable.';
-					$('#flash-messages').prepend(flashMsg+'</div>');
-				}else{
-					//- $('#status-dot').attr('style', dotStyle+'green;');
-				}
-				
+			$(function() {				
 				// post form to server in background
 				$('.post-form-ajax').submit(function(event){
 					event.preventDefault();
