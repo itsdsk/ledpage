@@ -2,59 +2,59 @@ extends ../layouts/default
 
 block content
 	.container: .row
-		if !data.sketch
-			h2 Invalid Sketch.
+		if !data.media
+			h2 Invalid Media.
 		else
 			.col-sm-12.col-md-12
 				.tab-content
 					div(id='preview').tab-pane.active.fade
 						div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
-							iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.sketch.localDir)
+							iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.media.localDir)
 					div(id='details').tab-pane.fade
 						.page-header
 							.btn-group.pull-right
-								a(href='/api/media/' + data.sketch.id + '/play').api-get-btn.btn.btn-primary ▶ Display
-								a(href='/view-static/'+data.sketch.localDir+'/index.html' target='_blank' id='media-direct').btn.btn-default Raw
-							- var title = data.sketch.title
-							- var date = data.sketch._.modifiedDate.format('D/M/Y')
+								a(href='/api/media/' + data.media.id + '/play').api-get-btn.btn.btn-primary ▶ Display
+								a(href='/view-static/'+data.media.localDir+'/index.html' target='_blank' id='media-direct').btn.btn-default Raw
+							- var title = data.media.title
+							- var date = data.media._.modifiedDate.format('D/M/Y')
 							h1 <strong>#{title}</strong> <small>#{date}</small>
 						.details-heading
-							form(action='/api/media/'+data.sketch.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
+							form(action='/api/media/'+data.media.id+'/update' method='post' class='post-form-ajax' id='sketch-form').form-horizontal
 								input(type='hidden', name='action', value='save')
-								.form-group(class=validationErrors.message ? 'has-error' : null)
+								.form-group
 									label.col-sm-2.control-label Title
 									.col-sm-10
-										textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.sketch.title
-								.form-group(class=validationErrors.message ? 'has-error' : null)
-									label.col-sm-2.control-label index.html
+										textarea(name='title' id='title-area' rows=1 value='hi' required).form-control= data.media.title
+								.form-group
+									label.col-sm-2.control-label Code
 									.col-sm-10
-										textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control= formData.sketch
+										textarea(name='code' id='code-area' style='font-family:monospace;' placeholder='HTML sketch...' rows=24 required).form-control
 								.form-group
 									.col-sm-10.col-sm-offset-2
 										button(type='submit').btn.btn-primary Save
 							.channel-heading
-							if data.sketch.ipfsHash
-								a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
-								a(href='/api/media/' + data.sketch.id + '/share').btn.btn-default.pull-right.api-get-btn Update address
+							if data.media.ipfsHash
+								a(href='https://gateway.ipfs.io/ipfs/' + data.media.ipfsHash, target='_blank').btn.btn-default.pull-right Gateway
+								a(href='/api/media/' + data.media.id + '/share').btn.btn-default.pull-right.api-get-btn Update address
 							else
-								a(href='/api/media/' + data.sketch.id + '/share').btn.btn-default.pull-right.api-get-btn Create address
+								a(href='/api/media/' + data.media.id + '/share').btn.btn-default.pull-right.api-get-btn Create address
 							h2 Channels
 						.list-group
 							.list-group-item
 								if data.channels && data.channels.length
 									ul.nav.nav-pills
 										each channel in data.channels
-											- var channelActive = data.sketch.channels.some(x => x.key === channel.key);
+											- var channelActive = data.media.channels.some(x => x.key === channel.key);
 											li(class=(channelActive ? 'active' : ''))
-												a(href='/api/media/'+data.sketch.id+'/channel?_id='+channel._id).api-get-btn=channel.key
+												a(href='/api/media/'+data.media.id+'/channel?_id='+channel._id).api-get-btn=channel.key
 						.channel-sync
-							if data.sketch.ipfsHash
-								- var shortHash = data.sketch.ipfsHash.substring(0,24);
+							if data.media.ipfsHash
+								- var shortHash = data.media.ipfsHash.substring(0,24);
 								p Address:
 									code
-										a(href='https://gateway.ipfs.io/ipfs/' + data.sketch.ipfsHash, target='_blank')=shortHash
+										a(href='https://gateway.ipfs.io/ipfs/' + data.media.ipfsHash, target='_blank')=shortHash
 						hr
-						a(href='/api/media/'+data.sketch.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
+						a(href='/api/media/'+data.media.id+'/remove', data-toggle='tooltip', data-placement='auto bottom', title='Warning! This cannot be undone.').list-group-item Delete
 block js
 	script.
 		jQuery(function($) {

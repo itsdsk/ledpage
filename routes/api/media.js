@@ -1145,7 +1145,6 @@ exports.download = function (req, res) {
 var autoplay;
 var autoplayCount = 0;
 exports.autoplay = function (req, res) {
-	var mediaArray = ["wafd", "aewf"];
 	if(!req.query.secs){
 			return res.apiError({
 				success: false,

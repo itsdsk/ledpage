@@ -37,7 +37,7 @@ exports = module.exports = function (app) {
 	// Views
 	app.get('/', routes.views.index);
 	app.get('/channel/:channel?', routes.views.index);
-	app.all('/media/:id', routes.views.media);
+	app.get('/media/:id', routes.views.media);
 	app.all('/upload', routes.views.upload);
 	app.all('/setup', routes.views.setup);
 
