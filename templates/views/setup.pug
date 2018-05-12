@@ -12,9 +12,9 @@ block content
 			.col-sm-4.col-md-4
 				.panel.panel-default
 					.panel-heading
-						label(for='brightness-slider')
+						label(for='brightness-range')
 							span.glyphicon.glyphicon-adjust
-							input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-slider').brightnessSlider
+							input(type='range', min='0.0', max='1.0', step='0.01', value='1.0', class='slider', id='brightness-range').brightnessSlider
 					.panel-body
 						h4
 							button(type='submit').btn.btn-info.btn-sm.pull-right Update Colour Values
@@ -349,23 +349,6 @@ block js
 				});
 			}
 			$("#save-led-map").click(saveMap);
-			// ajax button GET
-			function apiGetButton(e) {
-				//
-				e.preventDefault();
-				var url = $(this).attr('href');
-				$.ajax({url: url, async: false,
-					error: function(result){
-							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
-							notifier.alert(result.responseJSON.error.note);
-					},
-					success: function(result){
-							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							notifier.success(result.note);
-					}
-				});
-			}
-			$('.api-get-btn').click( apiGetButton );
 		});
 		$(function() {
 			// get existing settings from file

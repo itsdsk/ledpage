@@ -92,7 +92,7 @@ block content
 							.modal-footer
 								button(type='button', data-dismiss='modal').btn.btn-default Close
 				hr
-				.lead.text-muted Subscribed
+				.lead.text-muted Channels
 				ul.nav.nav-pills.nav-stacked
 					each channel in data.channels
 						li(role='presentation' class=data.channel && data.channel.id == channel.id ? 'active' : null)
@@ -115,53 +115,13 @@ block content
 							.input-group.input-group-md
 								span.input-group-addon
 									i.glyphicon.glyphicon-globe
-								input(type='text', placeholder='Add Channel', id='name', name='name' required).form-control
+								input(type='text', placeholder='Subscribe', id='name', name='name' required).form-control
 							button(type='submit', id='submit').hidden
 block js
-	script.
-		jQuery(function($) {
-			// play sketch button
-			function playSketch(e) {
-				console.log('hi')
-				e.preventDefault();
-
-				var url = $(this).attr('href');
-
-				$.get(url, function() {
-					// success
-				});
-			}
-			$(".display-sketch").click( playSketch );
-			// setbrightness slider
-			function setBrightness() {
-				var url = '/api/leds/set-brightness/' + $(this).val();
-				$.get(url, function() {
-					// success
-				});
-			}
-			$(".brightnessSlider").change( setBrightness );
-			// ajax button GET
-			function apiGetButton(e) {
-				//
-				e.preventDefault();
-				var url = $(this).attr('href');
-				$.ajax({url: url, async: false,
-					error: function(result){
-							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
-							notifier.alert(result.responseJSON.error.note);
-					},
-					success: function(result){
-							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							notifier.success(result.note);
-					}
-				});
-			}
-			$('.api-get-btn').click( apiGetButton );
-		});
 	script(src='https://d3js.org/d3.v5.js')
 	script.
 		d3.json('/config-static/leds.json').then(function(data) {
-			var width = 1280,
+			var width = 720,
 				height = 720,
 				padding = 15;
 			var svgContainer = d3.selectAll('.led-map').append('svg')
@@ -216,14 +176,5 @@ block js
 				.delay(750)
 				.duration(250)
 				.attr('r', function(d) { return 0.7*padding; });
-
-			// change ledmap opacity with brightness slider
-			d3.select('#brightness-range').on("input", function(){
-				d3.selectAll('svg')
-					.transition()
-					.duration(1000)
-					.ease(d3.easeLinear)
-					.style("opacity", d3.select('#brightness-range').property("value"));
-			})
 		})
 

@@ -40,7 +40,7 @@ html
 						else
 							form(action='/api/media/queue' method='post' class='post-form-ajax' role='search').navbar-form
 								.input-group
-									input(name='address' type='text', placeholder='Enter URL to Display' required).form-control
+									input(name='address' type='text', placeholder='Display URL' required).form-control
 									.input-group-btn
 										button(type='submit').btn.btn-default
 											i.glyphicon.glyphicon-play-circle
@@ -162,6 +162,36 @@ html
 					});
 
 				})
+			// brightness slider
+			d3.select('#brightness-range').on("input", function(){
+				// set brightness in background w/ ajax API call
+				var url = '/api/leds/set-brightness/' + $(this).val();
+				$.get(url);
+				// change svg opacity
+				d3.selectAll('svg')
+					.transition()
+					.duration(1000)
+					.ease(d3.easeLinear)
+					.style("opacity", d3.select('#brightness-range').property("value"));
+			})
+			// ajax button GET
+			function apiGetButton(e) {
+				//
+				e.preventDefault();
+				var url = $(this).attr('href');
+				$.ajax({url: url, async: false,
+					error: function(result){
+							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
+							notifier.alert(result.responseJSON.error.note);
+					},
+					success: function(result){
+							console.log('SUCCESS: ' + JSON.stringify(result.note));
+							notifier.success(result.note);
+					}
+				});
+			}
+			$('.api-get-btn').click( apiGetButton );
+
 
 			});
 		.container: #footer
