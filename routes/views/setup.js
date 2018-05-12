@@ -173,23 +173,6 @@ exports = module.exports = function (req, res) {
             pins: "3pin"
         }
     ];
-    locals.ledOrders = [{
-            value: "RGB",
-            label: "RGB"
-        },
-        {
-            value: "BGR",
-            label: "BGR"
-        },
-        {
-            value: "BRG",
-            label: "BRG"
-        },
-        {
-            value: "GRB",
-            label: "GRB"
-        }
-    ];
     locals.formData = req.body || {};
     locals.validationErrors = {};
     locals.setupSubmitted = false;

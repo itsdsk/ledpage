@@ -193,7 +193,6 @@ exports.config_arduino = function (req, res) {
     var config = {
         "ledcount": parseInt(req.body.numLeds, 10),
         "chipset": req.body.ledChip,
-        "order": req.body.ledOrder,
         "platform": req.body.boardType,
         "datapin": req.body.dataPin
     };
@@ -239,7 +238,7 @@ exports.config_arduino = function (req, res) {
                 }
                 var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
                 var define3 = '#define NUM_LEDS ' + req.body.numLeds + '\n';
-                var define4 = '#define COLOR_ORDER ' + req.body.ledOrder + '\n';
+                var define4 = '#define COLOR_ORDER RGB' + '\n';
                 var define5 = '#define LED_TYPE ' + req.body.ledChip + '\n';
                 var defines;
                 if (!req.body.clockPin) {

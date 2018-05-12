@@ -114,13 +114,6 @@ block content
 									option(value='' class = '') (required)
 									each type in ledChips
 										option(value=type.value class=type.pins selected=formData.ledChip === type.value)= type.label
-						.form-group(class=validationErrors.ledOrders ? 'has-error' : null required)
-							label.col-sm-2.control-label Color Order
-							.col-sm-10
-								select(name='ledOrder' id='ledOrderInput' required).form-control
-									option(value='') (required)
-									each type in ledOrders
-										option(value=type.value selected=formData.ledOrder === type.value)= type.label
 						.form-group(class=validationErrors.boardType ? 'has-error' : null required)
 							label.col-sm-2.control-label Platform
 							.col-sm-10
@@ -368,12 +361,6 @@ block js
 						$('#ledChip').val(result.chipset)
 					}else{
 						console.log('error: no ledchipset property found in setup.json');
-					}
-					// set order from setup.json
-					if(result.order){
-						$('#ledOrderInput').val(result.order)
-					}else{
-						console.log('error: no led order property found in setup.json');
 					}
 					// set platform from setup.json
 					if(result.platform){
