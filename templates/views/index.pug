@@ -1,40 +1,36 @@
 extends ../layouts/default
 
-mixin sketch(sketch)
-	.sketch(data-ks-editable=editable(user, { list: 'Sketch', id: sketch.id }))
-		.sketch-thumbnail
-			.img-wrapper(style='position:relative')
-				a(data-toggle="modal", data-target='#modal-'+sketch.id)
-					if sketch.prefThumb
-						- var imgThumb = '/view-static/'+sketch.localDir+'/'+sketch.prefThumb;
-						div(class='sq-thumb-'+sketch.id, style="background-image:url('"+imgThumb+"')").sq-thumb
-					else
-						img(src="http://placehold.it/300x300").img-responsive
-				div(id='modal-'+sketch.id, role='dialog').modal.fade
-					.modal-dialog.modal-sm
-						.modal-content
-							.modal-header
-								button(type='button', class='close', data-dismiss='modal') &times;
-								- var sketchid = sketch.id.slice(-6);
-								h4.modal-title <strong>Disk </strong><i><small>##{sketchid}</small></i>
-							.modal-body
-								a(href='/api/media/' + sketch.id + '/play').btn.btn-primary.btn-lg.btn-block.api-get-btn
-									span.glyphicon.glyphicon-play
-								a(href='/media/'+sketch._id, target='_blank').btn.btn-default.btn-lg.btn-block
-									.text-left
-										| Preview
-								a(href='/media/'+sketch._id+'#details', target='_blank').btn.btn-default.btn-lg.btn-block
-									.text-left
-										| Edit
-								a(href='/api/media/' + sketch.id + '/share').btn.btn-default.btn-lg.btn-block.api-get-btn
-									.text-left
-										| Share
-								if sketch.ipfsHash
-									a(href='https://gateway.ipfs.io/ipfs/' + sketch.ipfsHash, target='_blank').btn.btn-default.btn-lg.btn-block
-										.text-left
-											| View on IPFS
-							.modal-footer
-								button(type='button', data-dismiss='modal').btn.btn-default Close
+mixin mediaMixin(item)
+	a(data-toggle="modal", data-target='#modal-'+item.id)
+		if item.prefThumb
+			img(src='/view-static/'+item.localDir+'/'+item.prefThumb).img-responsive
+		else
+			img(src="http://placehold.it/300x300").img-responsive
+	div(id='modal-'+item.id, role='dialog').modal.fade
+		.modal-dialog.modal-sm
+			.modal-content
+				.modal-header
+					button(type='button', class='close', data-dismiss='modal') &times;
+					- var itemid = item.id.slice(-6);
+					h4.modal-title <strong>Disk </strong><i><small>##{itemid}</small></i>
+				.modal-body
+					a(href='/api/media/' + item.id + '/play').btn.btn-primary.btn-lg.btn-block.api-get-btn
+						span.glyphicon.glyphicon-play
+					a(href='/media/'+item._id, target='_blank').btn.btn-default.btn-lg.btn-block
+						.text-left
+							| Preview
+					a(href='/media/'+item._id+'#details', target='_blank').btn.btn-default.btn-lg.btn-block
+						.text-left
+							| Edit
+					a(href='/api/media/' + item.id + '/share').btn.btn-default.btn-lg.btn-block.api-get-btn
+						.text-left
+							| Share
+					if item.ipfsHash
+						a(href='https://gateway.ipfs.io/ipfs/' + item.ipfsHash, target='_blank').btn.btn-default.btn-lg.btn-block
+							.text-left
+								| View on IPFS
+				.modal-footer
+					button(type='button', data-dismiss='modal').btn.btn-default Close
 block content
 	.container: .row 
 		.col-sm-8.col-md-8
@@ -42,12 +38,10 @@ block content
 				h3.text-muted Invalid channel. 
 			else
 				if data.media.results.length
-					.row.browse
-						style .img-overlay:before {content: ' ';display:block;height:50%;}
-						style .sq-thumb {float:left;position: relative;width: 100%;padding-bottom : 100%;margin:0%;background-position:center center;background-repeat:no-repeat;background-size:cover;}
+					.row
 						each item in data.media.results
 							.col-xs-4(style="padding: 1px;")
-								+sketch(item)
+								+mediaMixin(item)
 					if data.media.totalPages > 1
 						ul.pagination
 							if data.media.previous
