@@ -46,7 +46,12 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS:BOOL=ON -DPLATFORM="rpi" -Wno-dev .. \
   && make -j $(nproc) \
   && mv ./bin/hyperion-remote /usr/bin/ \
-  && mv ./bin/hyperiond /usr/bin/
+  && mv ./bin/hyperiond /usr/bin/ \
+  && export HYPERION_NG_DIR="hyperion_ng" && cd /usr/src/app \
+  && git clone --recursive --depth 1 https://github.com/hyperion-project/hyperion.ng.git "$HYPERION_NG_DIR" \
+  && mkdir "$HYPERION_NG_DIR/build" && cd "$HYPERION_NG_DIR/build" \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_X11=ON -DENABLE_TESTS:BOOL=ON -DPLATFORM="rpi" -Wno-dev .. \
+  && make -j $(nproc)
 #  && rm -rf "/usr/src/app/$HYPERION_DIR"
 
 # install ipfs
