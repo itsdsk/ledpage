@@ -20,9 +20,9 @@ app.on('ready', () => {
   const windowOpts = {
     width: 720,
     height: 720,
-    useContentSize: true,
-    fullscreen: true,
-    enableLargerThanScreen: true,
+    // useContentSize: true,
+    // fullscreen: true,
+    // enableLargerThanScreen: true,
     show: false,
     // center: true,
     // useContentSize: true,
