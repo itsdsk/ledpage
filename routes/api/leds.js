@@ -14,12 +14,12 @@ exports.map_positions = function (req, res) {
         var newConf = {
             index: i,
             hscan: {
-                mininum: newLeds.leds[i].x - ledAreaOffset,
-                maximum: newLeds.leds[i].x + ledAreaOffset
+                mininum: parseFloat((newLeds.leds[i].x - ledAreaOffset).toFixed(4)),
+                maximum: parseFloat((newLeds.leds[i].x + ledAreaOffset).toFixed(4))
             },
             vscan: {
-                mininum: newLeds.leds[i].y - ledAreaOffset,
-                maximum: newLeds.leds[i].y + ledAreaOffset
+                mininum: parseFloat((newLeds.leds[i].y - ledAreaOffset).toFixed(4)),
+                maximum: parseFloat((newLeds.leds[i].y + ledAreaOffset).toFixed(4))
             }
         };
         newConfig.push(newConf);
