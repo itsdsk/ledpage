@@ -1,12 +1,12 @@
 {
 	"device" :
 	{
-		"name"       : "MyHyperionConfig",
+		"name"       : "d1",
 		"type"       : "adalight",
 		"output"     : "/dev/ttyACM0",
 		"rate"     : 460800,
 		"delayAfterConnect"     : 0,
-		"colorOrder" : "brg"
+		"colorOrder" : "rgb"
 	},
 	"color" :
 	{
@@ -80,9 +80,19 @@
 	"framegrabber" : 
 	{
 		"width" : 64,
-		"height" : 36,
-		"frequency_Hz" : 30.303030303030305,
+		"height" : 64,
+		"frequency_Hz" : 30.0,
 		"priority" : 50
+	},
+	"blackborderdetector" : 
+	{
+		"enable" : false,
+		"threshold" : 0.02,
+		"unknownFrameCnt" : 600,
+		"borderFrameCnt" : 50,
+		"maxInconsistentCnt" : 10,
+		"blurRemoveCnt" : 1,
+		"mode" : "default"
 	},
 	"jsonServer" : 
 	{
