@@ -164,8 +164,8 @@ ipc.connectTo(
 		ipc.of.dplayeripc.on(
 			'message',
 			function (data, socket) {
-				if(screenshotID != null){
-					var apiAddress = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+screenshotID+'/screenshot';
+				if (screenshotID != null) {
+					var apiAddress = 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10) + '/api/media/' + screenshotID + '/screenshot';
 					http.get(apiAddress);
 					screenshotID = null;
 				}
@@ -181,7 +181,7 @@ exports.get = function (req, res) {
 		if (err) return res.apiError('database error', err);
 		if (!item) return res.apiError('not found');
 		res.apiResponse({
-			sketch: item
+			media: item
 		});
 	});
 };
@@ -207,7 +207,7 @@ exports.list = function (req, res) {
 			}
 			res.apiResponse({
 				success: true,
-				note: 'retrieved media list from database',
+				note: 'retrieved media from database',
 				media: mediaList,
 				channels: channelList,
 			});
@@ -221,28 +221,28 @@ exports.list = function (req, res) {
  */
 exports.play = function (req, res) {
 	// stop autoplay
-	if(autoplay){
+	if (autoplay) {
 		clearInterval(autoplay);
 	}
-	
+
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 		return res.apiError({
 			success: false,
-			note: 'renderer not active'
+			note: 'could not display media because the renderer is not active'
 		});
 	}
 	Media.model.findById(req.params.id).exec(function (err, item) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not find media in database'
+				note: 'could not display media because it was not found in the database'
 			});
 		}
 		if (!item) {
 			return res.apiError({
 				success: false,
-				note: 'could not get media from database'
+				note: 'could not display media because it was not found'
 			});
 		}
 		if (ipc.of.dplayeripc) {
@@ -250,9 +250,9 @@ exports.play = function (req, res) {
 			ipc.of.dplayeripc.emit('message', sketchPath);
 			console.log(JSON.stringify(item));
 			// check if sketch has thumbnail
-			if(item.prefThumb) {
+			if (item.prefThumb) {
 				screenshotID = null; // dont save thumbnail
-			}else{
+			} else {
 				screenshotID = req.params.id; // save media ID to take thumbnail
 			}
 			res.apiResponse({
@@ -262,7 +262,7 @@ exports.play = function (req, res) {
 		} else {
 			res.apiError({
 				success: false,
-				note: 'failed to queue media to display'
+				note: 'could not display media because the renderer is offline'
 			});
 		}
 	});
@@ -283,7 +283,7 @@ exports.create = function (req, res) {
 		if (fserr.code !== 'EEXIST') {
 			return res.apiError({
 				success: false,
-				note: 'could not create new directory for media'
+				note: 'could not upload media because the directory could not be created'
 			});
 		}
 	}
@@ -293,7 +293,7 @@ exports.create = function (req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not save HTML to storage'
+				note: 'could not upload media because the file could not be saved'
 			});
 		}
 	});
@@ -308,14 +308,14 @@ exports.create = function (req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'could not save to database'
+				note: 'could not update database with new media'
 			});
 		} else {
 			// format media metadata
 			var diskJSON = {
 				"disk": {
-					"title":saveDir,
-					"state":"published"
+					"title": saveDir,
+					"state": "published"
 				}
 			};
 			// save metadata with media
@@ -328,7 +328,7 @@ exports.create = function (req, res) {
 					});
 				}
 				// play new sketch
-				var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+newModel.id+'/play';
+				var playURL = 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10) + '/api/media/' + newModel.id + '/play';
 				http.get(playURL);
 				// finished
 				return res.apiResponse({
@@ -349,13 +349,13 @@ exports.update = function (req, res) {
 		if (err) {
 			return res.apiError({
 				success: false,
-				note: 'database error' + err
+				note: 'could not update media because it was not found in the database'
 			});
 		}
 		if (!item) {
 			return res.apiError({
 				success: false,
-				note: 'sketch ID not found'
+				note: 'could not update media because it could not be retrieved'
 			});
 		}
 		// get absolute file name
@@ -368,7 +368,7 @@ exports.update = function (req, res) {
 				// error saving
 				return res.apiError({
 					success: false,
-					note: 'error saving sketch file'
+					note: 'could not save updated media to storage'
 				});
 			} else {
 				// save title
@@ -377,16 +377,16 @@ exports.update = function (req, res) {
 					if (err) {
 						return res.apiError({
 							success: false,
-							note: 'could not update database ' + err
+							note: 'could not update media in the database'
 						});
 					} else {
 						// update metadata file
 						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
 						var diskJSONexists = fs.existsSync(diskJSONpath);
-						if(diskJSONexists){
+						if (diskJSONexists) {
 							// read json with metadata
 							var rawDiskJSON = fs.readFileSync(diskJSONpath);
-							if(!rawDiskJSON) {
+							if (!rawDiskJSON) {
 								console.log('could not read updated media metadata');
 								return res.apiError({
 									success: false,
@@ -398,20 +398,21 @@ exports.update = function (req, res) {
 								obj.disk.title = req.body.title;
 								// save new metadata
 								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
-									if(err){
+									if (err) {
 										console.log('error saving setup json' + err);
 										return res.apiError({
 											success: false,
-											note: 'updated but failed to save metadata file'
-										});					
-									}else{
+											note: 'updated media but could not write metadata to storage'
+										});
+									} else {
 										// play new sketch
-										var playURL = 'http://0.0.0.0:'+parseInt(process.env.PORT || 80, 10)+'/api/media/'+req.params.id+'/play';
+										var playURL = 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10) + '/api/media/' + req.params.id + '/play';
 										http.get(playURL);
 										// finished
 										return res.apiResponse({
 											success: true,
-											note: 'updated media'
+											note: 'updated media',
+											reload: true
 										});
 									}
 								})
@@ -430,8 +431,18 @@ exports.update = function (req, res) {
 exports.channel = function (req, res) {
 	// find sketch
 	Media.model.findById(req.params.id).exec(function (err, item) {
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not update channel because the media was not found'
+			});
+		}
+		if (!item) {
+			return res.apiError({
+				success: false,
+				note: 'could not update channel because media was not retrieved'
+			});
+		}
 		var sketchChannels = [];
 		var alreadyInChannel = false;
 		// add existing channels to array
@@ -454,59 +465,76 @@ exports.channel = function (req, res) {
 		// run the database update
 		item.getUpdateHandler(req).process(data, function (err) {
 			if (err) {
-				return res.apiError('error updating media channel', err);
+				return res.apiError({
+					success: false,
+					note: 'could not update channel in the database'
+				});
 			} else {
 				// update metadata file
 				var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
 				var diskJSONexists = fs.existsSync(diskJSONpath);
-				if(diskJSONexists){
+				if (diskJSONexists) {
 					// read json with metadata
 					var rawDiskJSON = fs.readFileSync(diskJSONpath);
-					if(!rawDiskJSON) {
+					if (!rawDiskJSON) {
 						console.log('could not read updated media metadata');
 						return res.apiError({
 							success: false,
-							note: 'updated media but failed to find metadata file'
+							note: 'updated channel but could not back up to storage'
 						});
 					} else {
 						// get channel key (name as string) from id
-						MediaChannel.model.findById(req.query._id).exec(function(err, updatedChannel){
-							if (err) return res.apiError('database error', err);
-							if (!updatedChannel) return res.apiError('not found');
+						MediaChannel.model.findById(req.query._id).exec(function (err, updatedChannel) {
+							if (err) {
+								return res.apiError({
+									success: false,
+									note: 'could not update media because channel was not found'
+								});
+							}
+							if (!updatedChannel) {
+								return res.apiError({
+									success: false,
+									note: 'could not update because media channel was not found'
+								});
+							}
 							// add new metadata to loaded object
 							var obj = JSON.parse(rawDiskJSON);
-							if(alreadyInChannel == false){
-								if(obj.disk.channels){
+							if (alreadyInChannel == false) {
+								if (obj.disk.channels) {
 									obj.disk.channels.push(updatedChannel.key);
-								}else{
+								} else {
 									obj.disk.channels = [updatedChannel.key];
 								}
-							}else{
+							} else {
 								var channelIdx = obj.disk.channels.indexOf(updatedChannel.key);
-								if(channelIdx > -1){
+								if (channelIdx > -1) {
 									obj.disk.channels.splice(channelIdx, 1);
 								}
 							}
 							// save new metadata
 							fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
-								if(err){
+								if (err) {
 									console.log('error saving setup json' + err);
 									return res.apiError({
 										success: false,
-										note: 'updated but failed to save metadata file'
-									});					
-								}else{
+										note: 'updated channel but failed to save metadata file'
+									});
+								} else {
 									// finished
 									return res.apiResponse({
 										success: true,
-										note: 'added media to channel'
+										note: 'added media to channel',
+										reload: true
 									});
 								}
 							});
 						});
 					}
-				}else{
-					// disk.json doesnt exist
+				} else {
+					return res.apiError({
+						success: false,
+						note: 'updated channel but stored metadata could not be found'
+					});
 				}
 			}
 		});
@@ -649,7 +677,7 @@ exports.screenshot = function (req, res) {
 			// add thumbnail to database
 			var thumbEntry = {
 				prefThumb: uploadName
-			}; 
+			};
 			Media.updateItem(item, thumbEntry, {
 				fields: ["prefThumb"]
 			}, function (dberror) {
@@ -661,41 +689,41 @@ exports.screenshot = function (req, res) {
 					});
 				} else {
 					// save prefthumb to metadata file
-						// update metadata file
-						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
-						var diskJSONexists = fs.existsSync(diskJSONpath);
-						if(diskJSONexists){
-							// read json with metadata
-							var rawDiskJSON = fs.readFileSync(diskJSONpath);
-							if(!rawDiskJSON) {
-								console.log('could not read updated media metadata');
-								return res.apiError({
-									success: false,
-									note: 'could not read media metadata file'
-								});
-							} else {
-								// add new metadata to loaded object
-								var obj = JSON.parse(rawDiskJSON);
-								obj.disk.prefThumb = uploadName;
-								// save new metadata
-								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
-									if(err){
-										console.log('error saving setup json' + err);
-										return res.apiError({
-											success: false,
-											note: 'could not save screenshot to metadata file'
-										});					
-									}else{
-										// finished
-										return res.apiResponse({
-											success: true,
-											note: 'saved screenshot of media',
-											reload: true
-										});
-									}
-								})
-							}
+					// update metadata file
+					var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
+					var diskJSONexists = fs.existsSync(diskJSONpath);
+					if (diskJSONexists) {
+						// read json with metadata
+						var rawDiskJSON = fs.readFileSync(diskJSONpath);
+						if (!rawDiskJSON) {
+							console.log('could not read updated media metadata');
+							return res.apiError({
+								success: false,
+								note: 'could not read media metadata file'
+							});
+						} else {
+							// add new metadata to loaded object
+							var obj = JSON.parse(rawDiskJSON);
+							obj.disk.prefThumb = uploadName;
+							// save new metadata
+							fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
+								if (err) {
+									console.log('error saving setup json' + err);
+									return res.apiError({
+										success: false,
+										note: 'could not save screenshot to metadata file'
+									});
+								} else {
+									// finished
+									return res.apiResponse({
+										success: true,
+										note: 'saved screenshot of media',
+										reload: true
+									});
+								}
+							})
 						}
+					}
 				}
 			});
 		});
@@ -786,14 +814,14 @@ exports.share = function (req, res) {
 							success: false,
 							note: 'could not update media with shared p2p address in database'
 						});
-					}else{
+					} else {
 						// update metadata file
 						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
 						var diskJSONexists = fs.existsSync(diskJSONpath);
-						if(diskJSONexists){
+						if (diskJSONexists) {
 							// read json with metadata
 							var rawDiskJSON = fs.readFileSync(diskJSONpath);
-							if(!rawDiskJSON) {
+							if (!rawDiskJSON) {
 								console.log('could not read updated media metadata');
 								return res.apiError({
 									success: false,
@@ -805,13 +833,13 @@ exports.share = function (req, res) {
 								obj.disk.ipfsHash = files[files.length - 1].hash;
 								// save new metadata
 								fs.writeFile(diskJSONpath, JSON.stringify(obj, null, 4), 'utf8', function (err) {
-									if(err){
+									if (err) {
 										console.log('error saving setup json' + err);
 										return res.apiError({
 											success: false,
 											note: 'could not update media with shared hash'
-										});					
-									}else{
+										});
+									} else {
 										// finished
 										return res.apiResponse({
 											success: true,
@@ -835,7 +863,7 @@ exports.share = function (req, res) {
  */
 exports.queue = function (req, res) {
 	// stop autoplay
-	if(autoplay){
+	if (autoplay) {
 		clearInterval(autoplay);
 	}
 	if (!isDplayerConnected) {
@@ -867,24 +895,24 @@ exports.initialise = function (req, res) {
 	// check data paths exist
 	var dataPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
 	var dataPathExists = fs.existsSync(dataPath);
-	if(!dataPathExists){
-		if(process.env.D1_DATA_PATH){
+	if (!dataPathExists) {
+		if (process.env.D1_DATA_PATH) {
 			return res.apiError({
 				success: false,
 				note: 'could not initialise database because the data path does not exist'
-			});	
-		}else{
+			});
+		} else {
 			// create data directories
-			try{
-			fs.mkdirSync('/data/content');
-			fs.mkdirSync('/data/content/view-static');
-			fs.mkdirSync('/data/content/config-static');
+			try {
+				fs.mkdirSync('/data/content');
+				fs.mkdirSync('/data/content/view-static');
+				fs.mkdirSync('/data/content/config-static');
 			} catch (err) {
-				if(err.code !== 'EEXIST') {
+				if (err.code !== 'EEXIST') {
 					return res.apiError({
 						success: false,
 						note: 'could not create content directories while initialising'
-					});			
+					});
 				}
 			}
 		}
@@ -1003,8 +1031,8 @@ exports.initialise = function (req, res) {
 					} else {
 						// add sketch to database
 						var obj = JSON.parse(rawDiskJSON);
-						if(obj.disk.channels){
-							for(var k=0; k<obj.disk.channels.length; k++){
+						if (obj.disk.channels) {
+							for (var k = 0; k < obj.disk.channels.length; k++) {
 								newItems.MediaChannel.push({
 									"name": obj.disk.channels[k],
 									"__ref": obj.disk.channels[k]
@@ -1186,38 +1214,38 @@ exports.download = function (req, res) {
 var autoplay;
 var autoplayCount = 0;
 exports.autoplay = function (req, res) {
-	if(!req.query.secs){
-			return res.apiError({
-				success: false,
-				note: 'could not play media list because no interval was set'
-			});
-	}else{
+	if (!req.query.secs) {
+		return res.apiError({
+			success: false,
+			note: 'could not play media list because no interval was set'
+		});
+	} else {
 		// get interval in ms
 		var interval = req.query.secs * 1000;
 		// get media array
-		if(!req.query.channel){
+		if (!req.query.channel) {
 			return res.apiError({
 				success: false,
 				note: 'could not play media because no list was specified'
 			});
-		}else{
+		} else {
 			// query database
-			Media.model.find().where('state','published').sort('-publishedDate').populate('channels').where('channels').in([req.query.channel]).exec(function(err, results) {
-				if(err) {
+			Media.model.find().where('state', 'published').sort('-publishedDate').populate('channels').where('channels').in([req.query.channel]).exec(function (err, results) {
+				if (err) {
 					return res.apiError({
 						success: false,
 						note: 'could not play media list because it was not found in the database'
 					});
-				}else{
+				} else {
 					var mediaArray = [];
-					for(var i=0; i<results.length; i++){
+					for (var i = 0; i < results.length; i++) {
 						mediaArray.push(results[i].localDir);
 					}
 					autoplayMedia = mediaArray;
 					console.log(mediaArray);
-					autoplay = setInterval(function(media) {
+					autoplay = setInterval(function (media) {
 						// media to play
-						var currentMedia = media[autoplayCount%media.length];
+						var currentMedia = media[autoplayCount % media.length];
 						var mediaPath = 'file:///' + res.locals.staticPath + currentMedia + '/index.html';
 						console.log(mediaPath);
 						if (isDplayerConnected) {
@@ -1234,4 +1262,3 @@ exports.autoplay = function (req, res) {
 		}
 	}
 };
-
