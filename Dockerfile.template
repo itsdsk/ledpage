@@ -46,7 +46,7 @@ RUN export FIRMWARE_DIR="raspberrypi-firmware" \
   && cmake -DCMAKE_BUILD_TYPE=Release -DPLATFORM="rpi" -Wno-dev .. \
   && make -j $(nproc) \
   && mv ./bin/hyperion-remote /usr/bin/ \
-  && mv ./bin/hyperiond /usr/bin/
+  && mv ./bin/hyperiond /usr/bin/ \
   && rm -rf "/usr/src/app/$HYPERION_DIR"
 
 # install ipfs
