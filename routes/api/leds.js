@@ -10,7 +10,7 @@ exports.map_positions = function (req, res) {
     // duplicate new led map into hyperion format
     const newConfig = Array();
     for (var i = 0; i < newLeds.leds.length; i++) {
-        var ledAreaOffset = 0.66*newLeds.leds[i].r;
+        var ledAreaOffset = 0.66 * newLeds.leds[i].r;
         var newConf = {
             index: i,
             hscan: {
@@ -34,10 +34,10 @@ exports.map_positions = function (req, res) {
     console.log(cfgTemplatePath);
     fs.readFile(cfgTemplatePath, function (err, data) {
         if (err) {
-            console.log('wefaf' + err);
+            console.log('could not read hyperion config: ' + err);
             return res.apiError({
                 success: false,
-                note: 'could not read config template (hyperion json)'
+                note: 'update for LED mapping failed because the config template is missing'
             });
         }
         try {
@@ -48,10 +48,9 @@ exports.map_positions = function (req, res) {
             fs.writeFile(res.locals.configStaticPath + 'hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
                 if (fserr) {
                     console.log(fserr);
-                    res.apiResponse({
+                    res.apiError({
                         success: false,
-                        note: 'Error saving file...',
-                        error: fserr
+                        note: 'LED mapping file could not be saved'
                     });
                 } else {
                     // save new leds.json
@@ -59,16 +58,15 @@ exports.map_positions = function (req, res) {
                     fs.writeFile(res.locals.configStaticPath + 'leds.json', jsonNewLeds, 'utf8', (fserr) => {
                         if (fserr) {
                             console.log(fserr);
-                            res.apiResponse({
+                            res.apiError({
                                 success: false,
-                                note: 'Error saving file...',
+                                note: 'the LED mapping could not be saved',
                                 error: fserr
                             });
                         } else {
-                            console.log('File saved');
+                            console.log('LED mapping files saved');
                         }
                     });
-                    console.log('File saved');
                 }
             });
             // restart hyperion
@@ -80,19 +78,21 @@ exports.map_positions = function (req, res) {
                 if (err) {
                     return res.apiError({
                         success: false,
-                        note: 'could not update led interface'
+                        note: 'saved new LED mapping but interface could not be restarted'
                     });
                 } else {
                     return res.apiResponse({
                         success: true,
-                        note: 'updated led interface'
+                        note: 'saved new LED mapping and restarted interface',
+                        reload: true
                     });
                 }
             });
         } catch (exception) {
-            console.log('wedwddfaf' + exception);
+            console.log('error updating LED mapping: ' + exception);
             return res.apiError({
-                success: false
+                success: false,
+                note: 'unknown error updating LED mapping'
             });
         }
     });
@@ -110,7 +110,7 @@ exports.calibrate = function (req, res) {
         if (!hyperionConfig) {
             return res.apiError({
                 success: false,
-                note: 'could not find config file'
+                note: 'colours not calibrated because config file was not found'
             });
         } else {
             var hyperionConfigJSON = JSON.parse(hyperionConfig);
@@ -135,7 +135,7 @@ exports.calibrate = function (req, res) {
                 if (err || !results.length) {
                     return res.apiError({
                         success: false,
-                        note: 'could not fetch profile from database'
+                        note: 'colours calibrated but not updated in database (profile not found)'
                     });
                 }
                 // shorthand for profile and new settings
@@ -156,7 +156,7 @@ exports.calibrate = function (req, res) {
                     if (err) {
                         return res.apiError({
                             success: false,
-                            note: 'could not update profile in database'
+                            note: 'colours calibrated but could not update profile in database'
                         });
                     } else {
                         // restart hyperion
@@ -168,12 +168,13 @@ exports.calibrate = function (req, res) {
                             if (err) {
                                 return res.apiError({
                                     success: false,
-                                    note: 'updated colour calibration but could not restart interface'
+                                    note: 'colours calibrated but the LED interface could not be restarted'
                                 });
                             } else {
                                 return res.apiResponse({
                                     success: true,
-                                    note: 'updated colour calibration and restarted interface'
+                                    note: 'saved and updated LED colour calibration',
+                                    reload: true
                                 });
                             }
                         });
@@ -210,7 +211,7 @@ exports.config_arduino = function (req, res) {
             console.log('error saving setup json' + err);
             return res.apiError({
                 success: false,
-                note: 'couldnt save setup json'
+                note: 'hardware update failed because the config couldnt be written to storage'
             });
         } else {
             console.log('saved setup config json');
@@ -223,7 +224,7 @@ exports.config_arduino = function (req, res) {
             console.log('arduino not available');
             return res.apiError({
                 success: false,
-                note: 'arduino not available'
+                note: 'hardware update failed because arduino is not installed'
             });
         } else {
             // construct arduino file
@@ -233,7 +234,7 @@ exports.config_arduino = function (req, res) {
                     console.log(err);
                     return res.apiError({
                         success: false,
-                        note: 'could not write arduino file'
+                        note: 'hardware update failed because the arduino file could not be written'
                     });
                 }
                 var define1 = '#define DATA_PIN ' + req.body.dataPin + '\n';
@@ -253,7 +254,7 @@ exports.config_arduino = function (req, res) {
                         console.log(err);
                         return res.apiError({
                             success: false,
-                            note: 'could not input settings to arduino file'
+                            note: 'hardware update failed, the arduino file could not be added to'
                         });
                     }
                     fs.readFile("./libs/controller/arduino_segments/template.txt", (err, contents) => {
@@ -262,7 +263,7 @@ exports.config_arduino = function (req, res) {
                             console.log(err);
                             return res.apiError({
                                 success: false,
-                                note: 'could not read arduino template file'
+                                note: 'hardware update failed, the arduino template file could not be read'
                             });
                         }
                         fs.appendFile("./libs/controller/arduino_segments/form_setup.ino", contents, function (err) {
@@ -271,10 +272,10 @@ exports.config_arduino = function (req, res) {
                                 console.log(err);
                                 return res.apiError({
                                     success: false,
-                                    note: 'could not add arduino template to file'
+                                    note: 'hardware update failed, error building arduino file'
                                 });
                             }
-                            console.log('finished creating arduino file!');
+                            console.log('created arduino file');
                             // compile and upload new arduino file
                             const exec = require('child_process').exec;
                             console.log('starting arduino compile & upload');
@@ -285,20 +286,19 @@ exports.config_arduino = function (req, res) {
                                     console.log(`exec error: ${err}`);
                                     return res.apiError({
                                         success: false,
-                                        note: 'could not run arduino compile and upload script'
+                                        note: 'hardware update failed, could not sync arduino'
                                     });
                                 } // ref: https://stackoverflow.com/a/44667294
                                 if (!err) {
-                                    console.log('no erroi');
                                     return res.apiResponse({
                                         success: true,
-                                        note: 'settings for arduino compiled and uploaded'
+                                        note: 'settings for arduino compiled and uploaded',
+                                        redirect: '/'
                                     });
                                 } else {
-                                    console.log('errors');
                                     return res.apiError({
                                         success: false,
-                                        note: 'could not run arduino compile and upload script'
+                                        note: 'hardware update failed, could not compile and upload to arduino'
                                     });
                                 }
                             });
@@ -332,16 +332,17 @@ exports.set_brightness = function (req, res) {
     client.on('error', (error) => {
         console.log('error setting brightness');
         console.log(error);
-        return res.apiResponse({
-            error: error
+        return res.apiError({
+            success: false,
+            note: 'brightness not set'
         });
     });
     client.on('data', function (data) {
         console.log('Received: ' + data);
         client.destroy(); // kill client after server's response
-        res.apiResponse({
+        return res.apiResponse({
             success: true,
-            response: data
+            note: 'set brightness'
         });
     });
 };
@@ -360,7 +361,7 @@ exports.reboot = function (req, res) {
             console.log(`exec error: ${err}`);
             return res.apiError({
                 success: false,
-                note: 'could not send reboot signal'
+                note: 'reboot failed because the supervisor key is not present'
             });
         }
         if (stdout.length > 0) { // exists
@@ -374,28 +375,26 @@ exports.reboot = function (req, res) {
                     console.log(`exec error: ${err}`);
                     return res.apiError({
                         success: false,
-                        note: 'could not send reboot signal'
+                        note: 'reboot failed, the reboot signal could not be sent'
                     });
                 }
                 if (!err) {
-                    console.log('no erroi');
                     return res.apiResponse({
                         success: true,
-                        note: 'queued system to reboot'
+                        note: 'system rebooting',
+                        redirect: '/'
                     });
                 } else {
-                    console.log('errors');
                     return res.apiError({
                         success: false,
-                        note: 'could not reboot'
+                        note: 'reboot failed, the supervisor signal was not sent'
                     });
                 }
             });
         } else { // supervisor doesnt exist
-            console.log('errors');
             return res.apiError({
                 success: false,
-                note: 'could not talk to supervisor'
+                note: 'reboot failed, the supervisor key is not available'
             });
         }
     });
@@ -414,7 +413,7 @@ exports.shutdown = function (req, res) {
             console.log(`exec error: ${err}`);
             return res.apiError({
                 success: false,
-                note: 'could not send reboot signal'
+                note: 'shutdown failed, the supervisor key is not present'
             });
         }
         if (stdout.length > 0) { // exists
@@ -429,28 +428,26 @@ exports.shutdown = function (req, res) {
                     console.log(`exec error: ${err}`);
                     return res.apiError({
                         success: false,
-                        note: 'could not send shutdown signal'
+                        note: 'shutdown failed, the signal could not be sent'
                     });
                 }
                 if (!err) {
-                    console.log('no erroi');
                     return res.apiResponse({
                         success: true,
-                        note: 'queued system to shutdown'
+                        note: 'shutdown initiated',
+                        redirect: '/'
                     });
                 } else {
-                    console.log('errors');
                     return res.apiError({
                         success: false,
-                        note: 'could not shutdown'
+                        note: 'shutdown signal could not be sent'
                     });
                 }
             });
         } else { // supervisor doesnt exist
-            console.log('errors');
             return res.apiError({
                 success: false,
-                note: 'could not talk to supervisor'
+                note: 'shutdown failed, could not talk to supervisor'
             });
         }
     });
