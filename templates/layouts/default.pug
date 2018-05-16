@@ -104,7 +104,9 @@ html
 						},
 						success: function(result){
 							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							if(result.redirect){
+							if(result.reload){
+								window.location.reload();
+							}else if(result.redirect){
 								window.location.replace(result.redirect);
 							}else{
 								notifier.success(result.note);
@@ -141,7 +143,9 @@ html
 					},
 					success: function(result){
 							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							if(result.redirect){
+							if(result.reload){
+								window.location.reload();
+							}else if(result.redirect){
 								window.location.replace(result.redirect);
 							}else{
 								notifier.success(result.note);
