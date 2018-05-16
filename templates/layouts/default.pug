@@ -104,7 +104,11 @@ html
 						},
 						success: function(result){
 							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							notifier.success(result.note);
+							if(result.redirect){
+								window.location.replace(result.redirect);
+							}else{
+								notifier.success(result.note);
+							}
 						}
 					});
 
@@ -137,7 +141,11 @@ html
 					},
 					success: function(result){
 							console.log('SUCCESS: ' + JSON.stringify(result.note));
-							notifier.success(result.note);
+							if(result.redirect){
+								window.location.replace(result.redirect);
+							}else{
+								notifier.success(result.note);
+							}
 					}
 				});
 			}
