@@ -34,21 +34,6 @@ RUN echo "#!/bin/bash" > /etc/X11/xinit/xserverrc \
 # move to app dir
 WORKDIR /usr/src/app
 
-# clone and build hyperion
-RUN export FIRMWARE_DIR="raspberrypi-firmware" \
-  && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
-  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
-  && rm -rf "$FIRMWARE_DIR" \
-  && export HYPERION_DIR="hyperion" \
-  && git clone --recursive -b no-cropping --single-branch --depth 1 https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
-  && mkdir "$HYPERION_DIR/build" \
-  && cd "$HYPERION_DIR/build" \
-  && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS:BOOL=ON -DPLATFORM="rpi" -Wno-dev .. \
-  && make -j $(nproc) \
-  && mv ./bin/hyperion-remote /usr/bin/ \
-  && mv ./bin/hyperiond /usr/bin/
-#  && rm -rf "/usr/src/app/$HYPERION_DIR"
-
 # install ipfs
 ENV IPFS_VERSION=0.4.14
 RUN curl -O https://ipfs.io/ipns/dist.ipfs.io/go-ipfs/v${IPFS_VERSION}/go-ipfs_v${IPFS_VERSION}_linux-arm.tar.gz \
@@ -92,6 +77,21 @@ COPY ./templates ./templates
 COPY ./start.sh ./
 #COPY ./volume/data/content/view-static /data/content/view-static
 #VOLUME /data/content/view-static
+
+# clone and build hyperion
+RUN export FIRMWARE_DIR="raspberrypi-firmware" \
+  && git clone --depth 1 https://github.com/raspberrypi/firmware.git "$FIRMWARE_DIR" \
+  && cp -R "$FIRMWARE_DIR/hardfp/opt/" /opt \
+  && rm -rf "$FIRMWARE_DIR" \
+  && export HYPERION_DIR="hyperion" \
+  && git clone --recursive -b no-cropping --single-branch --depth 1 https://github.com/itsdsk/hyperion.git "$HYPERION_DIR" \
+  && mkdir "$HYPERION_DIR/build" \
+  && cd "$HYPERION_DIR/build" \
+  && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTS:BOOL=ON -DPLATFORM="rpi" -Wno-dev .. \
+  && make -j $(nproc) \
+  && mv ./bin/hyperion-remote /usr/bin/ \
+  && mv ./bin/hyperiond /usr/bin/
+#  && rm -rf "/usr/src/app/$HYPERION_DIR"
 
 # Start app
 CMD ["bash", "/usr/src/app/start.sh"]
