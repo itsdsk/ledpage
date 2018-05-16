@@ -333,7 +333,8 @@ exports.create = function (req, res) {
 				// finished
 				return res.apiResponse({
 					success: true,
-					note: 'uploaded new media'
+					note: 'uploaded new media',
+					redirect: '/'
 				});
 			});
 		}
@@ -533,7 +534,8 @@ exports.subscribe = function (req, res) {
 		} else {
 			return res.apiResponse({
 				success: true,
-				note: 'subscribed to channel'
+				note: 'subscribed to channel',
+				redirect: '/'
 			});
 		}
 	});
@@ -568,7 +570,8 @@ exports.unsubscribe = function (req, res) {
 			}
 			return res.apiResponse({
 				success: true,
-				note: 'deleted channel'
+				note: 'deleted channel',
+				redirect: '/'
 			});
 		});
 	});
@@ -585,10 +588,15 @@ exports.remove = function (req, res) {
 		item.state = 'archived';
 		item.save(function (err) {
 			if (err) {
-				return res.err(err);
+				return res.apiError({
+					success: false,
+					note: 'could not delete media'
+				});
 			} else {
-				res.apiResponse({
-					success: true
+				return res.apiResponse({
+					success: true,
+					note: 'removed media',
+					redirect: '/'
 				});
 			}
 		});
@@ -603,13 +611,24 @@ exports.screenshot = function (req, res) {
 	if (!isDplayerConnected) {
 		console.log('play error: player not connected');
 		return res.apiError({
-			success: false
+			success: false,
+			note: 'could not screenshot media because player is not connected'
 		});
 	}
 	// find sketch
 	Media.model.findById(req.params.id).exec(function (err, item) {
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not screenshot media as it could not be retrieved from the database'
+			});
+		}
+		if (!item) {
+			return res.apiError({
+				success: false,
+				note: 'could not screenshot media as it was not found'
+			});
+		}
 		// prep to save screenshot
 		var sys = require('sys');
 		var exec = require('child_process').exec;
@@ -637,7 +656,8 @@ exports.screenshot = function (req, res) {
 				if (dberror) {
 					console.log('db error: ' + dberror);
 					return res.apiError({
-						success: false
+						success: false,
+						note: 'could not add screenshot to media database'
 					});
 				} else {
 					// save prefthumb to metadata file
@@ -669,7 +689,8 @@ exports.screenshot = function (req, res) {
 										// finished
 										return res.apiResponse({
 											success: true,
-											note: 'screenshot saved to db'
+											note: 'saved screenshot of media',
+											reload: true
 										});
 									}
 								})
@@ -690,7 +711,7 @@ exports.savescreen = function (req, res) {
 		console.log('play error: player not connected');
 		return res.apiError({
 			success: false,
-			note: 'renderer not active'
+			note: 'could not capture media as the renderer is not active'
 		});
 	}
 	// prep to save screenshot
@@ -707,12 +728,12 @@ exports.savescreen = function (req, res) {
 			console.log('screenshot error: ');
 			return res.apiError({
 				success: false,
-				note: 'could not save screenshot'
+				note: 'could not capture screen'
 			});
 		} else {
 			return res.apiResponse({
 				success: true,
-				note: 'saved screenshot'
+				note: 'captured and saved screenshot'
 			});
 		}
 	});
@@ -723,8 +744,18 @@ exports.savescreen = function (req, res) {
  */
 exports.share = function (req, res) {
 	Media.model.findById(req.params.id).exec(function (err, item) {
-		if (err) return res.apiError('database error', err);
-		if (!item) return res.apiError('not found');
+		if (err) {
+			return res.apiError({
+				success: false,
+				note: 'could not share as media could not be retrieved from database'
+			});
+		}
+		if (!item) {
+			return res.apiError({
+				success: false,
+				note: 'could not share as media was not found'
+			});
+		}
 		var sketchPath = [];
 		sketchPath.push(path.join(res.locals.staticPath, item.localDir));
 		ipfs.files.add(sketchPath, {
@@ -732,7 +763,10 @@ exports.share = function (req, res) {
 		}, function (ipfserr, files) {
 			if (ipfserr) {
 				console.log('ipfs file add error');
-				return res.apiError('ipfs error', ipfserr);
+				return res.apiError({
+					success: false,
+					note: 'could not share media from peer-to-peer network'
+				});
 			} else {
 				console.log("Added:");
 				files.forEach((file) => {
@@ -748,6 +782,10 @@ exports.share = function (req, res) {
 				}, function (dberror) {
 					if (dberror) {
 						console.log(dberror);
+						return res.apiError({
+							success: false,
+							note: 'could not update media with shared p2p address in database'
+						});
 					}else{
 						// update metadata file
 						var diskJSONpath = res.locals.staticPath + item.localDir + '/disk.json';
@@ -759,7 +797,7 @@ exports.share = function (req, res) {
 								console.log('could not read updated media metadata');
 								return res.apiError({
 									success: false,
-									note: 'could not read media metadata file'
+									note: 'could not update media with shared p2p address in metadata file'
 								});
 							} else {
 								// add new metadata to loaded object
@@ -777,7 +815,8 @@ exports.share = function (req, res) {
 										// finished
 										return res.apiResponse({
 											success: true,
-											note: 'shared media'
+											note: 'shared media',
+											reload: true
 										});
 									}
 								})
@@ -803,7 +842,7 @@ exports.queue = function (req, res) {
 		console.log('play error: player not connected');
 		return res.apiError({
 			success: false,
-			note: 'renderer not connected'
+			note: 'could not play media because the renderer is not connected'
 		});
 	}
 	if (ipc.of.dplayeripc) {
@@ -811,7 +850,7 @@ exports.queue = function (req, res) {
 		ipc.of.dplayeripc.emit('message', sketchPath);
 		return res.apiResponse({
 			success: true,
-			note: 'queued sketch URL'
+			note: 'Queued URL to display'
 		});
 	} else {
 		return res.apiError({
@@ -832,7 +871,7 @@ exports.initialise = function (req, res) {
 		if(process.env.D1_DATA_PATH){
 			return res.apiError({
 				success: false,
-				note: 'data path does not exist'
+				note: 'could not initialise database because the data path does not exist'
 			});	
 		}else{
 			// create data directories
@@ -1052,9 +1091,9 @@ exports.download = function (req, res) {
 		ipfs.files.get(ipfsURI, function (err, files) {
 			if (err) {
 				console.log(err);
-				res.apiResponse({
+				return res.apiError({
 					success: false,
-					error: err
+					note: 'could not download media from ipfs'
 				});
 			} else {
 				// check existing database
@@ -1062,9 +1101,9 @@ exports.download = function (req, res) {
 					ipfsHash: req.params.ipfs
 				}).exec(function (dberr, result) {
 					if (result) {
-						res.apiResponse({
+						res.apiError({
 							success: false,
-							duplicates: result
+							note: 'could not download duplicate media'
 						});
 					} else {
 						// save each file
@@ -1083,6 +1122,10 @@ exports.download = function (req, res) {
 												fs.mkdirSync(path.join(sketchPath, currentPath));
 											} catch (fserr) {
 												if (fserr.code !== 'EEXIST') {
+													res.apiError({
+														success: false,
+														note: 'could not save downloaded media file to storage'
+													});
 													throw fserr;
 												}
 											}
@@ -1093,10 +1136,9 @@ exports.download = function (req, res) {
 								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
 									if (fserr) {
 										console.log(fserr);
-										res.apiResponse({
+										return res.apiError({
 											success: false,
-											note: 'Error saving file...',
-											error: fserr
+											note: 'could not save downloaded media to storage'
 										});
 									}
 								});
@@ -1114,15 +1156,14 @@ exports.download = function (req, res) {
 							flashErrors: true
 						}, function (upderr) {
 							if (upderr) {
-								res.apiResponse({
+								return res.apiError({
 									success: false,
-									note: 'Error adding new media to database...',
-									error: upderr
+									note: 'could not add downloaded media to database'
 								});
 							} else {
-								res.apiResponse({
+								return res.apiResponse({
 									success: true,
-									sketch: files
+									note: 'downloaded media from p2p'
 								});
 							}
 						});
@@ -1132,9 +1173,9 @@ exports.download = function (req, res) {
 		});
 	} else {
 		// no IPFS key added
-		res.apiResponse({
+		return res.apiError({
 			success: false,
-			error: "no ipfs key aded"
+			note: "could not download media because no address was specified"
 		});
 	}
 };
@@ -1148,7 +1189,7 @@ exports.autoplay = function (req, res) {
 	if(!req.query.secs){
 			return res.apiError({
 				success: false,
-				note: 'no interval set'
+				note: 'could not play media list because no interval was set'
 			});
 	}else{
 		// get interval in ms
@@ -1157,13 +1198,16 @@ exports.autoplay = function (req, res) {
 		if(!req.query.channel){
 			return res.apiError({
 				success: false,
-				note: 'no channel set'
+				note: 'could not play media because no list was specified'
 			});
 		}else{
 			// query database
 			Media.model.find().where('state','published').sort('-publishedDate').populate('channels').where('channels').in([req.query.channel]).exec(function(err, results) {
 				if(err) {
-					//
+					return res.apiError({
+						success: false,
+						note: 'could not play media list because it was not found in the database'
+					});
 				}else{
 					var mediaArray = [];
 					for(var i=0; i<results.length; i++){
@@ -1183,7 +1227,7 @@ exports.autoplay = function (req, res) {
 					}, interval, mediaArray);
 					return res.apiResponse({
 						success: true,
-						note: 'werarfe'
+						note: 'queued media list to display'
 					});
 				}
 			});
