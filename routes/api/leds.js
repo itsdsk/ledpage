@@ -14,11 +14,11 @@ exports.map_positions = function (req, res) {
         var newConf = {
             index: i,
             hscan: {
-                mininum: parseFloat((newLeds.leds[i].x - ledAreaOffset).toFixed(4)),
+                minimum: parseFloat((newLeds.leds[i].x - ledAreaOffset).toFixed(4)),
                 maximum: parseFloat((newLeds.leds[i].x + ledAreaOffset).toFixed(4))
             },
             vscan: {
-                mininum: parseFloat((newLeds.leds[i].y - ledAreaOffset).toFixed(4)),
+                minimum: parseFloat((newLeds.leds[i].y - ledAreaOffset).toFixed(4)),
                 maximum: parseFloat((newLeds.leds[i].y + ledAreaOffset).toFixed(4))
             }
         };
@@ -44,7 +44,7 @@ exports.map_positions = function (req, res) {
             // save new hyperion config
             const ledConfig = JSON.parse(data);
             ledConfig.leds = newConfig;
-            const jsonLedConfig = JSON.stringify(ledConfig, null, 2);
+            var jsonLedConfig = JSON.stringify(ledConfig, null, '\t');
             fs.writeFile(res.locals.configStaticPath + 'hyperion.config.json', jsonLedConfig, 'utf8', (fserr) => {
                 if (fserr) {
                     console.log(fserr);
