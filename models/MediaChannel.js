@@ -15,5 +15,4 @@ MediaChannel.add({
 
 MediaChannel.relationship({ path: 'media', ref: 'Media', refPath: 'channels' });
 
-MediaChannel.track = true;
 MediaChannel.register();

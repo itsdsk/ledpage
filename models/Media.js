@@ -23,11 +23,9 @@ var myStorage = new keystone.Storage({
 Media.add({
 	title: { type: String, required: true },
 	modifiedDate: { type: Types.Date, index: true },
-	//localPath: { type: String },
 	localDir: { type: String },
 	thumbnails: { type: Types.TextArray },
 	prefThumb: { type: String},
-	ipnsHash: { type: String },
 	ipfsHash: { type: String },
 	image: {
 		type: Types.File,
@@ -37,20 +35,7 @@ Media.add({
 
 
 	state: { type: Types.Select, options: 'draft, published, archived', default: 'published', index: true },
-	//author: { type: Types.Relationship, ref: 'User', index: true },
 	publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
-	//image: { type: Types.CloudinaryImage },
-	//content: {
-	//	brief: { type: Types.Html, wysiwyg: true, height: 150 },
-	//	extended: { type: Types.Html, wysiwyg: true, height: 400 },
-	//},
 });
 
-//Media.schema.virtual('content.full').get(function () {
-//	//return this.content.extended || this.content.brief;
-//	return this.localPath;
-//});
-
-// Media.defaultColumns = 'title, state|20%, author|20%, publishedDate|20%';
-Media.track = true;
 Media.register();
