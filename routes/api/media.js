@@ -65,6 +65,8 @@ var ipfsInit = () => {
 							console.log('Could not subscribe..');
 							console.log(suberr);
 							throw suberr;
+						}else{
+							console.log('subscribed to: '+topic);
 						}
 					});
 				});
@@ -96,23 +98,20 @@ setInterval(function () {
 				}
 				// loop through channels
 				channels.forEach((channel) => {
-					console.log('adding channel:');
 					var ipfsTopic = channel.name;
-					console.log(ipfsTopic);
 					// loop through media
 					keystone.list('Media').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
-						if (err) console.log(err);
+						if (err) console.log('could not sync media with network, error getting items from database'+err);
+						if(!sketchesToShare) console.log('no media found in channel '+ipfsTopic);
 						sketchesToShare.forEach((sketchToShare) => {
 							if (sketchToShare.ipfsHash) {
-								console.log('trying to share');
-								console.log(sketchToShare.ipfsHash);
-								console.log('in topic');
-								console.log(channel.name);
 								ipfs.pubsub.publish(channel.name, new Buffer(sketchToShare.ipfsHash), (err) => {
 									if (err) {
-										console.log('error trying to publish media');
+										console.log('error sharing '+sketchToShare.ipfsHash+' in channel '+channel.name);
 										console.log(err);
 										throw err;
+									}else{
+										console.log('shared '+sketchToShare.ipfsHash+' in channel '+channel.name);
 									}
 								});
 							}
