@@ -94,7 +94,7 @@ setInterval(function () {
 			// find channels
 			keystone.list('MediaChannel').model.find().sort('name').exec(function (err, channels) {
 				if (err || !channels.length) {
-					console.log('error finding media categories to sync with ipfs');
+					console.log('media sync failed, no channels found');
 				}
 				// loop through channels
 				channels.forEach((channel) => {
@@ -570,7 +570,7 @@ exports.subscribe = function (req, res) {
 					});
 					throw suberr;
 				} else {
-					console.log('subscribed to: ' + topic);
+					console.log('subscribed to: ' + req.query.name);
 					return res.apiResponse({
 						success: true,
 						note: 'subscribed to channel',
