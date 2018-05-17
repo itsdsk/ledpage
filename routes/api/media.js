@@ -1161,6 +1161,7 @@ exports.download = function (req, res) {
 						// save each file
 						var saveDir = req.params.ipfs;
 						var sketchPath = res.locals.staticPath + saveDir;
+						var sketchJSON = null;
 						files.forEach((file) => {
 							if (file.content) {
 								var fileName = file.path.slice(46); // trim ipfs hash
@@ -1185,6 +1186,9 @@ exports.download = function (req, res) {
 										return currentPath;
 									}, '');
 								var fileURI = sketchPath + fileName;
+								if(fileName == "/disk.json"){
+									sketchJSON = JSON.parse(file.content);
+								}
 								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
 									if (fserr) {
 										console.log('could not save media from ipfs ' + fserr);
@@ -1202,7 +1206,8 @@ exports.download = function (req, res) {
 						var data = {
 							title: saveDir,
 							ipfsHash: req.params.ipfs,
-							localDir: saveDir
+							localDir: saveDir,
+							prefThumb: (sketchJSON && sketchJSON.disk && sketchJSON.disk.prefThumb?sketchJSON.disk.prefThumb:null)
 						};
 						updater.process(data, {
 							flashErrors: true
