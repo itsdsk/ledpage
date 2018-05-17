@@ -24,7 +24,7 @@ const channelMsg = (msg) => {
 	// get api route
 	// var addPath = '/api/media/' + data + '/download';
 	// call add api
-	
+
 	var apiAddress = 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10) + '/api/media/' + data + '/download';
 	http.get(apiAddress);
 
@@ -1141,7 +1141,7 @@ exports.download = function (req, res) {
 		var ipfsURI = '/ipfs/' + req.params.ipfs;
 		ipfs.files.get(ipfsURI, function (err, files) {
 			if (err) {
-				console.log(err);
+				console.log('could not get files from ipfs '+err);
 				return res.apiError({
 					success: false,
 					note: 'could not download media from ipfs'
@@ -1152,6 +1152,7 @@ exports.download = function (req, res) {
 					ipfsHash: req.params.ipfs
 				}).exec(function (dberr, result) {
 					if (result) {
+						console.log('not downloading media as ipfs hash is already added');
 						res.apiError({
 							success: false,
 							note: 'could not download duplicate media'
@@ -1186,7 +1187,7 @@ exports.download = function (req, res) {
 								var fileURI = sketchPath + fileName;
 								fs.writeFile(fileURI, file.content, 'binary', (fserr) => {
 									if (fserr) {
-										console.log(fserr);
+										console.log('could not save media from ipfs ' + fserr);
 										return res.apiError({
 											success: false,
 											note: 'could not save downloaded media to storage'
