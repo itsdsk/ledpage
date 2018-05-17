@@ -918,7 +918,7 @@ exports.initialise = function (req, res) {
 	// check data paths exist
 	var dataPath = (process.env.D1_DATA_PATH ? process.env.D1_DATA_PATH : '/data/content/');
 	var dataPathExists = fs.existsSync(dataPath);
-	if (!dataPathExists) {
+	if (!dataPathExists) { // this logic could be avoided?
 		if (process.env.D1_DATA_PATH) {
 			console.log('data path does not exist, attempting to create ' + dataPath);
 			// create data directories
@@ -1091,14 +1091,27 @@ exports.initialise = function (req, res) {
 					});
 				}
 			} else {
+				// deduplicate media channels
+				var uniqueChannels = new Set(newItems.MediaChannel.map(e => JSON.stringify(e)));
+				newItems.MediaChannel = Array.from(uniqueChannels).map(e => JSON.parse(e));
 				// add to database when all sketches are added
 				keystone.createItems(newItems, function (err, stats) {
+					console.log('stats: '+JSON.stringify(stats, null, 2));
+					console.log('newitems: '+JSON.stringify(newItems, null, 2));
 					if (err) {
 						return res.apiError({
 							success: false,
 							note: 'could not update database ' + err
 						});
 					} else {
+						// store channel id+name mappings
+						for(var k=0; k<newItems.MediaChannel.length; k++){
+							channelNameIdMappings.push({
+								name: newItems.MediaChannel[k].name,
+								id: newItems.MediaChannel[k].__doc._id
+							});
+						}
+						console.log('mappins: ' + JSON.stringify(channelNameIdMappings));
 						res.apiResponse({
 							success: true,
 							note: 'added sketches to database',
