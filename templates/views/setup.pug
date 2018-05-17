@@ -271,9 +271,7 @@ block js
 		d3.select('#ledscale-range').on('input', function(){
 			// get scale
 			var ledScale = +d3.select('#ledscale-range').property('value');
-			// API call
-			//
-			// chyange SVG circle size
+			// change SVG circle size
 			d3.selectAll('circle')
 				.transition()
 				.duration(300)
@@ -373,11 +371,13 @@ block js
 				d3.selectAll('.ledNode').each(function (d, i) {
 					points.leds.push({x: d.x, y: d.y, r: d.r});
 				});
+				// get rescale from slider
+				var ledRescale = d3.select('#ledscale-range').property('value');
 				// send coords to server
 				$.ajax({
 					url: '/api/leds/map-positions',
 					type: 'POST',
-					data: '&leds=' + JSON.stringify(points),
+					data: '&leds=' + JSON.stringify(points) + '&rescale='+JSON.stringify(ledRescale),
 						error: function(result){
 							console.log('ERROR: ' + JSON.stringify(result.responseJSON.error.note));
 							notifier.alert(result.responseJSON.error.note);
