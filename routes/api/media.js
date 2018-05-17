@@ -23,7 +23,7 @@ const channelMsg = (msg) => {
 	data = msg.data.toString('utf8');
 	console.log("Received data: '" + data + "'");
 	// get api route
-	var addPath = '/api/' + data + '/add';
+	var addPath = '/api/media/' + data + '/download';
 	// call add api
 	http.get({
 		host: 'localhost',
@@ -141,7 +141,7 @@ setInterval(function () {
 	// 		});
 	// 	})
 	// });
-}, 900000); // 15 min timer
+}, 30000); // 30 second timer
 
 // ipc connection
 const ipc = require('node-ipc');
