@@ -15,6 +15,14 @@ Profile.add({
 		unique: true,
 		index: true
 	},
+	brightness: {
+		type: Types.Number,
+		default: 1.0
+	},
+	ledRadiusScale: {
+		type: Types.Number,
+		default: 1.0
+	},
 	colOrder: {
 		type: Types.Select,
 		options: 'rgb, rbg, brg, bgr, gbr, grb',
