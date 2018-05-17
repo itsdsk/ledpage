@@ -1111,15 +1111,9 @@ exports.initialise = function (req, res) {
 								name: newItems.MediaChannel[k].name,
 								id: newItems.MediaChannel[k].__doc._id
 							});
-							// subscribe
-							ipfs.pubsub.subscribe(newItems.MediaChannel[k].name, channelMsg, (suberr) => {
-								if (suberr) {
-									console.log('error subscribing to channel in initialisation');
-								} else {
-									console.log('initialisation subscribed to: ' + newItems.MediaChannel[k].name);
-								}
-							});
 						}
+						// subscribe to channels
+						ipfsInit();
 						console.log('mappins: ' + JSON.stringify(channelNameIdMappings));
 						res.apiResponse({
 							success: true,
