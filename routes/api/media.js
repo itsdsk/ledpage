@@ -99,6 +99,7 @@ setInterval(function () {
 				// loop through channels
 				channels.forEach((channel) => {
 					var ipfsTopic = channel.name;
+					console.log('syncing media channel: '+ipfsTopic);
 					// loop through media
 					keystone.list('Media').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
 						if (err) console.log('could not sync media with network, error getting items from database'+err);
