@@ -75,6 +75,9 @@ block content
 							span.glyphicon.glyphicon-random
 						input(type='file' id='hidden-file-upload' accept='text/xml, text/csv, application/json').hidden
 						.btn-group-vertical.btn-block
+							label Size
+							input(type='range', min='0.5', max='2.5', step='0.01', value='1.0', class='slider', id='ledscale-range')
+							br
 							a(id='upload-map').btn.btn-default.btn-block.btn-lg
 								.text-left Upload LED Mapping
 							a(id='save-led-map').btn.btn-default.btn-block.btn-lg
@@ -215,6 +218,7 @@ block js
 		d3.json('/config-static/leds.json').then( function(data) {
 			visualiseLeds(data.leds)
 		});
+		var ledSvgScale = null;
 		function visualiseLeds(data) {
 			// get range of data
 			var minX = d3.min(data, function(d) {return d.x});
@@ -227,6 +231,7 @@ block js
 			var scaleY = d3.scaleLinear()
 				.domain([minY,maxY])
 				.range([padding, height-padding]);
+			ledSvgScale = scaleX;
 			// draw path
 			var line = d3.line()
 				.curve(d3.curveLinear)
@@ -262,6 +267,19 @@ block js
 				.attr('cy', function(d) { return scaleY(d.y); })
 				.attr('r', function(d) { return scaleX(2.5*d.r); })
 		}
+		// led radius scale slider
+		d3.select('#ledscale-range').on('input', function(){
+			// get scale
+			var ledScale = +d3.select('#ledscale-range').property('value');
+			// API call
+			//
+			// chyange SVG circle size
+			d3.selectAll('circle')
+				.transition()
+				.duration(300)
+				.ease(d3.easeLinear)
+				.attr('r', function(d) { return ledSvgScale(ledScale*d.r);});
+		})
 		// led mapping file upload
 		d3.select('#upload-map').on('click', function(){
 			document.getElementById('hidden-file-upload').click();
