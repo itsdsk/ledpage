@@ -17,6 +17,9 @@ var ipfsAPI = require('ipfs-api');
 var ipfs = ipfsAPI('localhost', '5001', {
 	protocol: 'http'
 });
+// pairs of name and id for mediachannels in database
+var channelNameIdMappings = [];
+
 const channelMsg = (msg) => {
 	console.log('Channel received:');
 	console.log(msg);
@@ -561,6 +564,12 @@ exports.subscribe = function (req, res) {
 				note: 'could not subscribe to channel'
 			});
 		} else {
+			// save id with name
+			channelNameIdMappings.push({
+				name: req.query.name,
+				id: newChannel.id
+			});
+			// subscribe on network
 			ipfs.pubsub.subscribe(req.query.name, channelMsg, (suberr) => {
 				if (suberr) {
 					console.log('subscribed (local but not network) to: ' + req.query.name);
@@ -1203,11 +1212,27 @@ exports.download = function (req, res) {
 						// add to database
 						var application = new Media.model();
 						var updater = application.getUpdateHandler(req);
+						// get json metadata
+						var mediaMeta = (sketchJSON && sketchJSON.disk ? sketchJSON.disk : null);
+						// extract prefthumb
+						var _prefThumb = (mediaMeta && mediaMeta.prefThumb?mediaMeta.prefThumb:null);
+						// extract channels
+						var _channels = [];
+						if(mediaMeta && mediaMeta.channels){
+							for(var i=0; i<mediaMeta.channels.length; i++){
+								var cIndex = channelNameIdMappings.findIndex(x => x.name==mediaMeta.channels[i]);
+								if(cIndex > -1){
+									_channels.push(channelNameIdMappings[cIndex].id);
+								}
+							}
+						}
+						// database entries
 						var data = {
 							title: saveDir,
 							ipfsHash: req.params.ipfs,
 							localDir: saveDir,
-							prefThumb: (sketchJSON && sketchJSON.disk && sketchJSON.disk.prefThumb?sketchJSON.disk.prefThumb:null)
+							prefThumb: _prefThumb,
+							channels: _channels
 						};
 						updater.process(data, {
 							flashErrors: true
