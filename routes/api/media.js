@@ -99,7 +99,7 @@ setInterval(function () {
 				// loop through channels
 				channels.forEach((channel) => {
 					var ipfsTopic = channel.name;
-					console.log('syncing media channel: ' + ipfsTopic);
+					console.log('sharing media channel: ' + channel.key);
 					// loop through media
 					keystone.list('Media').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
 						if (err) console.log('could not sync media with network, error getting items from database' + err);
@@ -562,7 +562,7 @@ exports.subscribe = function (req, res) {
 		} else {
 			ipfs.pubsub.subscribe(req.query.name, channelMsg, (suberr) => {
 				if (suberr) {
-					console.log('channel not subbed in ipfs ' + suberr);
+					console.log('subscribed (local but not network) to: ' + req.query.name);
 					return res.apiResponse({
 						success: true,
 						note: 'subscribed to channel but IPFS is not online',
@@ -570,7 +570,7 @@ exports.subscribe = function (req, res) {
 					});
 					throw suberr;
 				} else {
-					console.log('subscribed to: ' + req.query.name);
+					console.log('subscribed (local+network) to: ' + req.query.name);
 					return res.apiResponse({
 						success: true,
 						note: 'subscribed to channel',
