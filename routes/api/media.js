@@ -120,27 +120,25 @@ setInterval(function () {
 					});
 				});
 			});
+			// get network details
+			ipfs.pubsub.ls((err, topics) => {
+				if (err) {
+					console.log('ipfs pubsub ls err:');
+					console.log(err);
+					throw err;
+				}
+				topics.forEach((topic) => {
+					ipfs.pubsub.peers(topic, (err, peerIds) => {
+						if (err) {
+							console.log('error getting network channel details for '+topic);
+							throw err;
+						}
+						console.log("Network channel "+topic+" has peers "+peerIds);
+					});
+				})
+			});
 		}
 	});
-	// // periodically show peers
-	// ipfs.pubsub.ls((err, topics) => {
-	// 	if (err) {
-	// 		console.log('ipfs pubsub ls err:');
-	// 		console.log(err);
-	// 		throw err;
-	// 	}
-	// 	console.log("Subscribed topics:");
-	// 	console.log(topics);
-	// 	topics.forEach((topic) => {
-	// 		ipfs.pubsub.peers(topic, (err, peerIds) => {
-	// 			if (err) {
-	// 				throw err;
-	// 			}
-	// 			console.log("Peers:");
-	// 			console.log(peerIds);
-	// 		});
-	// 	})
-	// });
 }, 30000); // 30 second timer
 
 // ipc connection
