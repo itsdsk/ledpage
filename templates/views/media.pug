@@ -7,9 +7,9 @@ block content
 		else
 			.col-sm-12.col-md-12
 				.tab-content
-					div(id='preview').tab-pane.active.fade
+					div(id='preview').tab-pane.active.in.fade
 						div(style='position:relative;width:100%;height:0;padding-bottom:56.25%;')
-							iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.media.localDir)
+							iframe(style='position:absolute;top:0;left:0;width:100%;height:100%;' frameborder="0" scrolling="no" src="/view-static/"+data.media.localDir id="media-iframe")
 					div(id='details').tab-pane.fade
 						.page-header
 							.btn-group.pull-right
@@ -71,6 +71,9 @@ block js
 			// initialise tooltip to appear on Delete button
 			$('[data-toggle="tooltip"]').tooltip(); 
 
-			// change tab according to query string (after page loads otherwise the media iframe doesn't...)
-			setTimeout(function(){$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')}, 3000);
+			// when iframe is loaded
+			document.getElementById("media-iframe").onload=function(){
+				// switch to details tab if requested in the page query
+				$('#mediaTabs a[href="' + window.location.hash + '"]').tab('show')
+			}
 		});
