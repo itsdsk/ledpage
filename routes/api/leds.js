@@ -7,11 +7,11 @@ var path = require('path');
 exports.map_positions = function (req, res) {
     // get new led map from HTTP post body
     const newLeds = JSON.parse(req.body.leds);
-    console.log('rescale: '+JSON.parse(req.body.rescale));
+    const rescaleAmt = parseFloat(JSON.parse(req.body.rescale));
     // duplicate new led map into hyperion format
     const newConfig = Array();
     for (var i = 0; i < newLeds.leds.length; i++) {
-        var ledAreaOffset = 0.66 * newLeds.leds[i].r;
+        var ledAreaOffset = rescaleAmt * newLeds.leds[i].r;
         var newConf = {
             index: i,
             hscan: {
