@@ -17,6 +17,9 @@ module.exports = function (done) {
 		}
 	});
 	new Profile.model({
+			name: 'defaultProfile',
+			brightness: 1.0,
+			ledRadiusScale: 1.0,
 			colOrder: 'rgb',
 			redR: 255,
 			redG: 0,
@@ -26,59 +29,7 @@ module.exports = function (done) {
 			greenB: 0,
 			blueR: 0,
 			blueG: 0,
-			blueB: 255,
-			name: 'defaultProfile'
+			blueB: 255
 		})
 		.save(done);
 };
-
-// exports.create = {
-// 	Profile: [{
-// 		'colOrder': 'rgb',
-// 		'redR': 255,
-// 		'redG': 255,
-// 		'redB': 255,
-// 		'greenR': 255,
-// 		'greenG': 255,
-// 		'greenB': 255,
-// 		'blueR': 255,
-// 		'blueG': 255,
-// 		'blueB': 255,
-// 		'name': 'defaultProfile'
-// 	}, ],
-// };
-
-/*
-
-// This is the long-hand version of the functionality above:
-
-var keystone = require('keystone');
-var async = require('async');
-var User = keystone.list('User');
-
-var admins = [
-	{ email: 'user@keystonejs.com', password: 'admin', name: { first: 'Admin', last: 'User' } }
-];
-
-function createAdmin (admin, done) {
-
-	var newAdmin = new User.model(admin);
-
-	newAdmin.isAdmin = true;
-	newAdmin.save(function (err) {
-		if (err) {
-			console.error('Error adding admin ' + admin.email + ' to the database:');
-			console.error(err);
-		} else {
-			console.log('Added admin ' + admin.email + ' to the database.');
-		}
-		done(err);
-	});
-
-}
-
-exports = module.exports = function (done) {
-	async.forEach(admins, createAdmin, done);
-};
-
-*/
