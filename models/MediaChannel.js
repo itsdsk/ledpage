@@ -1,4 +1,5 @@
 var keystone = require('keystone');
+var Types = keystone.Field.Types;
 
 /**
  * MediaChannel Model
@@ -10,7 +11,7 @@ var MediaChannel = new keystone.List('MediaChannel', {
 });
 
 MediaChannel.add({
-	name: { type: String, required: true },
+	name: { type: Types.Key, required: true },
 });
 
 MediaChannel.relationship({ path: 'media', ref: 'Media', refPath: 'channels' });

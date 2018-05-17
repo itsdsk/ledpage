@@ -23,17 +23,11 @@ var myStorage = new keystone.Storage({
 Media.add({
 	title: { type: String, required: true },
 	modifiedDate: { type: Types.Date, index: true },
-	localDir: { type: String },
+	localDir: { type: Types.Key },
 	thumbnails: { type: Types.TextArray },
 	prefThumb: { type: String},
-	ipfsHash: { type: String },
-	image: {
-		type: Types.File,
-		storage: myStorage
-	},
+	ipfsHash: { type: Types.Key },
 	channels: { type: Types.Relationship, ref: 'MediaChannel', many: true },
-
-
 	state: { type: Types.Select, options: 'draft, published, archived', default: 'published', index: true },
 	publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
 });
