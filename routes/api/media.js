@@ -18,29 +18,32 @@ var ipfs = ipfsAPI('localhost', '5001', {
 	protocol: 'http'
 });
 const channelMsg = (msg) => {
-	console.log('Channel msg received...');
+	console.log('Channel received:');
 	console.log(msg);
 	data = msg.data.toString('utf8');
-	console.log("Received data: '" + data + "'");
 	// get api route
-	var addPath = '/api/media/' + data + '/download';
+	// var addPath = '/api/media/' + data + '/download';
 	// call add api
-	http.get({
-		host: 'localhost',
-		path: addPath
-	}, function (response) {
-		// Continuously update stream with data
-		var body = '';
-		response.on('data', function (d) {
-			body += d;
-		});
-		response.on('end', function () {
-			// Data reception is done, do whatever with it!
-			var parsed = JSON.parse(body);
-			console.log('added');
-			console.log(parsed);
-		});
-	});
+	
+	var apiAddress = 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10) + '/api/media/' + data + '/download';
+	http.get(apiAddress);
+
+	// http.get({
+	// 	host: 'http://0.0.0.0:' + parseInt(process.env.PORT || 80, 10),
+	// 	path: addPath
+	// }, function (response) {
+	// 	// Continuously update stream with data
+	// 	var body = '';
+	// 	response.on('data', function (d) {
+	// 		body += d;
+	// 	});
+	// 	response.on('end', function () {
+	// 		// Data reception is done, do whatever with it!
+	// 		var parsed = JSON.parse(body);
+	// 		console.log('added');
+	// 		console.log(parsed);
+	// 	});
+	// });
 };
 var ipfsInitAttempts = 0;
 var ipfsInit = () => {
