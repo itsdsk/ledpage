@@ -7,29 +7,55 @@ var Types = keystone.Field.Types;
  */
 
 var Media = new keystone.List('Media', {
-	map: { name: 'title' },
-	autokey: { path: 'slug', from: 'title', unique: true },
+	map: {
+		name: 'title'
+	},
+	autokey: {
+		path: 'slug',
+		from: 'title',
+		unique: true
+	},
 });
 
-//
-var myStorage = new keystone.Storage({
-	adapter: keystone.Storage.Adapters.FS,
-	fs: {
-	  path: keystone.expandPath('./public/uploads/files'), // required; path where the files should be stored
-	  publicPath: '/public/uploads/files', // path where files will be served
-	}
-  });
-
 Media.add({
-	title: { type: String, required: true },
-	modifiedDate: { type: Types.Date, index: true },
-	localDir: { type: Types.Key },
-	thumbnails: { type: Types.TextArray },
-	prefThumb: { type: String},
-	ipfsHash: { type: Types.Key },
-	channels: { type: Types.Relationship, ref: 'MediaChannel', many: true },
-	state: { type: Types.Select, options: 'draft, published, archived', default: 'published', index: true },
-	publishedDate: { type: Types.Date, index: true, dependsOn: { state: 'published' } },
+	title: {
+		type: String,
+		required: true
+	},
+	modifiedDate: {
+		type: Types.Date,
+		index: true
+	},
+	localDir: {
+		type: Types.Key
+	},
+	thumbnails: {
+		type: Types.TextArray
+	},
+	prefThumb: {
+		type: String
+	},
+	ipfsHash: {
+		type: String
+	},
+	channels: {
+		type: Types.Relationship,
+		ref: 'MediaChannel',
+		many: true
+	},
+	state: {
+		type: Types.Select,
+		options: 'draft, published, archived',
+		default: 'published',
+		index: true
+	},
+	publishedDate: {
+		type: Types.Date,
+		index: true,
+		dependsOn: {
+			state: 'published'
+		}
+	},
 });
 
 Media.register();
