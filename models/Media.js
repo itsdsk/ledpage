@@ -27,7 +27,7 @@ Media.add({
 		index: true
 	},
 	localDir: {
-		type: Types.Key
+		type: String
 	},
 	thumbnails: {
 		type: Types.TextArray
