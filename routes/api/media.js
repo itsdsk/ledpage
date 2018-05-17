@@ -1096,19 +1096,28 @@ exports.initialise = function (req, res) {
 				newItems.MediaChannel = Array.from(uniqueChannels).map(e => JSON.parse(e));
 				// add to database when all sketches are added
 				keystone.createItems(newItems, function (err, stats) {
-					console.log('stats: '+JSON.stringify(stats, null, 2));
-					console.log('newitems: '+JSON.stringify(newItems, null, 2));
+					// console.log('stats: '+JSON.stringify(stats, null, 2));
+					// console.log('newitems: '+JSON.stringify(newItems, null, 2));
 					if (err) {
 						return res.apiError({
 							success: false,
 							note: 'could not update database ' + err
 						});
 					} else {
-						// store channel id+name mappings
+						// handle channels after updatin database
 						for(var k=0; k<newItems.MediaChannel.length; k++){
+							// store id+name mappings
 							channelNameIdMappings.push({
 								name: newItems.MediaChannel[k].name,
 								id: newItems.MediaChannel[k].__doc._id
+							});
+							// subscribe
+							ipfs.pubsub.subscribe(newItems.MediaChannel[k].name, channelMsg, (suberr) => {
+								if (suberr) {
+									console.log('error subscribing to channel in initialisation');
+								} else {
+									console.log('initialisation subscribed to: ' + newItems.MediaChannel[k].name);
+								}
 							});
 						}
 						console.log('mappins: ' + JSON.stringify(channelNameIdMappings));
