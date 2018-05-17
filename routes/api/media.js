@@ -65,8 +65,8 @@ var ipfsInit = () => {
 							console.log('Could not subscribe..');
 							console.log(suberr);
 							throw suberr;
-						}else{
-							console.log('subscribed to: '+topic);
+						} else {
+							console.log('subscribed to: ' + topic);
 						}
 					});
 				});
@@ -99,20 +99,20 @@ setInterval(function () {
 				// loop through channels
 				channels.forEach((channel) => {
 					var ipfsTopic = channel.name;
-					console.log('syncing media channel: '+ipfsTopic);
+					console.log('syncing media channel: ' + ipfsTopic);
 					// loop through media
 					keystone.list('Media').model.find().where('channels').in([channel.id]).exec(function (err, sketchesToShare) {
-						if (err) console.log('could not sync media with network, error getting items from database'+err);
-						if(!sketchesToShare) console.log('no media found in channel '+ipfsTopic);
+						if (err) console.log('could not sync media with network, error getting items from database' + err);
+						if (!sketchesToShare) console.log('no media found in channel ' + ipfsTopic);
 						sketchesToShare.forEach((sketchToShare) => {
 							if (sketchToShare.ipfsHash) {
 								ipfs.pubsub.publish(channel.name, new Buffer(sketchToShare.ipfsHash), (err) => {
 									if (err) {
-										console.log('error sharing '+sketchToShare.ipfsHash+' in channel '+channel.name);
+										console.log('error sharing ' + sketchToShare.ipfsHash + ' in channel ' + channel.name);
 										console.log(err);
 										throw err;
-									}else{
-										console.log('shared '+sketchToShare.ipfsHash+' in channel '+channel.name);
+									} else {
+										console.log('shared ' + sketchToShare.ipfsHash + ' in channel ' + channel.name);
 									}
 								});
 							}
@@ -560,10 +560,23 @@ exports.subscribe = function (req, res) {
 				note: 'could not subscribe to channel'
 			});
 		} else {
-			return res.apiResponse({
-				success: true,
-				note: 'subscribed to channel',
-				redirect: '/'
+			ipfs.pubsub.subscribe(req.query.name, channelMsg, (suberr) => {
+				if (suberr) {
+					console.log('channel not subbed in ipfs ' + suberr);
+					return res.apiResponse({
+						success: true,
+						note: 'subscribed to channel but IPFS is not online',
+						redirect: '/'
+					});
+					throw suberr;
+				} else {
+					console.log('subscribed to: ' + topic);
+					return res.apiResponse({
+						success: true,
+						note: 'subscribed to channel',
+						redirect: '/'
+					});
+				}
 			});
 		}
 	});
@@ -897,11 +910,11 @@ exports.initialise = function (req, res) {
 	var dataPathExists = fs.existsSync(dataPath);
 	if (!dataPathExists) {
 		if (process.env.D1_DATA_PATH) {
-			console.log('data path does not exist, attempting to create '+dataPath);
+			console.log('data path does not exist, attempting to create ' + dataPath);
 			// create data directories
 			try {
-				fs.mkdirSync(dataPath+'view-static');
-				fs.mkdirSync(dataPath+'config-static');
+				fs.mkdirSync(dataPath + 'view-static');
+				fs.mkdirSync(dataPath + 'config-static');
 			} catch (err) {
 				if (err.code !== 'EEXIST') {
 					return res.apiError({
