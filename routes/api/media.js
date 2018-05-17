@@ -896,10 +896,19 @@ exports.initialise = function (req, res) {
 	var dataPathExists = fs.existsSync(dataPath);
 	if (!dataPathExists) {
 		if (process.env.D1_DATA_PATH) {
-			return res.apiError({
-				success: false,
-				note: 'could not initialise database because the data path does not exist'
-			});
+			console.log('data path does not exist, attempting to create '+dataPath);
+			// create data directories
+			try {
+				fs.mkdirSync(dataPath+'view-static');
+				fs.mkdirSync(dataPath+'config-static');
+			} catch (err) {
+				if (err.code !== 'EEXIST') {
+					return res.apiError({
+						success: false,
+						note: 'could not create content directories while initialising'
+					});
+				}
+			}
 		} else {
 			// create data directories
 			try {
