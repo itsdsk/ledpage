@@ -121,13 +121,14 @@ function setup(){
   cnv.position(x, y);
 }
 ```
+(http://alpha.editor.p5js.org/sk/sketches/r1RZF7u0f)
 
 - Wrap your sketch between the following HTML blocks:
 ```
 <html>
   <head>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/p5.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.6/addons/p5.dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/addons/p5.dom.min.js"></script>
     <script>
 ```
 ```

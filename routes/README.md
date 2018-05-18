@@ -18,7 +18,7 @@ Upload content (web motion graphics)
 
   **Required:**
 
-    `sketch` = HTML content
+  `sketch` = HTML content
 
 ***
 
@@ -285,7 +285,7 @@ Set brightness
 
   **Required:**
 
-     `val=[float]`
+  `val=[float]`
 
 ***
 
