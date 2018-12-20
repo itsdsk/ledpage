@@ -17,7 +17,7 @@
             socket.send('hello');
         });
         socket.addEventListener('message', function (event) {
-            console.log('message from server ', event.data);
+            //console.log('message from server ', event.data);
             document.getElementById("container").innerHTML += (event.data);
         });
     </script>
