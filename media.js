@@ -1,5 +1,6 @@
 const Handlebars = require('handlebars');
 const fs = require('fs');
+const path = require('path');
 
 // compile media
 var template;
@@ -7,21 +8,30 @@ fs.readFile(__dirname + "/template.handlebars", function (err, data) {
     if (err) throw err;
     template = Handlebars.compile(data.toString());
 });
-
+var mediaPathRoot = './media';
 module.exports = {
     scanMedia: function () {
         var media = new Array();
         // look in each folder in content directory
-        fs.readdirSync('./media').filter(function (file) {
-            if (fs.statSync('./media/' + file).isDirectory()) {
+        fs.readdirSync(mediaPathRoot).filter(function (mediaPath) {
+            if (fs.statSync(path.join(mediaPathRoot, mediaPath)).isDirectory()) {
                 // load json
-                var med = require('./media/' + file + '/demo.json');
+                var meta = require(path.join(__dirname, mediaPathRoot, mediaPath, 'demo.json'));
+                // load files
+                meta.files = new Array();
+                (meta.demo.files).forEach(filename => {
+                    fs.readFile(path.join(__dirname, mediaPathRoot, mediaPath, filename), 'utf8', function (err, buf) {
+                        if (err) throw err;
+                        var fileData = {[filename]: buf};
+                        meta.files.push(fileData);
+                        media.push(meta);
+                    });
+                });
                 // parse image into json
                 fs.readFile('./media/item1/thumb.jpg', function (err, buf) {
                     if (err) throw err;
-                    var img = "data:image/jpeg;base64," + buf.toString('base64');
-                    med.img_src = img;
-                    media.push(med);
+                    //meta.img_src = "data:image/jpeg;base64," + buf.toString('base64');
+                    //media.push(meta);
                 });
             }
         });

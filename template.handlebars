@@ -2,4 +2,10 @@
     <p>{{demo.id}}</p>
     <p>{{demo.description}}</p>
     <img src="{{{img_src}}}" />
+    {{#each files}}
+        {{#each this}}
+            <h4>{{@key}}</h4>
+            <code>{{this}}</code>
+        {{/each}}
+    {{/each}}
 </div>
