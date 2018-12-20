@@ -5,7 +5,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "express-ws": "4.0.0",
-    "handlebars": "4.0.12"
+    "handlebars": "4.0.12",
+    "dat-node": "3.5.13"
   },
   "scripts": {
     "lint": "eslint .",
