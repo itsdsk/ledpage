@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+
+    <style>
+        #container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+    </style>
+    <script type="text/javascript">
+        const socket = new WebSocket('ws://localhost:3000');
+        socket.addEventListener('open', function (event) {
+            socket.send('hello');
+        });
+        socket.addEventListener('message', function (event) {
+            console.log('message from server ', event.data);
+            document.getElementById("container").innerHTML += (event.data);
+        });
+    </script>
+
+</head>
+
+<body>
+    <div id="container"></div>
+</body>
+
+</html>

@@ -1,15 +1,5 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-node:8
 
-# install mongodb
-ADD ./volume/mongodb/mongodb_3_0_14_core.tar.gz /usr/bin/
-ADD ./volume/mongodb/mongodb_3_0_14_tools.tar.gz /usr/bin/
-RUN groupadd -r mongodb && useradd -r -g mongodb mongodb \
-  && mkdir -p /data/db /data/configdb /var/log/mongodb \
-  && chown -R mongodb:mongodb /usr/bin/mongo* \
-  /data/db  /data/configdb /var/log/mongodb
-VOLUME /data/db /data/configdb
-EXPOSE 27017 28017
-
 # install apt packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-utils clang xserver-xorg-core xserver-xorg-input-all \
@@ -78,17 +68,11 @@ EXPOSE 80 443 4001
 COPY /volume/etc/systemd/system /etc/systemd/system/
 
 # start systemd services
-RUN systemctl enable ipfs.service && systemctl enable hyperion.service \
-  && systemctl enable mongod.service
+RUN systemctl enable ipfs.service && systemctl enable hyperion.service
 
 # move app to filesystem
 COPY ./app.js ./
-COPY ./public ./public
 COPY ./libs ./libs
-COPY ./updates ./updates
-COPY ./routes ./routes
-COPY ./models ./models
-COPY ./templates ./templates
 COPY ./start.sh ./
 #COPY ./volume/data/content/view-static /data/content/view-static
 #VOLUME /data/content/view-static
