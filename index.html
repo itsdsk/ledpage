@@ -19,11 +19,11 @@
             document.getElementById("container").innerHTML += (msg);
         })
 
-        function buttonClicked(demoId, fileIndex) {
+        function buttonClicked(demoId, fileIndex, filename) {
             var html = document.querySelector('#'+demoId+'_'+fileIndex).value
             var data = {
                 id: demoId,
-                file: fileIndex,
+                filename: filename,
                 text: html
             };
             socket.emit('sync', data);

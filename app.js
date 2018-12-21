@@ -26,12 +26,15 @@ io.on('connection', function (socket) {
   socket.on('sync', function (msg) {
     // get object representing demo
     var mediaItem = media.find(object => {
-      return object.demo.id === msg.id
+      return object.demo.id === msg.id;
     });
     // save in memory
-    mediaItem.files[msg.file].text = msg.text;
+    var mediaItemFile = mediaItem.files.find(object => {
+      return object.name === msg.filename;
+    });
+    mediaItemFile.text = msg.text;
     // send on disk
-    helper.updateFile(mediaItem.directory, mediaItem.demo.files[msg.file], msg.text);
+    helper.updateFile(mediaItem.directory, msg.filename, msg.text);
   });
 });
 
