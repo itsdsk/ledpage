@@ -16,6 +16,8 @@ app.get('/', function (req, res) {
 
 io.on('connection', function (socket) {
   console.log('a user connected');
+
+  // request items
   socket.on('load', function (msg) {
     console.log('load');
     media.forEach(element => {
@@ -23,6 +25,13 @@ io.on('connection', function (socket) {
       io.emit('load', helper.mediaObjectToHtml(element));
     });
   });
+
+  // play demo
+  socket.on('play', function(msg) {
+    helper.playLocalMedia(msg);
+  });
+
+  // update file
   socket.on('sync', function (msg) {
     // get object representing demo
     var mediaItem = media.find(object => {

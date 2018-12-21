@@ -1,7 +1,8 @@
 <div class="item">
-    <p>{{demo.id}}</p>
-    <p>{{demo.description}}</p>
     <img src="{{{img_src}}}" />
+    <h1>{{demo.id}}</h1>
+    <p>{{demo.description}}</p>
+    <button onclick="socket.emit('play', '{{directory}}')">Play</button>
     {{#each files}}
         <div>
             <h4>{{this.name}}</h4>

@@ -60,5 +60,10 @@ module.exports = {
             if (err) console.log(err);
             console.log('saved ' + filePath);
         });
+    },
+    playLocalMedia: function (name) {
+        var filePath = path.join(__dirname, mediaPathRoot, name);
+        console.log('playing local media: ' + filePath);
+        // TODO: reimplement IPC to send filepath to renderer
     }
 };
