@@ -2,6 +2,52 @@ const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(':memory:');
+
+db.serialize(function () {
+    // create tables
+    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, name TEXT)");
+    db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
+    db.run("CREATE TABLE disks_channels (disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL," +
+        "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
+        "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
+        "UNIQUE(disk_directory, channel_name))");
+
+    // dummy data
+    db.run("INSERT INTO disks (directory,name) VALUES ('dir1','name1')");
+    db.run("INSERT INTO disks (directory,name) VALUES ('dir2','name2')");
+    db.run("INSERT INTO disks (directory,name) VALUES ('dir3','name3')");
+    db.run("INSERT INTO disks (directory,name) VALUES ('dir4','name4')");
+    db.run("INSERT INTO channels (name) VALUES ('channel1')");
+    db.run("INSERT INTO channels (name) VALUES ('channel2')");
+
+    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel1')");
+    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel1')");
+    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir3','channel1')");
+    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel2')");
+    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel2')");
+
+    // log entries
+    db.each("SELECT * FROM disks", function (err, row) {
+        console.log("DISK: " + row.directory + " " + row.name);
+    });
+    db.each("SELECT * FROM channels", function (err, row) {
+        console.log("CHANNEL: " + row.name);
+    });
+    db.each("SELECT * FROM disks_channels", function (err, row) {
+        console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
+    });
+
+    // test log
+    db.each("SELECT disks.* FROM disks INNER JOIN disks_channels " +
+        "ON disks.directory = disks_channels.disk_directory " +
+        "AND disks_channels.channel_name = 'channel2'",
+        function (err, row) {
+            console.log("TEST: " + JSON.stringify(row));
+        });
+});
+
 // compile media
 var template;
 fs.readFile(__dirname + "/template.handlebars", function (err, data) {
