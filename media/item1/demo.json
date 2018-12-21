@@ -1,0 +1,8 @@
+{
+    "demo": {
+        "id": "item1",
+        "description": "description of demo goes here",
+        "files": ["index.html", "sketch.js"],
+        "image": "thumb.jpg"
+    }
+}
