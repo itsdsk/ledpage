@@ -7,7 +7,7 @@ var io = require('socket.io')(http);
 const Dat = require('dat-node');
 
 // get items
-var media = helper.scanMedia();
+var content = helper.scanMedia();
 
 // serve index.html
 app.get('/', function (req, res) {
@@ -20,7 +20,7 @@ io.on('connection', function (socket) {
   // request items
   socket.on('load', function (msg) {
     console.log('load');
-    media.forEach(element => {
+    content.forEach(element => {
       //console.log(element);
       io.emit('load', helper.mediaObjectToHtml(element));
     });
@@ -34,7 +34,7 @@ io.on('connection', function (socket) {
   // update file
   socket.on('sync', function (msg) {
     // get object representing demo
-    var mediaItem = media.find(object => {
+    var mediaItem = content.find(object => {
       return object.demo.id === msg.id;
     });
     // send to helper

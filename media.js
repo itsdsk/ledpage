@@ -10,6 +10,7 @@ fs.readFile(__dirname + "/template.handlebars", function (err, data) {
 });
 var mediaPathRoot = './media';
 module.exports = {
+    // build local database in memory
     scanMedia: function () {
         var media = new Array();
         // look in each folder in content directory
