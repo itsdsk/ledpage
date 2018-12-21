@@ -5,6 +5,6 @@
     {{#each files}}
         <button onclick="buttonClicked('{{../demo.id}}', '{{@index}}')">Sync</button>
         <h4>{{this.name}}</h4>
-        <textarea class="{{../demo.id}} {{@index}}">{{{this.text}}}</textarea>
+        <textarea id="{{../demo.id}}_{{@index}}">{{{this.text}}}</textarea>
     {{/each}}
 </div>

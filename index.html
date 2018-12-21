@@ -20,7 +20,7 @@
         })
 
         function buttonClicked(demoId, fileIndex) {
-            var html = document.querySelectorAll('textarea.' + demoId)[fileIndex].value
+            var html = document.querySelector('#'+demoId+'_'+fileIndex).value
             var data = {
                 id: demoId,
                 file: fileIndex,

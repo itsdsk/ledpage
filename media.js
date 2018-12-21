@@ -28,16 +28,18 @@ module.exports = {
                             text: buf
                         };
                         meta.files.push(fileData);
-                        console.log(meta);
-                        media.push(meta);
+                        //console.log(meta);
+                        //media.push(meta);
                     });
                 });
                 // parse image into json
                 fs.readFile('./media/item1/thumb.jpg', function (err, buf) {
                     if (err) throw err;
-                    //meta.img_src = "data:image/jpeg;base64," + buf.toString('base64');
+                    meta.img_src = "data:image/jpeg;base64," + buf.toString('base64');
                     //media.push(meta);
                 });
+                // add item to array
+                media.push(meta);
             }
         });
         return media;
