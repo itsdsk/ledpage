@@ -18,6 +18,16 @@
         socket.on('load', function (msg) {
             document.getElementById("container").innerHTML += (msg);
         })
+
+        function buttonClicked(demoId, fileIndex) {
+            var html = document.querySelectorAll('textarea.' + demoId)[fileIndex].value
+            var data = {
+                id: demoId,
+                file: fileIndex,
+                text: html
+            };
+            socket.emit('sync', data);
+        }
     </script>
 
 </head>

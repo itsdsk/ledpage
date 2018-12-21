@@ -22,7 +22,18 @@ io.on('connection', function (socket) {
       //console.log(element);
       io.emit('load', helper.mediaObjectToHtml(element));
     });
-  })
+  });
+  socket.on('sync', function (msg) {
+    // get object representing demo
+    var mediaItem = media.find(object => {
+      return object.demo.id === msg.id
+    });
+    // save local
+    //console.log(mediaItem)
+    //mediaItem.files[] = msg.text;
+    // send update with dir, filename and content to save
+    helper.updateFile(mediaItem.directory, mediaItem.demo.files[msg.file], msg.text);
+  });
 });
 
 http.listen(3000, function () {

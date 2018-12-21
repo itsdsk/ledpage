@@ -17,13 +17,17 @@ module.exports = {
             if (fs.statSync(path.join(mediaPathRoot, mediaPath)).isDirectory()) {
                 // load json
                 var meta = require(path.join(__dirname, mediaPathRoot, mediaPath, 'demo.json'));
+                meta.directory = mediaPath;
                 // load files
                 meta.files = new Array();
                 (meta.demo.files).forEach(filename => {
                     fs.readFile(path.join(__dirname, mediaPathRoot, mediaPath, filename), 'utf8', function (err, buf) {
                         if (err) throw err;
-                        var fileData = {[filename]: buf};
+                        var fileData = {
+                            [filename]: buf
+                        };
                         meta.files.push(fileData);
+                        //console.log(meta);
                         media.push(meta);
                     });
                 });
@@ -39,5 +43,12 @@ module.exports = {
     },
     mediaObjectToHtml: function (item) {
         return template(item);
+    },
+    updateFile: function (demoDir, filename, content) {
+        var filePath = path.join(__dirname, mediaPathRoot, demoDir, filename);
+        fs.writeFile(filePath, content, function (err) {
+            if (err) console.log(err);
+            console.log('saved ' + filePath);
+        })
     }
 };
