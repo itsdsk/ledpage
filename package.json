@@ -8,12 +8,7 @@
     "express": "^4.16.4",
     "express-ws": "4.0.0",
     "handlebars": "4.0.12",
-    "socket.io": "2.2.0",
-    "y-array": "latest",
-    "y-memory": "8.0.9",
-    "y-text": "9.5.1",
-    "y-websockets-server": "9.2.1",
-    "yjs": "12.3.3"
+    "socket.io": "2.2.0"
   },
   "scripts": {
     "lint": "eslint .",

@@ -11,35 +11,7 @@
             flex-wrap: wrap;
         }
     </style>
-    <script src="./bower_components/yjs/y.js"></script>
-    <!-- <script src="./bower_components/socket.io/lib/client.js"></script> -->
     <script type="text/javascript">
-        //
-        Y({
-          db: {
-            name: 'memory' // use memory database adapter.
-            // name: 'indexeddb' // use indexeddb database adapter instead for offline apps
-          },
-          connector: {
-            //name: 'webrtc', // use webrtc connector
-            name: 'websockets-client',
-            // name: 'xmpp'
-            room: 'my-room', // clients connecting to the same room share data
-            //socket: io('http://localhost:1234')
-            url: 'http://localhost:1234'
-          },
-          sourceDir: '/bower_components', // location of the y-* modules (browser only)
-          share: {
-            textarea: 'Text' // y.share.textarea is of type y-text
-          }
-        }).then(function (y) {
-          // The Yjs instance `y` is available
-          // y.share.* contains the shared types
-
-          // Bind `y.share.textarea` to `<textarea/>`
-          y.share.textarea.bind(document.querySelector('textarea'))
-        })
-
         //
         const socket = new WebSocket('ws://localhost:3000');
         socket.addEventListener('open', function (event) {
