@@ -24,10 +24,11 @@ module.exports = {
                     fs.readFile(path.join(__dirname, mediaPathRoot, mediaPath, filename), 'utf8', function (err, buf) {
                         if (err) throw err;
                         var fileData = {
-                            [filename]: buf
+                            name: filename,
+                            text: buf
                         };
                         meta.files.push(fileData);
-                        //console.log(meta);
+                        console.log(meta);
                         media.push(meta);
                     });
                 });
@@ -49,6 +50,6 @@ module.exports = {
         fs.writeFile(filePath, content, function (err) {
             if (err) console.log(err);
             console.log('saved ' + filePath);
-        })
+        });
     }
 };

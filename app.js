@@ -28,10 +28,9 @@ io.on('connection', function (socket) {
     var mediaItem = media.find(object => {
       return object.demo.id === msg.id
     });
-    // save local
-    //console.log(mediaItem)
-    //mediaItem.files[] = msg.text;
-    // send update with dir, filename and content to save
+    // save in memory
+    mediaItem.files[msg.file].text = msg.text;
+    // send on disk
     helper.updateFile(mediaItem.directory, mediaItem.demo.files[msg.file], msg.text);
   });
 });

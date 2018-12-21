@@ -3,10 +3,8 @@
     <p>{{demo.description}}</p>
     <img src="{{{img_src}}}" />
     {{#each files}}
-        {{#each this}}
-            <button onclick="buttonClicked('{{../../demo.id}}', '{{@index}}')">Sync</button>
-            <h4>{{@key}}</h4>
-            <textarea class="{{../../demo.id}} {{@index}}">{{{this}}}</textarea>
-        {{/each}}
+        <button onclick="buttonClicked('{{../demo.id}}', '{{@index}}')">Sync</button>
+        <h4>{{this.name}}</h4>
+        <textarea class="{{../demo.id}} {{@index}}">{{{this.text}}}</textarea>
     {{/each}}
 </div>
