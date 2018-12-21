@@ -8,7 +8,8 @@
     "express": "^4.16.4",
     "express-ws": "4.0.0",
     "handlebars": "4.0.12",
-    "socket.io": "2.2.0"
+    "socket.io": "2.2.0",
+    "sqlite3": "4.0.4"
   },
   "scripts": {
     "lint": "eslint .",
