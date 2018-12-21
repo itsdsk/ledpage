@@ -11,16 +11,13 @@
             flex-wrap: wrap;
         }
     </style>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript">
-        //
-        const socket = new WebSocket('ws://localhost:3000');
-        socket.addEventListener('open', function (event) {
-            socket.send('hello');
-        });
-        socket.addEventListener('message', function (event) {
-            console.log('message from server ', event.data);
-            document.getElementById("container").innerHTML += (event.data);
-        });
+        var socket = io();
+        socket.emit('load');
+        socket.on('load', function (msg) {
+            document.getElementById("container").innerHTML += (msg);
+        })
     </script>
 
 </head>
