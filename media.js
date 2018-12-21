@@ -47,9 +47,16 @@ module.exports = {
     mediaObjectToHtml: function (item) {
         return template(item);
     },
-    updateFile: function (demoDir, filename, content) {
-        var filePath = path.join(__dirname, mediaPathRoot, demoDir, filename);
-        fs.writeFile(filePath, content, function (err) {
+    updateFile: function (localItem, mediaUpdate) {
+        // get object with matching filename
+        var mediaItemFile = localItem.files.find(object => {
+            return object.name === mediaUpdate.filename;
+        });
+        // save updated text in memory
+        mediaItemFile.text = mediaUpdate.text;
+        // save updated text to file on disk
+        var filePath = path.join(__dirname, mediaPathRoot, localItem.directory, mediaUpdate.filename);
+        fs.writeFile(filePath, mediaUpdate.text, function (err) {
             if (err) console.log(err);
             console.log('saved ' + filePath);
         });

@@ -28,13 +28,8 @@ io.on('connection', function (socket) {
     var mediaItem = media.find(object => {
       return object.demo.id === msg.id;
     });
-    // save in memory
-    var mediaItemFile = mediaItem.files.find(object => {
-      return object.name === msg.filename;
-    });
-    mediaItemFile.text = msg.text;
-    // send on disk
-    helper.updateFile(mediaItem.directory, msg.filename, msg.text);
+    // send to helper
+    helper.updateFile(mediaItem, msg);
   });
 });
 
