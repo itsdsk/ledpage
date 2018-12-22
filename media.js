@@ -92,14 +92,15 @@ module.exports = {
         console.log('playing local media: ' + filePath);
         // TODO: reimplement IPC to send filepath to renderer
     },
-    serveOne: function (key) {
+    serveOne: function (io, key) {
         var element;
         var sql = "SELECT directory, title FROM disks WHERE directory = ?";
         db.get(sql, [key], (err, row) => {
-            //console.log("row: " + JSON.stringify(data));
+            console.log("row: " + JSON.stringify(row));
             element = template(row);
             console.log("template: " + element);
-            return element;
+            io.emit('load', element);
+            //return element;
             //console.log("worked from " + key + " on: " + row.title);
         });
     }
