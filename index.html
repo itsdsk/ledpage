@@ -16,6 +16,7 @@
         var socket = io();
         socket.emit('load');
         socket.on('load', function (msg) {
+            console.log(msg);
             document.getElementById("container").innerHTML += (msg);
         })
 

@@ -1,13 +1,13 @@
 <div class="item">
-    <img src="{{{img_src}}}" />
-    <h1>{{demo.id}}</h1>
-    <p>{{demo.description}}</p>
+    <img src="{{{image}}}" />
+    <h1>{{title}}</h1>
+    <p>{{directory}} and {{description}}</p>
     <button onclick="socket.emit('play', '{{directory}}')">Play</button>
     {{#each files}}
         <div>
             <h4>{{this.name}}</h4>
-            <textarea id="{{../demo.id}}_{{@index}}">{{{this.text}}}</textarea>
-            <button onclick="buttonClicked('{{../demo.id}}', '{{@index}}', '{{this.name}}')">Sync</button>
+            <textarea id="{{../demo.title}}_{{@index}}">{{{this.text}}}</textarea>
+            <button onclick="buttonClicked('{{../demo.title}}', '{{@index}}', '{{this.name}}')">Sync</button>
         </div>
     {{/each}}
 </div>

@@ -7,45 +7,13 @@ const db = new sqlite3.Database(':memory:');
 
 db.serialize(function () {
     // create tables
-    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, name TEXT)");
+    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, image BLOB)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
-    db.run("CREATE TABLE disks_channels (disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL," +
+    db.run("CREATE TABLE connections (disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
 
-    // dummy data
-    db.run("INSERT INTO disks (directory,name) VALUES ('dir1','name1')");
-    db.run("INSERT INTO disks (directory,name) VALUES ('dir2','name2')");
-    db.run("INSERT INTO disks (directory,name) VALUES ('dir3','name3')");
-    db.run("INSERT INTO disks (directory,name) VALUES ('dir4','name4')");
-    db.run("INSERT INTO channels (name) VALUES ('channel1')");
-    db.run("INSERT INTO channels (name) VALUES ('channel2')");
-
-    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel1')");
-    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel1')");
-    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir3','channel1')");
-    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel2')");
-    db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel2')");
-
-    // log entries
-    db.each("SELECT * FROM disks", function (err, row) {
-        console.log("DISK: " + row.directory + " " + row.name);
-    });
-    db.each("SELECT * FROM channels", function (err, row) {
-        console.log("CHANNEL: " + row.name);
-    });
-    db.each("SELECT * FROM disks_channels", function (err, row) {
-        console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
-    });
-
-    // test log
-    db.each("SELECT disks.* FROM disks INNER JOIN disks_channels " +
-        "ON disks.directory = disks_channels.disk_directory " +
-        "AND disks_channels.channel_name = 'channel2'",
-        function (err, row) {
-            console.log("TEST: " + JSON.stringify(row));
-        });
 });
 
 // compile media
@@ -86,9 +54,20 @@ module.exports = {
                     //media.push(meta);
                 });
                 // add item to array
+                db.run("INSERT INTO disks (directory,title,image) VALUES ('" + mediaPath + "','" + meta.demo.title + "','" + meta.imc_src + "')");
                 media.push(meta);
             }
         });
+        // log entries
+        db.each("SELECT * FROM disks", function (err, row) {
+            console.log("DISK: " + row.directory + " " + row.title + " " + row.image);
+        });
+        db.each("SELECT * FROM channels", function (err, row) {
+            console.log("CHANNEL: " + row.name);
+        });
+        // db.each("SELECT * FROM disks_channels", function (err, row) {
+        //     console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
+        // });
         return media;
     },
     mediaObjectToHtml: function (item) {
@@ -112,5 +91,49 @@ module.exports = {
         var filePath = path.join(__dirname, mediaPathRoot, name);
         console.log('playing local media: ' + filePath);
         // TODO: reimplement IPC to send filepath to renderer
+    },
+    serveOne: function (key) {
+        var element;
+        var sql = "SELECT directory, title FROM disks WHERE directory = ?";
+        db.get(sql, [key], (err, row) => {
+            //console.log("row: " + JSON.stringify(data));
+            element = template(row);
+            console.log("template: " + element);
+            return element;
+            //console.log("worked from " + key + " on: " + row.title);
+        });
     }
 };
+
+    // // dummy data
+    // db.run("INSERT INTO disks (directory,name) VALUES ('dir1','name1')");
+    // db.run("INSERT INTO disks (directory,name) VALUES ('dir2','name2')");
+    // db.run("INSERT INTO disks (directory,name) VALUES ('dir3','name3')");
+    // db.run("INSERT INTO disks (directory,name) VALUES ('dir4','name4')");
+    // db.run("INSERT INTO channels (name) VALUES ('channel1')");
+    // db.run("INSERT INTO channels (name) VALUES ('channel2')");
+
+    // db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel1')");
+    // db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel1')");
+    // db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir3','channel1')");
+    // db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel2')");
+    // db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel2')");
+
+    // // log entries
+    // db.each("SELECT * FROM disks", function (err, row) {
+    //     console.log("DISK: " + row.directory + " " + row.name);
+    // });
+    // db.each("SELECT * FROM channels", function (err, row) {
+    //     console.log("CHANNEL: " + row.name);
+    // });
+    // db.each("SELECT * FROM disks_channels", function (err, row) {
+    //     console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
+    // });
+
+    // // test log
+    // db.each("SELECT disks.* FROM disks INNER JOIN connections " +
+    //     "ON disks.directory = connections.disk_directory " +
+    //     "AND connections.channel_name = 'channel2'",
+    //     function (err, row) {
+    //         console.log("TEST: " + JSON.stringify(row));
+    //     });

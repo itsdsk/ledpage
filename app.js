@@ -17,11 +17,14 @@ io.on('connection', function (socket) {
 
   // request items
   socket.on('load', function (msg) {
-    console.log('load');
-    content.forEach(element => {
-      //console.log(element);
-      io.emit('load', helper.mediaObjectToHtml(element));
-    });
+    //console.log('load');
+    var data = helper.serveOne('item1');
+    console.log("sending: " + data);
+    io.emit('load', data);
+    // content.forEach(element => {
+    //   //console.log(element);
+    //   io.emit('load', helper.mediaObjectToHtml(element));
+    // });
   });
 
   // play demo
