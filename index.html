@@ -20,9 +20,11 @@
             document.getElementById("container").innerHTML += (msg);
         })
 
-        function updateFile(title, fileIndex) {
-            var html = document.querySelector('#' + title + '_' + fileIndex).value;
+        function updateFile(directory, filename, fileIndex) {
+            var html = document.querySelector('#' + directory + '_' + fileIndex).value;
             var data = {
+                directory: directory,
+                filename: filename,
                 fileID: fileIndex,
                 text: html
             };

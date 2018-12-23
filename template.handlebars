@@ -19,8 +19,8 @@
     {{#each files}}
     <div>
         <h4>{{this.filename}}</h4>
-        <textarea id="{{../title}}_{{this.id}}">{{{this.data}}}</textarea>
-        <button onclick="updateFile('{{../title}}', '{{this.id}}')">Sync</button>
+        <textarea id="{{../directory}}_{{this.id}}">{{{this.data}}}</textarea>
+        <button onclick="updateFile('{{../directory}}', '{{this.filename}}', '{{this.id}}')">Sync</button>
     </div>
     {{/each}}
 </div>
