@@ -60,6 +60,17 @@ module.exports = {
                                         db.run(addFileQuery, [file, filename, buf]);
                                     });
                                 });
+                                // add channels to database
+                                console.log('channels: ' + meta.demo.channels);
+                                var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
+                                var addConnectQuery = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
+                                meta.demo.channels.forEach(channelName => {
+                                    // add name to channels table
+                                    db.run(addChannelQuery, [channelName], function () {
+                                        // add pair to connections table
+                                        db.run(addConnectQuery, [file, channelName]);
+                                    });
+                                });
                             });
                         }
                     }
@@ -113,9 +124,18 @@ module.exports = {
                     // add each file to object
                     itemrow.files.push(filerow);
                 });
-                // compile media object into HTML and send to client websocket
-                var element = template(itemrow);
-                io.emit('load', element);
+                // fetch connected channels
+                itemrow.channels = new Array();
+                var getChannelsQuery = "SELECT channel_name FROM connections WHERE disk_directory = ?";
+                db.all(getChannelsQuery, [key], function (err, chanrows) {
+                    chanrows.forEach(function (chanrow) {
+                        // add each connected channel to object
+                        itemrow.channels.push(chanrow);
+                    });
+                    // compile media object into HTML and send to client websocket
+                    var element = template(itemrow);
+                    io.emit('load', element);
+                });
             });
         });
     }

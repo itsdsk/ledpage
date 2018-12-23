@@ -3,6 +3,7 @@
         "title": "funtitle1",
         "description": "description of demo goes here",
         "files": ["index.html", "sketch.js"],
+        "channels": ["funchannel1"],
         "image": "thumb.jpg"
     }
 }
