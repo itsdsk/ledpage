@@ -3,9 +3,8 @@
     <h1>{{title}}</h1>
     <p><i>saved in {{directory}}</i></p>
     <p>{{description}}</p>
-    <input type="text" id="channelInput" onkeyup="channelSearch()" placeholder="Channels...">
-    <p>Connected to:</p>
-    <ul id="channelList">
+    <input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
+    <ul id="{{directory}}_channelList">
         {{#each connectedChannels}}
         <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
         {{/each}}
