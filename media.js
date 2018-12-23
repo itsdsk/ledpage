@@ -8,6 +8,9 @@ const db = new sqlite3.Database(':memory:');
 db.serialize(function () {
     // create tables
     db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB)");
+    db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
+        "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
+        "UNIQUE(disk_directory, filename))");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
     db.run("CREATE TABLE connections (disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
@@ -33,30 +36,34 @@ module.exports = {
             files.forEach(file => {
                 //console.log(file);
                 var itemPath = path.join(mediaDir, file);
-                console.log(itemPath);
+                //console.log(itemPath);
                 fs.stat(itemPath, function (err, stats) {
                     if (err) console.log("err: " + err);
                     if (stats.isDirectory()) {
-                        console.log('file: ' + file);
+                        //console.log('file: ' + file);
                         var metad = require(path.join(itemPath, 'demo.json'));
                         if (metad) {
-                            console.log("this:L " + JSON.stringify(metad));
+                            //console.log("this:L " + JSON.stringify(metad));
                             var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
                             db.run(insertQuery, [file, metad.demo.title, metad.demo.description], function () {
-                                console.log("here");
-                                // parse image into json
+                                // add image to database
                                 var imagePath = path.join(itemPath, metad.demo.image);
                                 fs.readFile(imagePath, function (err, buf) {
                                     if (err) throw err;
-                                    //meta.img_src = "data:image/jpeg;base64," + buf.toString('base64');
                                     var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
                                     var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
                                     db.run(addImgQuery, [decodedImage, file]);
-                                    //var sql = "INSERT INTO disks (directory, title) VALUES (?, ?)";
-                                    //db.run(sql, [mediaPath, meta.demo.title]);
-                                    //media.push(meta);
                                 });
-
+                                // add files to database
+                                var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
+                                metad.demo.files.forEach(filename => {
+                                    var filepath = path.join(itemPath, filename);
+                                    console.log("filepath: " + filepath);
+                                    fs.readFile(filepath, 'utf8', function(err, buf) {
+                                        if(err) throw err;
+                                        db.run(addFileQuery, [file, filename, buf]);
+                                    });
+                                });
                             });
                         }
                     }
@@ -98,12 +105,12 @@ module.exports = {
         //     }
         // });
         // log entries
-        db.each("SELECT * FROM disks", function (err, row) {
-            console.log("DISK: " + row.directory + " " + row.title + " " + row.description + " " + row.image);
-        });
-        db.each("SELECT * FROM channels", function (err, row) {
-            console.log("CHANNEL: " + row.name);
-        });
+        // db.each("SELECT * FROM disks", function (err, row) {
+        //     console.log("DISK: " + row.directory + " " + row.title + " " + row.description + " " + row.image);
+        // });
+        // db.each("SELECT * FROM channels", function (err, row) {
+        //     console.log("CHANNEL: " + row.name);
+        // });
         // db.each("SELECT * FROM disks_channels", function (err, row) {
         //     console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
         // });
@@ -112,7 +119,10 @@ module.exports = {
     listDatabase: function () {
         // log entries
         db.each("SELECT * FROM disks", function (err, row) {
-            console.log("DISK: " + row.directory + " " + row.title + " " + row.description + " " + row.image);
+            console.log("DISK: " + row.directory + " " + row.title + " " + row.description);
+        });
+        db.each("SELECT rowid AS id, disk_directory, filename FROM files", function (err, row) {
+            console.log("FILE: " + row.disk_directory + " " + row.filename + " " + row.id);
         });
         db.each("SELECT * FROM channels", function (err, row) {
             console.log("CHANNEL: " + row.name);
@@ -143,12 +153,24 @@ module.exports = {
     },
     serveOne: function (io, key) {
         var element;
-        var sql = "SELECT directory, title, image FROM disks WHERE directory = ?";
-        db.get(sql, [key], (err, row) => {
-            console.log("row: " + JSON.stringify(row));
-            element = template(row);
-            console.log("template: " + element);
-            io.emit('load', element);
+        var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
+        db.get(sql, [key], (err, itemrow) => {
+            itemrow.files = new Array();
+            db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [key], function (err, filerows) {
+                //console.log("FILE: " + filerow.disk_directory + " " + filerow.filename + " " + filerow.id);
+                filerows.forEach(function (filerow) {
+                    console.log(JSON.stringify(filerow));
+                    itemrow.files.push(filerow);
+                });
+                //itemrow.files.push(filerow);
+                //console.log("row: " + JSON.stringify(itemrow));
+                element = template(itemrow);
+                io.emit('load', element);
+            });
+            
+                
+            //console.log("template: " + element);
+            
             //return element;
             //console.log("worked from " + key + " on: " + row.title);
         });
