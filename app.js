@@ -35,6 +35,11 @@ io.on('connection', function (socket) {
     console.log(msg);
     helper.deleteConnection(msg);
   });
+  // create connection
+  socket.on('createconnection', function (msg) {
+    console.log(msg);
+    helper.createConnection(msg);
+  });
 });
 
 http.listen(3000, function () {

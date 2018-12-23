@@ -12,7 +12,7 @@
     <p>Disconnected from:</p>
     <ul>
         {{#each unconnectedChannels}}
-        <li>{{this.name}}</li>
+        <li onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</li>
         {{/each}}
     </ul>
     <button onclick="socket.emit('play', '{{directory}}')">Play</button>

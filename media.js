@@ -129,7 +129,22 @@ module.exports = {
         });
     },
     createConnection: function (msg) {
-        //
+        // create connection in database
+        var sql = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
+        db.run(sql, msg);
+        // get path and load json
+        var metaPath = path.join(mediaDir, msg[0], 'demo.json');
+        var meta = require(metaPath);
+        // get index of channel in array
+        var index = meta.demo.channels.indexOf(msg[1]);
+        if (index == -1) {
+            // add if channel isnt connected
+            meta.demo.channels.push(msg[1]);
+        }
+        // save json to disk
+        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+            if (err) console.log(err);
+        });
     },
     playLocalMedia: function (name) {
         var filePath = path.join(mediaDir, name);
