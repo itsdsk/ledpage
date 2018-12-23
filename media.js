@@ -83,22 +83,22 @@ module.exports = {
     mediaObjectToHtml: function (item) {
         return template(item);
     },
-    updateFile: function (localItem, mediaUpdate) {
-        // get object with matching filename
-        var mediaItemFile = localItem.files.find(object => {
-            return object.name === mediaUpdate.filename;
-        });
-        // save updated text in memory
-        mediaItemFile.text = mediaUpdate.text;
-        // save updated text to file on disk
-        var filePath = path.join(__dirname, mediaPathRoot, localItem.directory, mediaUpdate.filename);
-        fs.writeFile(filePath, mediaUpdate.text, function (err) {
-            if (err) console.log(err);
-            console.log('saved ' + filePath);
+    updateFile: function (msg) {
+        // update file in database
+        var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";
+        db.run(updateQuery, [msg.text, msg.fileID]);
+        // get path of file on disk
+        var selectQuery = "SELECT disk_directory, filename FROM files WHERE rowid = ?";
+        db.get(selectQuery, [msg.fileID], (err, row) => {
+            var filepath = path.join(mediaDir, row.disk_directory, row.filename);
+            // update file on disk
+            fs.writeFile(filepath, msg.text, function (err) {
+                if (err) console.log(err);
+            });
         });
     },
     playLocalMedia: function (name) {
-        var filePath = path.join(__dirname, mediaPathRoot, name);
+        var filePath = path.join(mediaDir, name);
         console.log('playing local media: ' + filePath);
         // TODO: reimplement IPC to send filepath to renderer
     },

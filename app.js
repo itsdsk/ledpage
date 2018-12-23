@@ -26,13 +26,8 @@ io.on('connection', function (socket) {
   });
 
   // update file
-  socket.on('sync', function (msg) {
-    // get object representing demo
-    var mediaItem = content.find(object => {
-      return object.demo.id === msg.id;
-    });
-    // send to helper
-    helper.updateFile(mediaItem, msg);
+  socket.on('updatefile', function (msg) {
+    helper.updateFile(msg);
   });
 });
 

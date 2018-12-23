@@ -20,14 +20,13 @@
             document.getElementById("container").innerHTML += (msg);
         })
 
-        function buttonClicked(demoId, fileIndex, filename) {
-            var html = document.querySelector('#'+demoId+'_'+fileIndex).value
+        function updateFile(title, fileIndex) {
+            var html = document.querySelector('#' + title + '_' + fileIndex).value;
             var data = {
-                id: demoId,
-                filename: filename,
+                fileID: fileIndex,
                 text: html
             };
-            socket.emit('sync', data);
+            socket.emit('updatefile', data);
         }
     </script>
 
