@@ -16,7 +16,6 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
-
 });
 
 // compile media
@@ -30,24 +29,22 @@ var mediaDir = path.join(__dirname, mediaPathRoot);
 module.exports = {
     // build local database in memory
     scanMedia: function () {
-        var media = new Array();
-        // look in each folder in content directory
+        // read media directory
         fs.readdir(mediaDir, function (err, files) {
             files.forEach(file => {
-                //console.log(file);
                 var itemPath = path.join(mediaDir, file);
-                //console.log(itemPath);
                 fs.stat(itemPath, function (err, stats) {
                     if (err) console.log("err: " + err);
+                    // check if subpath is a directory
                     if (stats.isDirectory()) {
-                        //console.log('file: ' + file);
-                        var metad = require(path.join(itemPath, 'demo.json'));
-                        if (metad) {
-                            //console.log("this:L " + JSON.stringify(metad));
+                        // load media metadata
+                        var meta = require(path.join(itemPath, 'demo.json'));
+                        if (meta) {
+                            // add metadata to disks table in database
                             var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
-                            db.run(insertQuery, [file, metad.demo.title, metad.demo.description], function () {
-                                // add image to database
-                                var imagePath = path.join(itemPath, metad.demo.image);
+                            db.run(insertQuery, [file, meta.demo.title, meta.demo.description], function () {
+                                // add image to disks database
+                                var imagePath = path.join(itemPath, meta.demo.image);
                                 fs.readFile(imagePath, function (err, buf) {
                                     if (err) throw err;
                                     var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
@@ -56,11 +53,10 @@ module.exports = {
                                 });
                                 // add files to database
                                 var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
-                                metad.demo.files.forEach(filename => {
+                                meta.demo.files.forEach(filename => {
                                     var filepath = path.join(itemPath, filename);
-                                    console.log("filepath: " + filepath);
-                                    fs.readFile(filepath, 'utf8', function(err, buf) {
-                                        if(err) throw err;
+                                    fs.readFile(filepath, 'utf8', function (err, buf) {
+                                        if (err) throw err;
                                         db.run(addFileQuery, [file, filename, buf]);
                                     });
                                 });
@@ -70,51 +66,6 @@ module.exports = {
                 });
             });
         });
-        // fs.readdirSync(mediaPathRoot).filter(function (mediaPath) {
-        //     if (fs.statSync(path.join(mediaPathRoot, mediaPath)).isDirectory()) {
-        //         // load json
-        //         var meta = require(path.join(__dirname, mediaPathRoot, mediaPath, 'demo.json'));
-        //         meta.directory = mediaPath;
-        //         // load files
-        //         meta.files = new Array();
-        //         (meta.demo.files).forEach(filename => {
-        //             fs.readFile(path.join(__dirname, mediaPathRoot, mediaPath, filename), 'utf8', function (err, buf) {
-        //                 if (err) throw err;
-        //                 var fileData = {
-        //                     name: filename,
-        //                     text: buf
-        //                 };
-        //                 meta.files.push(fileData);
-        //                 //console.log(meta);
-        //                 //media.push(meta);
-        //             });
-        //         });
-        //         // parse image into json
-        //         fs.readFile('./media/item1/thumb.jpg', function (err, buf) {
-        //             if (err) throw err;
-        //             meta.img_src = "data:image/jpeg;base64," + buf.toString('base64');
-        //             var sql = "INSERT INTO disks (directory, title) VALUES (?, ?)";
-        //             db.run(sql, [mediaPath, meta.demo.title]);
-        //                 //media.push(meta);
-        //         });
-        //         // add item to array
-        //         // var sql = "INSERT INTO disks (directory, title) VALUES (?, ?)";
-        //         // db.run(sql, [mediaPath, meta.demo.title, meta.img_src]);
-        //         //db.run("INSERT INTO disks (directory,title,image) VALUES ('" + mediaPath + "','" + meta.demo.title + "','" + meta.imc_src + "')");
-        //         media.push(meta);
-        //     }
-        // });
-        // log entries
-        // db.each("SELECT * FROM disks", function (err, row) {
-        //     console.log("DISK: " + row.directory + " " + row.title + " " + row.description + " " + row.image);
-        // });
-        // db.each("SELECT * FROM channels", function (err, row) {
-        //     console.log("CHANNEL: " + row.name);
-        // });
-        // db.each("SELECT * FROM disks_channels", function (err, row) {
-        //     console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
-        // });
-        return media;
     },
     listDatabase: function () {
         // log entries
@@ -152,60 +103,20 @@ module.exports = {
         // TODO: reimplement IPC to send filepath to renderer
     },
     serveOne: function (io, key) {
-        var element;
+        // fetch entry requested in [key] arg from disks table
         var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
         db.get(sql, [key], (err, itemrow) => {
             itemrow.files = new Array();
+            // fetch corresponding entries in files table
             db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [key], function (err, filerows) {
-                //console.log("FILE: " + filerow.disk_directory + " " + filerow.filename + " " + filerow.id);
                 filerows.forEach(function (filerow) {
-                    console.log(JSON.stringify(filerow));
+                    // add each file to object
                     itemrow.files.push(filerow);
                 });
-                //itemrow.files.push(filerow);
-                //console.log("row: " + JSON.stringify(itemrow));
-                element = template(itemrow);
+                // compile media object into HTML and send to client websocket
+                var element = template(itemrow);
                 io.emit('load', element);
             });
-            
-                
-            //console.log("template: " + element);
-            
-            //return element;
-            //console.log("worked from " + key + " on: " + row.title);
         });
     }
 };
-
-// // dummy data
-// db.run("INSERT INTO disks (directory,name) VALUES ('dir1','name1')");
-// db.run("INSERT INTO disks (directory,name) VALUES ('dir2','name2')");
-// db.run("INSERT INTO disks (directory,name) VALUES ('dir3','name3')");
-// db.run("INSERT INTO disks (directory,name) VALUES ('dir4','name4')");
-// db.run("INSERT INTO channels (name) VALUES ('channel1')");
-// db.run("INSERT INTO channels (name) VALUES ('channel2')");
-
-// db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel1')");
-// db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel1')");
-// db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir3','channel1')");
-// db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir1','channel2')");
-// db.run("INSERT INTO disks_channels (disk_directory, channel_name) VALUES ('dir2','channel2')");
-
-// // log entries
-// db.each("SELECT * FROM disks", function (err, row) {
-//     console.log("DISK: " + row.directory + " " + row.name);
-// });
-// db.each("SELECT * FROM channels", function (err, row) {
-//     console.log("CHANNEL: " + row.name);
-// });
-// db.each("SELECT * FROM disks_channels", function (err, row) {
-//     console.log("DISK_CHANNEL: " + row.disk_directory + " " + row.channel_name);
-// });
-
-// // test log
-// db.each("SELECT disks.* FROM disks INNER JOIN connections " +
-//     "ON disks.directory = connections.disk_directory " +
-//     "AND connections.channel_name = 'channel2'",
-//     function (err, row) {
-//         console.log("TEST: " + JSON.stringify(row));
-//     });
