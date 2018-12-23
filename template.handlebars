@@ -5,8 +5,14 @@
     <p>{{description}}</p>
     <p>Connected to:</p>
     <ul>
-        {{#each channels}}
-        <li>{{this.channel_name}}</li>
+        {{#each connectedChannels}}
+        <li>{{this.name}}</li>
+        {{/each}}
+    </ul>
+    <p>Disconnected from:</p>
+    <ul>
+        {{#each unconnectedChannels}}
+        <li>{{this.name}}</li>
         {{/each}}
     </ul>
     <button onclick="socket.emit('play', '{{directory}}')">Play</button>

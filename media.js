@@ -16,6 +16,8 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
+        db.run("INSERT INTO channels (name) VALUES ('channel2')");
+        db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
 // compile media
@@ -124,18 +126,41 @@ module.exports = {
                     // add each file to object
                     itemrow.files.push(filerow);
                 });
-                // fetch connected channels
-                itemrow.channels = new Array();
-                var getChannelsQuery = "SELECT channel_name FROM connections WHERE disk_directory = ?";
+                // add arrays to hold channels
+                itemrow.connectedChannels = new Array();
+                itemrow.unconnectedChannels = new Array();
+                // get channels
+                var getChannelsQuery = "SELECT channels.name, connections.disk_directory FROM channels LEFT JOIN connections " +
+                    "ON channels.name = connections.channel_name " +
+                    "AND connections.disk_directory = ?";
                 db.all(getChannelsQuery, [key], function (err, chanrows) {
+                    // loop through channels
                     chanrows.forEach(function (chanrow) {
-                        // add each connected channel to object
-                        itemrow.channels.push(chanrow);
+                        // check if channel is connected
+                        if(chanrow.disk_directory){
+                            console.log("connected: " + JSON.stringify(chanrow));
+                            itemrow.connectedChannels.push(chanrow);
+                        }else{
+                            console.log("disconnected: " + JSON.stringify(chanrow));
+                            itemrow.unconnectedChannels.push(chanrow);
+                        }
                     });
                     // compile media object into HTML and send to client websocket
                     var element = template(itemrow);
                     io.emit('load', element);
-                });
+            });
+                // // fetch connected channels
+                // itemrow.channels = new Array();
+                // var getChannelsQuery = "SELECT channel_name FROM connections WHERE disk_directory = ?";
+                // db.all(getChannelsQuery, [key], function (err, chanrows) {
+                //     chanrows.forEach(function (chanrow) {
+                //         // add each connected channel to object
+                //         itemrow.channels.push(chanrow);
+                //     });
+                //     // compile media object into HTML and send to client websocket
+                //     var element = template(itemrow);
+                //     io.emit('load', element);
+                // });
             });
         });
     }
