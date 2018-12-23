@@ -17,6 +17,7 @@ io.on('connection', function (socket) {
 
   // request items
   socket.on('load', function (msg) {
+    helper.listDatabase();
     //console.log('load');
     var data = helper.serveOne(io, 'item1');
     console.log("sending: " + data);
