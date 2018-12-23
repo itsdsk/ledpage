@@ -16,7 +16,7 @@ io.on('connection', function (socket) {
 
   // request items
   socket.on('load', function (msg) {
-    helper.listDatabase();
+    //helper.listDatabase();
     helper.serveOne(io, 'item1');
     helper.serveOne(io, 'item2');
   });
@@ -32,12 +32,10 @@ io.on('connection', function (socket) {
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    console.log(msg);
     helper.deleteConnection(msg);
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    console.log(msg);
     helper.createConnection(msg);
   });
 });

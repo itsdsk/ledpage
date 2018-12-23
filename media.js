@@ -63,7 +63,6 @@ module.exports = {
                                     });
                                 });
                                 // add channels to database
-                                console.log('channels: ' + meta.demo.channels);
                                 var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
                                 var addConnectQuery = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
                                 meta.demo.channels.forEach(channelName => {
@@ -174,10 +173,8 @@ module.exports = {
                     chanrows.forEach(function (chanrow) {
                         // check if channel is connected
                         if (chanrow.disk_directory) {
-                            console.log("connected: " + JSON.stringify(chanrow));
                             itemrow.connectedChannels.push(chanrow);
                         } else {
-                            console.log("disconnected: " + JSON.stringify(chanrow));
                             itemrow.unconnectedChannels.push(chanrow);
                         }
                     });
