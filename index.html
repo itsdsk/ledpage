@@ -39,6 +39,12 @@
             socket.emit('createconnection', [directory, channel]);
         }
 
+        function createChannel(directory) {
+            // get channel name
+            var name = document.getElementById(directory + "_channelInput").value;
+            socket.emit('createchannel', name);
+        }
+
         function channelSearch(directory) {
             // declare variables
             var input, filter, ul, li, a, i, txtValue;

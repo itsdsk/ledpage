@@ -95,6 +95,10 @@ module.exports = {
     mediaObjectToHtml: function (item) {
         return template(item);
     },
+    createChannel: function (msg) {
+        var createQuery = "INSERT INTO channels (name) VALUES (?)";
+        db.run(createQuery, [msg]);
+    },
     updateFile: function (msg) {
         // update file in database
         var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";

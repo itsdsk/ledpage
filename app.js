@@ -30,6 +30,11 @@ io.on('connection', function (socket) {
   socket.on('updatefile', function (msg) {
     helper.updateFile(msg);
   });
+  // create channel
+  socket.on('createchannel', function (msg) {
+    if (msg.length > 0)
+      helper.createChannel(msg);
+  });
   // delete connection
   socket.on('deleteconnection', function (msg) {
     helper.deleteConnection(msg);

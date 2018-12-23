@@ -4,6 +4,7 @@
     <p><i>saved in {{directory}}</i></p>
     <p>{{description}}</p>
     <input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
+    <span onclick="createChannel('{{directory}}')">Create new channel</span>
     <ul id="{{directory}}_channelList">
         {{#each connectedChannels}}
         <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
