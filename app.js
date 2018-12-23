@@ -25,7 +25,10 @@ io.on('connection', function (socket) {
   socket.on('play', function (msg) {
     helper.playLocalMedia(msg);
   });
-
+  // create disk
+  socket.on('createdisk', function () {
+    helper.createDisk('channel2');
+  });
   // update file
   socket.on('updatefile', function (msg) {
     helper.updateFile(msg);

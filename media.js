@@ -42,41 +42,41 @@ module.exports = {
                         // load media metadata
                         var meta = require(path.join(itemPath, 'demo.json'));
                         if (meta) {
-                            // add metadata to disks table in database
-                            var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
-                            db.run(insertQuery, [file, meta.demo.title, meta.demo.description], function () {
-                                // add image to disks database
-                                var imagePath = path.join(itemPath, meta.demo.image);
-                                fs.readFile(imagePath, function (err, buf) {
-                                    if (err) throw err;
-                                    var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                                    var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
-                                    db.run(addImgQuery, [decodedImage, file]);
-                                });
-                                // add files to database
-                                var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
-                                meta.demo.files.forEach(filename => {
-                                    var filepath = path.join(itemPath, filename);
-                                    fs.readFile(filepath, 'utf8', function (err, buf) {
-                                        if (err) throw err;
-                                        db.run(addFileQuery, [file, filename, buf]);
-                                    });
-                                });
-                                // add channels to database
-                                var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
-                                var addConnectQuery = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
-                                meta.demo.channels.forEach(channelName => {
-                                    // add name to channels table
-                                    db.run(addChannelQuery, [channelName], function () {
-                                        // add pair to connections table
-                                        db.run(addConnectQuery, [file, channelName]);
-                                    });
-                                });
-                            });
+                            addMediaToDatabase(file, meta);
                         }
                     }
                 });
             });
+        });
+    },
+    createDisk: function (channelName) {
+        // path of new disk
+        var randomName = "disk_" + Math.random().toString(36).substring(2, 8);
+        var newDirectory = path.join(mediaDir, randomName);
+        // make directory
+        fs.mkdir(newDirectory, function (err) {
+            if (err) console.log(err)
+            else {
+                // get default metadata
+                var meta = require('./default/demo.json');
+                // set channel
+                meta.demo.channels.push(channelName);
+                // save metadata to disk
+                fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
+                    // copy default files
+                    fs.copyFile(path.join(__dirname, 'default', 'index.html'), path.join(newDirectory, 'index.html'), (err) => {
+                        if (err) console.log(err);
+                        fs.copyFile(path.join(__dirname, 'default', 'style.css'), path.join(newDirectory, 'style.css'), (err) => {
+                            if (err) console.log(err);
+                            fs.copyFile(path.join(__dirname, 'default', 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
+                                if (err) console.log(err);
+                                addMediaToDatabase(randomName, meta);
+                            });
+                        });
+                    });
+                });
+            }
         });
     },
     listDatabase: function () {
@@ -199,3 +199,41 @@ module.exports = {
         });
     }
 };
+
+function addMediaToDatabase(directory, meta) {
+    // add metadata to disks table in database
+    var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
+    db.run(insertQuery, [directory, meta.demo.title, meta.demo.description], function () {
+        var itemPath = path.join(mediaDir, directory);
+        if (meta.demo.image && meta.demo.image.length > 0) {
+            // add image to disks database TODO: check if files exist
+            var imagePath = path.join(itemPath, meta.demo.image);
+            fs.readFile(imagePath, function (err, buf) {
+                if (err) throw err;
+                var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
+                var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
+                db.run(addImgQuery, [decodedImage, directory]);
+            });
+        }
+        // add files to database
+        var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
+        meta.demo.files.forEach(filename => {
+            var filepath = path.join(itemPath, filename);
+            fs.readFile(filepath, 'utf8', function (err, buf) {
+                if (err) throw err;
+                db.run(addFileQuery, [directory, filename, buf]);
+            });
+        });
+        // add channels to database
+        var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
+        var addConnectQuery = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
+        meta.demo.channels.forEach(channelName => {
+            // add name to channels table
+            db.run(addChannelQuery, [channelName], function () {
+                // add pair to connections table
+                db.run(addConnectQuery, [directory, channelName]);
+            });
+        });
+    });
+
+}
