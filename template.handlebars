@@ -3,16 +3,14 @@
     <h1>{{title}}</h1>
     <p><i>saved in {{directory}}</i></p>
     <p>{{description}}</p>
+    <input type="text" id="channelInput" onkeyup="channelSearch()" placeholder="Channels...">
     <p>Connected to:</p>
-    <ul>
+    <ul id="channelList">
         {{#each connectedChannels}}
-        <li onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}}</li>
+        <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
         {{/each}}
-    </ul>
-    <p>Disconnected from:</p>
-    <ul>
         {{#each unconnectedChannels}}
-        <li onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</li>
+        <li><a href="#" onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</a></li>
         {{/each}}
     </ul>
     <button onclick="socket.emit('play', '{{directory}}')">Play</button>

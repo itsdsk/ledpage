@@ -18,7 +18,7 @@ io.on('connection', function (socket) {
   socket.on('load', function (msg) {
     //helper.listDatabase();
     helper.serveOne(io, 'item1');
-    helper.serveOne(io, 'item2');
+    //helper.serveOne(io, 'item2');
   });
 
   // play demo
