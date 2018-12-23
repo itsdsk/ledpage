@@ -28,6 +28,9 @@
             };
             socket.emit('updatefile', data);
         }
+        function deleteConnection(directory, channel) {
+            socket.emit('deleteconnection', [directory, channel]);
+        }
     </script>
 
 </head>

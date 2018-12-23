@@ -16,8 +16,8 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
-        db.run("INSERT INTO channels (name) VALUES ('channel2')");
-        db.run("INSERT INTO channels (name) VALUES ('channel3')");
+    db.run("INSERT INTO channels (name) VALUES ('channel2')");
+    db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
 // compile media
@@ -110,6 +110,27 @@ module.exports = {
             });
         });
     },
+    deleteConnection: function (msg) {
+        // delete connection in database
+        var sql = "DELETE FROM connections WHERE disk_directory = ? AND channel_name = ?";
+        db.run(sql, msg);
+        // get path and load json
+        var metaPath = path.join(mediaDir, msg[0], 'demo.json');
+        var meta = require(metaPath);
+        // get index of channel in array
+        var index = meta.demo.channels.indexOf(msg[1]);
+        if (index > -1) {
+            // delete if exists
+            meta.demo.channels.splice(index, 1);
+        }
+        // save json to disk
+        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+            if (err) console.log(err);
+        });
+    },
+    createConnection: function (msg) {
+        //
+    },
     playLocalMedia: function (name) {
         var filePath = path.join(mediaDir, name);
         console.log('playing local media: ' + filePath);
@@ -137,10 +158,10 @@ module.exports = {
                     // loop through channels
                     chanrows.forEach(function (chanrow) {
                         // check if channel is connected
-                        if(chanrow.disk_directory){
+                        if (chanrow.disk_directory) {
                             console.log("connected: " + JSON.stringify(chanrow));
                             itemrow.connectedChannels.push(chanrow);
-                        }else{
+                        } else {
                             console.log("disconnected: " + JSON.stringify(chanrow));
                             itemrow.unconnectedChannels.push(chanrow);
                         }
@@ -148,7 +169,7 @@ module.exports = {
                     // compile media object into HTML and send to client websocket
                     var element = template(itemrow);
                     io.emit('load', element);
-            });
+                });
                 // // fetch connected channels
                 // itemrow.channels = new Array();
                 // var getChannelsQuery = "SELECT channel_name FROM connections WHERE disk_directory = ?";

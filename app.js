@@ -17,7 +17,8 @@ io.on('connection', function (socket) {
   // request items
   socket.on('load', function (msg) {
     helper.listDatabase();
-    var data = helper.serveOne(io, 'item1');
+    helper.serveOne(io, 'item1');
+    helper.serveOne(io, 'item2');
   });
 
   // play demo
@@ -28,6 +29,11 @@ io.on('connection', function (socket) {
   // update file
   socket.on('updatefile', function (msg) {
     helper.updateFile(msg);
+  });
+  // delete connection
+  socket.on('deleteconnection', function (msg) {
+    console.log(msg);
+    helper.deleteConnection(msg);
   });
 });
 

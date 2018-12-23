@@ -6,7 +6,7 @@
     <p>Connected to:</p>
     <ul>
         {{#each connectedChannels}}
-        <li>{{this.name}}</li>
+        <li onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}}</li>
         {{/each}}
     </ul>
     <p>Disconnected from:</p>
