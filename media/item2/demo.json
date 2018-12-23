@@ -1,14 +1,14 @@
 {
     "demo": {
-        "title": "funtitle1",
+        "title": "funtitle2",
         "description": "description of demo goes here",
         "files": [
             "index.html",
             "sketch.js"
         ],
         "channels": [
-            "bestchan",
-            "funchannel1"
+            "funchannel2",
+            "bestchan"
         ],
         "image": "thumb.jpg"
     }
