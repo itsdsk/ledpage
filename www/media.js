@@ -18,8 +18,8 @@ db.serialize(function () {
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
     // add test data
-    db.run("INSERT INTO channels (name) VALUES ('channel2')");
-    db.run("INSERT INTO channels (name) VALUES ('channel3')");
+    // db.run("INSERT INTO channels (name) VALUES ('channel2')");
+    // db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
 // compile media
@@ -165,7 +165,7 @@ module.exports = {
         console.log('playing local media: ' + filePath);
         // TODO: reimplement IPC to send filepath to renderer
     },
-    loadFeed: function (io) {
+    loadFeed: function (callback) {
         // get list of distinct disks in connections
         var selectQuery = "SELECT * FROM connections GROUP BY disk_directory";
         db.all(selectQuery, function (err, rows) {
@@ -185,7 +185,7 @@ module.exports = {
                 var obj = grouped[key];
                 let disk_directories = obj.map(a => a.disk_directory);
                 serveChannelAndDisks(key, disk_directories, function (element) {
-                    io.emit('load', element);
+                    callback(element);
                 });
             }
         });

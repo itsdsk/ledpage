@@ -7,7 +7,7 @@ var io = require('socket.io')(http);
 // get items
 var content = helper.scanMedia();
 
-// serve index.html
+// serve static files
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -21,7 +21,9 @@ app.get('/script.js', function (req, res) {
 io.on('connection', function (socket) {
   // request items
   socket.on('load', function (msg) {
-    helper.loadFeed(io);
+    helper.loadFeed(function(elements) {
+      io.emit('load', elements);
+    });
   });
   // play demo
   socket.on('play', function (msg) {
