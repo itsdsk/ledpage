@@ -24,7 +24,7 @@ db.serialize(function () {
 
 // compile media
 var template;
-fs.readFile(__dirname + "/template.handlebars", function (err, data) {
+fs.readFile(__dirname + "/template.hbs", function (err, data) {
     if (err) throw err;
     template = Handlebars.compile(data.toString());
 });
