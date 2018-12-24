@@ -1,4 +1,5 @@
 <div class="item">
     <h1>{{channel_name}}</h1>
     <p>Count: {{count}}</p>
+    <button onclick="socket.emit('loadchannel','{{channel_name}}')">View</button>
 </div>

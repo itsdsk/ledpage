@@ -23,22 +23,22 @@ db.serialize(function () {
 });
 
 // compile media
-var template;
-fs.readFile(path.join(__dirname, "public", "template.hbs"), function (err, data) {
+var diskCompiler;
+fs.readFile(path.join(__dirname, "public", "disk.hbs"), function (err, data) {
     if (err) throw err;
-    template = Handlebars.compile(data.toString());
+    diskCompiler = Handlebars.compile(data.toString());
 });
-var channelTemplate;
+var channelCompiler;
 fs.readFile(path.join(__dirname, "public", "channel.hbs"), function (err, data) {
     if (err) throw err;
-    channelTemplate = Handlebars.compile(data.toString());
+    channelCompiler = Handlebars.compile(data.toString());
 });
 
 var mediaDir = path.join(__dirname, 'disks');
 
 module.exports = {
     // build local database in memory
-    scanMedia: function () {
+    generateDb: function () {
         // read media directory
         fs.readdir(mediaDir, function (err, files) {
             files.forEach(file => {
@@ -51,7 +51,7 @@ module.exports = {
                         var meta = require(path.join(itemPath, 'demo.json'));
                         if (meta) {
                             // add to database
-                            addMediaToDatabase(file, meta);
+                            parseDiskDirectory(file, meta);
                         }
                     }
                 });
@@ -82,7 +82,7 @@ module.exports = {
                             fs.copyFile(path.join(pathToDefault, 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
                                 if (err) console.log(err);
                                 // add to database
-                                addMediaToDatabase(randomName, meta);
+                                parseDiskDirectory(randomName, meta);
                             });
                         });
                     });
@@ -105,9 +105,6 @@ module.exports = {
             console.log("CONNECTION: " + row.disk_directory + " " + row.channel_name);
         });
 
-    },
-    mediaObjectToHtml: function (item) {
-        return template(item);
     },
     createChannel: function (msg) {
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
@@ -194,7 +191,7 @@ module.exports = {
 
 function serveChannelAndDisks(channel_name, disk_directories, callback) {
     var element = "";
-    serveChannel(channel_name, function (channel_element) {
+    templateChannel(channel_name, function (channel_element) {
         element += channel_element;
         serveDiskArray(disk_directories, function (disk_elements) {
             element += disk_elements;
@@ -208,7 +205,7 @@ function serveDiskArray(titles, callback) {
     var object = "";
 
     function repeat(title) {
-        serveDisk(title, function (element) {
+        templateDisk(title, function (element) {
             object += element;
             if (titles.length) {
                 repeat(titles.pop());
@@ -221,16 +218,16 @@ function serveDiskArray(titles, callback) {
     repeat(titles.pop());
 }
 
-function serveChannel(channel_name, callback) {
+function templateChannel(channel_name, callback) {
     // count number of disks in channel
     var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
     db.get(countQuery, [channel_name], (err, count) => {
-        var element = channelTemplate(count);
+        var element = channelCompiler(count);
         callback(element);
     });
 }
 
-function serveDisk(key, callback) {
+function templateDisk(key, callback) {
     // fetch entry requested in [key] arg from disks table
     var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
     db.get(sql, [key], (err, itemrow) => {
@@ -259,14 +256,14 @@ function serveDisk(key, callback) {
                     }
                 });
                 // compile media object into HTML and send to client websocket
-                var element = template(itemrow);
+                var element = diskCompiler(itemrow);
                 callback(element);
             });
         });
     });
 }
 
-function addMediaToDatabase(directory, meta) {
+function parseDiskDirectory(directory, meta) {
     // add metadata to disks table in database
     var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.description], function () {

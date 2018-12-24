@@ -1,11 +1,11 @@
 const app = require('express')();
-const helper = require("./media.js");
+const media = require("./media.js");
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-// get items
-var content = helper.scanMedia();
+// scan content
+media.generateDb();
 
 // serve static files
 app.get('/', function (req, res) {
@@ -19,36 +19,40 @@ app.get('/script.js', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-  // request items
+  // request feed
   socket.on('load', function (msg) {
-    helper.loadFeed(function(elements) {
+    media.loadFeed(function (elements) {
       io.emit('load', elements);
     });
   });
+  // request channel
+  socket.on('loadchannel', function(msg) {
+    console.log('loadchannel: ' + msg);
+  });
   // play demo
   socket.on('play', function (msg) {
-    helper.playLocalMedia(msg);
+    media.playLocalMedia(msg);
   });
   // create disk
   socket.on('createdisk', function () {
-    helper.createDisk('channel2');
+    media.createDisk('channel2');
   });
   // update file
   socket.on('updatefile', function (msg) {
-    helper.updateFile(msg);
+    media.updateFile(msg);
   });
   // create channel
   socket.on('createchannel', function (msg) {
     if (msg.length > 0)
-      helper.createChannel(msg);
+      media.createChannel(msg);
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    helper.deleteConnection(msg);
+    media.deleteConnection(msg);
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    helper.createConnection(msg);
+    media.createConnection(msg);
   });
 });
 
