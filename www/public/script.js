@@ -3,7 +3,7 @@ socket.emit('load');
 socket.on('load', function (msg) {
     //console.log(msg);
     document.getElementById("container").innerHTML += (msg);
-})
+});
 
 function updateFile(directory, filename, fileIndex) {
     var html = document.querySelector('#' + directory + '_' + fileIndex).value;

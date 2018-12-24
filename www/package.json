@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bower": "^1.8.4",
     "dat-node": "3.5.13",
     "express": "^4.16.4",
-    "express-ws": "4.0.0",
     "handlebars": "4.0.12",
     "socket.io": "2.2.0",
     "sqlite3": "4.0.4"

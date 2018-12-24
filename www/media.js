@@ -24,12 +24,12 @@ db.serialize(function () {
 
 // compile media
 var template;
-fs.readFile(__dirname + "/template.hbs", function (err, data) {
+fs.readFile(path.join(__dirname, "public", "template.hbs"), function (err, data) {
     if (err) throw err;
     template = Handlebars.compile(data.toString());
 });
 
-var mediaDir = path.join(__dirname, './media');
+var mediaDir = path.join(__dirname, 'disks');
 
 module.exports = {
     // build local database in memory
@@ -61,19 +61,20 @@ module.exports = {
         fs.mkdir(newDirectory, function (err) {
             if (err) console.log(err)
             else {
+                var pathToDefault = path.join(mediaDir, '.default');
                 // get default metadata
-                var meta = require('./default/demo.json');
+                var meta = require(path.join(pathToDefault, 'demo.json'));
                 // set channel
                 meta.demo.channels.push(channelName);
                 // save metadata to disk
                 fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(meta, null, 4), function (err) {
                     if (err) console.log(err);
                     // copy default files
-                    fs.copyFile(path.join(__dirname, 'default', 'index.html'), path.join(newDirectory, 'index.html'), (err) => {
+                    fs.copyFile(path.join(pathToDefault, 'index.html'), path.join(newDirectory, 'index.html'), (err) => {
                         if (err) console.log(err);
-                        fs.copyFile(path.join(__dirname, 'default', 'style.css'), path.join(newDirectory, 'style.css'), (err) => {
+                        fs.copyFile(path.join(pathToDefault, 'style.css'), path.join(newDirectory, 'style.css'), (err) => {
                             if (err) console.log(err);
-                            fs.copyFile(path.join(__dirname, 'default', 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
+                            fs.copyFile(path.join(pathToDefault, 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
                                 if (err) console.log(err);
                                 // add to database
                                 addMediaToDatabase(randomName, meta);

@@ -9,13 +9,13 @@ var content = helper.scanMedia();
 
 // serve index.html
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 });
 app.get('/style.css', function (req, res) {
-  res.sendFile(__dirname + '/style.css');
+  res.sendFile(__dirname + '/public/style.css');
 });
 app.get('/script.js', function (req, res) {
-  res.sendFile(__dirname + '/script.js');
+  res.sendFile(__dirname + '/public/script.js');
 });
 
 io.on('connection', function (socket) {
@@ -23,6 +23,7 @@ io.on('connection', function (socket) {
   // request items
   socket.on('load', function (msg) {
     //helper.listDatabase();
+    helper.serveOne(io, "disk_aefvhn");
     helper.serveOne(io, 'item1');
     helper.serveOne(io, 'item2');
   });
