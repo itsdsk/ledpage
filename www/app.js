@@ -19,15 +19,10 @@ app.get('/script.js', function (req, res) {
 });
 
 io.on('connection', function (socket) {
-
   // request items
   socket.on('load', function (msg) {
-    //helper.listDatabase();
-    helper.serveOne(io, "disk_aefvhn");
-    helper.serveOne(io, 'item1');
-    helper.serveOne(io, 'item2');
+    helper.loadFeed(io);
   });
-
   // play demo
   socket.on('play', function (msg) {
     helper.playLocalMedia(msg);

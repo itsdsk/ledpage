@@ -28,6 +28,11 @@ fs.readFile(path.join(__dirname, "public", "template.hbs"), function (err, data)
     if (err) throw err;
     template = Handlebars.compile(data.toString());
 });
+var channelTemplate;
+fs.readFile(path.join(__dirname, "public", "channel.hbs"), function (err, data) {
+    if (err) throw err;
+    channelTemplate = Handlebars.compile(data.toString());
+});
 
 var mediaDir = path.join(__dirname, 'disks');
 
@@ -96,6 +101,9 @@ module.exports = {
         db.each("SELECT * FROM channels", function (err, row) {
             console.log("CHANNEL: " + row.name);
         });
+        db.each("SELECT * FROM connections", function (err, row) {
+            console.log("CONNECTION: " + row.disk_directory + " " + row.channel_name);
+        });
 
     },
     mediaObjectToHtml: function (item) {
@@ -157,6 +165,42 @@ module.exports = {
         console.log('playing local media: ' + filePath);
         // TODO: reimplement IPC to send filepath to renderer
     },
+    loadFeed: function (io) {
+        // get list of distinct disks in connections
+        var selectQuery = "SELECT * FROM connections GROUP BY disk_directory";
+        db.all(selectQuery, function (err, rows) {
+            // group into channels
+            var grouped = {};
+            for (var i = 0; i < rows.length; i++) {
+                if (grouped[rows[i].channel_name] == undefined) {
+                    grouped[rows[i].channel_name] = [];
+                }
+                grouped[rows[i].channel_name].push(rows[i]);
+            }
+            // for each channel
+            for (var key in grouped) {
+                // skip loop of property is from prototype
+                if (!grouped.hasOwnProperty(key)) continue;
+                // count number of disks in channel
+                var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
+                db.get(countQuery, [key], (err, count) => {
+                    console.log("channel has: " + JSON.stringify(count));
+                    var obj = grouped[count.channel_name];
+                    console.log("key: " + count.channel_name);
+                    console.log("obj: " + JSON.stringify(obj));
+                    io.emit('load', channelTemplate(count));
+                    obj.forEach(function (objj) {
+                        serveDisk(io, objj.disk_directory);
+                    });
+                });
+                // var obj = grouped[key];
+                // console.log("key: " + key);
+                // console.log("obj: " + JSON.stringify(obj));
+                // console.log(JSON.stringify(grouped[obj], null, 2));
+            }
+            //console.log(JSON.stringify(grouped[0], null, 2));
+        });
+    },
     serveOne: function (io, key) {
         // fetch entry requested in [key] arg from disks table
         var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
@@ -193,6 +237,42 @@ module.exports = {
         });
     }
 };
+
+function serveDisk(io, key) {
+    // fetch entry requested in [key] arg from disks table
+    var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
+    db.get(sql, [key], (err, itemrow) => {
+        itemrow.files = new Array();
+        // fetch corresponding entries in files table
+        db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [key], function (err, filerows) {
+            filerows.forEach(function (filerow) {
+                // add each file to object
+                itemrow.files.push(filerow);
+            });
+            // add arrays to hold channels
+            itemrow.connectedChannels = new Array();
+            itemrow.unconnectedChannels = new Array();
+            // get channels
+            var getChannelsQuery = "SELECT channels.name, connections.disk_directory FROM channels LEFT JOIN connections " +
+                "ON channels.name = connections.channel_name " +
+                "AND connections.disk_directory = ?";
+            db.all(getChannelsQuery, [key], function (err, chanrows) {
+                // loop through channels
+                chanrows.forEach(function (chanrow) {
+                    // check if channel is connected
+                    if (chanrow.disk_directory) {
+                        itemrow.connectedChannels.push(chanrow);
+                    } else {
+                        itemrow.unconnectedChannels.push(chanrow);
+                    }
+                });
+                // compile media object into HTML and send to client websocket
+                var element = template(itemrow);
+                io.emit('load', element);
+            });
+        });
+    });
+}
 
 function addMediaToDatabase(directory, meta) {
     // add metadata to disks table in database
