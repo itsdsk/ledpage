@@ -1,19 +1,19 @@
 <div class="item">
     <img src="{{{image}}}" />
     <h1>{{title}}</h1>
+    <p><i>saved in {{directory}}</i></p>
+    <p>{{description}}</p>
+    <input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
+    <span onclick="createChannel('{{directory}}')">Create new channel</span>
+    <ul id="{{directory}}_channelList">
+        {{#each connectedChannels}}
+        <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
+        {{/each}}
+        {{#each unconnectedChannels}}
+        <li><a href="#" onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</a></li>
+        {{/each}}
+    </ul>
     <span style="display:none">
-        <p><i>saved in {{directory}}</i></p>
-        <p>{{description}}</p>
-        <input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
-        <span onclick="createChannel('{{directory}}')">Create new channel</span>
-        <ul id="{{directory}}_channelList">
-            {{#each connectedChannels}}
-            <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
-            {{/each}}
-            {{#each unconnectedChannels}}
-            <li><a href="#" onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</a></li>
-            {{/each}}
-        </ul>
         <button onclick="socket.emit('play', '{{directory}}')">Play</button>
         {{#each files}}
         <div>

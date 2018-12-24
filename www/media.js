@@ -181,18 +181,31 @@ module.exports = {
             for (var key in grouped) {
                 // skip loop of property is from prototype
                 if (!grouped.hasOwnProperty(key)) continue;
-                // count number of disks in channel
-                var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
-                db.get(countQuery, [key], (err, count) => {
-                    console.log("channel has: " + JSON.stringify(count));
-                    var obj = grouped[count.channel_name];
-                    console.log("key: " + count.channel_name);
-                    console.log("obj: " + JSON.stringify(obj));
-                    io.emit('load', channelTemplate(count));
-                    obj.forEach(function (objj) {
-                        serveDisk(io, objj.disk_directory);
-                    });
+                // 
+                var obj = grouped[key];
+                let disk_directories = obj.map(a => a.disk_directory);
+                serveChannelAndDisks(key, disk_directories, function (element) {
+                    io.emit('load', element);
                 });
+                // serveChannel(key, function (element) {
+                //     serveDiskArray(["item1", "item2"], function (elements) {
+                //         element += elements;
+                //         io.emit('load', element);
+                //     });
+                //     //io.emit('load', element);
+                // });
+                // count number of disks in channel
+                // var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
+                // db.get(countQuery, [key], (err, count) => {
+                //     console.log("channel has: " + JSON.stringify(count));
+                //     var obj = grouped[count.channel_name];
+                //     console.log("key: " + count.channel_name);
+                //     console.log("obj: " + JSON.stringify(obj));
+                //     io.emit('load', channelTemplate(count));
+                //     obj.forEach(function (objj) {
+                //         serveDisk(io, objj.disk_directory);
+                //     });
+                // });
                 // var obj = grouped[key];
                 // console.log("key: " + key);
                 // console.log("obj: " + JSON.stringify(obj));
@@ -238,9 +251,48 @@ module.exports = {
     }
 };
 
-function serveDisk(io, key) {
+function serveChannelAndDisks(channel_name, disk_directories, callback) {
+    var element = "";
+    serveChannel(channel_name, function (channel_element) {
+        element += channel_element;
+        serveDiskArray(disk_directories, function (disk_elements) {
+            element += disk_elements;
+            callback(element);
+        });
+    });
+}
+
+function serveDiskArray(titles, callback) {
+
+    var object = "";
+
+    function repeat(title) {
+        serveDisk(title, function (element) {
+            object += element;
+            if (titles.length) {
+                repeat(titles.pop());
+            } else {
+                callback(object);
+            }
+
+        });
+    }
+    repeat(titles.pop());
+}
+
+function serveChannel(channel_name, callback) {
+    // count number of disks in channel
+    var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
+    db.get(countQuery, [channel_name], (err, count) => {
+        var element = channelTemplate(count);
+        callback(element);
+    });
+}
+
+function serveDisk(key, callback) {
     // fetch entry requested in [key] arg from disks table
     var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
+    console.log("hre: " + key);
     db.get(sql, [key], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
@@ -268,7 +320,7 @@ function serveDisk(io, key) {
                 });
                 // compile media object into HTML and send to client websocket
                 var element = template(itemrow);
-                io.emit('load', element);
+                callback(element);
             });
         });
     });
