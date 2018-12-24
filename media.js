@@ -6,16 +6,18 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
 
 db.serialize(function () {
-    // create tables
+    // create tables for primitive types (disk and channel)
     db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB)");
+    db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
+    // create tables for relational types (files and connections)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "UNIQUE(disk_directory, filename))");
-    db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
     db.run("CREATE TABLE connections (disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
+    // add test data
     db.run("INSERT INTO channels (name) VALUES ('channel2')");
     db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
@@ -26,8 +28,9 @@ fs.readFile(__dirname + "/template.handlebars", function (err, data) {
     if (err) throw err;
     template = Handlebars.compile(data.toString());
 });
-var mediaPathRoot = './media';
-var mediaDir = path.join(__dirname, mediaPathRoot);
+
+var mediaDir = path.join(__dirname, './media');
+
 module.exports = {
     // build local database in memory
     scanMedia: function () {
@@ -42,6 +45,7 @@ module.exports = {
                         // load media metadata
                         var meta = require(path.join(itemPath, 'demo.json'));
                         if (meta) {
+                            // add to database
                             addMediaToDatabase(file, meta);
                         }
                     }
@@ -71,6 +75,7 @@ module.exports = {
                             if (err) console.log(err);
                             fs.copyFile(path.join(__dirname, 'default', 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
                                 if (err) console.log(err);
+                                // add to database
                                 addMediaToDatabase(randomName, meta);
                             });
                         });
@@ -183,18 +188,6 @@ module.exports = {
                     var element = template(itemrow);
                     io.emit('load', element);
                 });
-                // // fetch connected channels
-                // itemrow.channels = new Array();
-                // var getChannelsQuery = "SELECT channel_name FROM connections WHERE disk_directory = ?";
-                // db.all(getChannelsQuery, [key], function (err, chanrows) {
-                //     chanrows.forEach(function (chanrow) {
-                //         // add each connected channel to object
-                //         itemrow.channels.push(chanrow);
-                //     });
-                //     // compile media object into HTML and send to client websocket
-                //     var element = template(itemrow);
-                //     io.emit('load', element);
-                // });
             });
         });
     }

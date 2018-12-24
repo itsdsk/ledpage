@@ -1,6 +1,7 @@
 <div class="item">
     <img src="{{{image}}}" />
     <h1>{{title}}</h1>
+    <div style="display:none">
     <p><i>saved in {{directory}}</i></p>
     <p>{{description}}</p>
     <input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
@@ -21,4 +22,5 @@
         <button onclick="updateFile('{{../directory}}', '{{this.filename}}', '{{this.id}}')">Sync</button>
     </div>
     {{/each}}
+    </div>
 </div>
