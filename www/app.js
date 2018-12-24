@@ -18,6 +18,7 @@ app.get('/script.js', function (req, res) {
   res.sendFile(__dirname + '/public/script.js');
 });
 
+// client websocket routes
 io.on('connection', function (socket) {
   // request feed
   socket.on('load', function (msg) {
@@ -26,8 +27,10 @@ io.on('connection', function (socket) {
     });
   });
   // request channel
-  socket.on('loadchannel', function(msg) {
-    console.log('loadchannel: ' + msg);
+  socket.on('loadchannel', function (msg) {
+    media.loadChannel(msg, function (elements) {
+      io.emit('load', elements);
+    });
   });
   // play demo
   socket.on('play', function (msg) {

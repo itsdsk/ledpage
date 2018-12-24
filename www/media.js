@@ -186,6 +186,20 @@ module.exports = {
                 });
             }
         });
+    },
+    loadChannel: function (channel_name, callback) {
+        // get all disks in specified channel
+        var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
+            "ON disks.directory = connections.disk_directory " +
+            "AND connections.channel_name = ?";
+        db.all(selectQuery, [channel_name], function (err, rows) {
+            // get disk PKs as array of strings
+            let disk_directories = rows.map(a => a.directory);
+            // 
+            serveDiskArray(disk_directories, function (elements) {
+                callback(elements);
+            });
+        });
     }
 };
 
