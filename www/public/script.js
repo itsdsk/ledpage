@@ -49,6 +49,63 @@ function channelSearch(directory) {
     }
 }
 
-function createDisk() {
-    socket.emit('createdisk');
+//
+//
+//
+
+var selected = null, // Object of the element to be moved
+    x_pos = 0,
+    y_pos = 0, // Stores x & y coordinates of the mouse pointer
+    x_elem = 0,
+    y_elem = 0; // Stores top, left values (edge) of the element
+
+// Will be called when user starts dragging an element
+function _drag_init(elem) {
+    // Store the object of the element which needs to be moved
+    selected = elem;
+    x_elem = x_pos - selected.offsetLeft;
+    y_elem = y_pos - selected.offsetTop;
 }
+
+// Will be called when user dragging an element
+function _move_elem(e) {
+    x_pos = document.all ? window.event.clientX : e.pageX;
+    y_pos = document.all ? window.event.clientY : e.pageY;
+    if (selected !== null) {
+        selected.style.left = (x_pos - x_elem) + 'px';
+        selected.style.top = (y_pos - y_elem) + 'px';
+    }
+}
+
+// Destroy the object when we are done
+function _drop_elem() {
+    if (selected !== null) {
+
+        x_pos = Math.min(Math.max(x_pos, x_min), x_max);
+        y_pos = Math.min(Math.max(y_pos, y_min), x_max);
+        selected.style.left = (x_pos - x_elem) + 'px';
+        selected.style.top = (y_pos - y_elem) + 'px';
+    }
+    selected = null;
+
+}
+document.addEventListener('readystatechange', event => {
+    if (event.target.readyState === "interactive") {
+
+        // Bind the functions...
+        document.getElementById('circle').onmousedown = function () {
+            _drag_init(this);
+            return false;
+        };
+    }
+});
+
+
+document.onmousemove = _move_elem;
+document.onmouseup = _drop_elem;
+
+var gap = 200;
+var x_min = gap;
+var x_max = window.innerWidth - gap;
+var y_min = gap;
+var y_max = window.innerHeight - gap;
