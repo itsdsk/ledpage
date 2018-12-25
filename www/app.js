@@ -37,8 +37,8 @@ io.on('connection', function (socket) {
     media.playLocalMedia(msg);
   });
   // create disk
-  socket.on('createdisk', function () {
-    media.createDisk('channel2');
+  socket.on('createdisk', function (msg) {
+    media.createDisk(msg);
   });
   // update file
   socket.on('updatefile', function (msg) {

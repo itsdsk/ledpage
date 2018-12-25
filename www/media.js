@@ -190,7 +190,7 @@ module.exports = {
     loadChannel: function (channel_name, callback) {
         var elements = "";
         // get channel element at start
-        templateChannel(channel_name, function (channel_element) {
+        templateChannel(channel_name, true, function (channel_element) {
             elements = channel_element;
             // get all disks in specified channel
             var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
@@ -211,7 +211,7 @@ module.exports = {
 
 function serveChannelAndDisks(channel_name, disk_directories, callback) {
     var element = "";
-    templateChannel(channel_name, function (channel_element) {
+    templateChannel(channel_name, false, function (channel_element) {
         element += channel_element;
         serveDiskArray(disk_directories, function (disk_elements) {
             element += disk_elements;
@@ -236,10 +236,11 @@ function serveDiskArray(titles, callback) {
     repeat(titles.pop());
 }
 
-function templateChannel(channel_name, callback) {
+function templateChannel(channel_name, create_flag, callback) {
     // count number of disks in channel
     var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
     db.get(countQuery, [channel_name], (err, count) => {
+        count.create = create_flag;
         var element = channelCompiler(count);
         callback(element);
     });
