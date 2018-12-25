@@ -188,16 +188,22 @@ module.exports = {
         });
     },
     loadChannel: function (channel_name, callback) {
-        // get all disks in specified channel
-        var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
-            "ON disks.directory = connections.disk_directory " +
-            "AND connections.channel_name = ?";
-        db.all(selectQuery, [channel_name], function (err, rows) {
-            // get disk PKs as array of strings
-            let disk_directories = rows.map(a => a.directory);
-            // 
-            serveDiskArray(disk_directories, function (elements) {
-                callback(elements);
+        var elements = "";
+        // get channel element at start
+        templateChannel(channel_name, function (channel_element) {
+            elements = channel_element;
+            // get all disks in specified channel
+            var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
+                "ON disks.directory = connections.disk_directory " +
+                "AND connections.channel_name = ?";
+            db.all(selectQuery, [channel_name], function (err, rows) {
+                // get disk PKs as array of strings
+                let disk_directories = rows.map(a => a.directory);
+                // 
+                serveDiskArray(disk_directories, function (disk_elements) {
+                    elements += disk_elements;
+                    callback(elements);
+                });
             });
         });
     }
@@ -215,7 +221,6 @@ function serveChannelAndDisks(channel_name, disk_directories, callback) {
 }
 
 function serveDiskArray(titles, callback) {
-
     var object = "";
 
     function repeat(title) {
@@ -226,7 +231,6 @@ function serveDiskArray(titles, callback) {
             } else {
                 callback(object);
             }
-
         });
     }
     repeat(titles.pop());
@@ -241,13 +245,13 @@ function templateChannel(channel_name, callback) {
     });
 }
 
-function templateDisk(key, callback) {
+function templateDisk(disk_directory, callback) {
     // fetch entry requested in [key] arg from disks table
     var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
-    db.get(sql, [key], (err, itemrow) => {
+    db.get(sql, [disk_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
-        db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [key], function (err, filerows) {
+        db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [disk_directory], function (err, filerows) {
             filerows.forEach(function (filerow) {
                 // add each file to object
                 itemrow.files.push(filerow);
@@ -259,7 +263,7 @@ function templateDisk(key, callback) {
             var getChannelsQuery = "SELECT channels.name, connections.disk_directory FROM channels LEFT JOIN connections " +
                 "ON channels.name = connections.channel_name " +
                 "AND connections.disk_directory = ?";
-            db.all(getChannelsQuery, [key], function (err, chanrows) {
+            db.all(getChannelsQuery, [disk_directory], function (err, chanrows) {
                 // loop through channels
                 chanrows.forEach(function (chanrow) {
                     // check if channel is connected
