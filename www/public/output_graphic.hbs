@@ -4,10 +4,13 @@
     {{#unless @first}}
     x2="{{x}}" y2="{{y}}" />
     {{/unless}}
-    <circle cx="{{x}}" cy="{{y}}" r="{{r}}" id="c_{{number}}" />
+    <circle cx="{{x}}" cy="{{y}}" r="{{r}}" id="c_{{number}}" class="{{../device}}" />
     {{#unless @last}}
     <line id="c_{{number}}l" x1="{{x}}" y1="{{y}}"
     {{/unless}}
     {{/each}}
     {{/each}}
 </svg>
+<div id="outputForms">
+    <button onclick="updateLeds()">Update LEDs</button>
+</div>

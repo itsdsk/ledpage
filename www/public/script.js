@@ -33,6 +33,21 @@ socket.on('loadoutputgraphic', function (msg) {
     });
 });
 
+function updateLeds() {
+    var data = [];
+    document.querySelectorAll("circle").forEach(function (circle) {
+        var datum = {
+            "device": circle.className.baseVal,
+            "number": parseInt(circle.id.slice(-1)),
+            "x": circle.cx.baseVal.value,
+            "y": circle.cy.baseVal.value,
+            "r": circle.r.baseVal.value
+        };
+        data.push(datum);
+    });
+    socket.emit('updateleds', data);
+}
+
 function updateFile(directory, filename, fileIndex) {
     var html = document.querySelector('#' + directory + '_' + fileIndex).value;
     var data = {

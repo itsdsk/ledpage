@@ -38,6 +38,10 @@ io.on('connection', function (socket) {
       io.emit('loadoutputgraphic', elements);
     });
   });
+  // update leds
+  socket.on('updateleds', function (msg) {
+    console.log(msg);
+  });
   // play demo
   socket.on('play', function (msg) {
     media.playLocalMedia(msg);
