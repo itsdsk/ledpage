@@ -25,7 +25,9 @@ socket.on('loadoutputgraphic', function (msg) {
     // add event for dragging to circles
     document.querySelectorAll("circle").forEach(function (circle) {
         circle.onmousedown = function () {
-            _drag_init(this);
+            var _lineIn = document.querySelector("#c_" + (parseInt(circle.id.slice(-1)) - 1) + "l");
+            var _lineOut = document.querySelector("#" + circle.id + "l");
+            _drag_init(this, _lineIn, _lineOut);
             return false;
         };
     });
@@ -80,15 +82,19 @@ function channelSearch(directory) {
 //
 
 var selected = null, // Object of the element to be moved
+    lineIn = null,
+    lineOut = null,
     x_pos = 0,
     y_pos = 0, // Stores x & y coordinates of the mouse pointer
     x_elem = 0,
     y_elem = 0; // Stores top, left values (edge) of the element
 
 // Will be called when user starts dragging an element
-function _drag_init(elem) {
+function _drag_init(elem, _lineIn, _lineOut) {
     // Store the object of the element which needs to be moved
     selected = elem;
+    lineIn = _lineIn;
+    lineOut = _lineOut;
     x_elem = x_pos - selected.cx.baseVal.value;
     y_elem = y_pos - selected.cy.baseVal.value;
 }
@@ -98,8 +104,16 @@ function _move_elem(e) {
     x_pos = document.all ? window.event.clientX : e.pageX;
     y_pos = document.all ? window.event.clientY : e.pageY;
     if (selected !== null) {
-        selected.cx.baseVal.value = (x_pos - x_elem);
-        selected.cy.baseVal.value = (y_pos - y_elem);
+        selected.cx.baseVal.value = x_pos - x_elem;
+        selected.cy.baseVal.value = y_pos - y_elem;
+        if (lineIn) {
+            lineIn.x2.baseVal.value = x_pos - x_elem;
+            lineIn.y2.baseVal.value = y_pos - y_elem;
+        }
+        if (lineOut) {
+            lineOut.x1.baseVal.value = x_pos - x_elem;
+            lineOut.y1.baseVal.value = y_pos - y_elem;
+        }
     }
 }
 
@@ -110,6 +124,14 @@ function _drop_elem() {
         y_pos = Math.min(Math.max(y_pos - y_elem, y_min), x_max);
         selected.cx.baseVal.value = x_pos;
         selected.cy.baseVal.value = y_pos;
+        if (lineIn) {
+            lineIn.x2.baseVal.value = x_pos;
+            lineIn.y2.baseVal.value = y_pos;
+        }
+        if (lineOut) {
+            lineOut.x1.baseVal.value = x_pos;
+            lineOut.y1.baseVal.value = y_pos;
+        }
     }
     selected = null;
 }

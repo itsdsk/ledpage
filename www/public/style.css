@@ -27,3 +27,12 @@ body {
 #outputGraphic {
     text-align: center;
 }
+
+circle {
+    fill: white;
+}
+
+line {
+    stroke: white;
+    stroke-width: 25;
+}

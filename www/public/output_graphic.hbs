@@ -1,7 +1,13 @@
 <svg width="{{width}}" height="{{height}}">
     {{#each outputs}}
     {{#each leds}}
+    {{#unless @first}}
+    x2="{{x}}" y2="{{y}}" />
+    {{/unless}}
     <circle cx="{{x}}" cy="{{y}}" r="{{r}}" id="c_{{number}}" />
+    {{#unless @last}}
+    <line id="c_{{number}}l" x1="{{x}}" y1="{{y}}"
+    {{/unless}}
     {{/each}}
     {{/each}}
 </svg>
