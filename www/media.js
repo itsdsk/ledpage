@@ -261,15 +261,11 @@ module.exports = {
                         "leds": ledrows
                     };
                     config.outputs.push(output);
-                    console.log("config: " + JSON.stringify(config));
                     element = outputGraphicCompiler(config);
                     callback(element);
                 });
-                //console.log("output device: " + JSON.stringify(outrow));
             });
         });
-        // element = outputGraphicCompiler();
-        // callback(element);
     }
 };
 

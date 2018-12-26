@@ -35,7 +35,6 @@ io.on('connection', function (socket) {
   // request output graphic
   socket.on('loadoutputgraphic', function () {
     media.loadOutputGraphic(function (elements) {
-      console.log(elements);
       io.emit('loadoutputgraphic', elements);
     });
   });

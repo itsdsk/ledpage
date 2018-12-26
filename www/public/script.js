@@ -7,8 +7,28 @@ socket.on('load', function (msg) {
 });
 
 socket.emit('loadoutputgraphic');
+var s_width = 0,
+    s_height = 0;
+var gap = 50;
+var x_min = gap;
+var x_max = 0;
+var y_min = gap;
+var y_max = 0;
 socket.on('loadoutputgraphic', function (msg) {
+    // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
+    // get SVG width+height and set boundaries
+    s_width = document.querySelector("svg").width.baseVal.value;
+    s_height = document.querySelector("svg").height.baseVal.value;
+    x_max = s_width - gap;
+    y_max = s_height - gap;
+    // add event for dragging to circles
+    document.querySelectorAll("circle").forEach(function (circle) {
+        circle.onmousedown = function () {
+            _drag_init(this);
+            return false;
+        };
+    });
 });
 
 function updateFile(directory, filename, fileIndex) {
@@ -69,8 +89,8 @@ var selected = null, // Object of the element to be moved
 function _drag_init(elem) {
     // Store the object of the element which needs to be moved
     selected = elem;
-    x_elem = x_pos - selected.offsetLeft;
-    y_elem = y_pos - selected.offsetTop;
+    x_elem = x_pos - selected.cx.baseVal.value;
+    y_elem = y_pos - selected.cy.baseVal.value;
 }
 
 // Will be called when user dragging an element
@@ -78,40 +98,21 @@ function _move_elem(e) {
     x_pos = document.all ? window.event.clientX : e.pageX;
     y_pos = document.all ? window.event.clientY : e.pageY;
     if (selected !== null) {
-        selected.style.left = (x_pos - x_elem) + 'px';
-        selected.style.top = (y_pos - y_elem) + 'px';
+        selected.cx.baseVal.value = (x_pos - x_elem);
+        selected.cy.baseVal.value = (y_pos - y_elem);
     }
 }
 
 // Destroy the object when we are done
 function _drop_elem() {
     if (selected !== null) {
-
-        x_pos = Math.min(Math.max(x_pos, x_min), x_max);
-        y_pos = Math.min(Math.max(y_pos, y_min), x_max);
-        selected.style.left = (x_pos - x_elem) + 'px';
-        selected.style.top = (y_pos - y_elem) + 'px';
+        x_pos = Math.min(Math.max(x_pos - x_elem, x_min), x_max);
+        y_pos = Math.min(Math.max(y_pos - y_elem, y_min), x_max);
+        selected.cx.baseVal.value = x_pos;
+        selected.cy.baseVal.value = y_pos;
     }
     selected = null;
-
 }
-document.addEventListener('readystatechange', event => {
-    if (event.target.readyState === "interactive") {
-
-        // Bind the functions...
-        document.getElementById('circle').onmousedown = function () {
-            _drag_init(this);
-            return false;
-        };
-    }
-});
-
 
 document.onmousemove = _move_elem;
 document.onmouseup = _drop_elem;
-
-var gap = 200;
-var x_min = gap;
-var x_max = window.innerWidth - gap;
-var y_min = gap;
-var y_max = window.innerHeight - gap;
