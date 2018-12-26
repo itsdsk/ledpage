@@ -1,16 +1,16 @@
-<svg width="{{width}}" height="{{height}}">
+<svg width="{{window.width}}" height="{{window.height}}">
     {{#each outputs}}
     {{#each leds}}
     {{#unless @first}}
     x2="{{x}}" y2="{{y}}" />
     {{/unless}}
-    <circle cx="{{x}}" cy="{{y}}" r="{{r}}" id="c_{{number}}" class="{{../device}}" />
+    <circle cx="{{x}}" cy="{{y}}" r="{{r}}" id="c_{{index}}" class="{{../device}}" />
     {{#unless @last}}
-    <line id="c_{{number}}l" x1="{{x}}" y1="{{y}}"
+    <line id="c_{{index}}l" x1="{{x}}" y1="{{y}}"
     {{/unless}}
     {{/each}}
     {{/each}}
 </svg>
 <div id="outputForms">
-    <button onclick="updateLeds()">Update LEDs</button>
+    <button onclick="socket.emit('saveconfig');">Save</button>
 </div>

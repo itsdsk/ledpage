@@ -67,6 +67,9 @@ io.on('connection', function (socket) {
   socket.on('createconnection', function (msg) {
     media.createConnection(msg);
   });
+  socket.on('saveconfig', function () {
+    media.saveConfig();
+  });
 });
 
 http.listen(3000, function () {

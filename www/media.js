@@ -6,11 +6,10 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
 
 db.serialize(function () {
-    // create tables for primitive types (disk, channel and output)
+    // create tables for primitive types (disk and channel)
     db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
-    db.run("CREATE TABLE outputs (device TEXT PRIMARY KEY, type TEXT, colorOrder TEXT, rate INTEGER)");
-    // create tables for relational types (files, connections, leds)
+    // create tables for relational types (files and connections)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "UNIQUE(disk_directory, filename))");
@@ -18,10 +17,6 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
-    db.run("CREATE TABLE leds (output_device TEXT NOT NULL, number INTEGER NOT NULL," +
-        "x INTEGER NOT NULL, y INTEGER NOT NULL, r INTEGER NOT NULL," +
-        "FOREIGN KEY(output_device) REFERENCES outputs(device)," +
-        "UNIQUE(output_device, number))");
     // add test data
     // db.run("INSERT INTO channels (name) VALUES ('channel2')");
     // db.run("INSERT INTO channels (name) VALUES ('channel3')");
@@ -71,21 +66,6 @@ module.exports = {
         var configPath = path.join(__dirname, 'engine', 'config.json');
         // TODO: check if file exists and copy default if not
         config = require(configPath);
-        // for each output in config
-        config.outputs.forEach(output => {
-            // add output properties to table
-            var insertOutputQuery = "INSERT INTO outputs (device, type, colorOrder, rate) VALUES (?, ?, ?, ?)";
-            var insertLedQuery = "INSERT INTO leds (output_device, number, x, y, r) VALUES (?, ?, ?, ?, ?)";
-            db.run(insertOutputQuery, [output.device, output.type, output.colorOrder, output.rate], function () {
-                // add LEDs to table
-                output.leds.forEach(led => {
-                    //console.log(output.device + " led: " + JSON.stringify(led));
-                    db.run(insertLedQuery, [output.device, led.index, led.x, led.y, led.r]);
-                });
-            });
-            //console.log("output: " + JSON.stringify(output));
-        });
-        //console.log("config: " + JSON.stringify(config, null, 2));
     },
     createDisk: function (channelName) {
         // path of new disk
@@ -242,36 +222,23 @@ module.exports = {
         });
     },
     loadOutputGraphic: function (callback) {
-        var element = "";
-        var graphicConfig = {
-            "width": config.window.width,
-            "height": config.window.height,
-            "outputs": []
-        };
-        var selectOutputsQuery = "SELECT * FROM outputs";
-        var selectLedsQuery = "SELECT * FROM leds WHERE output_device = ?";
-        db.all(selectOutputsQuery, function (err, outrows) {
-            // loop through outputs // TODO: make this work for multiple outputs
-            outrows.forEach(function (outrow) {
-                // get all LEDs of output
-                db.all(selectLedsQuery, [outrow.device], function (err, ledrows) {
-                    //
-                    var output = {
-                        "device": outrow.device,
-                        "leds": ledrows
-                    };
-                    graphicConfig.outputs.push(output);
-                    element = outputGraphicCompiler(graphicConfig);
-                    callback(element);
-                });
-            });
-        });
+        var element = outputGraphicCompiler(config);
+        callback(element);
     },
     updateLeds: function (msg) {
-        var updateLedQuery = "UPDATE leds SET x = ?, y = ?, r = ? WHERE output_device = ? AND number = ?";
-        msg.forEach(function (led) {
-            // update in database
-            db.run(updateLedQuery, [led.x, led.y, led.r, led.device, led.number]);
+        // for each object in received array
+        msg.forEach(function (obj) {
+            var output = config.outputs.find(x => x.device === obj.device);
+            var led = output.leds.find(x => x.index === obj.index);
+            led.x = obj.x;
+            led.y = obj.y;
+            led.r = obj.r;
+        });
+    },
+    saveConfig: function () {
+        var configPath = path.join(__dirname, 'engine', 'config.json');
+        fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
+            if (err) console.log(err);
         });
     }
 };

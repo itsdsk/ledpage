@@ -38,7 +38,7 @@ function updateLeds() {
     document.querySelectorAll("circle").forEach(function (circle) {
         var datum = {
             "device": circle.className.baseVal,
-            "number": parseInt(circle.id.slice(-1)),
+            "index": parseInt(circle.id.slice(-1)),
             "x": circle.cx.baseVal.value,
             "y": circle.cy.baseVal.value,
             "r": circle.r.baseVal.value
@@ -151,7 +151,7 @@ function _drop_elem() {
         // send update to server
         var datum = {
             "device": selected.className.baseVal,
-            "number": parseInt(selected.id.slice(-1)),
+            "index": parseInt(selected.id.slice(-1)),
             "x": selected.cx.baseVal.value,
             "y": selected.cy.baseVal.value,
             "r": selected.r.baseVal.value
