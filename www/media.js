@@ -6,10 +6,11 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
 
 db.serialize(function () {
-    // create tables for primitive types (disk and channel)
+    // create tables for primitive types (disk, channel and output)
     db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
-    // create tables for relational types (files and connections)
+    db.run("CREATE TABLE outputs (device TEXT PRIMARY KEY, type TEXT, colorOrder TEXT, rate INTEGER)");
+    // create tables for relational types (files, connections, leds)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "UNIQUE(disk_directory, filename))");
@@ -17,6 +18,10 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
+    db.run("CREATE TABLE leds (output_device TEXT NOT NULL, number INTEGER NOT NULL," +
+        "x INTEGER NOT NULL, y INTEGER NOT NULL, r INTEGER NOT NULL," +
+        "FOREIGN KEY(output_device) REFERENCES outputs(device)," +
+        "UNIQUE(output_device, number))");
     // add test data
     // db.run("INSERT INTO channels (name) VALUES ('channel2')");
     // db.run("INSERT INTO channels (name) VALUES ('channel3')");
@@ -57,6 +62,25 @@ module.exports = {
                 });
             });
         });
+        // read config JSON
+        var configPath = path.join(__dirname, 'engine', 'config.json');
+        // TODO: check if file exists and copy default if not
+        var config = require(configPath);
+        // for each output in config
+        config.outputs.forEach(output => {
+            // add output properties to table
+            var insertOutputQuery = "INSERT INTO outputs (device, type, colorOrder, rate) VALUES (?, ?, ?, ?)";
+            var insertLedQuery = "INSERT INTO leds (output_device, number, x, y, r) VALUES (?, ?, ?, ?, ?)";
+            db.run(insertOutputQuery, [output.device, output.type, output.colorOrder, output.rate], function() {
+                // add LEDs to table
+                output.leds.forEach(led => {
+                    //console.log(output.device + " led: " + JSON.stringify(led));
+                    db.run(insertLedQuery, [output.device, led.index, led.x, led.y, led.r]);
+                });
+            });
+            //console.log("output: " + JSON.stringify(output));
+        });
+        //console.log("config: " + JSON.stringify(config, null, 2));
     },
     createDisk: function (channelName) {
         // path of new disk
@@ -104,7 +128,12 @@ module.exports = {
         db.each("SELECT * FROM connections", function (err, row) {
             console.log("CONNECTION: " + row.disk_directory + " " + row.channel_name);
         });
-
+        db.each("SELECT * FROM outputs", function (err, row) {
+            console.log("OUTPUT: " + JSON.stringify(row));
+        });
+        db.each("SELECT * FROM leds", function (err, row) {
+            console.log("LED: " + JSON.stringify(row));
+        });
     },
     createChannel: function (msg) {
         var createQuery = "INSERT INTO channels (name) VALUES (?)";

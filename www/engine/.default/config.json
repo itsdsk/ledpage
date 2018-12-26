@@ -1,0 +1,38 @@
+{
+    "window": {
+        "width": 640,
+        "height": 640
+    },
+    "outputs": [{
+        "type": "WS2812",
+        "colorOrder": "rgb",
+        "device": "/dev/ttyACM0",
+        "rate": 460800,
+        "leds": [
+            {
+                "index": 0,
+                "x": 160,
+                "y": 160,
+                "r": 50
+            },
+            {
+                "index": 1,
+                "x": 480,
+                "y": 160,
+                "r": 50
+            },
+            {
+                "index": 2,
+                "x": 480,
+                "y": 480,
+                "r": 50
+            },
+            {
+                "index": 3,
+                "x": 160,
+                "y": 480,
+                "r": 50
+            }
+        ]
+    }]
+}
