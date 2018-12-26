@@ -1,8 +1,14 @@
 var socket = io();
+
 socket.emit('load');
 socket.on('load', function (msg) {
     //console.log(msg);
     document.getElementById("container").innerHTML += (msg);
+});
+
+socket.emit('loadoutputgraphic');
+socket.on('loadoutputgraphic', function (msg) {
+    document.getElementById("outputGraphic").innerHTML = msg;
 });
 
 function updateFile(directory, filename, fileIndex) {

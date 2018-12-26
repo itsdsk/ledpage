@@ -32,6 +32,13 @@ io.on('connection', function (socket) {
       io.emit('load', elements);
     });
   });
+  // request output graphic
+  socket.on('loadoutputgraphic', function () {
+    media.loadOutputGraphic(function (elements) {
+      console.log(elements);
+      io.emit('loadoutputgraphic', elements);
+    });
+  });
   // play demo
   socket.on('play', function (msg) {
     media.playLocalMedia(msg);

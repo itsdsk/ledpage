@@ -38,6 +38,11 @@ fs.readFile(path.join(__dirname, "public", "channel.hbs"), function (err, data) 
     if (err) throw err;
     channelCompiler = Handlebars.compile(data.toString());
 });
+var outputGraphicCompiler;
+fs.readFile(path.join(__dirname, "public", "output_graphic.hbs"), function (err, data) {
+    if (err) throw err;
+    outputGraphicCompiler = Handlebars.compile(data.toString());
+});
 
 var mediaDir = path.join(__dirname, 'disks');
 
@@ -71,7 +76,7 @@ module.exports = {
             // add output properties to table
             var insertOutputQuery = "INSERT INTO outputs (device, type, colorOrder, rate) VALUES (?, ?, ?, ?)";
             var insertLedQuery = "INSERT INTO leds (output_device, number, x, y, r) VALUES (?, ?, ?, ?, ?)";
-            db.run(insertOutputQuery, [output.device, output.type, output.colorOrder, output.rate], function() {
+            db.run(insertOutputQuery, [output.device, output.type, output.colorOrder, output.rate], function () {
                 // add LEDs to table
                 output.leds.forEach(led => {
                     //console.log(output.device + " led: " + JSON.stringify(led));
@@ -235,6 +240,36 @@ module.exports = {
                 });
             });
         });
+    },
+    loadOutputGraphic: function (callback) {
+        var element = "";
+        var config = {
+            "width": 640,
+            "height": 640,
+            "outputs": []
+        };
+        var selectOutputsQuery = "SELECT * FROM outputs";
+        var selectLedsQuery = "SELECT * FROM leds WHERE output_device = ?";
+        db.all(selectOutputsQuery, function (err, outrows) {
+            // loop through outputs // TODO: make this work for multiple outputs
+            outrows.forEach(function (outrow) {
+                // get all LEDs of output
+                db.all(selectLedsQuery, [outrow.device], function (err, ledrows) {
+                    //
+                    var output = {
+                        "device": outrow.device,
+                        "leds": ledrows
+                    };
+                    config.outputs.push(output);
+                    console.log("config: " + JSON.stringify(config));
+                    element = outputGraphicCompiler(config);
+                    callback(element);
+                });
+                //console.log("output device: " + JSON.stringify(outrow));
+            });
+        });
+        // element = outputGraphicCompiler();
+        // callback(element);
     }
 };
 
