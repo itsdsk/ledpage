@@ -40,7 +40,7 @@ io.on('connection', function (socket) {
   });
   // update leds
   socket.on('updateleds', function (msg) {
-    console.log(msg);
+    media.updateLeds(msg);
   });
   // play demo
   socket.on('play', function (msg) {

@@ -134,6 +134,7 @@ function _move_elem(e) {
 
 // Destroy the object when we are done
 function _drop_elem() {
+    // keep led in boundaries
     if (selected !== null) {
         x_pos = Math.min(Math.max(x_pos - x_elem, x_min), x_max);
         y_pos = Math.min(Math.max(y_pos - y_elem, y_min), x_max);
@@ -147,7 +148,17 @@ function _drop_elem() {
             lineOut.x1.baseVal.value = x_pos;
             lineOut.y1.baseVal.value = y_pos;
         }
+        // send update to server
+        var datum = {
+            "device": selected.className.baseVal,
+            "number": parseInt(selected.id.slice(-1)),
+            "x": selected.cx.baseVal.value,
+            "y": selected.cy.baseVal.value,
+            "r": selected.r.baseVal.value
+        };
+        socket.emit('updateleds', [datum]);
     }
+    // reset
     selected = null;
 }
 

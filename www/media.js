@@ -45,7 +45,7 @@ fs.readFile(path.join(__dirname, "public", "output_graphic.hbs"), function (err,
 });
 
 var mediaDir = path.join(__dirname, 'disks');
-
+var config; // device config
 module.exports = {
     // build local database in memory
     generateDb: function () {
@@ -70,7 +70,7 @@ module.exports = {
         // read config JSON
         var configPath = path.join(__dirname, 'engine', 'config.json');
         // TODO: check if file exists and copy default if not
-        var config = require(configPath);
+        config = require(configPath);
         // for each output in config
         config.outputs.forEach(output => {
             // add output properties to table
@@ -243,9 +243,9 @@ module.exports = {
     },
     loadOutputGraphic: function (callback) {
         var element = "";
-        var config = {
-            "width": 640,
-            "height": 640,
+        var graphicConfig = {
+            "width": config.window.width,
+            "height": config.window.height,
             "outputs": []
         };
         var selectOutputsQuery = "SELECT * FROM outputs";
@@ -260,11 +260,18 @@ module.exports = {
                         "device": outrow.device,
                         "leds": ledrows
                     };
-                    config.outputs.push(output);
-                    element = outputGraphicCompiler(config);
+                    graphicConfig.outputs.push(output);
+                    element = outputGraphicCompiler(graphicConfig);
                     callback(element);
                 });
             });
+        });
+    },
+    updateLeds: function (msg) {
+        var updateLedQuery = "UPDATE leds SET x = ?, y = ?, r = ? WHERE output_device = ? AND number = ?";
+        msg.forEach(function (led) {
+            // update in database
+            db.run(updateLedQuery, [led.x, led.y, led.r, led.device, led.number]);
         });
     }
 };
