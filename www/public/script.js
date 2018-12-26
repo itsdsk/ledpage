@@ -6,7 +6,7 @@ socket.on('load', function (msg) {
     document.getElementById("container").innerHTML += (msg);
 });
 
-socket.emit('loadoutputgraphic');
+socket.emit('loadoutput');
 var s_width = 0,
     s_height = 0;
 var gap = 50;
@@ -14,7 +14,7 @@ var x_min = gap;
 var x_max = 0;
 var y_min = gap;
 var y_max = 0;
-socket.on('loadoutputgraphic', function (msg) {
+socket.on('loadoutput', function (msg) {
     // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
     // get SVG width+height and set boundaries
@@ -32,6 +32,21 @@ socket.on('loadoutputgraphic', function (msg) {
         };
     });
 });
+
+function updateConfig() {
+    var data = [];
+    document.querySelectorAll("#outputForm div").forEach(function (outputForm) {
+        var datum = {
+            "id": outputForm.className,
+            "values": {}
+        }
+        outputForm.querySelectorAll("textarea").forEach(function (textArea) {
+            datum.values[textArea.className] = textArea.value;
+        });
+        data.push(datum);
+    });
+    socket.emit('updateoutputs', data);
+}
 
 function updateLeds() {
     var data = [];

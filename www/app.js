@@ -33,9 +33,9 @@ io.on('connection', function (socket) {
     });
   });
   // request output graphic
-  socket.on('loadoutputgraphic', function () {
-    media.loadOutputGraphic(function (elements) {
-      io.emit('loadoutputgraphic', elements);
+  socket.on('loadoutput', function () {
+    media.loadOutput(function (elements) {
+      io.emit('loadoutput', elements);
     });
   });
   // update leds
@@ -67,6 +67,11 @@ io.on('connection', function (socket) {
   socket.on('createconnection', function (msg) {
     media.createConnection(msg);
   });
+  // update output
+  socket.on('updateoutputs', function (msg) {
+    media.updateOutputs(msg);
+  });
+  // save config file
   socket.on('saveconfig', function () {
     media.saveConfig();
   });

@@ -38,6 +38,11 @@ fs.readFile(path.join(__dirname, "public", "output_graphic.hbs"), function (err,
     if (err) throw err;
     outputGraphicCompiler = Handlebars.compile(data.toString());
 });
+var outputFormCompiler;
+fs.readFile(path.join(__dirname, "public", "output_form.hbs"), function (err, data) {
+    if (err) throw err;
+    outputFormCompiler = Handlebars.compile(data.toString());
+});
 
 var mediaDir = path.join(__dirname, 'disks');
 var config; // device config
@@ -221,8 +226,9 @@ module.exports = {
             });
         });
     },
-    loadOutputGraphic: function (callback) {
+    loadOutput: function (callback) {
         var element = outputGraphicCompiler(config);
+        element += "<br>" + outputFormCompiler(config);
         callback(element);
     },
     updateLeds: function (msg) {
@@ -233,6 +239,15 @@ module.exports = {
             led.x = obj.x;
             led.y = obj.y;
             led.r = obj.r;
+        });
+    },
+    updateOutputs: function (msg) {
+        msg.forEach(function (obj) {
+            var output = config.outputs.find(x => x.device === obj.id);
+            for (var value in obj.values) {
+                if (!obj.values.hasOwnProperty(value)) continue;
+                output[value] = obj.values[value];
+            }
         });
     },
     saveConfig: function () {

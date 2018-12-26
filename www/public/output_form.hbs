@@ -1,0 +1,13 @@
+<div id="outputForm">
+    {{#each outputs}}
+    <div class="{{device}}">
+        <label for="o_device{{@index}}">Device:</label>
+        <textarea id="o_device{{@index}}" rows="1" class="device">{{device}}</textarea>
+        <label for="o_type{{@index}}">Type:</label>
+        <textarea id="o_type{{@index}}" rows="1" class="type">{{type}}</textarea>
+        <label for="o_color{{@index}}">Colour Order:</label>
+        <textarea id="o_color{{@index}}" rows="1" class="colorOrder">{{colorOrder}}</textarea>
+    </div>
+    {{/each}}
+    <button onclick="updateConfig()">Update Config</button>
+</div>
