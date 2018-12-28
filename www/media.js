@@ -95,8 +95,11 @@ module.exports = {
                             if (err) console.log(err);
                             fs.copyFile(path.join(pathToDefault, 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
                                 if (err) console.log(err);
-                                // add to database
-                                parseDiskDirectory(randomName, meta);
+                                fs.copyFile(path.join(pathToDefault, 'thumb.jpg'), path.join(newDirectory, 'thumb.jpg'), (err) => {
+                                    if (err) console.log(err);
+                                    // add to database
+                                    parseDiskDirectory(randomName, meta);
+                                });
                             });
                         });
                     });
@@ -233,20 +236,20 @@ module.exports = {
     },
     updateConfig: function (msg) {
         // update window
-        if(msg.window){
+        if (msg.window) {
             config.window = Object.assign(config.window, msg.window);
         }
         // update output
-        if(msg.outputs){
+        if (msg.outputs) {
             // find correct output
             msg.outputs.forEach(function (msgoutput) {
                 var output = config.outputs.find(x => x.device === msgoutput.device);
                 // update output properties
-                if(msgoutput.properties){
+                if (msgoutput.properties) {
                     output.properties = Object.assign(output.properties, msgoutput.properties);
                 }
                 // update output leds
-                if(msgoutput.leds){
+                if (msgoutput.leds) {
                     // find correct led
                     msgoutput.leds.forEach(function (msgled) {
                         var led = output.leds.find(x => x.index === msgled.index);
