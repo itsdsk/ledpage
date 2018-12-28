@@ -38,9 +38,13 @@ io.on('connection', function (socket) {
       io.emit('loadoutput', elements);
     });
   });
-  // update leds
-  socket.on('updateleds', function (msg) {
-    media.updateLeds(msg);
+  // update config
+  socket.on('updateconfig', function (msg) {
+    media.updateConfig(msg);
+  });
+  // save config file
+  socket.on('saveconfig', function () {
+    media.saveConfig();
   });
   // play demo
   socket.on('play', function (msg) {
@@ -66,14 +70,6 @@ io.on('connection', function (socket) {
   // create connection
   socket.on('createconnection', function (msg) {
     media.createConnection(msg);
-  });
-  // update output
-  socket.on('updateoutputs', function (msg) {
-    media.updateOutputs(msg);
-  });
-  // save config file
-  socket.on('saveconfig', function () {
-    media.saveConfig();
   });
 });
 

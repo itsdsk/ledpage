@@ -1,14 +1,16 @@
 {
     "window": {
-        "width": 640,
-        "height": 640
+        "width": "640",
+        "height": "640"
     },
     "outputs": [
         {
             "device": "/dev/ttyACM0",
-            "type": "WS2812",
-            "colorOrder": "rgb",
-            "rate": 460800,
+            "properties": {
+                "type": "WS2812",
+                "colorOrder": "rgb",
+                "rate": "460800"
+            },
             "leds": [
                 {
                     "index": 0,
@@ -32,6 +34,40 @@
                     "index": 3,
                     "x": 160,
                     "y": 480,
+                    "r": 50
+                }
+            ]
+        },
+        {
+            "device": "/dev/ttyACM1",
+            "properties": {
+                "type": "WS2812",
+                "colorOrder": "rgb",
+                "rate": "460800"
+            },
+            "leds": [
+                {
+                    "index": 0,
+                    "x": 320,
+                    "y": 80,
+                    "r": 50
+                },
+                {
+                    "index": 1,
+                    "x": 560,
+                    "y": 320,
+                    "r": 50
+                },
+                {
+                    "index": 2,
+                    "x": 320,
+                    "y": 560,
+                    "r": 50
+                },
+                {
+                    "index": 3,
+                    "x": 80,
+                    "y": 320,
                     "r": 50
                 }
             ]

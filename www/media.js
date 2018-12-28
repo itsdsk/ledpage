@@ -231,24 +231,31 @@ module.exports = {
         element += "<br>" + outputFormCompiler(config);
         callback(element);
     },
-    updateLeds: function (msg) {
-        // for each object in received array
-        msg.forEach(function (obj) {
-            var output = config.outputs.find(x => x.device === obj.device);
-            var led = output.leds.find(x => x.index === obj.index);
-            led.x = obj.x;
-            led.y = obj.y;
-            led.r = obj.r;
-        });
-    },
-    updateOutputs: function (msg) {
-        msg.forEach(function (obj) {
-            var output = config.outputs.find(x => x.device === obj.id);
-            for (var value in obj.values) {
-                if (!obj.values.hasOwnProperty(value)) continue;
-                output[value] = obj.values[value];
-            }
-        });
+    updateConfig: function (msg) {
+        // update window
+        if(msg.window){
+            config.window = Object.assign(config.window, msg.window);
+        }
+        // update output
+        if(msg.outputs){
+            // find correct output
+            msg.outputs.forEach(function (msgoutput) {
+                var output = config.outputs.find(x => x.device === msgoutput.device);
+                // update output properties
+                if(msgoutput.properties){
+                    output.properties = Object.assign(output.properties, msgoutput.properties);
+                }
+                // update output leds
+                if(msgoutput.leds){
+                    // find correct led
+                    msgoutput.leds.forEach(function (msgled) {
+                        var led = output.leds.find(x => x.index === msgled.index);
+                        // update led properties
+                        led = Object.assign(led, msgled);
+                    });
+                }
+            });
+        }
     },
     saveConfig: function () {
         var configPath = path.join(__dirname, 'engine', 'config.json');

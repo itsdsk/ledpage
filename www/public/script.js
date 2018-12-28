@@ -25,7 +25,8 @@ socket.on('loadoutput', function (msg) {
     // add event for dragging to circles
     document.querySelectorAll("circle").forEach(function (circle) {
         circle.onmousedown = function () {
-            var _lineIn = document.querySelector("#c_" + (parseInt(circle.id.slice(-1)) - 1) + "l");
+            // circle id (e.g. output 0 circle 1 = "o0_c1") has connected line IN with id "o0_c0l" and line OUT with id "o0_c1l"
+            var _lineIn = document.querySelector("#" + circle.id.replace(/.$/, parseInt(circle.id.slice(-1)) - 1) + "l");
             var _lineOut = document.querySelector("#" + circle.id + "l");
             _drag_init(this, _lineIn, _lineOut);
             return false;
@@ -34,33 +35,28 @@ socket.on('loadoutput', function (msg) {
 });
 
 function updateConfig() {
-    var data = [];
-    document.querySelectorAll("#outputForm div").forEach(function (outputForm) {
-        var datum = {
-            "id": outputForm.className,
-            "values": {}
-        }
-        outputForm.querySelectorAll("textarea").forEach(function (textArea) {
-            datum.values[textArea.className] = textArea.value;
-        });
-        data.push(datum);
+    // update config (data structure resembles host's config.json)
+    var data = {
+        "window": {},
+        "outputs": []
+    };
+    // get window properties
+    document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
+        data.window[windowProperty.className] = windowProperty.value;
     });
-    socket.emit('updateoutputs', data);
-}
-
-function updateLeds() {
-    var data = [];
-    document.querySelectorAll("circle").forEach(function (circle) {
-        var datum = {
-            "device": circle.className.baseVal,
-            "index": parseInt(circle.id.slice(-1)),
-            "x": circle.cx.baseVal.value,
-            "y": circle.cy.baseVal.value,
-            "r": circle.r.baseVal.value
+    // get output properties (except LEDs)
+    document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
+        var output = {
+            "device": outputDiv.className,
+            "properties": {}
         };
-        data.push(datum);
+        outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
+            output.properties[propertyInput.className] = propertyInput.value;
+        });
+        data.outputs.push(output);
     });
-    socket.emit('updateleds', data);
+    // send to server
+    socket.emit('updateconfig', data);
 }
 
 function updateFile(directory, filename, fileIndex) {
@@ -163,15 +159,19 @@ function _drop_elem() {
             lineOut.x1.baseVal.value = x_pos;
             lineOut.y1.baseVal.value = y_pos;
         }
-        // send update to server
-        var datum = {
-            "device": selected.className.baseVal,
-            "index": parseInt(selected.id.slice(-1)),
-            "x": selected.cx.baseVal.value,
-            "y": selected.cy.baseVal.value,
-            "r": selected.r.baseVal.value
+        // send updated led to server (data structure resembles host's config.json)
+        var data = {
+            "outputs": [{
+                "device": selected.parentElement.className.baseVal,
+                "leds": [{
+                    "index": parseInt(selected.id.slice(-1)),
+                    "x": selected.cx.baseVal.value,
+                    "y": selected.cy.baseVal.value,
+                    "r": selected.r.baseVal.value
+                }]
+            }]
         };
-        socket.emit('updateleds', [datum]);
+        socket.emit('updateconfig', data);
     }
     // reset
     selected = null;
