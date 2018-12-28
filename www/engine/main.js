@@ -72,7 +72,7 @@ app.on('ready', () => {
   });
 
   // initial page load
-  var initialURL = `file:///${path.join(__dirname, 'data', 'index.html')}`;
+  var initialURL = `file:///${path.join(__dirname, 'index.html')}`;
   mainWindowA.loadURL(initialURL);
 
   // bool state to say which window to load to

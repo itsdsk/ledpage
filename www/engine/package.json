@@ -3,12 +3,6 @@
   "version": "0.0.1",
   "description": "web graphics renderer based on electronJS",
   "main": "main.js",
-  "keywords": [
-    "resin",
-    "io",
-    "electron",
-    "js"
-  ],
   "dependencies": {
     "electron": "~1.6.16",
     "electron-rebuild": "^1.7.2",
