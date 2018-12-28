@@ -7,7 +7,7 @@
             "sketch.js",
             "style.css"
         ],
-        "channels": [],
-        "image": ""
+        "channels": ["firstchannel"],
+        "image": "thumb.jpg"
     }
 }
