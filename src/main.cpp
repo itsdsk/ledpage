@@ -88,12 +88,12 @@ int main()
     {
         for (int x = 0; x < image.width(); x++)
         {
-            myfile << image(x, y).red;
+            myfile << image(x, y)[0];
             myfile << " ";
-            myfile << image(x, y).green;
+            myfile << image(x, y)[1];
             myfile << " ";
-            myfile << image(x, y).blue;
-            cout << "pixel(" << x << "," << y << ") = " << image(x, y) << " r:" << image(x, y).red << " g:" << image(x, y).green << " b:" << image(x, y).blue << endl;
+            myfile << image(x, y)[2];
+            //cout << "pixel(" << x << "," << y << ") = " << image(x, y) << " r:" << image(x, y).red << " g:" << image(x, y).green << " b:" << image(x, y).blue << endl;
             if (y != image.height() - 1)
             {
                 if (x == image.width() - 1)
