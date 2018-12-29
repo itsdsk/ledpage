@@ -16,7 +16,7 @@ int main()
 
     // Create the resources for capturing image
     uint32_t vc_nativeImageHandle;
-    // Handle to the resource for storing the captured snapshot
+    // Handle to the resource for storing the captured snapshot // Create the resources for capturing image
     DISPMANX_RESOURCE_HANDLE_T _vc_resource = vc_dispmanx_resource_create(
         VC_IMAGE_RGBA32,
         720,
@@ -35,7 +35,7 @@ int main()
     if (_vc_display < 0)
     {
         std::cout << "DISPMANXGRABBER ERROR: Cannot open display: " << _vc_display << std::endl;
-        return;
+        return 0;
     }
     assert(_vc_display > 0);
     // Obtain the display information
@@ -45,15 +45,6 @@ int main()
     (void)result;
     assert(result == 0);
     std::cout << "INFO: Display opened with resolution: " << vc_info.width << "x" << vc_info.height << std::endl;
-
-    // Create the resources for capturing image
-    uint32_t vc_nativeImageHandle;
-    DISPMANX_RESOURCE_HANDLE_T _vc_resource = vc_dispmanx_resource_create(
-        VC_IMAGE_RGBA32,
-        vc_info.width,
-        vc_info.height,
-        &vc_nativeImageHandle);
-    assert(_vc_resource);
 
     // Define the capture rectangle with the same size
     vc_dispmanx_rect_set(&_rectangle, 0, 0, vc_info.width, vc_info.height);
