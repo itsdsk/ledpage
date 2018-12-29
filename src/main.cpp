@@ -13,7 +13,30 @@ using namespace std;
 int main()
 {
     bcm_host_init();
+
+    // Create the resources for capturing image
+    uint32_t vc_nativeImageHandle;
+    // Handle to the resource for storing the captured snapshot
+    DISPMANX_RESOURCE_HANDLE_T _vc_resource = vc_dispmanx_resource_create(
+        VC_IMAGE_RGBA32,
+        720,
+        480,
+        &vc_nativeImageHandle);
+    assert(_vc_resource);
+
+    /// Rectangle of the captured resource that is transfered to user space
+    VC_RECT_T _rectangle;
+
+    // Define the capture rectangle with the same size
+    vc_dispmanx_rect_set(&_rectangle, 0, 0, 720, 480);
+
+    // open displauy
     DISPMANX_DISPLAY_HANDLE_T _vc_display = vc_dispmanx_display_open(0);
+    if (_vc_display < 0)
+    {
+        std::cout << "DISPMANXGRABBER ERROR: Cannot open display: " << _vc_display << std::endl;
+        return;
+    }
     assert(_vc_display > 0);
     // Obtain the display information
     DISPMANX_MODEINFO_T vc_info;
@@ -31,9 +54,6 @@ int main()
         vc_info.height,
         &vc_nativeImageHandle);
     assert(_vc_resource);
-
-    /// Rectangle of the captured resource that is transfered to user space
-    VC_RECT_T _rectangle;
 
     // Define the capture rectangle with the same size
     vc_dispmanx_rect_set(&_rectangle, 0, 0, vc_info.width, vc_info.height);
@@ -82,6 +102,7 @@ int main()
             myfile << image(x, y).green;
             myfile << " ";
             myfile << image(x, y).blue;
+            cout << "pixel(" << x << "," << y << ") = " << image(x, y) << " r:" << image(x, y).red << " g:" << image(x, y).green << " b:" << image(x, y).blue << endl;
             if (y != image.height() - 1)
             {
                 if (x == image.width() - 1)
@@ -99,6 +120,13 @@ int main()
 
     // Close the displaye
     vc_dispmanx_display_close(_vc_display);
+
+    // Clean up resources
+    vc_dispmanx_resource_delete(_vc_resource);
+
+    // De-init BCM
+    bcm_host_deinit();
+
     cout << "Hello and goodbye, World!";
     return 0;
 }
