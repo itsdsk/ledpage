@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <fstream>
+#include <cstdint>
 
 #pragma GCC system_header
 #include <bcm_host.h>
@@ -88,11 +89,11 @@ int main()
     {
         for (int x = 0; x < image.width(); x++)
         {
-            myfile << image(x, y)[0];
+            myfile << unsigned(image(x, y).red);
             myfile << " ";
-            myfile << image(x, y)[1];
+            myfile << unsigned(image(x, y).green);
             myfile << " ";
-            myfile << image(x, y)[2];
+            myfile << unsigned(image(x, y).blue);
             //cout << "pixel(" << x << "," << y << ") = " << image(x, y) << " r:" << image(x, y).red << " g:" << image(x, y).green << " b:" << image(x, y).blue << endl;
             if (y != image.height() - 1)
             {
