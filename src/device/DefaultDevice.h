@@ -1,16 +1,21 @@
 #include <vector>
 
 #include <grabber/ColorRgb.h>
+#include <grabber/ColorRgba.h>
+#include <grabber/Image.h>
 #include <serial/serial.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class DefaultDevice
 {
   public:
     DefaultDevice(const DefaultDevice &obj) : _rs232Port(), _deviceName(obj._deviceName), _baudRate(obj._baudRate), _ledBuffer(0){};
-    DefaultDevice(const std::string &outputDevice, const unsigned baudRate) : _deviceName(outputDevice),
-                                                                              _baudRate(baudRate),
-                                                                              _rs232Port(),
-                                                                              _ledBuffer(0){};
+    DefaultDevice(const std::string &outputDevice, const unsigned baudRate, const json &ledsJson) : _deviceName(outputDevice),
+                                                                                                    _baudRate(baudRate),
+                                                                                                    _rs232Port(),
+                                                                                                    _ledBuffer(0){};
     ~DefaultDevice()
     {
         if (_rs232Port.isOpen())
@@ -18,6 +23,12 @@ class DefaultDevice
             _rs232Port.close();
         }
     };
+    template <typename Pixel_T>
+    int update(const Image<Pixel_T> &image)
+    {
+        // todo: build mColorsMap vector from ledsJson arg in initializer then use in this function to get colors to pass to write() below...
+        return 0;
+    }
     int write(const std::vector<ColorRgb> &ledValues)
     {
         if (_ledBuffer.size() == 0)
@@ -42,7 +53,7 @@ class DefaultDevice
     {
         try
         {
-            std::cout << "Opening UART: " << _deviceName << " at " << _baudRate << "Bd" << std::endl;
+            std::cout << "Opening UART: " << _deviceName << " at " << _baudRate << " Bd" << std::endl;
             _rs232Port.setPort(_deviceName);
             _rs232Port.setBaudrate(_baudRate);
             _rs232Port.open();
@@ -133,9 +144,10 @@ class DefaultDevice
     const std::string _deviceName;
     const int _baudRate;
     serial::Serial _rs232Port;
+    std::vector<unsigned> mColorsMap; // absolute integer position of each LED in the image
 
   protected:
-    //
+    // buffer containing packed RGB values
     std::vector<uint8_t> _ledBuffer;
 
   private:

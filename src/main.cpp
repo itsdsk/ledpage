@@ -37,26 +37,35 @@ int main()
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
     // The image used for grabbing frames
     Image<ColorRgba> _image(_w, _h);
-    //
-    grabber->grabFrame(_image);
-    //
-    // write ppm file
-    ofstream myfile;
-    myfile.open("screenshot.ppm");
-    myfile << "P6"
-           << "\n"
-           << _w << " " << _h << "\n"
-           << 255 << "\n";
-    for (uint_least32_t y = 0; y < _image.height(); y++)
+
+    if (true) // runtime loop
     {
-        for (uint_least32_t x = 0; x < _image.width(); x++)
+        for (int i = 0; i < 1; i++)
         {
-            myfile << _image(x, y).red;
-            myfile << _image(x, y).green;
-            myfile << _image(x, y).blue;
+            grabber->grabFrame(_image);
         }
     }
-    myfile.close();
+    else // save screenshot
+    {
+        grabber->grabFrame(_image);
+        // write ppm file
+        ofstream myfile;
+        myfile.open("screenshot.ppm");
+        myfile << "P6"
+               << "\n"
+               << _w << " " << _h << "\n"
+               << 255 << "\n";
+        for (uint_least32_t y = 0; y < _image.height(); y++)
+        {
+            for (uint_least32_t x = 0; x < _image.width(); x++)
+            {
+                myfile << _image(x, y).red;
+                myfile << _image(x, y).green;
+                myfile << _image(x, y).blue;
+            }
+        }
+        myfile.close();
+    }
 
     delete grabber;
     return 0;
