@@ -4,11 +4,20 @@
 #include <grabber/Image.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Grabber.h>
+#include <nlohmann/json.hpp>
 
 using namespace std;
+using json = nlohmann::json;
 
 int main()
 {
+    // read config file
+    std::ifstream confFile("../www/engine/config.json");
+    json config;
+    confFile >> config;
+    cout << config << endl;
+
+    //
     unsigned _w = 640;
     unsigned _h = 480;
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
