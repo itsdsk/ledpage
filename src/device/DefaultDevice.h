@@ -2,7 +2,6 @@
 
 #include <grabber/ColorRgb.h>
 #include <serial/serial.h>
-//#include "teuniz/rs232.h"
 
 class DefaultDevice
 {
@@ -43,7 +42,7 @@ class DefaultDevice
     {
         try
         {
-            std::cout << "Opening UART: " << _deviceName << std::endl;
+            std::cout << "Opening UART: " << _deviceName << " at " << _baudRate << "Bd" << std::endl;
             _rs232Port.setPort(_deviceName);
             _rs232Port.setBaudrate(_baudRate);
             _rs232Port.open();

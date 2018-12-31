@@ -11,24 +11,29 @@
 using namespace std;
 using json = nlohmann::json;
 
+int jsonStringToInt(json &value)
+{
+    return std::stoi(value.get<std::string>());
+}
+
 int main()
 {
     // read config file
     std::ifstream confFile("../www/engine/config.json");
     json config;
     confFile >> config;
-    std::vector<DefaultDevice> devices;
-    //DefaultDevice devices [2];
-    for(json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it) {
-        DefaultDevice device((*it)["device"], /*(*it)["properties"]["rate"]*/460800);
+    std::vector<DefaultDevice> devices; // todo: change this vector to array for performance?
+    for (json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it)
+    {
+        DefaultDevice device((*it)["device"], jsonStringToInt((*it)["properties"]["rate"]));
         device.open();
         devices.push_back(device);
-        //devices[0] = device;
     }
 
     //
-    unsigned _w = 640;
-    unsigned _h = 480;
+    unsigned _w = jsonStringToInt(config["window"]["width"]);
+    unsigned _h = jsonStringToInt(config["window"]["height"]);
+    cout << "config window size: " << _w << " x " << _h << endl;
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
     // The image used for grabbing frames
     Image<ColorRgba> _image(_w, _h);
