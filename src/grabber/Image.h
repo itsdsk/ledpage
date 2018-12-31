@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
-#include <ColorRgb.h>
+#include <grabber/ColorRgb.h>
 
 
 template <typename Pixel_T>

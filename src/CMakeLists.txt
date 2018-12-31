@@ -8,6 +8,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${BCM_INCLUDE_DIRS})
 include_directories("/opt/vc/include")
 
+# Find the BCM-package (VC control)
 find_package(BCM REQUIRED)
 
 set(main_SOURCES
