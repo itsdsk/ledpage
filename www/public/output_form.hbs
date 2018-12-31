@@ -10,8 +10,9 @@
         <div class="{{device}}">
             {{!-- <label for="o_device{{@index}}">Device:</label>
             <textarea id="o_device{{@index}}" rows="1" class="device">{{device}}</textarea> --}}
-            <label>{{device}}</label>
+            {{!-- <label>{{device}}</label> --}}
             <div class="properties">
+                <b>{{device}}:&emsp;</b>
                 <label for="o_type{{@index}}">Type:</label>
                 <textarea id="o_type{{@index}}" rows="1" class="type">{{properties.type}}</textarea>
                 <label for="o_color{{@index}}">Colour Order:</label>
@@ -22,5 +23,7 @@
         </div>
         {{/each}}
     </div>
+    <button onclick="socket.emit('saveconfig');">Save</button>
     <button onclick="updateConfig()">Update Config</button>
+    <button onclick="resetConfig()">Reset</button>
 </div>

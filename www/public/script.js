@@ -14,7 +14,14 @@ var x_min = gap;
 var x_max = 0;
 var y_min = gap;
 var y_max = 0;
+var lastReceivedOutputMsg;
+
 socket.on('loadoutput', function (msg) {
+    lastReceivedOutputMsg = msg;
+    setConfig();
+});
+
+function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
     // get SVG width+height and set boundaries
@@ -32,7 +39,11 @@ socket.on('loadoutput', function (msg) {
             return false;
         };
     });
-});
+}
+
+function resetConfig() {
+    setConfig();
+}
 
 function updateConfig() {
     // update config (data structure resembles host's config.json)

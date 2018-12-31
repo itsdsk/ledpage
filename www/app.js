@@ -4,6 +4,10 @@ const media = require("./media.js");
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+http.listen(process.env.PORT || 3000, function () {
+  //console.log('listening on *:3000');
+});
+
 // scan content
 media.generateDb();
 
@@ -71,10 +75,6 @@ io.on('connection', function (socket) {
   socket.on('createconnection', function (msg) {
     media.createConnection(msg);
   });
-});
-
-http.listen(3000, function () {
-  //console.log('listening on *:3000');
 });
 
 // Dat test

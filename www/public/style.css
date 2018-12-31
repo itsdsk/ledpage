@@ -15,7 +15,7 @@
 }
 
 textarea {
-    width: 95%;
+    /* width: 95%; */
     margin: auto;
 }
 
@@ -34,5 +34,5 @@ circle {
 
 line {
     stroke: white;
-    stroke-width: 25;
+    stroke-width: 10;
 }
