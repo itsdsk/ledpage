@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <grabber/Image.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Grabber.h>
 #include <nlohmann/json.hpp>
+#include <device/DefaultDevice.h>
 
 using namespace std;
 using json = nlohmann::json;
@@ -15,7 +17,14 @@ int main()
     std::ifstream confFile("../www/engine/config.json");
     json config;
     confFile >> config;
-    cout << config << endl;
+    std::vector<DefaultDevice> devices;
+    //DefaultDevice devices [2];
+    for(json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it) {
+        DefaultDevice device((*it)["device"], /*(*it)["properties"]["rate"]*/460800);
+        device.open();
+        devices.push_back(device);
+        //devices[0] = device;
+    }
 
     //
     unsigned _w = 640;
