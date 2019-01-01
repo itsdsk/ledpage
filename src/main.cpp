@@ -25,7 +25,7 @@ int main()
     std::vector<DefaultDevice> devices; // todo: change this vector to array for performance?
     for (json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it)
     {
-        DefaultDevice device((*it)["device"], jsonStringToInt((*it)["properties"]["rate"]));
+        DefaultDevice device((*it)["device"], jsonStringToInt((*it)["properties"]["rate"]), (*it)["leds"], config["window"]);
         device.open();
         devices.push_back(device);
     }

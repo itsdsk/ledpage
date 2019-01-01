@@ -6,16 +6,39 @@
 #include <serial/serial.h>
 #include <nlohmann/json.hpp>
 
+using namespace std;
 using json = nlohmann::json;
 
 class DefaultDevice
 {
   public:
-    DefaultDevice(const DefaultDevice &obj) : _rs232Port(), _deviceName(obj._deviceName), _baudRate(obj._baudRate), _ledBuffer(0){};
-    DefaultDevice(const std::string &outputDevice, const unsigned baudRate, const json &ledsJson) : _deviceName(outputDevice),
-                                                                                                    _baudRate(baudRate),
-                                                                                                    _rs232Port(),
-                                                                                                    _ledBuffer(0){};
+    DefaultDevice(const DefaultDevice &obj) : _rs232Port(), _deviceName(obj._deviceName), _baudRate(obj._baudRate), _ledBuffer(0)
+    {
+        positions = obj.positions;
+    };
+    DefaultDevice(const std::string &outputDevice, const unsigned baudRate,
+                  const json &ledsJson, const json &windowJson) : _deviceName(outputDevice),
+                                                                  _baudRate(baudRate),
+                                                                  _rs232Port(),
+                                                                  _ledBuffer(0)
+    {
+        positions.reserve(ledsJson.size());
+        //
+        for (int i = 0; i < positions.capacity(); i++)
+        {
+            //
+            for (auto &led : ledsJson)
+            {
+                if (led["index"] == i)
+                {
+                    unsigned position = (int)led["y"] * jsonStringToInt(windowJson["width"]) + (int)led["x"];
+                    positions[i] = position;
+                    // look for next led in json
+                    break;
+                }
+            }
+        }
+    };
     ~DefaultDevice()
     {
         if (_rs232Port.isOpen())
@@ -26,7 +49,7 @@ class DefaultDevice
     template <typename Pixel_T>
     int update(const Image<Pixel_T> &image)
     {
-        // todo: build mColorsMap vector from ledsJson arg in initializer then use in this function to get colors to pass to write() below...
+        // todo: build positions vector from ledsJson arg in initializer then use in this function to get colors to pass to write() below...
         return 0;
     }
     int write(const std::vector<ColorRgb> &ledValues)
@@ -144,7 +167,7 @@ class DefaultDevice
     const std::string _deviceName;
     const int _baudRate;
     serial::Serial _rs232Port;
-    std::vector<unsigned> mColorsMap; // absolute integer position of each LED in the image
+    std::vector<unsigned> positions; // absolute integer position of each LED in the image
 
   protected:
     // buffer containing packed RGB values
@@ -152,4 +175,8 @@ class DefaultDevice
 
   private:
     //
+    int jsonStringToInt(const json &value)
+    {
+        return std::stoi(value.get<std::string>());
+    }
 };
