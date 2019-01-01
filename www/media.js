@@ -67,10 +67,21 @@ module.exports = {
                 });
             });
         });
-        // read config JSON
+        // get config JSON
         var configPath = path.join(__dirname, 'engine', 'config.json');
-        // TODO: check if file exists and copy default if not
-        config = require(configPath);
+        try {
+            config = require(configPath);
+        } catch (ex) {
+            console.log("Error getting config: " + ex);
+            var pathToDefault = path.join(__dirname, 'engine', '.default', 'config.json');
+            fs.copyFile(pathToDefault, configPath, (err) => {
+                if (err) console.log(err)
+                else {
+                    console.log("Copied default config to " + configPath);
+                    config = require(configPath);
+                }
+            });
+        }
     },
     createDisk: function (channelName) {
         // path of new disk
