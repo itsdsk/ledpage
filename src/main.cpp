@@ -26,7 +26,7 @@ int main()
     for (json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it)
     {
         DefaultDevice device((*it)["device"], jsonStringToInt((*it)["properties"]["rate"]), (*it)["leds"], config["window"]);
-        device.open();
+        //device.open();
         devices.push_back(device);
     }
 
@@ -43,6 +43,12 @@ int main()
         for (int i = 0; i < 1; i++)
         {
             grabber->grabFrame(_image);
+            for (auto &device : devices)
+            {
+                device.open();
+                sleep(2);
+                device.update(_image);
+            }
         }
     }
     else // save screenshot

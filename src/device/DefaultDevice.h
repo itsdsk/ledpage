@@ -24,7 +24,7 @@ class DefaultDevice
     {
         positions.reserve(ledsJson.size());
         //
-        for (int i = 0; i < positions.capacity(); i++)
+        for (int i = 0; i < ledsJson.size(); i++)
         {
             //
             for (auto &led : ledsJson)
@@ -32,12 +32,13 @@ class DefaultDevice
                 if (led["index"] == i)
                 {
                     unsigned position = (int)led["y"] * jsonStringToInt(windowJson["width"]) + (int)led["x"];
-                    positions[i] = position;
+                    positions.push_back(position);
                     // look for next led in json
                     break;
                 }
             }
         }
+        cout << "Loaded " << ledsJson.size() << " leds" << endl;
     };
     ~DefaultDevice()
     {
@@ -49,8 +50,16 @@ class DefaultDevice
     template <typename Pixel_T>
     int update(const Image<Pixel_T> &image)
     {
-        // todo: build positions vector from ledsJson arg in initializer then use in this function to get colors to pass to write() below...
-        return 0;
+        std::vector<ColorRgb> ledValues;
+        // get colours
+        for (int i = 0; i < positions.size(); i++)
+        {
+            int px = positions[i] % 640;
+            int py = (int)floor((float)positions[i] / 640.0);
+            ColorRgb col = {(uint8_t)image(px, py).red, (uint8_t)image(px, py).green, (uint8_t)image(px, py).blue};
+            ledValues.push_back(col);
+        }
+        return write(ledValues);
     }
     int write(const std::vector<ColorRgb> &ledValues)
     {
@@ -103,7 +112,7 @@ class DefaultDevice
         //     return 0;
         // }
 
-        // if (!_rs232Port.isOpen())
+        if (!_rs232Port.isOpen())
         {
             // try to reopen
             int status = open();
@@ -119,26 +128,22 @@ class DefaultDevice
             return status;
         }
 
-        //	for (int i = 0; i < 20; ++i)
-        //		std::cout << std::hex << (int)data[i] << " ";
-        //	std::cout << std::endl;
-
-        // try
+        try
         {
-            // _rs232Port.flushOutput();
-            // _rs232Port.write(data, size);
-            // _rs232Port.flush();
+            _rs232Port.flushOutput();
+            _rs232Port.write(data, size);
+            _rs232Port.flush();
         }
-        // catch (const serial::SerialException &serialExc)
+        catch (const serial::SerialException &serialExc)
         {
             // TODO[TvdZ]: Maybe we should limit the frequency of this error report somehow
-            // std::cerr << "Serial exception caught while writing to device: " << serialExc.what() << std::endl;
-            // std::cout << "Attempting to re-open the device." << std::endl;
+            std::cerr << "Serial exception caught while writing to device: " << serialExc.what() << std::endl;
+            std::cout << "Attempting to re-open the device." << std::endl;
 
             // First make sure the device is properly closed
             try
             {
-                // _rs232Port.close();
+                _rs232Port.close();
             }
             catch (const std::exception &e)
             {
@@ -147,19 +152,19 @@ class DefaultDevice
             // Attempt to open the device and write the data
             try
             {
-                // _rs232Port.open();
-                // _rs232Port.write(data, size);
-                // _rs232Port.flush();
+                _rs232Port.open();
+                _rs232Port.write(data, size);
+                _rs232Port.flush();
             }
             catch (const std::exception &e)
             {
                 // We failed again, this not good, do nothing maybe in the next loop we have more success
             }
         }
-        // catch (const std::exception &e)
+        catch (const std::exception &e)
         {
-            // std::cerr << "Unable to write to RS232 device (" << e.what() << ")" << std::endl;
-            // return -1;
+            std::cerr << "Unable to write to RS232 device (" << e.what() << ")" << std::endl;
+            return -1;
         }
 
         return 0;
