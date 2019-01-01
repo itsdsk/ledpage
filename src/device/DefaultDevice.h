@@ -4,7 +4,7 @@
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
 #include <serial/serial.h>
-#include <nlohmann/json.hpp>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
 
 using namespace std;
 using json = nlohmann::json;

@@ -1,0 +1,6 @@
+[submodule "src/thirdparty/json"]
+	path = src/thirdparty/json
+	url = https://github.com/nlohmann/json.git
+[submodule "src/thirdparty/serial"]
+	path = src/thirdparty/serial
+	url = https://github.com/wjwwood/serial.git

@@ -7,14 +7,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${BCM_INCLUDE_DIRS})
 include_directories("/opt/vc/include")
-include_directories(serial/include)
+include_directories(thirdparty/serial/include)
 
 #
-set(serial_SOURCES serial/src/serial.cc serial/include/serial/serial.h serial/include/serial/v8stdint.h)
+set(serial_SOURCES thirdparty/serial/src/serial.cc thirdparty/serial/include/serial/serial.h thirdparty/serial/include/serial/v8stdint.h)
 if(UNIX)
-    list(APPEND serial_SOURCES serial/src/impl/unix.cc)
+    list(APPEND serial_SOURCES thirdparty/serial/src/impl/unix.cc)
 else()
-    list(APPEND serial_SOURCES serial/src/impl/win.cc)
+    list(APPEND serial_SOURCES thirdparty/serial/src/impl/win.cc)
 endif()
 
 #

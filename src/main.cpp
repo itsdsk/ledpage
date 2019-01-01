@@ -5,7 +5,7 @@
 #include <grabber/Image.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Grabber.h>
-#include <nlohmann/json.hpp>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
 #include <device/DefaultDevice.h>
 
 using namespace std;
