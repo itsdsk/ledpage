@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <unistd.h>
 
 #include <grabber/Image.h>
 #include <grabber/ColorRgba.h>
