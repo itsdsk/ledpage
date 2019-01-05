@@ -4,3 +4,6 @@
 [submodule "src/thirdparty/serial"]
 	path = src/thirdparty/serial
 	url = https://github.com/wjwwood/serial.git
+[submodule "src/thirdparty/cxxopts"]
+	path = src/thirdparty/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
