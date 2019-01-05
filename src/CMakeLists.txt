@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 project (main)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 include_directories("${PROJECT_BINARY_DIR}")
 
@@ -14,7 +15,7 @@ endif()
 
 # SERIAL LIBRARY
 set(ENV{USB} FALSE)
-if(ENV{USB})
+#if(ENV{USB})
     include_directories(thirdparty/serial/include)
     set(serial_SOURCES thirdparty/serial/src/serial.cc thirdparty/serial/include/serial/serial.h thirdparty/serial/include/serial/v8stdint.h)
     if(UNIX)
@@ -26,7 +27,7 @@ if(ENV{USB})
     if(UNIX AND NOT APPLE)
         target_link_libraries(serial rt)
     endif()
-endif()
+#endif()
 
 # RASPBERRY PI VIDEOCORE
 if(ENV{RPI})
@@ -35,7 +36,7 @@ if(ENV{RPI})
 endif()
 
 set(main_SOURCES
-	main.cpp
+    main.cpp
 )
 
 add_executable( ${PROJECT_NAME} ${main_SOURCES})
@@ -43,6 +44,6 @@ add_executable( ${PROJECT_NAME} ${main_SOURCES})
 if(ENV{RPI})
     target_link_libraries(main ${BCM_LIBRARIES})
 endif()
-if(ENV{SERIAL})
+#if(ENV{USB})
     target_link_libraries(main serial)
-endif()
+#endif()
