@@ -7,7 +7,7 @@
 #include <grabber/ColorRgba.h>
 #include <grabber/Grabber.h>
 #include <thirdparty/json/single_include/nlohmann/json.hpp>
-#include <device/DefaultDevice.h>
+#include <device/DeviceManager.h>
 
 using namespace std;
 using json = nlohmann::json;
@@ -23,20 +23,19 @@ int main()
     std::ifstream confFile("../www/engine/config.json");
     json config;
     confFile >> config;
-    std::vector<DefaultDevice> devices; // todo: change this vector to array for performance?
-    for (json::iterator it = config["outputs"].begin(); it != config["outputs"].end(); ++it)
+
+    // add output objects based on config
+    vector<DeviceManager> deviceManagers;
+    for (unsigned i = 0; i < config["outputs"].size(); i++)
     {
-        DefaultDevice device((*it)["device"], jsonStringToInt((*it)["properties"]["rate"]), (*it)["leds"], config["window"]);
-        //device.open();
-        devices.push_back(device);
+        deviceManagers.emplace_back(config, i);
     }
 
-    //
+    // create framegrabber and image object
     unsigned _w = jsonStringToInt(config["window"]["width"]);
     unsigned _h = jsonStringToInt(config["window"]["height"]);
     cout << "config window size: " << _w << " x " << _h << endl;
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
-    // The image used for grabbing frames
     Image<ColorRgba> _image(_w, _h);
 
     if (true) // runtime loop
@@ -44,11 +43,9 @@ int main()
         for (int i = 0; i < 1; i++)
         {
             grabber->grabFrame(_image);
-            for (auto &device : devices)
+            for (auto &deviceManager : deviceManagers)
             {
-                device.open();
-                sleep(2);
-                device.update(_image);
+                deviceManager.update(_image);
             }
         }
     }
@@ -73,7 +70,6 @@ int main()
         }
         myfile.close();
     }
-
     delete grabber;
     return 0;
 }
