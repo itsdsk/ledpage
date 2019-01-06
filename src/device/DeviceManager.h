@@ -16,9 +16,19 @@ struct LedNode
     unsigned r;
     unsigned pos;
     vector<unsigned> positions;
-    LedNode(unsigned x, unsigned y, unsigned r, unsigned width, unsigned height) : x_pos(x), y_pos(y), r(r)
+    LedNode(unsigned x, unsigned y, unsigned r, unsigned width, unsigned height)
     {
-        // get boundaries of pixels
+        setPosition(x, y, r, width, height);
+    };
+    void setPosition(unsigned x, unsigned y, unsigned r, unsigned width, unsigned height)
+    {
+        // set absolute position and radius
+        x_pos = x;
+        y_pos = y;
+        this->r = r;
+        // reset sample points
+        positions.clear();
+        // get sampling area boundary
         unsigned min_x = max((int)x_pos - (int)r, (0));
         unsigned max_x = min((int)x_pos + (int)r, (int)width);
         unsigned min_y = max((int)y_pos - (int)r, (0));
@@ -31,8 +41,8 @@ struct LedNode
                 unsigned position = iy * width + ix;
                 positions.emplace_back(position);
             }
-        cout << "Adding LED: " << x_pos << "," << y_pos << " r:" << r << " samples: " << positions.size() << endl;
-    };
+        //cout << "Set LED: " << x_pos << "," << y_pos << " r:" << r << " samples: " << positions.size() << endl;
+    }
 };
 
 class DeviceManager
@@ -51,6 +61,7 @@ class DeviceManager
         }
         // create output object
         const string deviceName = config["outputs"][outputIndex]["device"];
+        nameTEMP = config["outputs"][outputIndex]["device"];
         const unsigned baudRate = jsonStringToInt(config["outputs"][outputIndex]["properties"]["rate"]);
         output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
     }
@@ -88,6 +99,7 @@ class DeviceManager
     }
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
+    string nameTEMP;
 
   private:
     //

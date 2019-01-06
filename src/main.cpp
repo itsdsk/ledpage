@@ -23,6 +23,10 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 typedef server::message_ptr message_ptr;
 
+vector<DeviceManager> deviceManagers;
+unsigned _w;
+unsigned _h;
+
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
 {
     try
@@ -52,7 +56,11 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                             int y = ledElement.value()["y"];
                             int r = ledElement.value()["r"];
                             // log
-                            cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
+                            //cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
+                            // get corresponding deviceManager and set ledNode position
+                            for (auto &deviceManager : deviceManagers)
+                                if (deviceManager.nameTEMP == outputDevice)
+                                    deviceManager.ledNodes[index].setPosition(x, y, r, _w, _h);
                         }
                     }
                 }
@@ -89,7 +97,6 @@ int main(int argc, char *argv[])
     confFile >> config;
 
     // add output objects based on config
-    vector<DeviceManager> deviceManagers;
     for (unsigned i = 0; i < config["outputs"].size(); i++)
     {
         deviceManagers.emplace_back(config, i);
@@ -116,17 +123,18 @@ int main(int argc, char *argv[])
     {
         std::cout << "other exception" << std::endl;
     }
+
+    // create framegrabber and image object
+    _w = jsonStringToInt(config["window"]["width"]);
+    _h = jsonStringToInt(config["window"]["height"]);
+    cout << "config window size: " << _w << " x " << _h << endl;
+    FrameGrabber *grabber = new FrameGrabber(_w, _h);
+    Image<ColorRgba> _image(_w, _h);
+
     while (true)
     {
         // run indefinitely (test for WS)
     }
-
-    // create framegrabber and image object
-    unsigned _w = jsonStringToInt(config["window"]["width"]);
-    unsigned _h = jsonStringToInt(config["window"]["height"]);
-    cout << "config window size: " << _w << " x " << _h << endl;
-    FrameGrabber *grabber = new FrameGrabber(_w, _h);
-    Image<ColorRgba> _image(_w, _h);
 
     // display screen on device
     if (result.count("display") > 0) // runtime loop
