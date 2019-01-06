@@ -27,8 +27,41 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
 {
     try
     {
-        //s->send(hdl, msg->get_payload(), msg->get_opcode());
-        std::cout << "got message: " << msg->get_payload() << std::endl;
+        // parse msg received as json
+        auto jdata = json::parse(msg->get_payload());
+        //cout << "payload:" << jdata.dump(2) << endl;
+        // go through top level of JSON object received
+        for (auto &element1 : jdata.items())
+        {
+            string key1 = element1.key();
+            if (key1 == "outputs")
+            {
+                // received an entry for "outputs", go through items in this array
+                for (auto &element2 : (element1.value()).items())
+                {
+                    // get this output device name
+                    string outputDevice = element2.value()["device"];
+                    if (element2.value().find("leds") != element2.value().end())
+                    {
+                        // there is an entry in array "leds", loop through objects within it
+                        for (auto &ledElement : element2.value()["leds"].items())
+                        {
+                            // get new values for LED
+                            int index = ledElement.value()["index"];
+                            int x = ledElement.value()["x"];
+                            int y = ledElement.value()["y"];
+                            int r = ledElement.value()["r"];
+                            // log
+                            cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
+                        }
+                    }
+                }
+            }
+            else if (key1 == "window")
+            {
+                cout << "key1 is window" << endl;
+            }
+        }
     }
     catch (const websocketpp::lib::error_code &e)
     {
