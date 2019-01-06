@@ -154,6 +154,9 @@ function _move_elem(e) {
     }
 }
 
+// connect to host's main websocket server (websocketpp)
+var mainSocket = new WebSocket('ws://localhost:9002');
+
 // Destroy the object when we are done
 function _drop_elem() {
     // keep led in boundaries
@@ -182,7 +185,8 @@ function _drop_elem() {
                 }]
             }]
         };
-        socket.emit('updateconfig', data);
+        //socket.emit('updateconfig', data);
+        mainSocket.send(JSON.stringify(data));
     }
     // reset
     selected = null;
