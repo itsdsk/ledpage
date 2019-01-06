@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.8)
 project (main)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost COMPONENTS thread system REQUIRED)
 
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${Boost_INCLUDE_DIRS})

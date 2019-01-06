@@ -7,11 +7,34 @@
 #include <grabber/Image.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Grabber.h>
+
+#include <boost/thread/thread.hpp>
 #include <thirdparty/json/single_include/nlohmann/json.hpp>
 #include <thirdparty/cxxopts/include/cxxopts.hpp>
+#include <thirdparty/websocketpp/websocketpp/server.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
 
 using namespace std;
 using json = nlohmann::json;
+
+// websocketpp
+typedef websocketpp::server<websocketpp::config::asio> server;
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+typedef server::message_ptr message_ptr;
+
+void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
+{
+    try
+    {
+        //s->send(hdl, msg->get_payload(), msg->get_opcode());
+        std::cout << "got message: " << msg->get_payload() << std::endl;
+    }
+    catch (const websocketpp::lib::error_code &e)
+    {
+        std::cout << "Read failed because: " << e << "(" << e.message() << ")" << std::endl;
+    }
+}
 
 int jsonStringToInt(json &value)
 {
@@ -37,6 +60,32 @@ int main(int argc, char *argv[])
     for (unsigned i = 0; i < config["outputs"].size(); i++)
     {
         deviceManagers.emplace_back(config, i);
+    }
+
+    // websockets server
+    server ws_server;
+    boost::asio::io_service io_service;
+    try
+    {
+        // todo: add exception handling e.g. https://mayaposch.wordpress.com/2015/09/16/creating-a-websocket-server-with-websocket/
+        ws_server.init_asio(&io_service);
+        ws_server.set_message_handler(bind(&on_message, &ws_server, ::_1, ::_2));
+        ws_server.set_reuse_addr(true);
+        ws_server.listen(9002);
+        ws_server.start_accept();
+        boost::thread t(boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+    }
+    catch (websocketpp::exception const &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "other exception" << std::endl;
+    }
+    while (true)
+    {
+        // run indefinitely (test for WS)
     }
 
     // create framegrabber and image object
