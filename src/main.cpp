@@ -26,6 +26,7 @@ typedef server::message_ptr message_ptr;
 vector<DeviceManager> deviceManagers;
 unsigned _w;
 unsigned _h;
+float brightness;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
 {
@@ -68,6 +69,11 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
             else if (key1 == "window")
             {
                 cout << "key1 is window" << endl;
+                if(element1.value().find("brightness") != element1.value().end())
+                {
+                    cout << "brightness: " << element1.value()["brightness"] << endl;
+                    brightness = element1.value()["brightness"];
+                }
             }
         }
     }
@@ -144,7 +150,7 @@ int main(int argc, char *argv[])
             grabber->grabFrame(_image);
             for (auto &deviceManager : deviceManagers)
             {
-                deviceManager.update(_image);
+                deviceManager.update(_image, brightness);
             }
         }
     }

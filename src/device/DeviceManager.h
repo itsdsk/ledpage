@@ -65,8 +65,9 @@ class DeviceManager
         const unsigned baudRate = jsonStringToInt(config["outputs"][outputIndex]["properties"]["rate"]);
         output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
     }
+
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image)
+    int update(const Image<Pixel_T> &image, float &brightness)
     {
         std::vector<ColorRgb> ledValues;
         // get colours
@@ -87,6 +88,11 @@ class DeviceManager
             uint8_t avgR = uint8_t(cummR / ledNode.positions.size());
             uint8_t avgG = uint8_t(cummG / ledNode.positions.size());
             uint8_t avgB = uint8_t(cummB / ledNode.positions.size());
+            // apply brightness TODO: check works
+            uint8_t floatBrightness = uint8_t(brightness)/uint8_t(1.0f);
+            avgR *= floatBrightness;
+            avgG *= floatBrightness;
+            avgB *= floatBrightness;
             // store colour
             ColorRgb col = {avgR, avgG, avgB};
             ledValues.emplace_back(col);
