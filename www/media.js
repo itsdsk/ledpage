@@ -1,6 +1,7 @@
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
@@ -21,6 +22,17 @@ db.serialize(function () {
     // db.run("INSERT INTO channels (name) VALUES ('channel2')");
     // db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
+
+// connect to engine
+var client = new net.Socket();
+client.connect(2845, function () {
+    console.log("connected to engine");
+});
+client.on('error', function (err) {
+    console.log('client error:');
+    console.log(err);
+});
+
 
 // compile media
 var diskCompiler;
@@ -192,8 +204,11 @@ module.exports = {
     },
     playLocalMedia: function (name) {
         var filePath = path.join(mediaDir, name);
+        if (client.pending == false) {
+            // send file path to engine if socket is connected
+            client.write('file://' + filePath);
+        }
         console.log('playing local media: ' + filePath);
-        // TODO: reimplement IPC to send filepath to renderer
     },
     loadFeed: function (callback) {
         // get list of distinct disks in connections
