@@ -77,6 +77,12 @@ io.on('connection', function (socket) {
   });
 });
 
+var net = require('net');
+var client = new net.Socket();
+client.connect(2845, function() {
+  client.write("hello world");
+});
+
 // Dat test
 //const Dat = require('dat-node');
 // Dat('./media/item1', function (err, dat) {
