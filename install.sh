@@ -7,7 +7,7 @@ sudo apt update && sudo apt install xserver-xorg-core \
   xserver-xorg-input-all \
   xserver-xorg-video-fbturbo \
   xorg \
-  libgtk2.0-dev \
+  libgtk-3-0 \
   libxss1 \
   libgconf2-dev \
   libnss3

@@ -4,8 +4,8 @@
   "description": "web graphics renderer based on electronJS",
   "main": "main.js",
   "dependencies": {
-    "electron": "~1.6.16",
-    "electron-rebuild": "^1.7.2",
+    "electron": "^3.0.0",
+    "electron-rebuild": "latest",
     "node-ipc": "^9.1.1"
   }
 }
