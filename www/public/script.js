@@ -1,5 +1,12 @@
 var socket = io();
 
+// search
+function playURL(event, value) {
+    if (event.keyCode == 13) { // 'Enter'
+        socket.emit('playURL', value);
+    }
+}
+
 socket.emit('load');
 socket.on('load', function (msg) {
     //console.log(msg);

@@ -54,6 +54,9 @@ io.on('connection', function (socket) {
   socket.on('play', function (msg) {
     media.playLocalMedia(msg);
   });
+  socket.on('playURL', function (msg) {
+    media.playRemoteMedia(msg);
+  });
   // create disk
   socket.on('createdisk', function (msg) {
     media.createDisk(msg);

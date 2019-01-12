@@ -210,6 +210,14 @@ module.exports = {
         }
         console.log('playing local media: ' + filePath);
     },
+    playRemoteMedia: function (name) {
+        // TODO: check if URL is valid?
+        if (client.pending == false) {
+            // send file path to engine if socket is connected
+            client.write(name);
+        }
+        console.log('playing remote media: ' + name);
+    },
     loadFeed: function (callback) {
         // get list of distinct disks in connections
         var selectQuery = "SELECT * FROM connections GROUP BY disk_directory";
