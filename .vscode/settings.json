@@ -1,0 +1,22 @@
+{
+  "files.exclude": {
+    "__error": "Not found",
+    "src/cmake_install.cmake": true,
+    "src/CMakeCache.txt": true,
+    "src/libserial.a": true,
+    "src/main": true,
+    "src/Makefile": true,
+    ".gitignore": true,
+    ".gitmodules": true,
+    "LICENSE": true,
+    ".vscode": true,
+    "src/build": true,
+    "src/CMakeFiles": true,
+    "**/.directory": true,
+    "**/.directory.*": true,
+    "**/node_modules": true,
+    "**/node_modules.*": true,
+    "**/package-lock": true,
+    "**/package-lock.*": true
+  }
+}
