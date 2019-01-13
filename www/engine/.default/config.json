@@ -1,0 +1,80 @@
+{
+    "window": {
+        "width": "640",
+        "height": "480"
+    },
+    "outputs": [
+        {
+            "index": 0,
+            "device": "/dev/ttyACM0",
+            "properties": {
+                "port": "/dev/ttyACM0",
+                "type": "WS2812",
+                "colorOrder": "rgb",
+                "rate": "460800"
+            },
+            "leds": [
+                {
+                    "index": 0,
+                    "x": 160,
+                    "y": 120,
+                    "r": 50
+                },
+                {
+                    "index": 1,
+                    "x": 480,
+                    "y": 120,
+                    "r": 50
+                },
+                {
+                    "index": 2,
+                    "x": 480,
+                    "y": 360,
+                    "r": 50
+                },
+                {
+                    "index": 3,
+                    "x": 160,
+                    "y": 360,
+                    "r": 50
+                }
+            ]
+        },
+        {
+            "index": 1,
+            "device": "/dev/ttyACM1",
+            "properties": {
+                "port": "/dev/ttyACM1",
+                "type": "WS2812",
+                "colorOrder": "rgb",
+                "rate": "460800"
+            },
+            "leds": [
+                {
+                    "index": 0,
+                    "x": 320,
+                    "y": 60,
+                    "r": 50
+                },
+                {
+                    "index": 1,
+                    "x": 560,
+                    "y": 240,
+                    "r": 50
+                },
+                {
+                    "index": 2,
+                    "x": 320,
+                    "y": 420,
+                    "r": 50
+                },
+                {
+                    "index": 3,
+                    "x": 80,
+                    "y": 240,
+                    "r": 50
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+#container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 100%;
+    margin: auto;
+}
+
+.item {
+    flex-basis: 29%;
+    border-style: solid;
+    border-width: 1px;
+    margin: 1%;
+    padding: 1%;
+}
+
+textarea {
+    /* width: 95%; */
+    margin: auto;
+}
+
+body {
+    background: #202020;
+    color: white;
+}
+
+#outputGraphic {
+    text-align: center;
+}
+
+circle {
+    fill: white;
+}
+
+line {
+    stroke: white;
+    stroke-width: 10;
+}

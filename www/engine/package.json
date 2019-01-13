@@ -1,0 +1,10 @@
+{
+  "name": "renderer",
+  "version": "0.0.1",
+  "description": "web graphics renderer based on electronJS",
+  "main": "main.js",
+  "dependencies": {
+    "electron": "^3.0.0",
+    "electron-rebuild": "latest"
+  }
+}

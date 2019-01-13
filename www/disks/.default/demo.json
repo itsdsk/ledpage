@@ -1,0 +1,13 @@
+{
+    "demo": {
+        "title": "untitled",
+        "description": "starter project",
+        "files": [
+            "index.html",
+            "sketch.js",
+            "style.css"
+        ],
+        "channels": ["firstchannel"],
+        "image": "thumb.jpg"
+    }
+}

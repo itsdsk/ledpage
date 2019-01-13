@@ -1,0 +1,10 @@
+<div class="item">
+    <h1>{{channel_name}}</h1>
+    <p>Count: {{count}}</p>
+    {{#if create}}
+    <h2>+</h2>
+    <button onclick="socket.emit('createdisk','{{channel_name}}')">New</button>
+    {{else}}
+    <button onclick="socket.emit('loadchannel','{{channel_name}}')">View</button>
+    {{/if}}
+</div>

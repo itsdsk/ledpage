@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <input type="search" onkeypress="playURL(event, this.value);" placeholder="Enter URL to display">
+    <div id="outputGraphic"></div>
+    <div id="container"></div>
+    <input id="test" type="range" min="0.00" max="1.00" step="0.01" onchange="updateBrightness(this.value)" />
+</body>
+
+</html>

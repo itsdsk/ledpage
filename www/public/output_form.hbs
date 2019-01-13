@@ -1,0 +1,29 @@
+<div id="outputForm">
+    <div class="window">
+        <label for="windowWidth">Width:</label>
+        <input type="number" id="windowWidth" rows="1" class="width" value="{{window.width}}">
+        <label for="windowHeight">Height:</label>
+        <input type="number" id="windowHeight" rows="1" class="height" value="{{window.height}}">
+    </div>
+    <div class="outputs">
+        {{#each outputs}}
+        <div class="{{device}}">
+            {{!-- <label for="o_device{{@index}}">Device:</label>
+            <textarea id="o_device{{@index}}" rows="1" class="device">{{device}}</textarea> --}}
+            {{!-- <label>{{device}}</label> --}}
+            <div class="properties">
+                <b>{{device}}:&emsp;</b>
+                <label for="o_type{{@index}}">Type:</label>
+                <textarea id="o_type{{@index}}" rows="1" class="type">{{properties.type}}</textarea>
+                <label for="o_color{{@index}}">Colour Order:</label>
+                <textarea id="o_color{{@index}}" rows="1" class="colorOrder">{{properties.colorOrder}}</textarea>
+                <label for="o_rate{{@index}}">Baud Rate:</label>
+                <input type="number" id="o_rate{{@index}}" rows="1" class="rate" value="{{properties.rate}}">
+            </div>
+        </div>
+        {{/each}}
+    </div>
+    <button onclick="socket.emit('saveconfig');">Save</button>
+    <button onclick="updateConfig()">Update Config</button>
+    <button onclick="resetConfig()">Reset</button>
+</div>
