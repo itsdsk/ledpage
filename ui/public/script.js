@@ -210,5 +210,21 @@ function _drop_elem() {
     selected = null;
 }
 
+function showEditor(directory) {
+    socket.emit('loadeditor', directory);
+}
+socket.on('loadeditor', function (msg) {
+    // add received HTML to DOM
+    document.getElementById("diskContainer").innerHTML = msg;
+    // hide/show containers
+    document.getElementById("indexContainer").style.display = "none";
+    document.getElementById("diskContainer").style.display = "block";
+});
+
+function closeEditor() {
+    document.getElementById("indexContainer").style.display = "block";
+    document.getElementById("diskContainer").style.display = "none";
+}
+
 document.onmousemove = _move_elem;
 document.onmouseup = _drop_elem;

@@ -55,6 +55,11 @@ fs.readFile(path.join(__dirname, "templates", "output_form.hbs"), function (err,
     if (err) throw err;
     outputFormCompiler = Handlebars.compile(data.toString());
 });
+var diskEditorCompiler;
+fs.readFile(path.join(__dirname, "templates", "disk_editor.hbs"), function (err, data) {
+    if (err) throw err;
+    diskEditorCompiler = Handlebars.compile(data.toString());
+});
 
 var mediaDir = path.join(__dirname, 'disks');
 var config; // device config
@@ -259,6 +264,11 @@ module.exports = {
             }
         });
     },
+    loadEditor: function (directory, callback) {
+        templateDisk(directory, diskEditorCompiler, function (elements) {
+            callback(elements);
+        });
+    },
     loadChannel: function (channel_name, callback) {
         var elements = "";
         // get channel element at start
@@ -333,7 +343,7 @@ function serveDiskArray(titles, callback) {
     var object = "";
 
     function repeat(title) {
-        templateDisk(title, function (element) {
+        templateDisk(title, diskCompiler, function (element) {
             object += element;
             if (titles.length) {
                 repeat(titles.pop());
@@ -355,7 +365,7 @@ function templateChannel(channel_name, create_flag, callback) {
     });
 }
 
-function templateDisk(disk_directory, callback) {
+function templateDisk(disk_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from disks table
     var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
     db.get(sql, [disk_directory], (err, itemrow) => {
@@ -384,7 +394,7 @@ function templateDisk(disk_directory, callback) {
                     }
                 });
                 // compile media object into HTML and send to client websocket
-                var element = diskCompiler(itemrow);
+                var element = templateCompiler(itemrow);
                 callback(element);
             });
         });

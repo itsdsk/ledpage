@@ -30,6 +30,12 @@ io.on('connection', function (socket) {
       io.emit('load', elements);
     });
   });
+  // request editor
+  socket.on('loadeditor', function (msg) {
+    media.loadEditor(msg, function (elements) {
+      io.emit('loadeditor', elements);
+    });
+  });
   // request channel
   socket.on('loadchannel', function (msg) {
     media.loadChannel(msg, function (elements) {
