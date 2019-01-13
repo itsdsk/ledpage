@@ -164,6 +164,22 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
+            // refresh window
+            if (client.pending == false) {
+                var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
+                client.write(updatedDir);
+                console.log("refreshing " + updatedDir);
+            }
+        });
+    },
+    saveVersion: function (msg) {
+        // update media DAT
+        var Dat = require('dat-node');
+        Dat(path.join(mediaDir, msg), function (err, dat) {
+            if (err) throw err;
+            dat.importFiles();
+            dat.joinNetwork();
+            console.log("Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
         });
     },
     deleteConnection: function (msg) {

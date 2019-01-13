@@ -65,6 +65,10 @@ io.on('connection', function (socket) {
   socket.on('updatefile', function (msg) {
     media.updateFile(msg);
   });
+  // save version (DAT)
+  socket.on('saveversion', function (msg) {
+    media.saveVersion(msg);
+  });
   // create channel
   socket.on('createchannel', function (msg) {
     if (msg.length > 0)
@@ -79,12 +83,3 @@ io.on('connection', function (socket) {
     media.createConnection(msg);
   });
 });
-
-// Dat test
-//const Dat = require('dat-node');
-// Dat('./media/item1', function (err, dat) {
-//   if (err) throw err;
-//   dat.importFiles();
-//   dat.joinNetwork();
-//   console.log("dat link: dat://" + dat.key.toString('hex'));
-// });
