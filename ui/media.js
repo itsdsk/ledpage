@@ -36,22 +36,22 @@ client.on('error', function (err) {
 
 // compile media
 var diskCompiler;
-fs.readFile(path.join(__dirname, "public", "disk.hbs"), function (err, data) {
+fs.readFile(path.join(__dirname, "templates", "disk.hbs"), function (err, data) {
     if (err) throw err;
     diskCompiler = Handlebars.compile(data.toString());
 });
 var channelCompiler;
-fs.readFile(path.join(__dirname, "public", "channel.hbs"), function (err, data) {
+fs.readFile(path.join(__dirname, "templates", "channel.hbs"), function (err, data) {
     if (err) throw err;
     channelCompiler = Handlebars.compile(data.toString());
 });
 var outputGraphicCompiler;
-fs.readFile(path.join(__dirname, "public", "output_graphic.hbs"), function (err, data) {
+fs.readFile(path.join(__dirname, "templates", "output_graphic.hbs"), function (err, data) {
     if (err) throw err;
     outputGraphicCompiler = Handlebars.compile(data.toString());
 });
 var outputFormCompiler;
-fs.readFile(path.join(__dirname, "public", "output_form.hbs"), function (err, data) {
+fs.readFile(path.join(__dirname, "templates", "output_form.hbs"), function (err, data) {
     if (err) throw err;
     outputFormCompiler = Handlebars.compile(data.toString());
 });
