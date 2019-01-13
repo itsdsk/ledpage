@@ -13,7 +13,7 @@
         <li><a href="#" onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</a></li>
         {{/each}}
     </ul>
-    <span style="display:none">
+    <span style="">
         <button onclick="socket.emit('play', '{{directory}}')">Play</button>
         {{#each files}}
         <div>

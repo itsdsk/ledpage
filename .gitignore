@@ -1,11 +1,11 @@
 node_modules
-www/engine/config.json
-src/CMakeFiles
-src/build
+renderer/config.json
+backend/CMakeFiles
+backend/build
 
-src/main
-src/libserial.a
-src/CMakeCache.txt
-src/cmake_install.cmake
-src/Makefile
+backend/main
+backend/libserial.a
+backend/CMakeCache.txt
+backend/cmake_install.cmake
+backend/Makefile
 .directory*

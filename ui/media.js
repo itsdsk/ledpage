@@ -80,12 +80,12 @@ module.exports = {
             });
         });
         // get config JSON
-        var configPath = path.join(__dirname, 'engine', 'config.json');
+        var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
         try {
             config = require(configPath);
         } catch (ex) {
             console.log("Error getting config: " + ex);
-            var pathToDefault = path.join(__dirname, 'engine', '.default', 'config.json');
+            var pathToDefault = path.join(__dirname, '..', 'renderer', '.default', 'config.json');
             fs.copyFile(pathToDefault, configPath, (err) => {
                 if (err) console.log(err)
                 else {
@@ -295,7 +295,7 @@ module.exports = {
         }
     },
     saveConfig: function () {
-        var configPath = path.join(__dirname, 'engine', 'config.json');
+        var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);
         });

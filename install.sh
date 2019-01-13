@@ -10,7 +10,9 @@ sudo apt update && sudo apt install xserver-xorg-core \
   libgtk-3-0 \
   libxss1 \
   libgconf2-dev \
-  libnss3
+  libnss3 \
+  sqlite3 \
+  libboost-all-dev
 
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody

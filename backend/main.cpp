@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     auto result = options.parse(argc, argv);
 
     // read config file
-    std::ifstream confFile("../www/engine/config.json");
+    std::ifstream confFile("../renderer/config.json");
     json config;
     confFile >> config;
 
