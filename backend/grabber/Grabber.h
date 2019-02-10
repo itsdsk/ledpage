@@ -1,7 +1,7 @@
 #pragma GCC system_header
-#ifdef RPI
+//#ifdef RPI
 #include <bcm_host.h>
-#endif
+//#endif
 
 // STL includes
 #include <cstdint>
@@ -15,7 +15,7 @@
 class FrameGrabber
 {
   public:
-#ifdef RPI
+//#ifdef RPI
     /// Handle to the display that is being captured
     DISPMANX_DISPLAY_HANDLE_T _vc_display;
 
@@ -24,7 +24,7 @@ class FrameGrabber
 
     /// Rectangle of the captured resource that is transfered to user space
     VC_RECT_T _rectangle;
-#endif
+//#endif
 
     /// Flags (transforms) for creating snapshots
     int _vc_flags;
@@ -49,10 +49,10 @@ class FrameGrabber
 
     // constructor
     FrameGrabber(const unsigned width, const unsigned height) :
-#ifdef RPI
+//#ifdef RPI
                                                                 _vc_display(0),
                                                                 _vc_resource(0),
-#endif
+//#endif
                                                                 _vc_flags(0),
                                                                 _width(width),
                                                                 _height(height),
@@ -64,7 +64,7 @@ class FrameGrabber
                                                                 _captureBuffer(new ColorRgba[0]),
                                                                 _captureBufferSize(0)
     {
-#ifdef RPI
+//#ifdef RPI
         // Initiase BCM
         bcm_host_init();
 
@@ -98,19 +98,19 @@ class FrameGrabber
         // Define the capture rectangle with the same size
         vc_dispmanx_rect_set(&_rectangle, 0, 0, width, height);
 
-#endif
+//#endif
     }
     // destructor
     ~FrameGrabber()
     {
         delete[] _captureBuffer;
-#ifdef RPI
+//#ifdef RPI
         // Clean up resources
         vc_dispmanx_resource_delete(_vc_resource);
 
         // De-init BCM
         bcm_host_deinit();
-#endif
+//#endif
     }
     void setFlags(const int vc_flags)
     {
@@ -161,7 +161,7 @@ class FrameGrabber
         unsigned cropRight = _cropRight;
         unsigned cropTop = _cropTop;
         unsigned cropBottom = _cropBottom;
-#ifdef RPI
+//#ifdef RPI
         if (_vc_flags & DISPMANX_SNAPSHOT_FILL)
         {
             // disable cropping, we are capturing the video overlay window
@@ -258,6 +258,6 @@ class FrameGrabber
 
         // Close the displaye
         vc_dispmanx_display_close(_vc_display);
-#endif
+//#endif
     }
 };

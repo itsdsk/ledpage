@@ -89,14 +89,14 @@ class DeviceManager
             uint8_t avgG = uint8_t(cummG / ledNode.positions.size());
             uint8_t avgB = uint8_t(cummB / ledNode.positions.size());
             // apply brightness TODO: check works
-            uint8_t floatBrightness = uint8_t(brightness)/uint8_t(1.0f);
-            avgR *= floatBrightness;
-            avgG *= floatBrightness;
-            avgB *= floatBrightness;
+            //uint8_t floatBrightness = uint8_t(brightness)/uint8_t(1.0f);
+            //avgR = uint8_t(brightness * avgR);
+            //avgG = uint8_t(brightness * avgG);
+            //avgB = uint8_t(brightness * avgB);
             // store colour
             ColorRgb col = {avgR, avgG, avgB};
             ledValues.emplace_back(col);
-            cout << col << endl;
+            //cout << col << endl;
         }
         return output->write(ledValues);
     }
