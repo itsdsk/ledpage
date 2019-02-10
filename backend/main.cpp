@@ -28,60 +28,7 @@ unsigned _w;
 unsigned _h;
 float brightness;
 
-void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
-{
-    try
-    {
-        // parse msg received as json
-        auto jdata = json::parse(msg->get_payload());
-        //cout << "payload:" << jdata.dump(2) << endl;
-        // go through top level of JSON object received
-        for (auto &element1 : jdata.items())
-        {
-            string key1 = element1.key();
-            if (key1 == "outputs")
-            {
-                // received an entry for "outputs", go through items in this array
-                for (auto &element2 : (element1.value()).items())
-                {
-                    // get this output device name
-                    string outputDevice = element2.value()["device"];
-                    if (element2.value().find("leds") != element2.value().end())
-                    {
-                        // there is an entry in array "leds", loop through objects within it
-                        for (auto &ledElement : element2.value()["leds"].items())
-                        {
-                            // get new values for LED
-                            int index = ledElement.value()["index"];
-                            int x = ledElement.value()["x"];
-                            int y = ledElement.value()["y"];
-                            int r = ledElement.value()["r"];
-                            // log
-                            //cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
-                            // get corresponding deviceManager and set ledNode position
-                            for (auto &deviceManager : deviceManagers)
-                                if (deviceManager.nameTEMP == outputDevice)
-                                    deviceManager.ledNodes[index].setPosition(x, y, r, _w, _h);
-                        }
-                    }
-                }
-            }
-            else if (key1 == "window")
-            {
-                cout << "key1 is window" << endl;
-                if(element1.value().find("brightness") != element1.value().end())
-                {
-                    cout << "brightness: " << element1.value()["brightness"] << endl;
-                    brightness = element1.value()["brightness"];
-                }
-            }
-        }
-    }
-    catch (const websocketpp::lib::error_code &e)
-    {
-        std::cout << "Read failed because: " << e << "(" << e.message() << ")" << std::endl;
-    }
-}
+void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
 
 int jsonStringToInt(json &value)
 {
@@ -137,21 +84,18 @@ int main(int argc, char *argv[])
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
     Image<ColorRgba> _image(_w, _h);
 
-    while (true)
-    {
-        // run indefinitely (test for WS)
-    }
-
     // display screen on device
     if (result.count("display") > 0) // runtime loop
     {
-        for (int i = 0; i < 1; i++)
+        while (true)
         {
             grabber->grabFrame(_image);
             for (auto &deviceManager : deviceManagers)
             {
                 deviceManager.update(_image, brightness);
             }
+            // max 30fps TODO: add proper FPS control
+            //sleep(0.03333333);
         }
     }
     // save screenshot
@@ -184,4 +128,59 @@ void saveScreenshot(Image<ColorRgba> &_image)
     }
     cout << "Saving screenshot" << endl;
     myfile.close();
+}
+
+void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
+{
+    try
+    {
+        // parse msg received as json
+        auto jdata = json::parse(msg->get_payload());
+        //cout << "payload:" << jdata.dump(2) << endl;
+        // go through top level of JSON object received
+        for (auto &element1 : jdata.items())
+        {
+            string key1 = element1.key();
+            if (key1 == "outputs")
+            {
+                // received an entry for "outputs", go through items in this array
+                for (auto &element2 : (element1.value()).items())
+                {
+                    // get this output device name
+                    string outputDevice = element2.value()["device"];
+                    if (element2.value().find("leds") != element2.value().end())
+                    {
+                        // there is an entry in array "leds", loop through objects within it
+                        for (auto &ledElement : element2.value()["leds"].items())
+                        {
+                            // get new values for LED
+                            int index = ledElement.value()["index"];
+                            int x = ledElement.value()["x"];
+                            int y = ledElement.value()["y"];
+                            int r = ledElement.value()["r"];
+                            // log
+                            //cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
+                            // get corresponding deviceManager and set ledNode position
+                            for (auto &deviceManager : deviceManagers)
+                                if (deviceManager.nameTEMP == outputDevice)
+                                    deviceManager.ledNodes[index].setPosition(x, y, r, _w, _h);
+                        }
+                    }
+                }
+            }
+            else if (key1 == "window")
+            {
+                cout << "key1 is window" << endl;
+                if(element1.value().find("brightness") != element1.value().end())
+                {
+                    cout << "brightness: " << element1.value()["brightness"] << endl;
+                    brightness = element1.value()["brightness"];
+                }
+            }
+        }
+    }
+    catch (const websocketpp::lib::error_code &e)
+    {
+        std::cout << "Read failed because: " << e << "(" << e.message() << ")" << std::endl;
+    }
 }
