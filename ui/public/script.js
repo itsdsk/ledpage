@@ -4,6 +4,7 @@ var socket = io();
 function playURL(event, value) {
     if (event.keyCode == 13) { // 'Enter'
         socket.emit('playURL', value);
+        console.log("sent " + value);
     }
 }
 
@@ -211,6 +212,7 @@ function _drop_elem() {
 }
 
 function showEditor(directory) {
+    console.log("hi");
     socket.emit('loadeditor', directory);
 }
 socket.on('loadeditor', function (msg) {

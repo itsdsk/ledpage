@@ -81,6 +81,7 @@ app.on('ready', () => {
   tcpServer.listen(2845);
 
   function onClientConnected(sock) {
+    console.log("Client connected");
     // receive URL to display
     sock.on('data', function (data) {
       console.log("recieved: " + data);

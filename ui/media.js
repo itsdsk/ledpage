@@ -227,7 +227,7 @@ module.exports = {
         var filePath = path.join(mediaDir, name);
         if (client.pending == false) {
             // send file path to engine if socket is connected
-            client.write('file://' + filePath);
+            client.write('file://' + filePath + "/index.html");
         }
         console.log('playing local media: ' + filePath);
     },
@@ -236,8 +236,10 @@ module.exports = {
         if (client.pending == false) {
             // send file path to engine if socket is connected
             client.write(name);
+            console.log('playing remote media: ' + name);
+        } else {
+            console.log("Cannot play " + name + " because renderer is disconnected");
         }
-        console.log('playing remote media: ' + name);
     },
     loadFeed: function (callback) {
         // get list of distinct disks in connections
