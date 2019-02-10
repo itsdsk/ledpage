@@ -8,4 +8,7 @@ backend/libserial.a
 backend/CMakeCache.txt
 backend/cmake_install.cmake
 backend/Makefile
+
+ui/disks
+
 .directory*
