@@ -1,22 +1,22 @@
 <h1>{{title}}</h1>
-<p><i>saved in {{directory}}</i></p>
+<h2 hidden>{{directory}}</h2>
 <p>{{description}}</p>
-<input type="text" id="{{directory}}_channelInput" onkeyup="channelSearch('{{directory}}')" placeholder="Channels...">
-<span onclick="createChannel('{{directory}}')">Create new channel</span>
-<ul id="{{directory}}_channelList">
+<input type="text" id="editorChannelsInput" placeholder="Channels...">
+<span id="newChannelButton">Create new channel</span>
+<ul id="editorChannelList">
     {{#each connectedChannels}}
-    <li><a href="#" onclick="deleteConnection('{{../directory}}','{{this.name}}')">{{this.name}} ✔</a></li>
+    <li><a href="#" class="editorConnectedChannelItem">{{this.name}}</a> ✔</li>
     {{/each}}
     {{#each unconnectedChannels}}
-    <li><a href="#" onclick="createConnection('{{../directory}}','{{this.name}}')">{{this.name}}</a></li>
+    <li><a href="#" class="editorDisconnectedChannelItem">{{this.name}}</a></li>
     {{/each}}
 </ul>
 {{#each files}}
-<div>
+<div data-row-id="{{this.id}}">
     <h4>{{this.filename}}</h4>
-    <textarea id="{{../directory}}_{{this.id}}">{{{this.data}}}</textarea>
-    <button onclick="updateFile('{{../directory}}', '{{this.filename}}', '{{this.id}}')">Sync</button>
+    <textarea>{{{this.data}}}</textarea>
+    <button class="editorUpdateFileButton">Sync</button>
 </div>
 {{/each}}
-<button onclick="socket.emit('saveversion','{{directory}}');">Save</button>
-<button onclick="closeEditor();">Close</button>
+<button id="editorSaveButton">Save</button>
+<button id="editorCloseButton">Close</button>

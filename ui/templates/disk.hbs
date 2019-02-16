@@ -1,8 +1,8 @@
 <div class="item">
     <img src="{{{image}}}" />
     <h1>{{title}}</h1>
-    <p><i>saved in {{directory}}</i></p>
+    <h2 hidden>{{directory}}</h2>
     <p>{{description}}</p>
-    <button onclick="socket.emit('play', '{{directory}}')">Play</button>
-    <button onclick="showEditor('{{directory}}');">Edit</button>
+    <button class="playDiskButton">Play</button>
+    <button class="editDiskButton">Edit</button>
 </div>
