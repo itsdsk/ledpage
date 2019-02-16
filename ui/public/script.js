@@ -2,33 +2,29 @@
 var socket = io();
 var mainSocket = new WebSocket('ws://localhost:9002');
 
+// events to handle user interactions on main page
 document.addEventListener('DOMContentLoaded', function () {
-    // add events
-    document.querySelector('#brightnessInput').onchange = brightnessInputHandler;
-    document.querySelector('#urlInput').onkeyup = urlInputHandler;
+    document.querySelector('#brightnessInput').onchange = function (event) {
+        var data = {
+            "window": {
+                "brightness": parseFloat(this.value)
+            }
+        };
+        console.log(JSON.stringify(data));
+        mainSocket.send(JSON.stringify(data));
+    };
+    document.querySelector('#urlInput').onkeyup = function (event) {
+        if (event.keyCode == 13) { // 'Enter'
+            socket.emit('playURL', this.value);
+            console.log("sent " + this.value);
+        }
+    };
 }, false);
 
 // input handlers
-function urlInputHandler(event) {
-    if (event.keyCode == 13) { // 'Enter'
-        socket.emit('playURL', this.value);
-        console.log("sent " + this.value);
-    }
-}
-
-function brightnessInputHandler(event) {
-    var data = {
-        "window": {
-            "brightness": parseFloat(this.value)
-        }
-    }
-    console.log(JSON.stringify(data));
-    mainSocket.send(JSON.stringify(data));
-}
-
 socket.emit('load');
 socket.on('load', function (msg) {
-    //console.log(msg);
+    // insert HTML body received from server into page
     document.getElementById("container").innerHTML += (msg);
     // add input handlers
     document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
@@ -66,8 +62,6 @@ function newDiskButtonHandler(event) {
 }
 
 socket.emit('loadoutput');
-var s_width = 0,
-    s_height = 0;
 var gap = 50;
 var x_min = gap;
 var x_max = 0;
@@ -84,11 +78,11 @@ function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
     // get SVG width+height and set boundaries
-    s_width = document.querySelector("svg").width.baseVal.value;
-    s_height = document.querySelector("svg").height.baseVal.value;
+    var s_width = document.querySelector("svg").width.baseVal.value;
+    var s_height = document.querySelector("svg").height.baseVal.value;
     x_max = s_width - gap;
     y_max = s_height - gap;
-    // add event for dragging to circles
+    // click circle event
     document.querySelectorAll("circle").forEach(function (circle) {
         circle.onmousedown = function () {
             // circle id (e.g. output 0 circle 1 = "o0_c1") has connected line IN with id "o0_c0l" and line OUT with id "o0_c1l"
@@ -98,39 +92,39 @@ function setConfig(msg = lastReceivedOutputMsg) {
             return false;
         };
     });
-    // add event for form buttons
+    // save output event
     document.querySelector('#saveOutputButton').onclick = function () {
         socket.emit('saveconfig');
     };
-    document.querySelector('#updateOutputButton').onclick = updateOutputHandler;
+    // update output event
+    document.querySelector('#updateOutputButton').onclick = function () {
+        // update config (data structure resembles host's config.json)
+        var data = {
+            "window": {},
+            "outputs": []
+        };
+        // get window properties
+        document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
+            data.window[windowProperty.className] = windowProperty.value;
+        });
+        // get output properties (except LEDs)
+        document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
+            var output = {
+                "device": outputDiv.className,
+                "properties": {}
+            };
+            outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
+                output.properties[propertyInput.className] = propertyInput.value;
+            });
+            data.outputs.push(output);
+        });
+        // send to server
+        socket.emit('updateconfig', data);
+    };
+    // reset output event
     document.querySelector('#resetOutputButton').onclick = function () {
         setConfig();
     };
-}
-
-function updateOutputHandler() {
-    // update config (data structure resembles host's config.json)
-    var data = {
-        "window": {},
-        "outputs": []
-    };
-    // get window properties
-    document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
-        data.window[windowProperty.className] = windowProperty.value;
-    });
-    // get output properties (except LEDs)
-    document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
-        var output = {
-            "device": outputDiv.className,
-            "properties": {}
-        };
-        outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
-            output.properties[propertyInput.className] = propertyInput.value;
-        });
-        data.outputs.push(output);
-    });
-    // send to server
-    socket.emit('updateconfig', data);
 }
 
 socket.on('loadeditor', function (msg) {
@@ -139,31 +133,56 @@ socket.on('loadeditor', function (msg) {
     // hide/show containers
     document.getElementById("indexContainer").style.display = "none";
     document.getElementById("diskContainer").style.display = "block";
-    // add events
-    document.getElementById("editorChannelsInput").onkeyup = editorChannelsInputHandler; // search
-    document.getElementById("newChannelButton").onclick = newChannelButtonHandler; // create channel
+    // enter text in channel search box event
+    document.getElementById("editorChannelsInput").onkeyup = function () {
+        // declare variables
+        var input = this.value.toUpperCase();
+        var ul, li, a, i, txtValue;
+        ul = document.getElementById('editorChannelList');
+        li = ul.getElementsByTagName("li");
+        // loop through list items
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(input) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    };
+    // create channel event
+    document.getElementById("newChannelButton").onclick = function () {
+        // get new channel name
+        var name = document.getElementById("editorChannelsInput").value;
+        // todo: add disk open in editor to new channel...
+        //var directory = this.parentElement.children[1].innerHTML;
+        socket.emit('createchannel', name);
+
+    };
+    // delete from channel event
     document.querySelectorAll('.editorConnectedChannelItem').forEach(function (editorConnectedChannelItem) {
-        editorConnectedChannelItem.onclick = editorDisconnectChannelHandler; // delete from channel
+        editorConnectedChannelItem.onclick = editorDisconnectChannelHandler;
     });
+    // add to channel event
     document.querySelectorAll('.editorDisconnectedChannelItem').forEach(function (editorDisconnectedChannelItem) {
-        editorDisconnectedChannelItem.onclick = editorConnectChannelHandler; // add to channel
+        editorDisconnectedChannelItem.onclick = editorConnectChannelHandler;
     });
+    // update file event
     document.querySelectorAll('.editorUpdateFileButton').forEach(function (editorUpdateFileButton) {
-        editorUpdateFileButton.onclick = editorUpdateFileHandler; // save file
+        editorUpdateFileButton.onclick = editorUpdateFileHandler;
     });
-    document.getElementById("editorSaveButton").onclick = editorSaveButtonHandler; // save version
-    document.getElementById("editorCloseButton").onclick = editorCloseButtonHandler; // close editor
+    // commit/save version event
+    document.getElementById("editorSaveButton").onclick = function () {
+        var directory = this.parentElement.children[1].innerHTML;
+        socket.emit('saveversion', directory);
+    };
+    // close editor event
+    document.getElementById("editorCloseButton").onclick = function() {
+        document.getElementById("indexContainer").style.display = "block";
+        document.getElementById("diskContainer").style.display = "none";    
+    };
 });
-
-function editorSaveButtonHandler(event) {
-    var directory = this.parentElement.children[1].innerHTML;
-    socket.emit('saveversion', directory);
-}
-
-function editorCloseButtonHandler() {
-    document.getElementById("indexContainer").style.display = "block";
-    document.getElementById("diskContainer").style.display = "none";
-}
 
 function editorUpdateFileHandler(event) {
     // get data
@@ -193,32 +212,6 @@ function editorDisconnectChannelHandler(event) {
     var directory = this.parentElement.parentElement.parentElement.children[1].innerHTML;
     var channel = this.innerHTML;
     socket.emit('deleteconnection', [directory, channel]);
-}
-
-function newChannelButtonHandler(event) {
-    // get new channel name
-    var name = document.getElementById("editorChannelsInput").value;
-    // todo: add disk open in editor to new channel...
-    //var directory = this.parentElement.children[1].innerHTML;
-    socket.emit('createchannel', name);
-}
-
-function editorChannelsInputHandler(event) {
-    // declare variables
-    var input = this.value.toUpperCase();
-    var ul, li, a, i, txtValue;
-    ul = document.getElementById('editorChannelList');
-    li = ul.getElementsByTagName("li");
-    // loop through list items
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(input) > -1) {
-            li[i].style.display = "";
-        } else {
-            li[i].style.display = "none";
-        }
-    }
 }
 
 //
