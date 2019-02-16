@@ -104,6 +104,7 @@ module.exports = {
         // path of new disk
         var randomName = "disk_" + Math.random().toString(36).substring(2, 8);
         var newDirectory = path.join(mediaDir, randomName);
+        console.log("USER INPUT::creating disk: " + newDirectory);
         // make directory
         fs.mkdir(newDirectory, function (err) {
             if (err) console.log(err)
@@ -157,6 +158,7 @@ module.exports = {
         });
     },
     createChannel: function (msg) {
+        console.log("USER INPUT::creating channel: " + msg);
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
         db.run(createQuery, [msg]);
     },
@@ -166,6 +168,7 @@ module.exports = {
         db.run(updateQuery, [msg.text, msg.fileID]);
         // get path of file on disk
         var filepath = path.join(mediaDir, msg.directory, msg.filename);
+        console.log("USER INPUT::updating file " + filepath);
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
@@ -184,10 +187,11 @@ module.exports = {
             if (err) throw err;
             dat.importFiles();
             dat.joinNetwork();
-            console.log("Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
+            console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
         });
     },
     deleteConnection: function (msg) {
+        console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE disk_directory = ? AND channel_name = ?";
         db.run(sql, msg);
@@ -206,6 +210,7 @@ module.exports = {
         });
     },
     createConnection: function (msg) {
+        console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
         var sql = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
         db.run(sql, msg);
@@ -229,16 +234,16 @@ module.exports = {
             // send file path to engine if socket is connected
             client.write('file://' + filePath + "/index.html");
         }
-        console.log('playing local media: ' + filePath);
+        console.log('USER INPUT::playing local media: ' + filePath);
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
         if (client.pending == false) {
             // send file path to engine if socket is connected
             client.write(name);
-            console.log('playing remote media: ' + name);
+            console.log('USER INPUT::playing remote media: ' + name);
         } else {
-            console.log("Cannot play " + name + " because renderer is disconnected");
+            console.log("USER INPUT::Cannot play " + name + " because renderer is disconnected");
         }
     },
     loadFeed: function (callback) {
@@ -297,6 +302,7 @@ module.exports = {
         callback(element);
     },
     updateConfig: function (msg) {
+        console.log("USER INPUT::updating output configuration");
         // update window
         if (msg.window) {
             config.window = Object.assign(config.window, msg.window);
@@ -324,6 +330,7 @@ module.exports = {
     },
     saveConfig: function () {
         var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
+        console.log("USER INPUT::saving output config to " + configPath);
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);
         });
