@@ -62,6 +62,8 @@ function newDiskButtonHandler(event) {
 }
 
 socket.emit('loadoutput');
+var s_width = 0;
+var s_height = 0;
 var gap = 50;
 var x_min = gap;
 var x_max = 0;
@@ -77,13 +79,31 @@ socket.on('loadoutput', function (msg) {
 function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
+    // style SVG using measurements based on shortest distance between LEDs
+    function distanceBetweenPoints(p1, p2) {
+        return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
+    }
+    var min_distance = 9999;
+    var circles = document.getElementsByClassName('circle');
+    for (var i = 1; i < circles.length; i++) {
+        var p1 = [circles[i - 1].getAttribute('x1'), circles[i - 1].getAttribute('y1')];
+        var p2 = [circles[i].getAttribute('x1'), circles[i].getAttribute('y1')];
+        var dist = distanceBetweenPoints(p1, p2);
+        if (dist < min_distance) min_distance = dist;
+    }
+    var svgStyle = document.createElement('style');
+    svgStyle.innerHTML = ".circle{stroke:white;stroke-width:" + (0.8 * min_distance) + ";stroke-linecap:round;}.circle:hover{stroke-width:" + (1.3 * min_distance) + ";}.line{stroke:white;stroke-width:" + (0.25 * min_distance) + ";}";
+    document.body.appendChild(svgStyle);
+    gap = 0.5 * min_distance;
+    x_min = gap;
+    y_min = gap;
     // get SVG width+height and set boundaries
-    var s_width = document.querySelector("svg").width.baseVal.value;
-    var s_height = document.querySelector("svg").height.baseVal.value;
+    s_width = document.querySelector("svg").width.baseVal.value;
+    s_height = document.querySelector("svg").height.baseVal.value;
     x_max = s_width - gap;
     y_max = s_height - gap;
     // click circle event
-    document.querySelectorAll("circle").forEach(function (circle) {
+    document.querySelectorAll(".circle").forEach(function (circle) {
         circle.onmousedown = function () {
             // circle id (e.g. output 0 circle 1 = "o0_c1") has connected line IN with id "o0_c0l" and line OUT with id "o0_c1l"
             var _lineIn = document.querySelector("#" + circle.id.replace(/.$/, parseInt(circle.id.slice(-1)) - 1) + "l");
@@ -178,9 +198,9 @@ socket.on('loadeditor', function (msg) {
         socket.emit('saveversion', directory);
     };
     // close editor event
-    document.getElementById("editorCloseButton").onclick = function() {
+    document.getElementById("editorCloseButton").onclick = function () {
         document.getElementById("indexContainer").style.display = "block";
-        document.getElementById("diskContainer").style.display = "none";    
+        document.getElementById("diskContainer").style.display = "none";
     };
 });
 
@@ -232,8 +252,8 @@ function _drag_init(elem, _lineIn, _lineOut) {
     selected = elem;
     lineIn = _lineIn;
     lineOut = _lineOut;
-    x_elem = x_pos - selected.cx.baseVal.value;
-    y_elem = y_pos - selected.cy.baseVal.value;
+    x_elem = x_pos - selected.x1.baseVal.value;
+    y_elem = y_pos - selected.y1.baseVal.value;
 }
 
 // Will be called when user dragging an element
@@ -241,8 +261,10 @@ function _move_elem(e) {
     x_pos = document.all ? window.event.clientX : e.pageX;
     y_pos = document.all ? window.event.clientY : e.pageY;
     if (selected !== null) {
-        selected.cx.baseVal.value = x_pos - x_elem;
-        selected.cy.baseVal.value = y_pos - y_elem;
+        selected.x1.baseVal.value = x_pos - x_elem;
+        selected.y1.baseVal.value = y_pos - y_elem;
+        selected.x2.baseVal.value = x_pos - x_elem;
+        selected.y2.baseVal.value = y_pos - y_elem;
         if (lineIn) {
             lineIn.x2.baseVal.value = x_pos - x_elem;
             lineIn.y2.baseVal.value = y_pos - y_elem;
@@ -259,9 +281,11 @@ function _drop_elem() {
     // keep led in boundaries
     if (selected !== null) {
         x_pos = Math.min(Math.max(x_pos - x_elem, x_min), x_max);
-        y_pos = Math.min(Math.max(y_pos - y_elem, y_min), x_max);
-        selected.cx.baseVal.value = x_pos;
-        selected.cy.baseVal.value = y_pos;
+        y_pos = Math.min(Math.max(y_pos - y_elem, y_min), y_max);
+        selected.x1.baseVal.value = x_pos;
+        selected.y1.baseVal.value = y_pos;
+        selected.x2.baseVal.value = x_pos;
+        selected.y2.baseVal.value = y_pos;
         if (lineIn) {
             lineIn.x2.baseVal.value = x_pos;
             lineIn.y2.baseVal.value = y_pos;
@@ -276,9 +300,9 @@ function _drop_elem() {
                 "device": selected.parentElement.className.baseVal,
                 "leds": [{
                     "index": parseInt(selected.id.slice(-1)),
-                    "x": selected.cx.baseVal.value,
-                    "y": selected.cy.baseVal.value,
-                    "r": selected.r.baseVal.value
+                    "x": selected.x1.baseVal.value,
+                    "y": selected.y1.baseVal.value,
+                    "r": selected.dataset.radiusId
                 }]
             }]
         };
