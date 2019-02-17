@@ -68,7 +68,7 @@ socket.on('load', function (msg) {
 });
 
 function editDiskButtonHandler() {
-    var diskDirectory = this.parentElement.children[2].innerHTML;
+    var diskDirectory = this.parentElement.dataset.directory;
     window.history.pushState({
         page: 'editor',
         disk: diskDirectory
@@ -77,17 +77,17 @@ function editDiskButtonHandler() {
 }
 
 function playDiskButtonHandler() {
-    var diskDirectory = this.parentElement.children[2].innerHTML;
+    var diskDirectory = this.parentElement.dataset.directory;
     socket.emit('play', diskDirectory);
 }
 
 function viewChannelButtonHandler() {
-    var channelName = this.parentElement.firstElementChild.innerHTML;
+    var channelName = this.parentElement.dataset.channel;
     socket.emit('loadchannel', channelName);
 }
 
 function newDiskButtonHandler() {
-    var channelName = this.parentElement.firstElementChild.innerHTML;
+    var channelName = this.parentElement.dataset.channel;
     socket.emit('createdisk', channelName);
 }
 
