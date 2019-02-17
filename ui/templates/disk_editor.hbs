@@ -5,10 +5,10 @@
 <span id="newChannelButton">Create new channel</span>
 <ul id="editorChannelList">
     {{#each connectedChannels}}
-    <li><a href="#" class="editorConnectedChannelItem">{{this.name}}</a> ✔</li>
+    <li><a class="editorConnectedChannelItem">{{this.name}}</a> ✔</li>
     {{/each}}
     {{#each unconnectedChannels}}
-    <li><a href="#" class="editorDisconnectedChannelItem">{{this.name}}</a></li>
+    <li><a class="editorDisconnectedChannelItem">{{this.name}}</a></li>
     {{/each}}
 </ul>
 {{#each files}}

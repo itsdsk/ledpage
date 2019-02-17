@@ -65,7 +65,12 @@ io.on('connection', function (socket) {
   });
   // create disk
   socket.on('createdisk', function (msg) {
-    media.createDisk(msg);
+    media.createDisk(msg, function (diskDirectory) {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: diskDirectory
+      }));
+    });
   });
   // update file
   socket.on('updatefile', function (msg) {
@@ -82,10 +87,20 @@ io.on('connection', function (socket) {
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    media.deleteConnection(msg);
+    media.deleteConnection(msg, function (diskDirectory) {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: diskDirectory
+      }));
+    });
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    media.createConnection(msg);
+    media.createConnection(msg, function (diskDirectory) {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: diskDirectory
+      }));
+    });
   });
 });

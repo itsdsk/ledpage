@@ -100,7 +100,7 @@ module.exports = {
             });
         }
     },
-    createDisk: function (channelName) {
+    createDisk: function (channelName, callback) {
         // path of new disk
         var randomName = "disk_" + Math.random().toString(36).substring(2, 8);
         var newDirectory = path.join(mediaDir, randomName);
@@ -128,7 +128,8 @@ module.exports = {
                                 fs.copyFile(path.join(pathToDefault, 'thumb.jpg'), path.join(newDirectory, 'thumb.jpg'), (err) => {
                                     if (err) console.log(err);
                                     // add to database
-                                    parseDiskDirectory(randomName, meta);
+                                    parseDiskDirectory(randomName, meta, callback(randomName));
+
                                 });
                             });
                         });
@@ -191,7 +192,7 @@ module.exports = {
             console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
         });
     },
-    deleteConnection: function (msg) {
+    deleteConnection: function (msg, callback) {
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE disk_directory = ? AND channel_name = ?";
@@ -208,9 +209,10 @@ module.exports = {
         // save json to disk
         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
             if (err) console.log(err);
+            callback(msg[0]);
         });
     },
-    createConnection: function (msg) {
+    createConnection: function (msg, callback) {
         console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
         var sql = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
@@ -227,6 +229,7 @@ module.exports = {
         // save json to disk
         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
             if (err) console.log(err);
+            callback(msg[0]);
         });
     },
     playLocalMedia: function (name) {
@@ -415,7 +418,7 @@ function templateDisk(disk_directory, templateCompiler, callback) {
     });
 }
 
-function parseDiskDirectory(directory, meta) {
+function parseDiskDirectory(directory, meta, callback) {
     // add metadata to disks table in database
     var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.description], function () {
@@ -446,7 +449,7 @@ function parseDiskDirectory(directory, meta) {
             // add name to channels table
             db.run(addChannelQuery, [channelName], function () {
                 // add pair to connections table
-                db.run(addConnectQuery, [directory, channelName]);
+                db.run(addConnectQuery, [directory, channelName], callback);
             });
         });
     });

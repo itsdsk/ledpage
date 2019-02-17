@@ -96,6 +96,18 @@ socket.on('loadchannel', function (msg) {
     });
 });
 
+socket.on('changeddisk', function (msg) {
+    // load editor on disk received from server, adding to URL history if new
+    if (JSON.stringify(window.history.state) !== msg) {
+        var parsedMsg = JSON.parse(msg);
+        window.history.pushState({
+            page: 'editor',
+            disk: parsedMsg.disk
+        }, parsedMsg.disk, "?page=editor&disk=" + parsedMsg.disk);
+    }
+    refresh();
+});
+
 function editDiskButtonHandler() {
     var diskDirectory = this.parentElement.dataset.directory;
     window.history.pushState({
