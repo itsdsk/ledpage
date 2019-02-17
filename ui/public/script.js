@@ -105,9 +105,9 @@ function setConfig(msg = lastReceivedOutputMsg) {
     // click circle event
     document.querySelectorAll(".circle").forEach(function (circle) {
         circle.onmousedown = function () {
-            // circle id (e.g. output 0 circle 1 = "o0_c1") has connected line IN with id "o0_c0l" and line OUT with id "o0_c1l"
-            var _lineIn = document.querySelector("#" + circle.id.replace(/.$/, parseInt(circle.id.slice(-1)) - 1) + "l");
-            var _lineOut = document.querySelector("#" + circle.id + "l");
+            var circleId = this.dataset.circleId;
+            var _lineOut = this.parentElement.querySelector('[data-from-circle-id="' + circleId + '"]');
+            var _lineIn = this.parentElement.querySelector('[data-to-circle-id="' + circleId + '"]');
             _drag_init(this, _lineIn, _lineOut);
             return false;
         };
