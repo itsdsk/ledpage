@@ -2,8 +2,35 @@
 var socket = io();
 var mainSocket = new WebSocket('ws://localhost:9002');
 
-// events to handle user interactions on main page
+// location change
+window.onpopstate = function () {
+    refresh();
+};
+
+function refresh() {
+    // load page
+    var url = new URL(document.location);
+    var page = url.searchParams.get('page');
+    switch (page) {
+        case 'editor':
+            var directory = url.searchParams.get('disk');
+            socket.emit('loadeditor', directory);
+            break;
+        default:
+            // check if index page is loaded
+            if (document.getElementById("container").childNodes.length === 0) {
+                socket.emit('load');
+            }
+            document.getElementById("indexContainer").style.display = "block";
+            document.getElementById("diskContainer").style.display = "none";
+            break;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    // load page
+    refresh();
+    // events to handle user interactions on main page
     document.querySelector('#brightnessInput').onchange = function () {
         var data = {
             "window": {
@@ -22,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
 }, false);
 
 // input handlers
-socket.emit('load');
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("container").innerHTML += msg;
@@ -43,7 +69,11 @@ socket.on('load', function (msg) {
 
 function editDiskButtonHandler() {
     var diskDirectory = this.parentElement.children[2].innerHTML;
-    socket.emit('loadeditor', diskDirectory);
+    window.history.pushState({
+        page: 'editor',
+        disk: diskDirectory
+    }, diskDirectory, "?page=editor&disk=" + diskDirectory);
+    refresh();
 }
 
 function playDiskButtonHandler() {
@@ -196,8 +226,10 @@ socket.on('loadeditor', function (msg) {
     };
     // close editor event
     document.getElementById("editorCloseButton").onclick = function () {
-        document.getElementById("indexContainer").style.display = "block";
-        document.getElementById("diskContainer").style.display = "none";
+        window.history.pushState({
+            page: 'index'
+        }, "Home", "/");
+        refresh();
     };
 });
 
