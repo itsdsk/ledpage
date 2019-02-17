@@ -16,13 +16,21 @@ function refresh() {
             var directory = url.searchParams.get('disk');
             socket.emit('loadeditor', directory);
             break;
+        case 'channel':
+            var channelName = url.searchParams.get('channel');
+            socket.emit('loadchannel', channelName);
+            break;
         default:
             // check if index page is loaded
             if (document.getElementById("container").childNodes.length === 0) {
                 socket.emit('load');
+            } else {
+                // hide/show containers
+                document.getElementById("indexContainer").style.display = "block";
+                document.getElementById("channelContainer").style.display = "none";
+                document.getElementById("container").style.display = "flex";
+                document.getElementById("diskContainer").style.display = "none";
             }
-            document.getElementById("indexContainer").style.display = "block";
-            document.getElementById("diskContainer").style.display = "none";
             break;
     }
 }
@@ -52,12 +60,33 @@ document.addEventListener('DOMContentLoaded', function () {
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("container").innerHTML += msg;
+    // hide/show containers
+    document.getElementById("indexContainer").style.display = "block";
+    document.getElementById("channelContainer").style.display = "none";
+    document.getElementById("container").style.display = "flex";
+    document.getElementById("diskContainer").style.display = "none";
+    // add input handlers
+    document.querySelectorAll('.viewChannelButton').forEach(function (viewChannelButton) {
+        viewChannelButton.onclick = viewChannelButtonHandler;
+    });
+    document.querySelectorAll('.playDiskButton').forEach(function (playDiskButton) {
+        playDiskButton.onclick = playDiskButtonHandler;
+    });
+    document.querySelectorAll('.editDiskButton').forEach(function (editDiskButton) {
+        editDiskButton.onclick = editDiskButtonHandler;
+    });
+});
+socket.on('loadchannel', function (msg) {
+    // insert HTML body received from server into page
+    document.getElementById("channelContainer").innerHTML = msg;
+    // hide/show containers
+    document.getElementById("indexContainer").style.display = "block";
+    document.getElementById("channelContainer").style.display = "flex";
+    document.getElementById("container").style.display = "none";
+    document.getElementById("diskContainer").style.display = "none";
     // add input handlers
     document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
         newDiskButton.onclick = newDiskButtonHandler;
-    });
-    document.querySelectorAll('.viewChannelButton').forEach(function (viewChannelButton) {
-        viewChannelButton.onclick = viewChannelButtonHandler;
     });
     document.querySelectorAll('.playDiskButton').forEach(function (playDiskButton) {
         playDiskButton.onclick = playDiskButtonHandler;
@@ -83,7 +112,10 @@ function playDiskButtonHandler() {
 
 function viewChannelButtonHandler() {
     var channelName = this.parentElement.dataset.channel;
-    socket.emit('loadchannel', channelName);
+    window.history.pushState({
+        page: 'channel'
+    }, channelName, "?page=channel&channel=" + channelName);
+    refresh();
 }
 
 function newDiskButtonHandler() {
@@ -226,10 +258,15 @@ socket.on('loadeditor', function (msg) {
     };
     // close editor event
     document.getElementById("editorCloseButton").onclick = function () {
-        window.history.pushState({
-            page: 'index'
-        }, "Home", "/");
-        refresh();
+        // return to channel if window.history.back() is possible, else to index
+        if (window.history.length > 2)
+            window.history.back();
+        else {
+            window.history.pushState({
+                page: 'index'
+            }, "Home", "/");
+            refresh();
+        }
     };
 });
 

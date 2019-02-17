@@ -39,7 +39,7 @@ io.on('connection', function (socket) {
   // request channel
   socket.on('loadchannel', function (msg) {
     media.loadChannel(msg, function (elements) {
-      io.emit('load', elements);
+      io.emit('loadchannel', elements);
     });
   });
   // request output graphic
