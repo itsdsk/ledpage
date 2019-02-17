@@ -112,8 +112,9 @@ module.exports = {
                 var pathToDefault = path.join(mediaDir, '.default');
                 // get default metadata
                 var meta = require(path.join(pathToDefault, 'demo.json'));
-                // set channel
-                meta.demo.channels.push(channelName);
+                // add channel if unique
+                if (meta.demo.channels.indexOf(channelName) === -1)
+                    meta.demo.channels.push(channelName);
                 // save metadata to disk
                 fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(meta, null, 4), function (err) {
                     if (err) console.log(err);
