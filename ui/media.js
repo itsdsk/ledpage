@@ -267,6 +267,7 @@ module.exports = {
                 var obj = grouped[key];
                 let disk_directories = obj.map(a => a.disk_directory);
                 serveChannelAndDisks(key, disk_directories, function (element) {
+                    console.log("USER INPUT::loading feed");
                     callback(element);
                 });
             }
@@ -274,6 +275,7 @@ module.exports = {
     },
     loadEditor: function (directory, callback) {
         templateDisk(directory, diskEditorCompiler, function (elements) {
+            console.log("USER INPUT::loading editor: " + directory);
             callback(elements);
         });
     },
@@ -292,6 +294,7 @@ module.exports = {
                 // 
                 serveDiskArray(disk_directories, function (disk_elements) {
                     elements += disk_elements;
+                    console.log("USER INPUT::loading feed for channel: " + channel_name);
                     callback(elements);
                 });
             });
@@ -300,6 +303,7 @@ module.exports = {
     loadOutput: function (callback) {
         var element = outputGraphicCompiler(config);
         element += "<br>" + outputFormCompiler(config);
+        console.log("USER INPUT::loading output");
         callback(element);
     },
     updateConfig: function (msg) {
