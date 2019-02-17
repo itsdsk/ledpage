@@ -25,7 +25,7 @@ app.get('/script.js', function (req, res) {
 // client websocket routes
 io.on('connection', function (socket) {
   // request feed
-  socket.on('load', function (msg) {
+  socket.on('load', function () {
     media.loadFeed(function (elements) {
       io.emit('load', elements);
     });

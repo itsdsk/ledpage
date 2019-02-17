@@ -1,17 +1,16 @@
 <svg width="{{window.width}}" height="{{window.height}}">
     {{#each outputs}}
-    <g class="{{device}}">
+    <g data-device-name="{{device}}">
         {{#each leds}}
         {{#unless @first}}
-        data-to-circle-id="{{index}}" x2="{{x}}" y2="{{y}}" />
+        x2="{{x}}" y2="{{y}}" />
         {{/unless}}
         {{#unless @last}}
-        <line class="line" id="o{{@../index}}_c{{index}}l" data-from-circle-id="{{index}}" x1="{{x}}" y1="{{y}}"
+        <line class="line" data-from-circle-id="{{index}}" x1="{{x}}" y1="{{y}}"
         {{/unless}}
         {{/each}}
         {{#each leds}}
-        {{!-- <line x1="{{x}}" y1="{{y}}" x2="{{x}}" y2="{{y}}" data-radius-id="{{r}}" class="circle" id="o{{@../index}}_c{{index}}" /> --}}
-        <line x1="{{x}}" y1="{{y}}" x2="{{x}}" y2="{{y}}" data-radius-id="{{r}}" data-circle-id="{{index}}" class="circle" id="o{{@../index}}_c{{index}}" />
+        <line x1="{{x}}" y1="{{y}}" x2="{{x}}" y2="{{y}}" data-radius-id="{{r}}" data-circle-id="{{index}}" class="circle"/>
         {{/each}}
     </g>
     {{/each}}

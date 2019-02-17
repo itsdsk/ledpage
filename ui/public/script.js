@@ -4,7 +4,7 @@ var mainSocket = new WebSocket('ws://localhost:9002');
 
 // events to handle user interactions on main page
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('#brightnessInput').onchange = function (event) {
+    document.querySelector('#brightnessInput').onchange = function () {
         var data = {
             "window": {
                 "brightness": parseFloat(this.value)
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 socket.emit('load');
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
-    document.getElementById("container").innerHTML += (msg);
+    document.getElementById("container").innerHTML += msg;
     // add input handlers
     document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
         newDiskButton.onclick = newDiskButtonHandler;
@@ -41,22 +41,22 @@ socket.on('load', function (msg) {
     });
 });
 
-function editDiskButtonHandler(event) {
+function editDiskButtonHandler() {
     var diskDirectory = this.parentElement.children[2].innerHTML;
     socket.emit('loadeditor', diskDirectory);
 }
 
-function playDiskButtonHandler(event) {
+function playDiskButtonHandler() {
     var diskDirectory = this.parentElement.children[2].innerHTML;
     socket.emit('play', diskDirectory);
 }
 
-function viewChannelButtonHandler(event) {
+function viewChannelButtonHandler() {
     var channelName = this.parentElement.firstElementChild.innerHTML;
     socket.emit('loadchannel', channelName);
 }
 
-function newDiskButtonHandler(event) {
+function newDiskButtonHandler() {
     var channelName = this.parentElement.firstElementChild.innerHTML;
     socket.emit('createdisk', channelName);
 }
@@ -105,10 +105,7 @@ function setConfig(msg = lastReceivedOutputMsg) {
     // click circle event
     document.querySelectorAll(".circle").forEach(function (circle) {
         circle.onmousedown = function () {
-            var circleId = this.dataset.circleId;
-            var _lineOut = this.parentElement.querySelector('[data-from-circle-id="' + circleId + '"]');
-            var _lineIn = this.parentElement.querySelector('[data-to-circle-id="' + circleId + '"]');
-            _drag_init(this, _lineIn, _lineOut);
+            _drag_init(this);
             return false;
         };
     });
@@ -204,7 +201,7 @@ socket.on('loadeditor', function (msg) {
     };
 });
 
-function editorUpdateFileHandler(event) {
+function editorUpdateFileHandler() {
     // get data
     var directory, filename, fileindex, text;
     directory = this.parentElement.parentElement.children[1].innerHTML;
@@ -222,13 +219,13 @@ function editorUpdateFileHandler(event) {
     socket.emit('updatefile', data);
 }
 
-function editorConnectChannelHandler(event) {
+function editorConnectChannelHandler() {
     var directory = this.parentElement.parentElement.parentElement.children[1].innerHTML;
     var channel = this.innerHTML;
     socket.emit('createconnection', [directory, channel]);
 }
 
-function editorDisconnectChannelHandler(event) {
+function editorDisconnectChannelHandler() {
     var directory = this.parentElement.parentElement.parentElement.children[1].innerHTML;
     var channel = this.innerHTML;
     socket.emit('deleteconnection', [directory, channel]);
@@ -247,11 +244,14 @@ var selected = null, // Object of the element to be moved
     y_elem = 0; // Stores top, left values (edge) of the element
 
 // Will be called when user starts dragging an element
-function _drag_init(elem, _lineIn, _lineOut) {
+function _drag_init(elem) {
     // Store the object of the element which needs to be moved
     selected = elem;
-    lineIn = _lineIn;
-    lineOut = _lineOut;
+    var circleId = selected.dataset.circleId;
+    // get connected lines
+    lineOut = selected.parentElement.querySelector('[data-from-circle-id="' + circleId + '"]');
+    lineIn = selected.parentElement.querySelector('[data-from-circle-id="' + (circleId - 1) + '"]');
+    // store element's top left coord
     x_elem = x_pos - selected.x1.baseVal.value;
     y_elem = y_pos - selected.y1.baseVal.value;
 }
@@ -297,9 +297,9 @@ function _drop_elem() {
         // send updated led to server (data structure resembles host's config.json)
         var data = {
             "outputs": [{
-                "device": selected.parentElement.className.baseVal,
+                "device": selected.parentElement.dataset.deviceName,
                 "leds": [{
-                    "index": parseInt(selected.id.slice(-1)),
+                    "index": selected.dataset.circleId,
                     "x": selected.x1.baseVal.value,
                     "y": selected.y1.baseVal.value,
                     "r": selected.dataset.radiusId
