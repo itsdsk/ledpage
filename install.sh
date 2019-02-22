@@ -14,5 +14,11 @@ sudo apt update && sudo apt install xserver-xorg-core \
   sqlite3 \
   libboost-all-dev
 
+# compile backend
+./backend/compile.sh
+
+# get app dependencies
+cd ./ui/ && npm install
+
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody
