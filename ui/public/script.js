@@ -2,11 +2,6 @@
 var socket = io();
 var mainSocket = new WebSocket('ws://localhost:9002');
 
-// location change
-window.onpopstate = function () {
-    refresh();
-};
-
 function refresh() {
     // load page
     var url = new URL(document.location);
@@ -375,7 +370,7 @@ function _drop_elem() {
             lineOut.x1.baseVal.value = x_pos;
             lineOut.y1.baseVal.value = y_pos;
         }
-        // send updated led to server (data structure resembles host's config.json)
+        // LED formatted as a subset of the host's config.json
         var data = {
             "outputs": [{
                 "device": selected.parentElement.dataset.deviceName,
@@ -387,12 +382,18 @@ function _drop_elem() {
                 }]
             }]
         };
-        //socket.emit('updateconfig', data);
-        mainSocket.send(JSON.stringify(data));
+        // send updated led(s) to server
+        //socket.emit('updateconfig', data); // sends full structure of LEDs?
+        mainSocket.send(JSON.stringify(data)); // send direct to host backend?
     }
     // reset
     selected = null;
 }
+
+// location change
+window.onpopstate = function () {
+    refresh();
+};
 
 document.onmousemove = _move_elem;
 document.onmouseup = _drop_elem;
