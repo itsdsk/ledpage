@@ -347,6 +347,16 @@ module.exports = {
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);
         });
+    },
+    getLogs: function (callback) {
+        console.log("USER INPUT::getting service logs");
+        runCommand('journalctl -u disk-backend-daemon.service -b --no-pager', function (backendLogs) {
+            runCommand('journalctl -u disk-renderer-daemon.service  -b --no-pager', function (rendererLogs) {
+                runCommand('journalctl -u disk-ui-daemon.service  -b --no-pager', function (uiLogs) {
+                    callback("backend: \n" + backendLogs + "renderer: \n" + rendererLogs + "ui: \n" + uiLogs);
+                });
+            });
+        });
     }
 };
 
@@ -459,4 +469,16 @@ function parseDiskDirectory(directory, meta, callback) {
         });
     });
 
+}
+
+function runCommand(command, callback) {
+    // run terminal command
+    var exec = require('child_process').exec;
+    exec(command, function (err, stdout, stderr) {
+        if (err) {
+            callback(stderr);
+        } else {
+            callback(stdout);
+        }
+    });
 }

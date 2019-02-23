@@ -111,4 +111,10 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // get logs
+  socket.on('getlogs', function () {
+    media.getLogs(function (logs) {
+      io.emit('getlogs', logs);
+    });
+  });
 });

@@ -50,7 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 }, false);
-
+socket.on('getlogs', function (msg) {
+    console.log(msg);
+});
 // input handlers
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
@@ -240,6 +242,9 @@ function setConfig(msg = lastReceivedOutputMsg) {
     // reset output event
     document.querySelector('#resetOutputButton').onclick = function () {
         setConfig();
+    };
+    document.querySelector('#getLogsButton').onclick = function () {
+        socket.emit('getlogs');
     };
 }
 
