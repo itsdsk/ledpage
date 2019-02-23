@@ -243,8 +243,21 @@ function setConfig(msg = lastReceivedOutputMsg) {
     document.querySelector('#resetOutputButton').onclick = function () {
         setConfig();
     };
+    // restart services event
+    document.querySelector('#restartBackendButton').onclick = function () {
+        socket.emit('restartservice', 'disk-backend-daemon.service');
+    };
+    document.querySelector('#restartRendererButton').onclick = function () {
+        socket.emit('restartservice', 'disk-renderer-daemon.service');
+    };
     document.querySelector('#getLogsButton').onclick = function () {
         socket.emit('getlogs');
+    };
+    document.querySelector('#shutdownButton').onclick = function () {
+        socket.emit('systempower', 'shutdown');
+    };
+    document.querySelector('#rebootButton').onclick = function () {
+        socket.emit('systempower', 'reboot');
     };
 }
 

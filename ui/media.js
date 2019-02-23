@@ -357,6 +357,17 @@ module.exports = {
                 });
             });
         });
+    },
+    restartService: function (msg) {
+        console.log("USER INPUT::restarting service " + msg);
+        runCommand('systemctl restart ' + msg);
+    },
+    systemPower: function (msg) {
+        console.log("USER INPUT::system " + msg);
+        if (msg == "shutdown")
+            runCommand('shutdown now');
+        else if (msg == "reboot")
+            runCommand('reboot');
     }
 };
 

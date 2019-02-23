@@ -117,4 +117,12 @@ io.on('connection', function (socket) {
       io.emit('getlogs', logs);
     });
   });
+  // restart component
+  socket.on('restartservice', function(msg) {
+    media.restartService(msg);
+  });
+  // shutdown/reboot system
+  socket.on('systempower', function(msg) {
+    media.systemPower(msg);
+  })
 });
