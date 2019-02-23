@@ -7,12 +7,12 @@
     </div>
     <div class="outputs">
         {{#each outputs}}
-        <div class="{{device}}">
+        <div data-output-id="{{index}}">
             {{!-- <label for="o_device{{@index}}">Device:</label>
             <textarea id="o_device{{@index}}" rows="1" class="device">{{device}}</textarea> --}}
             {{!-- <label>{{device}}</label> --}}
             <div class="properties">
-                <b>{{device}}:&emsp;</b>
+                <b>{{index}}:&emsp;</b>
                 <label for="o_port{{@index}}">Port:</label>
                 <textarea id="o_port{{@index}}" rows="1" class="port">{{properties.port}}</textarea>
                 <label for="o_type{{@index}}">Type:</label>

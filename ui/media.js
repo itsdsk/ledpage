@@ -319,7 +319,7 @@ module.exports = {
         if (msg.outputs) {
             // find correct output
             msg.outputs.forEach(function (msgoutput) {
-                var output = config.outputs.find(x => x.device === msgoutput.device);
+                var output = config.outputs.find(x => x.index === msgoutput.index);
                 // update output properties
                 if (msgoutput.properties) {
                     output.properties = Object.assign(output.properties, msgoutput.properties);

@@ -1,6 +1,6 @@
 <svg width="{{window.width}}" height="{{window.height}}">
     {{#each outputs}}
-    <g data-device-name="{{device}}">
+    <g data-output-id="{{index}}">
         {{#each leds}}
         {{#unless @first}}
         x2="{{x}}" y2="{{y}}" />

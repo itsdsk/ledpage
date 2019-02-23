@@ -196,7 +196,7 @@ function setConfig(msg = lastReceivedOutputMsg) {
         // get output properties (except LEDs)
         document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
             var output = {
-                "device": outputDiv.className,
+                "index": parseInt(outputDiv.dataset.outputId),
                 "properties": {}
             };
             outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
@@ -373,12 +373,12 @@ function _drop_elem() {
         // LED formatted as a subset of the host's config.json
         var data = {
             "outputs": [{
-                "device": selected.parentElement.dataset.deviceName,
+                "index": parseInt(selected.parentElement.dataset.outputId),
                 "leds": [{
-                    "index": selected.dataset.circleId,
+                    "index": parseInt(selected.dataset.circleId),
                     "x": selected.x1.baseVal.value,
                     "y": selected.y1.baseVal.value,
-                    "r": selected.dataset.radiusId
+                    "r": parseInt(selected.dataset.radiusId)
                 }]
             }]
         };
