@@ -52,6 +52,14 @@ io.on('connection', function (socket) {
   socket.on('updateconfig', function (msg) {
     media.updateConfig(msg);
   });
+  // upload config
+  socket.on('uploadconfig', function (msg) {
+    media.uploadConfig(msg, function () {
+      media.loadOutput(function (elements) {
+        io.emit('loadoutput', elements);
+      });
+    });
+  });
   // save config file
   socket.on('saveconfig', function () {
     media.saveConfig();

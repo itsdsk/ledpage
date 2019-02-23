@@ -336,6 +336,11 @@ module.exports = {
             });
         }
     },
+    uploadConfig: function (msg, callback) {
+        console.log("USER INPUT::uploading output configuration");
+        config = msg;
+        callback();
+    },
     saveConfig: function () {
         var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
         console.log("USER INPUT::saving output config to " + configPath);

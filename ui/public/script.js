@@ -178,6 +178,36 @@ function setConfig(msg = lastReceivedOutputMsg) {
             return false;
         };
     });
+    // file drag and drop event
+    document.querySelector('#outputForm').ondrop = function (evt) {
+        evt.stopPropagation();
+        evt.preventDefault(); // prevent default behaviour (file being opened)
+        var files = evt.dataTransfer.files;
+        // continue if single JSON file was dropped
+        if (files.length == 1) {
+            if (files[0].type == "application/json") {
+                // parse JSON file
+                var reader = new FileReader();
+                reader.onload = (function () {
+                    return function (e) {
+                        var jsonconf;
+                        try {
+                            jsonconf = JSON.parse(e.target.result);
+                        } catch (ex) {
+                            alert('exception caught when parsing json: ' + ex);
+                        }
+                        // send uploaded config to server
+                        socket.emit('uploadconfig', jsonconf);
+                    };
+                })(files[0]);
+                reader.readAsText(files[0]);
+            }
+        }
+    };
+    document.querySelector('#outputForm').ondragover = function (evt) {
+        evt.stopPropagation();
+        evt.preventDefault(); // turn off browser's default drag behaviour
+    };
     // save output event
     document.querySelector('#saveOutputButton').onclick = function () {
         socket.emit('saveconfig');
