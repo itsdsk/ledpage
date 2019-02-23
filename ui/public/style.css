@@ -1,5 +1,5 @@
-#container,
-#channelContainer {
+#diskFeedContainer,
+#diskChannelContainer {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

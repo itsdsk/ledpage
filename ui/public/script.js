@@ -17,13 +17,13 @@ function refresh() {
             break;
         default:
             // check if index page is loaded
-            if (document.getElementById("container").childNodes.length === 0) {
+            if (document.getElementById("diskFeedContainer").childNodes.length === 0) {
                 socket.emit('load');
             } else {
                 // hide/show containers
                 document.getElementById("indexContainer").style.display = "block";
-                document.getElementById("channelContainer").style.display = "none";
-                document.getElementById("container").style.display = "flex";
+                document.getElementById("diskChannelContainer").style.display = "none";
+                document.getElementById("diskFeedContainer").style.display = "flex";
                 document.getElementById("diskContainer").style.display = "none";
             }
             break;
@@ -54,11 +54,11 @@ document.addEventListener('DOMContentLoaded', function () {
 // input handlers
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
-    document.getElementById("container").innerHTML += msg;
+    document.getElementById("diskFeedContainer").innerHTML += msg;
     // hide/show containers
     document.getElementById("indexContainer").style.display = "block";
-    document.getElementById("channelContainer").style.display = "none";
-    document.getElementById("container").style.display = "flex";
+    document.getElementById("diskChannelContainer").style.display = "none";
+    document.getElementById("diskFeedContainer").style.display = "flex";
     document.getElementById("diskContainer").style.display = "none";
     // add input handlers
     document.querySelectorAll('.viewChannelButton').forEach(function (viewChannelButton) {
@@ -73,11 +73,11 @@ socket.on('load', function (msg) {
 });
 socket.on('loadchannel', function (msg) {
     // insert HTML body received from server into page
-    document.getElementById("channelContainer").innerHTML = msg;
+    document.getElementById("diskChannelContainer").innerHTML = msg;
     // hide/show containers
     document.getElementById("indexContainer").style.display = "block";
-    document.getElementById("channelContainer").style.display = "flex";
-    document.getElementById("container").style.display = "none";
+    document.getElementById("diskChannelContainer").style.display = "flex";
+    document.getElementById("diskFeedContainer").style.display = "none";
     document.getElementById("diskContainer").style.display = "none";
     // add input handlers
     document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
