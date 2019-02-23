@@ -13,6 +13,8 @@
             {{!-- <label>{{device}}</label> --}}
             <div class="properties">
                 <b>{{device}}:&emsp;</b>
+                <label for="o_port{{@index}}">Port:</label>
+                <textarea id="o_port{{@index}}" rows="1" class="port">{{properties.port}}</textarea>
                 <label for="o_type{{@index}}">Type:</label>
                 <textarea id="o_type{{@index}}" rows="1" class="type">{{properties.type}}</textarea>
                 <label for="o_color{{@index}}">Colour Order:</label>
