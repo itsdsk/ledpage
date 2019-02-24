@@ -150,27 +150,36 @@ socket.on('loadoutput', function (msg) {
 function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
     document.getElementById("outputGraphic").innerHTML = msg;
-    // style SVG using measurements based on shortest distance between LEDs
+    // 2D euclidean distance helper
     function distanceBetweenPoints(p1, p2) {
         return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
     }
+    // try to get shortest distance between points (for SVG styling)
     var min_distance = 9999;
     var circles = document.getElementsByClassName('circle');
     for (var i = 1; i < circles.length; i++) {
-        var p1 = [circles[i - 1].getAttribute('x1'), circles[i - 1].getAttribute('y1')];
-        var p2 = [circles[i].getAttribute('x1'), circles[i].getAttribute('y1')];
+        var p1 = [circles[i].getAttribute('x1'), circles[i].getAttribute('y1')];
+        var p2 = [circles[0].getAttribute('x1'), circles[0].getAttribute('y1')];
         var dist = distanceBetweenPoints(p1, p2);
         if (dist < min_distance) min_distance = dist;
     }
+    // use calculated min_distance between points as SVG circle width
+    var circleWidth = Math.min(0.8 * min_distance, 25);
+    // style SVG
     var svgStyle = document.createElement('style');
-    svgStyle.innerHTML = ".circle{stroke:white;stroke-width:" + (0.8 * min_distance) + ";stroke-linecap:round;}.circle:hover{stroke-width:" + (1.3 * min_distance) + ";}.line{stroke:white;stroke-width:" + (0.25 * min_distance) + ";}";
+    svgStyle.innerHTML = `
+        .circle{stroke:white;stroke-width:` + circleWidth.toString() + `px;stroke-linecap:round;}
+        .circle:hover{stroke-width:` + (circleWidth + 5).toString() + `px;}
+        .line{stroke:white;stroke-width:` + (0.25 * circleWidth).toString() + `px;}
+    `;
     document.body.appendChild(svgStyle);
+    // get SVG width+height
+    s_width = document.querySelector("svg").width.baseVal.value;
+    s_height = document.querySelector("svg").height.baseVal.value;
+    // set boundary values for SVG interaction
     gap = 0.5 * min_distance;
     x_min = gap;
     y_min = gap;
-    // get SVG width+height and set boundaries
-    s_width = document.querySelector("svg").width.baseVal.value;
-    s_height = document.querySelector("svg").height.baseVal.value;
     x_max = s_width - gap;
     y_max = s_height - gap;
     // click circle event
