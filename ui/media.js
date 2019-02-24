@@ -350,9 +350,9 @@ module.exports = {
     },
     getLogs: function (callback) {
         console.log("USER INPUT::getting service logs");
-        runCommand('journalctl -u disk-backend-daemon.service -b --no-pager', function (backendLogs) {
-            runCommand('journalctl -u disk-renderer-daemon.service  -b --no-pager', function (rendererLogs) {
-                runCommand('journalctl -u disk-ui-daemon.service  -b --no-pager', function (uiLogs) {
+        runCommand('journalctl -u disk-backend-daemon.service -b --no-pager --lines=128', function (backendLogs) {
+            runCommand('journalctl -u disk-renderer-daemon.service  -b --no-pager --lines=128', function (rendererLogs) {
+                runCommand('journalctl -u disk-ui-daemon.service  -b --no-pager --lines=128', function (uiLogs) {
                     callback("backend: \n" + backendLogs + "renderer: \n" + rendererLogs + "ui: \n" + uiLogs);
                 });
             });
