@@ -1,22 +1,23 @@
-<h1>{{title}}</h1>
-<h2 hidden>{{directory}}</h2>
-<p>{{description}}</p>
-<input type="text" id="editorChannelsInput" placeholder="Channels...">
-<span id="newChannelButton">Create new channel</span>
-<ul id="editorChannelList">
-    {{#each connectedChannels}}
-    <li><a class="editorConnectedChannelItem">{{this.name}}</a> ✔</li>
+<div data-disk-directory="{{directory}}">
+    <h1>{{title}}</h1>
+    <p>{{description}}</p>
+    <input type="text" id="editorChannelsInput" placeholder="Channels...">
+    <span id="newChannelButton">Create new channel</span>
+    <ul id="editorChannelList">
+        {{#each connectedChannels}}
+        <li><a class="editorConnectedChannelItem">{{this.name}}</a> ✔</li>
+        {{/each}}
+        {{#each unconnectedChannels}}
+        <li><a class="editorDisconnectedChannelItem">{{this.name}}</a></li>
+        {{/each}}
+    </ul>
+    {{#each files}}
+    <div data-row-id="{{this.id}}">
+        <h4>{{this.filename}}</h4>
+        <textarea>{{{this.data}}}</textarea>
+        <button class="editorUpdateFileButton">Sync</button>
+    </div>
     {{/each}}
-    {{#each unconnectedChannels}}
-    <li><a class="editorDisconnectedChannelItem">{{this.name}}</a></li>
-    {{/each}}
-</ul>
-{{#each files}}
-<div data-row-id="{{this.id}}">
-    <h4>{{this.filename}}</h4>
-    <textarea>{{{this.data}}}</textarea>
-    <button class="editorUpdateFileButton">Sync</button>
+    <button id="editorSaveButton">Save</button>
+    <button id="editorCloseButton">Close</button>
 </div>
-{{/each}}
-<button id="editorSaveButton">Save</button>
-<button id="editorCloseButton">Close</button>

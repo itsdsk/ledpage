@@ -317,7 +317,7 @@ socket.on('loadeditor', function (msg) {
     });
     // commit/save version event
     document.getElementById("editorSaveButton").onclick = function () {
-        var directory = this.parentElement.children[1].innerHTML;
+        var directory = this.parentElement.dataset.diskDirectory;
         socket.emit('saveversion', directory);
     };
     // close editor event
@@ -337,7 +337,7 @@ socket.on('loadeditor', function (msg) {
 function editorUpdateFileHandler() {
     // get data
     var directory, filename, fileindex, text;
-    directory = this.parentElement.parentElement.children[1].innerHTML;
+    directory = this.parentElement.parentElement.dataset.diskDirectory;
     filename = this.parentElement.firstElementChild.innerHTML;
     fileindex = this.parentElement.dataset.rowId;
     text = this.parentElement.children[1].value;
@@ -353,13 +353,13 @@ function editorUpdateFileHandler() {
 }
 
 function editorConnectChannelHandler() {
-    var directory = this.parentElement.parentElement.parentElement.children[1].innerHTML;
+    var directory = this.parentElement.parentElement.parentElement.dataset.diskDirectory;
     var channel = this.innerHTML;
     socket.emit('createconnection', [directory, channel]);
 }
 
 function editorDisconnectChannelHandler() {
-    var directory = this.parentElement.parentElement.parentElement.children[1].innerHTML;
+    var directory = this.parentElement.parentElement.parentElement.dataset.diskDirectory;
     var channel = this.innerHTML;
     socket.emit('deleteconnection', [directory, channel]);
 }
