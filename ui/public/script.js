@@ -20,11 +20,8 @@ function refresh() {
             if (document.getElementById("diskFeedContainer").childNodes.length === 0) {
                 socket.emit('load');
             } else {
-                // hide/show containers
-                document.getElementById("indexContainer").style.display = "block";
-                document.getElementById("diskChannelContainer").style.display = "none";
-                document.getElementById("diskFeedContainer").style.display = "flex";
-                document.getElementById("diskContainer").style.display = "none";
+                // show feed div and hide other containers
+                changeStyleToView('feed');
             }
             break;
     }
@@ -57,11 +54,8 @@ socket.on('getlogs', function (msg) {
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("diskFeedContainer").innerHTML += msg;
-    // hide/show containers
-    document.getElementById("indexContainer").style.display = "block";
-    document.getElementById("diskChannelContainer").style.display = "none";
-    document.getElementById("diskFeedContainer").style.display = "flex";
-    document.getElementById("diskContainer").style.display = "none";
+    // show feed div and hide other containers
+    changeStyleToView('feed');
     // add input handlers
     document.querySelectorAll('.viewChannelButton').forEach(function (viewChannelButton) {
         viewChannelButton.onclick = viewChannelButtonHandler;
@@ -76,11 +70,8 @@ socket.on('load', function (msg) {
 socket.on('loadchannel', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("diskChannelContainer").innerHTML = msg;
-    // hide/show containers
-    document.getElementById("indexContainer").style.display = "block";
-    document.getElementById("diskChannelContainer").style.display = "flex";
-    document.getElementById("diskFeedContainer").style.display = "none";
-    document.getElementById("diskContainer").style.display = "none";
+    // show channel div and hide other containers
+    changeStyleToView('channel');
     // add input handlers
     document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
         newDiskButton.onclick = newDiskButtonHandler;
@@ -451,6 +442,14 @@ function _drop_elem() {
 window.onpopstate = function () {
     refresh();
 };
+
+function changeStyleToView(view) {
+    // show/hide containers, argument should be 'feed', 'channel' or 'editor'
+    document.getElementById("indexContainer").style.display = (view == "editor" ? "none" : "block");
+    document.getElementById("diskChannelContainer").style.display = (view == "channel" ? "flex" : "none");
+    document.getElementById("diskFeedContainer").style.display = (view == "feed" ? "flex" : "none");
+    document.getElementById("diskContainer").style.display = (view == "editor" ? "block" : "none");
+}
 
 document.onmousemove = _move_elem;
 document.onmouseup = _drop_elem;
