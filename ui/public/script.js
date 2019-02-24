@@ -40,12 +40,33 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(JSON.stringify(data));
         mainSocket.send(JSON.stringify(data));
     };
-    document.querySelector('#urlInput').onkeyup = function (event) {
+}, false);
+
+document.addEventListener('keyup', function (event) {
+    // handle keyboard button up events
+    if (event.target.matches('#urlInput')) {
         if (event.keyCode == 13) { // 'Enter'
-            socket.emit('playURL', this.value);
-            console.log("sent " + this.value);
+            socket.emit('playURL', event.target.value);
+            console.log("sent " + event.target.value);
         }
-    };
+    } else if (event.target.matches('#editorChannelsInput')) {
+        // filter channels when text is entered into channel search box
+        // declare variables
+        var input = event.target.value.toUpperCase();
+        var ul, li, a, i, txtValue;
+        ul = document.getElementById('editorChannelList');
+        li = ul.getElementsByTagName("li");
+        // loop through list items
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(input) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
 }, false);
 
 document.addEventListener('click', function (event) {
@@ -208,24 +229,6 @@ socket.on('loadeditor', function (msg) {
     document.getElementById("diskContainer").innerHTML = msg;
     // show editor div and hide other containers
     changeStyleToView('editor');
-    // enter text in channel search box event
-    document.getElementById("editorChannelsInput").onkeyup = function () {
-        // declare variables
-        var input = this.value.toUpperCase();
-        var ul, li, a, i, txtValue;
-        ul = document.getElementById('editorChannelList');
-        li = ul.getElementsByTagName("li");
-        // loop through list items
-        for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(input) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
-        }
-    };
 });
 
 socket.emit('loadoutput');
