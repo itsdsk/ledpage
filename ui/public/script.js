@@ -42,6 +42,52 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 }, false);
 
+document.addEventListener('mousedown', function (event) {
+    // click circle event
+    if (event.target.matches('.circle')) {
+        _drag_init(event.target);
+        return false;
+    }
+}, false);
+
+document.addEventListener('dragover', function (event) {
+    // file drag and drop event
+    if (document.getElementById('outputForm').contains(event.target)) {
+        // turn off browser's default drag behaviour
+        event.stopPropagation();
+        event.preventDefault();
+    }
+}, false);
+
+document.addEventListener('drop', function (event) {
+    // file drag and drop event
+    if (document.getElementById('outputForm').contains(event.target)) {
+        event.stopPropagation();
+        event.preventDefault(); // prevent default behaviour (file being opened)
+        var files = event.dataTransfer.files;
+        // continue if single JSON file was dropped
+        if (files.length == 1) {
+            if (files[0].type == "application/json") {
+                // parse JSON file
+                var reader = new FileReader();
+                reader.onload = (function () {
+                    return function (e) {
+                        var jsonconf;
+                        try {
+                            jsonconf = JSON.parse(e.target.result);
+                        } catch (ex) {
+                            alert('exception caught when parsing json: ' + ex);
+                        }
+                        // send uploaded config to server
+                        socket.emit('uploadconfig', jsonconf);
+                    };
+                })(files[0]);
+                reader.readAsText(files[0]);
+            }
+        }
+    }
+}, false);
+
 document.addEventListener('keyup', function (event) {
     // handle keyboard button up events
     if (event.target.matches('#urlInput')) {
@@ -276,43 +322,6 @@ function setConfig(msg = lastReceivedOutputMsg) {
     y_min = gap;
     x_max = s_width - gap;
     y_max = s_height - gap;
-    // click circle event
-    document.querySelectorAll(".circle").forEach(function (circle) {
-        circle.onmousedown = function () {
-            _drag_init(this);
-            return false;
-        };
-    });
-    // file drag and drop event
-    document.querySelector('#outputForm').ondrop = function (evt) {
-        evt.stopPropagation();
-        evt.preventDefault(); // prevent default behaviour (file being opened)
-        var files = evt.dataTransfer.files;
-        // continue if single JSON file was dropped
-        if (files.length == 1) {
-            if (files[0].type == "application/json") {
-                // parse JSON file
-                var reader = new FileReader();
-                reader.onload = (function () {
-                    return function (e) {
-                        var jsonconf;
-                        try {
-                            jsonconf = JSON.parse(e.target.result);
-                        } catch (ex) {
-                            alert('exception caught when parsing json: ' + ex);
-                        }
-                        // send uploaded config to server
-                        socket.emit('uploadconfig', jsonconf);
-                    };
-                })(files[0]);
-                reader.readAsText(files[0]);
-            }
-        }
-    };
-    document.querySelector('#outputForm').ondragover = function (evt) {
-        evt.stopPropagation();
-        evt.preventDefault(); // turn off browser's default drag behaviour
-    };
 }
 
 //
