@@ -47,41 +47,143 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 }, false);
+
+document.addEventListener('click', function (event) {
+    // handle mouseclick events
+    var channelName, diskDirectory, data;
+    // mouseclick events
+    if (event.target.matches('.viewChannelButton')) {
+        //
+        channelName = event.target.parentElement.dataset.channel;
+        window.history.pushState({
+            page: 'channel'
+        }, channelName, "?page=channel&channel=" + channelName);
+        refresh();
+    } else if (event.target.matches('.playDiskButton')) {
+        //
+        diskDirectory = event.target.parentElement.dataset.directory;
+        socket.emit('play', diskDirectory);
+    } else if (event.target.matches('.editDiskButton')) {
+        //
+        diskDirectory = event.target.parentElement.dataset.directory;
+        window.history.pushState({
+            page: 'editor',
+            disk: diskDirectory
+        }, diskDirectory, "?page=editor&disk=" + diskDirectory);
+        refresh();
+    } else if (event.target.matches('.newDiskButton')) {
+        //
+        channelName = event.target.parentElement.dataset.channel;
+        socket.emit('createdisk', channelName);
+    } else if (event.target.matches('#newChannelButton')) {
+        // get new channel name
+        var name = document.getElementById("editorChannelsInput").value;
+        // todo: add disk open in editor to new channel...
+        // also todo: add new channel list element
+        //var directory = this.parentElement.children[1].innerHTML;
+        socket.emit('createchannel', name);
+    } else if (event.target.matches('.editorConnectedChannelItem')) {
+        // disconnect
+        diskDirectory = event.target.parentElement.parentElement.parentElement.dataset.diskDirectory;
+        channelName = event.target.innerHTML;
+        socket.emit('deleteconnection', [diskDirectory, channelName]);
+    } else if (event.target.matches('.editorDisconnectedChannelItem')) {
+        // connect
+        diskDirectory = event.target.parentElement.parentElement.parentElement.dataset.diskDirectory;
+        channelName = event.target.innerHTML;
+        socket.emit('createconnection', [diskDirectory, channelName]);
+    } else if (event.target.matches('.editorUpdateFileButton')) {
+        // get data
+        var filename, fileindex, text;
+        diskDirectory = event.target.parentElement.parentElement.dataset.diskDirectory;
+        filename = event.target.parentElement.firstElementChild.innerHTML;
+        fileindex = event.target.parentElement.dataset.rowId;
+        text = event.target.parentElement.children[1].value;
+        // format
+        data = {
+            directory: diskDirectory,
+            filename: filename,
+            fileID: fileindex,
+            text: text
+        };
+        // send to server
+        socket.emit('updatefile', data);
+    } else if (event.target.matches('#editorSaveButton')) {
+        // commit/save version event
+        diskDirectory = event.target.parentElement.dataset.diskDirectory;
+        socket.emit('saveversion', diskDirectory);
+    } else if (event.target.matches('#editorCloseButton')) {
+        // return to channel if window.history.back() is possible, else to index
+        if (window.history.length > 2)
+            window.history.back();
+        else {
+            window.history.pushState({
+                page: 'index'
+            }, "Home", "/");
+            refresh();
+        }
+    } else if (event.target.matches('#saveOutputButton')) {
+        // save output button
+        socket.emit('saveconfig');
+    } else if (event.target.matches('#updateOutputButton')) {
+        // update config (data structure resembles host's config.json)
+        data = {
+            "window": {},
+            "outputs": []
+        };
+        // get window properties
+        document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
+            data.window[windowProperty.className] = windowProperty.value;
+        });
+        // get output properties (except LEDs)
+        document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
+            var output = {
+                "index": parseInt(outputDiv.dataset.outputId),
+                "properties": {}
+            };
+            outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
+                output.properties[propertyInput.className] = propertyInput.value;
+            });
+            data.outputs.push(output);
+        });
+        // send to server
+        socket.emit('updateconfig', data);
+    } else if (event.target.matches('#resetOutputButton')) {
+        // reset output
+        setConfig();
+    } else if (event.target.matches('#restartBackendButton')) {
+        // restart backend process
+        socket.emit('restartservice', 'disk-backend-daemon.service');
+    } else if (event.target.matches('#restartRendererButton')) {
+        // restart renderer process
+        socket.emit('restartservice', 'disk-renderer-daemon.service');
+    } else if (event.target.matches('#getLogsButton')) {
+        // get process logs
+        socket.emit('getlogs');
+    } else if (event.target.matches('#shutdownButton')) {
+        socket.emit('systempower', 'shutdown');
+    } else if (event.target.matches('#rebootButton')) {
+        socket.emit('systempower', 'reboot');
+    }
+}, false);
+
+// incoming messages
 socket.on('getlogs', function (msg) {
     console.log(msg);
 });
+
 // input handlers
 socket.on('load', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("diskFeedContainer").innerHTML += msg;
     // show feed div and hide other containers
     changeStyleToView('feed');
-    // add input handlers
-    document.querySelectorAll('.viewChannelButton').forEach(function (viewChannelButton) {
-        viewChannelButton.onclick = viewChannelButtonHandler;
-    });
-    document.querySelectorAll('.playDiskButton').forEach(function (playDiskButton) {
-        playDiskButton.onclick = playDiskButtonHandler;
-    });
-    document.querySelectorAll('.editDiskButton').forEach(function (editDiskButton) {
-        editDiskButton.onclick = editDiskButtonHandler;
-    });
 });
 socket.on('loadchannel', function (msg) {
     // insert HTML body received from server into page
     document.getElementById("diskChannelContainer").innerHTML = msg;
     // show channel div and hide other containers
     changeStyleToView('channel');
-    // add input handlers
-    document.querySelectorAll('.newDiskButton').forEach(function (newDiskButton) {
-        newDiskButton.onclick = newDiskButtonHandler;
-    });
-    document.querySelectorAll('.playDiskButton').forEach(function (playDiskButton) {
-        playDiskButton.onclick = playDiskButtonHandler;
-    });
-    document.querySelectorAll('.editDiskButton').forEach(function (editDiskButton) {
-        editDiskButton.onclick = editDiskButtonHandler;
-    });
 });
 
 socket.on('changeddisk', function (msg) {
@@ -96,32 +198,35 @@ socket.on('changeddisk', function (msg) {
     refresh();
 });
 
-function editDiskButtonHandler() {
-    var diskDirectory = this.parentElement.dataset.directory;
-    window.history.pushState({
-        page: 'editor',
-        disk: diskDirectory
-    }, diskDirectory, "?page=editor&disk=" + diskDirectory);
-    refresh();
-}
+socket.on('loadoutput', function (msg) {
+    lastReceivedOutputMsg = msg;
+    setConfig();
+});
 
-function playDiskButtonHandler() {
-    var diskDirectory = this.parentElement.dataset.directory;
-    socket.emit('play', diskDirectory);
-}
-
-function viewChannelButtonHandler() {
-    var channelName = this.parentElement.dataset.channel;
-    window.history.pushState({
-        page: 'channel'
-    }, channelName, "?page=channel&channel=" + channelName);
-    refresh();
-}
-
-function newDiskButtonHandler() {
-    var channelName = this.parentElement.dataset.channel;
-    socket.emit('createdisk', channelName);
-}
+socket.on('loadeditor', function (msg) {
+    // add received HTML to DOM
+    document.getElementById("diskContainer").innerHTML = msg;
+    // show editor div and hide other containers
+    changeStyleToView('editor');
+    // enter text in channel search box event
+    document.getElementById("editorChannelsInput").onkeyup = function () {
+        // declare variables
+        var input = this.value.toUpperCase();
+        var ul, li, a, i, txtValue;
+        ul = document.getElementById('editorChannelList');
+        li = ul.getElementsByTagName("li");
+        // loop through list items
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(input) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    };
+});
 
 socket.emit('loadoutput');
 var s_width = 0;
@@ -132,11 +237,6 @@ var x_max = 0;
 var y_min = gap;
 var y_max = 0;
 var lastReceivedOutputMsg;
-
-socket.on('loadoutput', function (msg) {
-    lastReceivedOutputMsg = msg;
-    setConfig();
-});
 
 function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
@@ -210,149 +310,6 @@ function setConfig(msg = lastReceivedOutputMsg) {
         evt.stopPropagation();
         evt.preventDefault(); // turn off browser's default drag behaviour
     };
-    // save output event
-    document.querySelector('#saveOutputButton').onclick = function () {
-        socket.emit('saveconfig');
-    };
-    // update output event
-    document.querySelector('#updateOutputButton').onclick = function () {
-        // update config (data structure resembles host's config.json)
-        var data = {
-            "window": {},
-            "outputs": []
-        };
-        // get window properties
-        document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
-            data.window[windowProperty.className] = windowProperty.value;
-        });
-        // get output properties (except LEDs)
-        document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
-            var output = {
-                "index": parseInt(outputDiv.dataset.outputId),
-                "properties": {}
-            };
-            outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
-                output.properties[propertyInput.className] = propertyInput.value;
-            });
-            data.outputs.push(output);
-        });
-        // send to server
-        socket.emit('updateconfig', data);
-    };
-    // reset output event
-    document.querySelector('#resetOutputButton').onclick = function () {
-        setConfig();
-    };
-    // restart services event
-    document.querySelector('#restartBackendButton').onclick = function () {
-        socket.emit('restartservice', 'disk-backend-daemon.service');
-    };
-    document.querySelector('#restartRendererButton').onclick = function () {
-        socket.emit('restartservice', 'disk-renderer-daemon.service');
-    };
-    document.querySelector('#getLogsButton').onclick = function () {
-        socket.emit('getlogs');
-    };
-    document.querySelector('#shutdownButton').onclick = function () {
-        socket.emit('systempower', 'shutdown');
-    };
-    document.querySelector('#rebootButton').onclick = function () {
-        socket.emit('systempower', 'reboot');
-    };
-}
-
-socket.on('loadeditor', function (msg) {
-    // add received HTML to DOM
-    document.getElementById("diskContainer").innerHTML = msg;
-    // hide/show containers
-    document.getElementById("indexContainer").style.display = "none";
-    document.getElementById("diskContainer").style.display = "block";
-    // enter text in channel search box event
-    document.getElementById("editorChannelsInput").onkeyup = function () {
-        // declare variables
-        var input = this.value.toUpperCase();
-        var ul, li, a, i, txtValue;
-        ul = document.getElementById('editorChannelList');
-        li = ul.getElementsByTagName("li");
-        // loop through list items
-        for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(input) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
-        }
-    };
-    // create channel event
-    document.getElementById("newChannelButton").onclick = function () {
-        // get new channel name
-        var name = document.getElementById("editorChannelsInput").value;
-        // todo: add disk open in editor to new channel...
-        //var directory = this.parentElement.children[1].innerHTML;
-        socket.emit('createchannel', name);
-
-    };
-    // delete from channel event
-    document.querySelectorAll('.editorConnectedChannelItem').forEach(function (editorConnectedChannelItem) {
-        editorConnectedChannelItem.onclick = editorDisconnectChannelHandler;
-    });
-    // add to channel event
-    document.querySelectorAll('.editorDisconnectedChannelItem').forEach(function (editorDisconnectedChannelItem) {
-        editorDisconnectedChannelItem.onclick = editorConnectChannelHandler;
-    });
-    // update file event
-    document.querySelectorAll('.editorUpdateFileButton').forEach(function (editorUpdateFileButton) {
-        editorUpdateFileButton.onclick = editorUpdateFileHandler;
-    });
-    // commit/save version event
-    document.getElementById("editorSaveButton").onclick = function () {
-        var directory = this.parentElement.dataset.diskDirectory;
-        socket.emit('saveversion', directory);
-    };
-    // close editor event
-    document.getElementById("editorCloseButton").onclick = function () {
-        // return to channel if window.history.back() is possible, else to index
-        if (window.history.length > 2)
-            window.history.back();
-        else {
-            window.history.pushState({
-                page: 'index'
-            }, "Home", "/");
-            refresh();
-        }
-    };
-});
-
-function editorUpdateFileHandler() {
-    // get data
-    var directory, filename, fileindex, text;
-    directory = this.parentElement.parentElement.dataset.diskDirectory;
-    filename = this.parentElement.firstElementChild.innerHTML;
-    fileindex = this.parentElement.dataset.rowId;
-    text = this.parentElement.children[1].value;
-    // format
-    var data = {
-        directory: directory,
-        filename: filename,
-        fileID: fileindex,
-        text: text
-    };
-    // send to server
-    socket.emit('updatefile', data);
-}
-
-function editorConnectChannelHandler() {
-    var directory = this.parentElement.parentElement.parentElement.dataset.diskDirectory;
-    var channel = this.innerHTML;
-    socket.emit('createconnection', [directory, channel]);
-}
-
-function editorDisconnectChannelHandler() {
-    var directory = this.parentElement.parentElement.parentElement.dataset.diskDirectory;
-    var channel = this.innerHTML;
-    socket.emit('deleteconnection', [directory, channel]);
 }
 
 //
