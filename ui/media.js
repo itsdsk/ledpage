@@ -24,12 +24,12 @@ db.serialize(function () {
 });
 
 // connect to engine
-var client = new net.Socket();
-client.connect(2845, function () {
+var backendSocket = new net.Socket();
+backendSocket.connect(2845, function () {
     console.log("connected to engine");
 });
-client.on('error', function (err) {
-    console.log('client error:');
+backendSocket.on('error', function (err) {
+    console.log('backend not connected:');
     console.log(err);
 });
 
@@ -175,9 +175,9 @@ module.exports = {
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
             // refresh window
-            if (client.pending == false) {
+            if (backendSocket.pending == false) {
                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                client.write(updatedDir);
+                backendSocket.write(updatedDir);
                 console.log("refreshing " + updatedDir);
             }
         });
@@ -234,17 +234,17 @@ module.exports = {
     },
     playLocalMedia: function (name) {
         var filePath = path.join(mediaDir, name);
-        if (client.pending == false) {
+        if (backendSocket.pending == false) {
             // send file path to engine if socket is connected
-            client.write('file://' + filePath + "/index.html");
+            backendSocket.write('file://' + filePath + "/index.html");
         }
         console.log('USER INPUT::playing local media: ' + filePath);
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
-        if (client.pending == false) {
+        if (backendSocket.pending == false) {
             // send file path to engine if socket is connected
-            client.write(name);
+            backendSocket.write(name);
             console.log('USER INPUT::playing remote media: ' + name);
         } else {
             console.log("USER INPUT::Cannot play " + name + " because renderer is disconnected");
