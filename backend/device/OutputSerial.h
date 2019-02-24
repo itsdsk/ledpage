@@ -32,13 +32,13 @@ class OutputSerial : public Output
     {
         if (!_rs232Port.isOpen())
         {
-            // try to reopen
-            int status = open();
-            if (status == -1)
-            {
-                std::cout << "Device blocked" << std::endl;
-            }
-            return status;
+            // (dont try to reopen)
+            //int status = open();
+            //if (status == -1)
+            //{
+            //    std::cout << "Device blocked" << std::endl;
+            //}
+            return -1;
         }
 
         try
