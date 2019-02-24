@@ -487,9 +487,9 @@ function runCommand(command, callback) {
     var exec = require('child_process').exec;
     exec(command, function (err, stdout, stderr) {
         if (err) {
-            callback(stderr);
+            if(callback)callback(stderr);
         } else {
-            callback(stdout);
+            if(callback)callback(stdout);
         }
     });
 }
