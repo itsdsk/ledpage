@@ -43,11 +43,56 @@ document.addEventListener('DOMContentLoaded', function () {
 }, false);
 
 document.addEventListener('mousedown', function (event) {
-    // click circle event
+    // click circle event, will be called when user starts dragging LED
     if (event.target.matches('.circle')) {
-        _drag_init(event.target);
+        // Store the object of the element which needs to be moved
+        selected = event.target;
+        var circleId = selected.dataset.circleId;
+        // get connected lines
+        lineOut = selected.parentElement.querySelector('[data-from-circle-id="' + circleId + '"]');
+        lineIn = selected.parentElement.querySelector('[data-from-circle-id="' + (circleId - 1) + '"]');
+        // store element's top left coord
+        x_elem = x_pos - selected.x1.baseVal.value;
+        y_elem = y_pos - selected.y1.baseVal.value;
         return false;
     }
+}, false);
+
+document.addEventListener('mouseup', function () {
+    if (selected !== null) {
+        // keep led in boundaries
+        x_pos = Math.min(Math.max(x_pos - x_elem, x_min), x_max);
+        y_pos = Math.min(Math.max(y_pos - y_elem, y_min), y_max);
+        selected.x1.baseVal.value = x_pos;
+        selected.y1.baseVal.value = y_pos;
+        selected.x2.baseVal.value = x_pos;
+        selected.y2.baseVal.value = y_pos;
+        if (lineIn) {
+            lineIn.x2.baseVal.value = x_pos;
+            lineIn.y2.baseVal.value = y_pos;
+        }
+        if (lineOut) {
+            lineOut.x1.baseVal.value = x_pos;
+            lineOut.y1.baseVal.value = y_pos;
+        }
+        // LED formatted as a subset of the host's config.json
+        var data = {
+            "outputs": [{
+                "index": parseInt(selected.parentElement.dataset.outputId),
+                "leds": [{
+                    "index": parseInt(selected.dataset.circleId),
+                    "x": selected.x1.baseVal.value,
+                    "y": selected.y1.baseVal.value,
+                    "r": parseInt(selected.dataset.radiusId)
+                }]
+            }]
+        };
+        // send updated led(s) to server
+        //socket.emit('updateconfig', data); // sends full structure of LEDs?
+        mainSocket.send(JSON.stringify(data)); // send direct to host backend?
+    }
+    // destroy/reset SVG object used for interaction
+    selected = null;
 }, false);
 
 document.addEventListener('dragover', function (event) {
@@ -56,6 +101,26 @@ document.addEventListener('dragover', function (event) {
         // turn off browser's default drag behaviour
         event.stopPropagation();
         event.preventDefault();
+    }
+}, false);
+
+document.addEventListener('mousemove', function (event) {
+    // called when user is dragging an element
+    x_pos = document.all ? window.event.clientX : event.pageX;
+    y_pos = document.all ? window.event.clientY : event.pageY;
+    if (selected !== null) {
+        selected.x1.baseVal.value = x_pos - x_elem;
+        selected.y1.baseVal.value = y_pos - y_elem;
+        selected.x2.baseVal.value = x_pos - x_elem;
+        selected.y2.baseVal.value = y_pos - y_elem;
+        if (lineIn) {
+            lineIn.x2.baseVal.value = x_pos - x_elem;
+            lineIn.y2.baseVal.value = y_pos - y_elem;
+        }
+        if (lineOut) {
+            lineOut.x1.baseVal.value = x_pos - x_elem;
+            lineOut.y1.baseVal.value = y_pos - y_elem;
+        }
     }
 }, false);
 
@@ -336,77 +401,6 @@ var selected = null, // Object of the element to be moved
     x_elem = 0,
     y_elem = 0; // Stores top, left values (edge) of the element
 
-// Will be called when user starts dragging an element
-function _drag_init(elem) {
-    // Store the object of the element which needs to be moved
-    selected = elem;
-    var circleId = selected.dataset.circleId;
-    // get connected lines
-    lineOut = selected.parentElement.querySelector('[data-from-circle-id="' + circleId + '"]');
-    lineIn = selected.parentElement.querySelector('[data-from-circle-id="' + (circleId - 1) + '"]');
-    // store element's top left coord
-    x_elem = x_pos - selected.x1.baseVal.value;
-    y_elem = y_pos - selected.y1.baseVal.value;
-}
-
-// Will be called when user dragging an element
-function _move_elem(e) {
-    x_pos = document.all ? window.event.clientX : e.pageX;
-    y_pos = document.all ? window.event.clientY : e.pageY;
-    if (selected !== null) {
-        selected.x1.baseVal.value = x_pos - x_elem;
-        selected.y1.baseVal.value = y_pos - y_elem;
-        selected.x2.baseVal.value = x_pos - x_elem;
-        selected.y2.baseVal.value = y_pos - y_elem;
-        if (lineIn) {
-            lineIn.x2.baseVal.value = x_pos - x_elem;
-            lineIn.y2.baseVal.value = y_pos - y_elem;
-        }
-        if (lineOut) {
-            lineOut.x1.baseVal.value = x_pos - x_elem;
-            lineOut.y1.baseVal.value = y_pos - y_elem;
-        }
-    }
-}
-
-// Destroy the object when we are done
-function _drop_elem() {
-    // keep led in boundaries
-    if (selected !== null) {
-        x_pos = Math.min(Math.max(x_pos - x_elem, x_min), x_max);
-        y_pos = Math.min(Math.max(y_pos - y_elem, y_min), y_max);
-        selected.x1.baseVal.value = x_pos;
-        selected.y1.baseVal.value = y_pos;
-        selected.x2.baseVal.value = x_pos;
-        selected.y2.baseVal.value = y_pos;
-        if (lineIn) {
-            lineIn.x2.baseVal.value = x_pos;
-            lineIn.y2.baseVal.value = y_pos;
-        }
-        if (lineOut) {
-            lineOut.x1.baseVal.value = x_pos;
-            lineOut.y1.baseVal.value = y_pos;
-        }
-        // LED formatted as a subset of the host's config.json
-        var data = {
-            "outputs": [{
-                "index": parseInt(selected.parentElement.dataset.outputId),
-                "leds": [{
-                    "index": parseInt(selected.dataset.circleId),
-                    "x": selected.x1.baseVal.value,
-                    "y": selected.y1.baseVal.value,
-                    "r": parseInt(selected.dataset.radiusId)
-                }]
-            }]
-        };
-        // send updated led(s) to server
-        //socket.emit('updateconfig', data); // sends full structure of LEDs?
-        mainSocket.send(JSON.stringify(data)); // send direct to host backend?
-    }
-    // reset
-    selected = null;
-}
-
 // location change
 window.onpopstate = function () {
     refresh();
@@ -419,6 +413,3 @@ function changeStyleToView(view) {
     document.getElementById("diskFeedContainer").style.display = (view == "feed" ? "flex" : "none");
     document.getElementById("diskContainer").style.display = (view == "editor" ? "block" : "none");
 }
-
-document.onmousemove = _move_elem;
-document.onmouseup = _drop_elem;
