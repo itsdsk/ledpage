@@ -191,6 +191,22 @@ module.exports = {
             dat.joinNetwork();
             console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
         });
+        // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
+        // Dat('/home/disk/ui/disks/item/', {
+        //     key: '0c2f952a505a2bffc913a79e0fdc2cccf2654a31ff555dc6248a407036c69cd5'
+        // }, function (err, dat) {
+        //     if(err) throw err;
+        //     dat.joinNetwork();
+        //     dat.archive.on('content', function() {
+        //         dat.archive.checkout(4).download('/', function (err) {
+        //             if(err)console.log("err: " + err);
+        //             dat.archive.readFile('/index.html', {cached: true}, function (err, content) {
+        //                 if(err)console.log("err2: " + err);
+        //                 console.log("content: " + content);
+        //             });
+        //         });
+        //     });
+        // });
     },
     deleteConnection: function (msg, callback) {
         console.log("USER INPUT::deleting connection: " + msg);
