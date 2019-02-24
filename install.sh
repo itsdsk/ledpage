@@ -28,7 +28,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
-ExecStart=/home/pi/disk/backend/main -d
+ExecStart=/home/pi/disk/backend/main -d -c \"/home/pi/disk/renderer/config.json\"
 
 [Install]
 WantedBy=multi-user.target

@@ -41,11 +41,13 @@ int main(int argc, char *argv[])
 {
     // command line options
     cxxopts::Options options("Disk", "Display Web Media on LEDs from Raspberry Pi");
-    options.add_options()("s,screenshot", "Save screenshot as .PPM")("d,display", "Display screenshot on device");
+    options.add_options()("s,screenshot", "Save screenshot as .PPM")("d,display", "Display screenshot on device")("c,config", "Config file path", cxxopts::value<std::string>()->default_value("/home/pi/disk/renderer/config.json"));
     auto result = options.parse(argc, argv);
 
     // read config file
-    std::ifstream confFile("../renderer/config.json");
+    std::string confFilePath = result["c"].as<std::string>();
+    std::cout << "Config file path: " << confFilePath << std::endl;
+    std::ifstream confFile(confFilePath);
     json config;
     confFile >> config;
 
