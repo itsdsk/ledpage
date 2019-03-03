@@ -177,6 +177,11 @@ document.addEventListener('click', function (event) {
             }, "Home", "/");
             refresh();
         }
+    } else if (event.target.matches('.editorVersionButton')) {
+        // edit version event
+        var version = event.target.dataset.id;
+        diskDirectory = event.target.parentElement.parentElement.parentElement.dataset.diskDirectory;
+        socket.emit('editversion', [+version, diskDirectory]);
     } else if (event.target.matches('#saveOutputButton')) {
         // save output button
         socket.emit('saveconfig');

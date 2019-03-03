@@ -20,4 +20,12 @@
     {{/each}}
     <button id="editorSaveButton">Save</button>
     <button id="editorCloseButton">Close</button>
+    {{#if dat_key}}
+    <ul>
+        {{#iterate dat_versions}}
+        <li><button class="editorVersionButton" data-id="{{this}}">v{{this}}</button></li>
+        {{/iterate}}
+    </ul>
+    <p>dat://{{dat_key}}</p>
+    {{/if}}
 </div>

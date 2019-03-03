@@ -88,6 +88,10 @@ io.on('connection', function (socket) {
   socket.on('saveversion', function (msg) {
     media.saveVersion(msg);
   });
+  // select version (DAT)
+  socket.on('editversion', function (dirAndVersion) {
+    console.log(JSON.stringify(dirAndVersion));
+  });
   // create channel
   socket.on('createchannel', function (msg) {
     if (msg.length > 0)
@@ -118,11 +122,11 @@ io.on('connection', function (socket) {
     });
   });
   // restart component
-  socket.on('restartservice', function(msg) {
+  socket.on('restartservice', function (msg) {
     media.restartService(msg);
   });
   // shutdown/reboot system
-  socket.on('systempower', function(msg) {
+  socket.on('systempower', function (msg) {
     media.systemPower(msg);
   })
 });

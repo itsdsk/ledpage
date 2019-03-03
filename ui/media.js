@@ -34,7 +34,13 @@ backendSocket.on('error', function (err) {
     console.log(err);
 });
 
-
+// add basic iteration/for-loop helper
+Handlebars.registerHelper('iterate', function (n, block) {
+    var accum = '';
+    for (var i = 1; i <= n; ++i)
+        accum += block.fn(i);
+    return accum;
+});
 // compile media
 var diskCompiler;
 fs.readFile(path.join(__dirname, "templates", "disk.hbs"), function (err, data) {
@@ -441,7 +447,7 @@ function templateChannel(channel_name, create_flag, callback) {
 
 function templateDisk(disk_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from disks table
-    var sql = "SELECT directory, title, description, image FROM disks WHERE directory = ?";
+    var sql = "SELECT directory, title, description, image, dat_key, dat_versions FROM disks WHERE directory = ?";
     db.get(sql, [disk_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
