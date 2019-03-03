@@ -7,6 +7,8 @@ const Dat = require('dat-node');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
 
+var datHttpServer;
+
 db.serialize(function () {
     // create tables for primitive types (disk and channel)
     db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
@@ -37,7 +39,7 @@ backendSocket.on('error', function (err) {
 // add basic iteration/for-loop helper
 Handlebars.registerHelper('iterate', function (n, block) {
     var accum = '';
-    for (var i = 1; i <= n; ++i)
+    for (var i = n; i > 0; --i)
         accum += block.fn(i);
     return accum;
 });
@@ -269,13 +271,30 @@ module.exports = {
             callback(msg[0]);
         });
     },
-    playLocalMedia: function (name) {
-        var filePath = path.join(mediaDir, name);
-        if (backendSocket.pending == false) {
-            // send file path to engine if socket is connected
-            backendSocket.write('file://' + filePath + "/index.html");
+    playLocalMedia: function (dirAndVersion) {
+        var filePath = path.join(mediaDir, dirAndVersion.directory);
+        if (dirAndVersion.version) {
+            // serve Dat to see old version
+            Dat(filePath, function (err, dat) {
+                if (err) throw err;
+                if (datHttpServer)
+                    datHttpServer.close();
+                datHttpServer = dat.serveHttp({
+                    port: 8731
+                });
+                // send file path to engine if socket is connected
+                if (backendSocket.pending == false) {
+                    var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
+                    backendSocket.write(rendererURL);
+                }
+            });
+        } else {
+            if (backendSocket.pending == false) {
+                // send file path to engine if socket is connected
+                backendSocket.write('file://' + filePath + "/index.html");
+            }
         }
-        console.log('USER INPUT::playing local media: ' + filePath);
+        console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?

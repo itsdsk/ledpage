@@ -65,8 +65,8 @@ io.on('connection', function (socket) {
     media.saveConfig();
   });
   // play demo
-  socket.on('play', function (msg) {
-    media.playLocalMedia(msg);
+  socket.on('play', function (dirAndVersion) {
+    media.playLocalMedia(dirAndVersion);
   });
   socket.on('playURL', function (msg) {
     media.playRemoteMedia(msg);
@@ -87,10 +87,6 @@ io.on('connection', function (socket) {
   // save version (DAT)
   socket.on('saveversion', function (msg) {
     media.saveVersion(msg);
-  });
-  // select version (DAT)
-  socket.on('editversion', function (dirAndVersion) {
-    console.log(JSON.stringify(dirAndVersion));
   });
   // create channel
   socket.on('createchannel', function (msg) {

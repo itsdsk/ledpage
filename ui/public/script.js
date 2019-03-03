@@ -117,7 +117,9 @@ document.addEventListener('click', function (event) {
     } else if (event.target.matches('.playDiskButton')) {
         //
         diskDirectory = event.target.parentElement.dataset.directory;
-        socket.emit('play', diskDirectory);
+        socket.emit('play', {
+            directory: diskDirectory
+        });
     } else if (event.target.matches('.editDiskButton')) {
         //
         diskDirectory = event.target.parentElement.dataset.directory;
@@ -181,7 +183,10 @@ document.addEventListener('click', function (event) {
         // edit version event
         var version = event.target.dataset.id;
         diskDirectory = event.target.parentElement.parentElement.parentElement.dataset.diskDirectory;
-        socket.emit('editversion', [+version, diskDirectory]);
+        socket.emit('play', {
+            directory: diskDirectory,
+            version: +version
+        });
     } else if (event.target.matches('#saveOutputButton')) {
         // save output button
         socket.emit('saveconfig');
