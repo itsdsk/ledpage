@@ -195,23 +195,27 @@ module.exports = {
         // save version of media to Dat
         Dat(path.join(mediaDir, msg), function (err, dat) {
             if (err) throw err;
-            dat.importFiles();
-            dat.joinNetwork();
-            console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
-            // update key+version in database
-            var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
-            db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
-            // update key in JSON
-            var metaPath = path.join(mediaDir, msg, 'demo.json');
-            var meta = require(metaPath);
-            if (!meta.demo.datKey) {
-                meta.demo = Object.assign(meta.demo, {
-                    datKey: dat.key.toString('hex')
-                });
-                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                    if (err) console.log(err);
-                    // callback(msg[0]);
-                });
+            if (dat.writable) {
+                dat.importFiles();
+                dat.joinNetwork();
+                console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
+                // update key+version in database
+                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
+                db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
+                // update key in JSON
+                var metaPath = path.join(mediaDir, msg, 'demo.json');
+                var meta = require(metaPath);
+                if (!meta.demo.datKey) {
+                    meta.demo = Object.assign(meta.demo, {
+                        datKey: dat.key.toString('hex')
+                    });
+                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                        if (err) console.log(err);
+                        // callback(msg[0]);
+                    });
+                }
+            } else {
+                console.log("USER INPUT ERROR::Could not save version because dat is not writable (must be owner to import files)");
             }
         });
         // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
