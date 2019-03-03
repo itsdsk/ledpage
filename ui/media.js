@@ -193,17 +193,18 @@ module.exports = {
             // update key+version in database
             var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
             db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
-            // update key+version in JSON
+            // update key in JSON
             var metaPath = path.join(mediaDir, msg, 'demo.json');
             var meta = require(metaPath);
-            meta.demo = Object.assign(meta.demo, {
-                datKey: dat.key.toString('hex'),
-                datVersions: dat.archive.version
-            });
-            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                if (err) console.log(err);
-                // callback(msg[0]);
-            });
+            if (!meta.demo.datKey) {
+                meta.demo = Object.assign(meta.demo, {
+                    datKey: dat.key.toString('hex')
+                });
+                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
+                    // callback(msg[0]);
+                });
+            }
         });
         // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
         // Dat('/home/disk/ui/disks/item/', {
@@ -508,10 +509,19 @@ function parseDiskDirectory(directory, meta, callback) {
                 db.run(addConnectQuery, [directory, channelName], callback);
             });
         });
-        // add DAT info to database // TODO: get version number from Dat
-        if (meta.demo.datKey && meta.demo.datVersions) {
-            var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
-            db.run(addDatQuery, [meta.demo.datKey, meta.demo.datVersions, directory]);
+        // add DAT info to database
+        if (meta.demo.datKey) {
+            // get version number from Dat
+            Dat(itemPath, {
+                key: meta.demo.datKey,
+                sparse: true
+            }, function (err, dat) {
+                if (err) throw err;
+                dat.joinNetwork();
+                // update Dat fields in database
+                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
+                db.run(addDatQuery, [meta.demo.datKey, dat.archive.version, directory]);
+            });
         }
     });
 
