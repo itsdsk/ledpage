@@ -508,6 +508,11 @@ function parseDiskDirectory(directory, meta, callback) {
                 db.run(addConnectQuery, [directory, channelName], callback);
             });
         });
+        // add DAT info to database // TODO: get version number from Dat
+        if (meta.demo.datKey && meta.demo.datVersions) {
+            var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
+            db.run(addDatQuery, [meta.demo.datKey, meta.demo.datVersions, directory]);
+        }
     });
 
 }
