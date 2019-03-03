@@ -2,6 +2,7 @@ const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 const net = require('net');
+const Dat = require('dat-node');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
@@ -183,13 +184,15 @@ module.exports = {
         });
     },
     saveVersion: function (msg) {
-        // update media DAT
-        var Dat = require('dat-node');
+        // save version of media to Dat
         Dat(path.join(mediaDir, msg), function (err, dat) {
             if (err) throw err;
             dat.importFiles();
             dat.joinNetwork();
             console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
+            // update key+version in database
+            var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
+            db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
         });
         // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
         // Dat('/home/disk/ui/disks/item/', {
@@ -465,8 +468,8 @@ function parseDiskDirectory(directory, meta, callback) {
     var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.description], function () {
         var itemPath = path.join(mediaDir, directory);
+        // add image to disks database TODO: check if files exist
         if (meta.demo.image && meta.demo.image.length > 0) {
-            // add image to disks database TODO: check if files exist
             var imagePath = path.join(itemPath, meta.demo.image);
             fs.readFile(imagePath, function (err, buf) {
                 if (err) throw err;
@@ -503,9 +506,9 @@ function runCommand(command, callback) {
     var exec = require('child_process').exec;
     exec(command, function (err, stdout, stderr) {
         if (err) {
-            if(callback)callback(stderr);
+            if (callback) callback(stderr);
         } else {
-            if(callback)callback(stdout);
+            if (callback) callback(stdout);
         }
     });
 }
