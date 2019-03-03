@@ -193,6 +193,17 @@ module.exports = {
             // update key+version in database
             var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
             db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
+            // update key+version in JSON
+            var metaPath = path.join(mediaDir, msg, 'demo.json');
+            var meta = require(metaPath);
+            meta.demo = Object.assign(meta.demo, {
+                datKey: dat.key.toString('hex'),
+                datVersions: dat.archive.version
+            });
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+                // callback(msg[0]);
+            });
         });
         // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
         // Dat('/home/disk/ui/disks/item/', {
