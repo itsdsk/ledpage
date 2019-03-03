@@ -11,11 +11,14 @@
         <li><a class="editorDisconnectedChannelItem">{{this.name}}</a></li>
         {{/each}}
     </ul>
+    <button id="editorCreateFileButton">New file</button>
     {{#each files}}
     <div data-row-id="{{this.id}}">
         <h4>{{this.filename}}</h4>
+        <input class="filenameInput" type="search" placeholder="{{this.filename}}">
         <textarea>{{{this.data}}}</textarea>
         <button class="editorUpdateFileButton">Sync</button>
+        <button class="editorRemoveFileButton">Remove</button>
     </div>
     {{/each}}
     <button id="editorSaveButton">Save</button>

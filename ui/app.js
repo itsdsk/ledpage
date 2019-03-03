@@ -80,9 +80,36 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // create file
+  socket.on('createfile', function (msg) {
+    media.createFile(msg, function () {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: msg
+      }));
+    });
+  });
+  // rename file
+  socket.on('renamefile', function (msg) {
+    media.renameFile(msg, function () {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: msg.directory
+      }));
+    });
+  });
   // update file
   socket.on('updatefile', function (msg) {
     media.updateFile(msg);
+  });
+  // remove file
+  socket.on('removefile', function (msg) {
+    media.removeFile(msg, function () {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: msg.directory
+      }));
+    });
   });
   // save version (DAT)
   socket.on('saveversion', function (msg) {

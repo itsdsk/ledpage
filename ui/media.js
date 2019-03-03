@@ -173,6 +173,53 @@ module.exports = {
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
         db.run(createQuery, [msg]);
     },
+    createFile: function (msg, callback) {
+        //
+        var filepath = path.join(mediaDir, msg, 'new_file.txt');
+        console.log("USER INPUT::creating file " + filepath);
+        // create file on disk
+        fs.writeFile(filepath, "", function (err) {
+            if (err) console.log(err);
+            // add file to JSON
+            var metaPath = path.join(mediaDir, msg, 'demo.json');
+            var meta = require(metaPath);
+            meta.demo.files.push('new_file.txt');
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+                // add file to database
+                var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
+                db.run(addFileQuery, [msg, 'new_file.txt', ""], function () {
+                    callback();
+                });
+            });
+        });
+    },
+    renameFile: function (msg, callback) {
+        // get path of file on disk
+        var oldPath = path.join(mediaDir, msg.directory, msg.oldName);
+        var newPath = path.join(mediaDir, msg.directory, msg.newName);
+        console.log("USER INPUT::renaming file " + msg.oldName + " - " + newPath);
+        // rename file on disk
+        fs.rename(oldPath, newPath, function (err) {
+            if (err) console.log(err);
+            // update JSON
+            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+            var meta = require(metaPath);
+            var index = meta.demo.files.indexOf(msg.oldName); // get index of channel in array
+            if (index > -1) {
+                // delete if exists
+                meta.demo.files[index] = msg.newName;
+            }
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+                // update name in database
+                var updateQuery = "UPDATE files SET filename = ? WHERE rowid = ?";
+                db.run(updateQuery, [msg.newName, msg.fileID], function () {
+                    callback();
+                });
+            });
+        });
+    },
     updateFile: function (msg) {
         // update file in database
         var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";
@@ -189,6 +236,39 @@ module.exports = {
                 backendSocket.write(updatedDir);
                 console.log("refreshing " + updatedDir);
             }
+        });
+    },
+    removeFile: function (msg, callback) {
+        // remove file in database
+        var removeQuery = "DELETE FROM files WHERE rowid = ?";
+        db.run(removeQuery, [msg.fileID]);
+        // get path of file on disk
+        var filepath = path.join(mediaDir, msg.directory, msg.filename);
+        console.log("USER INPUT::removing file " + filepath);
+        // remove file on disk
+        fs.unlink(filepath, function (err) {
+            if (err) console.log(err);
+            // update demo.json
+            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+            var meta = require(metaPath);
+            var index = meta.demo.files.indexOf(msg.filename); // get index of channel in array
+            if (index > -1) {
+                // delete if exists
+                meta.demo.files.splice(index, 1);
+            }
+            // save json to disk
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+                // refresh window
+                if (backendSocket.pending == false) {
+                    var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
+                    backendSocket.write(updatedDir);
+                    console.log("refreshing " + updatedDir);
+                    callback();
+                } else {
+                    callback();
+                }
+            });
         });
     },
     saveVersion: function (msg) {

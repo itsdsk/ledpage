@@ -149,6 +149,10 @@ document.addEventListener('click', function (event) {
         diskDirectory = event.target.parentElement.parentElement.parentElement.dataset.diskDirectory;
         channelName = event.target.innerHTML;
         socket.emit('createconnection', [diskDirectory, channelName]);
+    } else if (event.target.matches('#editorCreateFileButton')) {
+        // new file
+        diskDirectory = event.target.parentElement.dataset.diskDirectory;
+        socket.emit('createfile', diskDirectory);
     } else if (event.target.matches('.editorUpdateFileButton')) {
         // get data
         var filename, fileindex, text;
@@ -165,6 +169,20 @@ document.addEventListener('click', function (event) {
         };
         // send to server
         socket.emit('updatefile', data);
+    } else if (event.target.matches('.editorRemoveFileButton')) {
+        // get data
+        var filename, fileindex;
+        diskDirectory = event.target.parentElement.parentElement.dataset.diskDirectory;
+        filename = event.target.parentElement.firstElementChild.innerHTML;
+        fileindex = event.target.parentElement.dataset.rowId;
+        // format
+        data = {
+            directory: diskDirectory,
+            filename: filename,
+            fileID: fileindex
+        };
+        // send to server
+        socket.emit('removefile', data);
     } else if (event.target.matches('#editorSaveButton')) {
         // commit/save version event
         diskDirectory = event.target.parentElement.dataset.diskDirectory;
@@ -343,6 +361,24 @@ document.addEventListener('keyup', function (event) {
         if (event.keyCode == 13) { // 'Enter'
             socket.emit('playURL', event.target.value);
             console.log("sent " + event.target.value);
+        }
+    } else if (event.target.matches('.filenameInput')) {
+        if (event.keyCode == 13) { // 'Enter'
+            // get data
+            var oldName, newName, fileindex, diskDirectory;
+            diskDirectory = event.target.parentElement.parentElement.dataset.diskDirectory;
+            newName = event.target.value;
+            oldName = event.target.parentElement.firstElementChild.innerHTML;
+            fileindex = event.target.parentElement.dataset.rowId;
+            // format
+            var data = {
+                directory: diskDirectory,
+                oldName: oldName,
+                newName: newName,
+                fileID: fileindex
+            };
+            // send to server
+            socket.emit('renamefile', data);
         }
     } else if (event.target.matches('#editorChannelsInput')) {
         // filter channels when text is entered into channel search box
