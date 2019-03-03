@@ -8,7 +8,7 @@ const db = new sqlite3.Database(':memory:');
 
 db.serialize(function () {
     // create tables for primitive types (disk and channel)
-    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB)");
+    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
     // create tables for relational types (files and connections)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
