@@ -1,4 +1,5 @@
 #include <vector>
+#include <climits>
 #include <device/Output.h>
 #include <device/OutputSerialDefault.h>
 #include <grabber/ColorRgb.h>
@@ -67,7 +68,7 @@ class DeviceManager
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness)
+    int update(const Image<Pixel_T> &image, unsigned char &brightness)
     {
         std::vector<ColorRgb> ledValues;
         // get colours
@@ -89,10 +90,9 @@ class DeviceManager
             uint8_t avgG = uint8_t(cummG / ledNode.positions.size());
             uint8_t avgB = uint8_t(cummB / ledNode.positions.size());
             // apply brightness TODO: check works
-            //uint8_t floatBrightness = uint8_t(brightness)/uint8_t(1.0f);
-            //avgR = uint8_t(brightness * avgR);
-            //avgG = uint8_t(brightness * avgG);
-            //avgB = uint8_t(brightness * avgB);
+            avgR *= brightness/UCHAR_MAX;
+            avgG *= brightness/UCHAR_MAX;
+            avgB *= brightness/UCHAR_MAX;
             // store colour
             ColorRgb col = {avgR, avgG, avgB};
             ledValues.emplace_back(col);

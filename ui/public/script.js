@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#brightnessInput').onchange = function () {
         var data = {
             "window": {
-                "brightness": parseFloat(this.value)
+                "brightness": parseInt(this.value)
             }
         };
         console.log(JSON.stringify(data));

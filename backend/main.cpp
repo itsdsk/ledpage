@@ -27,7 +27,7 @@ typedef server::message_ptr message_ptr;
 vector<DeviceManager> deviceManagers;
 unsigned _w;
 unsigned _h;
-float brightness;
+unsigned char brightness;
 bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
