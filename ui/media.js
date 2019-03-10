@@ -367,16 +367,16 @@ module.exports = {
                     port: 8731
                 });
                 // send file path to engine if socket is connected
-                if (backendSocket.pending == false) {
+                //if (backendSocket.pending == false) {
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
                     backendSocket.write(rendererURL);
-                }
+                //}
             });
         } else {
-            if (backendSocket.pending == false) {
+            //if (backendSocket.pending == false) {
                 // send file path to engine if socket is connected
                 backendSocket.write('file://' + filePath + "/index.html");
-            }
+            //}
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },

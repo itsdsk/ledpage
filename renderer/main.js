@@ -84,12 +84,12 @@ app.on('ready', () => {
     console.log("Client connected");
     // receive URL to display
     sock.on('data', function (data) {
-      console.log("recieved: " + data);
+      console.log("recieved: " + data.toString());
       // display recieved URI
       if (flipWindow) {
-        mainWindowA.loadURL(data);
+        mainWindowA.loadURL(data.toString());
       } else {
-        mainWindowB.loadURL(data);
+        mainWindowB.loadURL(data.toString());
       }
       // flip window to display on
       flipWindow = !flipWindow;
