@@ -100,6 +100,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
         console.log(JSON.stringify(data));
+        if(mainSocket.readyState != 1) {
+            mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+        }
         mainSocket.send(JSON.stringify(data));
     };
 }, false);
@@ -298,6 +301,9 @@ document.addEventListener('mouseup', function () {
         };
         // send updated led(s) to server
         //socket.emit('updateconfig', data); // sends full structure of LEDs?
+        if(mainSocket.readyState != 1) {
+            mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+        }
         mainSocket.send(JSON.stringify(data)); // send direct to host backend?
     }
     // destroy/reset SVG object used for interaction
