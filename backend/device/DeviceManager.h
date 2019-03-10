@@ -51,18 +51,18 @@ class DeviceManager
     DeviceManager(const json &config, unsigned &outputIndex)
     {
         //
-        cout << "Output: " << config["outputs"][outputIndex]["device"] << endl;
-        unsigned width = jsonStringToInt(config["window"]["width"]);
-        unsigned height = jsonStringToInt(config["window"]["height"]);
+        cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
+        unsigned width = config["window"]["width"];
+        unsigned height = config["window"]["height"];
         // add leds
         for (auto &led : config["outputs"][outputIndex]["leds"])
         {
             ledNodes.emplace_back(led["x"], led["y"], led["r"], width, height);
         }
         // create output object
-        const string deviceName = config["outputs"][outputIndex]["device"];
-        nameTEMP = config["outputs"][outputIndex]["device"];
-        const unsigned baudRate = jsonStringToInt(config["outputs"][outputIndex]["properties"]["rate"]);
+        const string deviceName = config["outputs"][outputIndex]["properties"]["port"];
+        nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
+        const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
         output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
     }
 
@@ -109,8 +109,4 @@ class DeviceManager
 
   private:
     //
-    int jsonStringToInt(const json &value)
-    {
-        return std::stoi(value.get<std::string>());
-    }
 };

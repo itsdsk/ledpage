@@ -32,11 +32,6 @@ bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
 
-int jsonStringToInt(json &value)
-{
-    return std::stoi(value.get<std::string>());
-}
-
 void saveScreenshot(Image<ColorRgba> &_image);
 
 void exitHandler(int s);
@@ -92,8 +87,8 @@ int main(int argc, char *argv[])
     }
 
     // create framegrabber and image object
-    _w = jsonStringToInt(config["window"]["width"]);
-    _h = jsonStringToInt(config["window"]["height"]);
+    _w = config["window"]["width"];
+    _h = config["window"]["height"];
     cout << "config window size: " << _w << " x " << _h << endl;
     FrameGrabber *grabber = new FrameGrabber(_w, _h);
     Image<ColorRgba> _image(_w, _h);
