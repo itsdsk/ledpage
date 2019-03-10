@@ -1,6 +1,6 @@
 // connect to ui and backend
 var socket = io();
-var mainSocket = new WebSocket('ws://localhost:9002');
+var mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
 
 var selected = null, // Object of the element to be moved
     lineIn = null,
