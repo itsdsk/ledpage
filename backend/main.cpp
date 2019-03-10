@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
+#include <signal.h>
 
 #include <device/DeviceManager.h>
 #include <grabber/Image.h>
@@ -27,6 +28,7 @@ vector<DeviceManager> deviceManagers;
 unsigned _w;
 unsigned _h;
 float brightness;
+bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
 
@@ -37,8 +39,17 @@ int jsonStringToInt(json &value)
 
 void saveScreenshot(Image<ColorRgba> &_image);
 
+void exitHandler(int s);
+
 int main(int argc, char *argv[])
 {
+    // ctrl-c (exit) signal handling
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = exitHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
     // command line options
     cxxopts::Options options("Disk", "Display Web Media on LEDs from Raspberry Pi");
     options.add_options()("s,screenshot", "Save screenshot as .PPM")("d,display", "Display screenshot on device")("c,config", "Config file path", cxxopts::value<std::string>()->default_value("/home/pi/disk/renderer/config.json"));
@@ -185,4 +196,9 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
     {
         std::cout << "Read failed because: " << e << "(" << e.message() << ")" << std::endl;
     }
+}
+
+void exitHandler(int s)
+{
+    receivedQuitSignal = true;
 }
