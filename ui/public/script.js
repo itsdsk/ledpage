@@ -216,7 +216,7 @@ document.addEventListener('click', function (event) {
         };
         // get window properties
         document.querySelectorAll("#outputForm .window input").forEach(function (windowProperty) {
-            data.window[windowProperty.className] = windowProperty.value;
+            data.window[windowProperty.className] = parseInt(windowProperty.value);
         });
         // get output properties (except LEDs)
         document.querySelectorAll("#outputForm .outputs > div").forEach(function (outputDiv) {
@@ -224,8 +224,11 @@ document.addEventListener('click', function (event) {
                 "index": parseInt(outputDiv.dataset.outputId),
                 "properties": {}
             };
-            outputDiv.querySelectorAll(".properties textarea,input").forEach(function (propertyInput) {
+            outputDiv.querySelectorAll(".properties textarea").forEach(function (propertyInput) {
                 output.properties[propertyInput.className] = propertyInput.value;
+            });
+            outputDiv.querySelectorAll(".properties input").forEach(function (propertyInput) {
+                output.properties[propertyInput.className] = parseInt(propertyInput.value);
             });
             data.outputs.push(output);
         });
