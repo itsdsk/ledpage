@@ -98,26 +98,17 @@ int main(int argc, char *argv[])
     Image<ColorRgba> _image(_w, _h);
 
     // display screen on device
-    if (result.count("display") > 0) // runtime loop
-    {
-        while (true)
-        {
-            grabber->grabFrame(_image);
-            for (auto &deviceManager : deviceManagers)
-            {
-                deviceManager.update(_image, brightness);
-            }
-            // max 30fps TODO: add proper FPS control
-            //sleep(0.03333333);
-        }
-    }
-    // save screenshot
-    if (result.count("screenshot") > 0)
+    while (receivedQuitSignal == false)
     {
         grabber->grabFrame(_image);
+        for (auto &deviceManager : deviceManagers)
+        {
+            deviceManager.update(_image, brightness);
+        }
     }
 
     delete grabber;
+    cout << "Exiting grabber" << endl;
     return 0;
 }
 
