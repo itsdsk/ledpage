@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
         ws_server.listen(9002);
         ws_server.start_accept();
         boost::thread t(boost::bind(&boost::asio::io_service::run, boost::ref(io_service)));
+        cout << "WebSocket server listening on port 9002" << endl;
     }
     catch (websocketpp::exception const &e)
     {
@@ -150,32 +151,38 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                 // received an entry for "outputs", go through items in this array
                 for (auto &element2 : (element1.value()).items())
                 {
-                    // get this output device name
-                    string outputDevice = element2.value()["device"];
-                    if (element2.value().find("leds") != element2.value().end())
+                    // get this output device index
+                    if (element2.value().find("index") != element2.value().end())
                     {
-                        // there is an entry in array "leds", loop through objects within it
-                        for (auto &ledElement : element2.value()["leds"].items())
+                        int outputIndex = element2.value()["index"];
+                        // look for LEDs in json
+                        if (element2.value().find("leds") != element2.value().end())
                         {
-                            // get new values for LED
-                            int index = ledElement.value()["index"];
-                            int x = ledElement.value()["x"];
-                            int y = ledElement.value()["y"];
-                            int r = ledElement.value()["r"];
-                            // log
-                            //cout << "Received LED in device \"" << outputDevice << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
-                            // get corresponding deviceManager and set ledNode position
-                            for (auto &deviceManager : deviceManagers)
-                                if (deviceManager.nameTEMP == outputDevice)
-                                    deviceManager.ledNodes[index].setPosition(x, y, r, _w, _h);
+                            // loop through objects in LEDs array
+                            for (auto &ledElement : element2.value()["leds"].items())
+                            {
+                                // get new values for LED
+                                int index = ledElement.value()["index"];
+                                int x = ledElement.value()["x"];
+                                int y = ledElement.value()["y"];
+                                int r = ledElement.value()["r"];
+                                // log
+                                cout << "Received LED in device \"" << deviceManagers[outputIndex].nameTEMP << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
+                                // set led node position and radius
+                                deviceManagers[outputIndex].ledNodes[index].setPosition(x, y, r, _w, _h);
+                            }
                         }
+                    }
+                    else
+                    {
+                        cout << "could not get index" << endl;
                     }
                 }
             }
             else if (key1 == "window")
             {
                 cout << "key1 is window" << endl;
-                if(element1.value().find("brightness") != element1.value().end())
+                if (element1.value().find("brightness") != element1.value().end())
                 {
                     cout << "brightness: " << element1.value()["brightness"] << endl;
                     brightness = element1.value()["brightness"];
