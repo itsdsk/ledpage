@@ -1,17 +1,16 @@
 {
     "window": {
-        "width": "640",
-        "height": "480"
+        "width": 640,
+        "height": 480
     },
     "outputs": [
         {
             "index": 0,
-            "device": "/dev/ttyACM0",
             "properties": {
                 "port": "/dev/ttyACM0",
                 "type": "WS2812",
                 "colorOrder": "rgb",
-                "rate": "460800"
+                "rate": 460800
             },
             "leds": [
                 {
@@ -42,12 +41,11 @@
         },
         {
             "index": 1,
-            "device": "/dev/ttyACM1",
             "properties": {
                 "port": "/dev/ttyACM1",
                 "type": "WS2812",
                 "colorOrder": "rgb",
-                "rate": "460800"
+                "rate": 460800
             },
             "leds": [
                 {
