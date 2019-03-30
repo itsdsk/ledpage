@@ -50,6 +50,8 @@ app.on('ready', () => {
       // hide previous window
       mainWindowB.hide();
       mainWindowB.minimize();
+      // report loaded to client
+      if(client) client.write("loaded");
     }, 300);
   });
   mainWindowB.webContents.on('did-finish-load', () => {
@@ -62,6 +64,8 @@ app.on('ready', () => {
       // hide previous window
       mainWindowA.hide();
       mainWindowA.minimize();
+      // report loaded to client
+      if(client) client.write("loaded");
     }, 300);
   });
 
@@ -79,12 +83,14 @@ app.on('ready', () => {
   // create server to receive URLs on
   var tcpServer = net.createServer(onClientConnected);
   tcpServer.listen(2845);
-
+  var client; // keep track of connected TCP client
   function onClientConnected(sock) {
     console.log("Client connected");
     // receive URL to display
     sock.on('data', function (data) {
       console.log("recieved: " + data.toString());
+      // save client
+      client = sock;
       // display recieved URI
       if (flipWindow) {
         mainWindowA.loadURL(data.toString());

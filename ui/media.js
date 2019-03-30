@@ -35,6 +35,21 @@ backendSocket.on('error', function (err) {
     console.log('backend not connected:');
     console.log(err);
 });
+// receive msg from renderer
+backendSocket.on('data', function (data) {
+    console.log('Received: ' + data);
+    // TODO: send command to backend to save screenshot
+    // if (backendWS.readyState != 1) {
+    //     backendWS = new WebSocket('ws://localhost:9002');
+    // }
+    // backendWS.send(JSON.stringify({
+    //     "command": "screenshot"
+    // }));
+});
+// // connect to backend
+// var backendWS = new WebSocket();
+// backendWS.url = 'ws://localhost:9002';
+// //var backendWS = new WebSocket('ws://localhost:9002');
 
 // add basic iteration/for-loop helper
 Handlebars.registerHelper('iterate', function (n, block) {
