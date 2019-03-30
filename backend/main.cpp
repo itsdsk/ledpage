@@ -28,6 +28,7 @@ vector<DeviceManager> deviceManagers;
 unsigned _w;
 unsigned _h;
 unsigned char brightness;
+bool receivedScreenshotCommand = false;
 bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
@@ -97,6 +98,12 @@ int main(int argc, char *argv[])
     while (receivedQuitSignal == false)
     {
         grabber->grabFrame(_image);
+        //
+        if(receivedScreenshotCommand)
+        {
+            saveScreenshot(_image);
+            receivedScreenshotCommand = false;
+        }
         for (auto &deviceManager : deviceManagers)
         {
             deviceManager.update(_image, brightness);
@@ -181,6 +188,15 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                 {
                     cout << "brightness: " << element1.value()["brightness"] << endl;
                     brightness = element1.value()["brightness"];
+                }
+            }
+            else if (key1 == "command")
+            {
+                cout << "key1 is command" << endl;
+                if (element1.value() == "screenshot")
+                {
+                    cout << "screenshot" << endl;
+                    receivedScreenshotCommand = true;
                 }
             }
         }

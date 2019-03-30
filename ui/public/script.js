@@ -253,6 +253,15 @@ document.addEventListener('click', function (event) {
         socket.emit('systempower', 'shutdown');
     } else if (event.target.matches('#rebootButton')) {
         socket.emit('systempower', 'reboot');
+    } else {
+        // test to save screenshot on click
+        if (mainSocket.readyState != 1) {
+            mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+            console.log("main socket not connected");
+        }
+        mainSocket.send(JSON.stringify({
+            "command": "screenshot"
+        }));
     }
 }, false);
 document.addEventListener('mousedown', function (event) {
