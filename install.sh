@@ -2,6 +2,8 @@
 
 # for raspbian 2018-11-13-raspbian-stretch-lite.zip image
 
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+
 # dependencies
 sudo apt update
 sudo apt install xserver-xorg-core \
@@ -13,7 +15,8 @@ sudo apt install xserver-xorg-core \
   libgconf2-dev \
   libnss3 \
   sqlite3 \
-  libboost-all-dev
+  libboost-all-dev \
+  nodejs
 
 # compile backend
 cd ./backend
@@ -80,6 +83,24 @@ sudo systemctl start disk-ui-daemon
 sudo systemctl start disk-renderer-daemon
 sudo systemctl start disk-backend-daemon
 
+# disable screen-off (blanking)
+sudo bash -c "> /usr/share/X11/xorg.conf.d/10-monitor.conf"
+sudo bash -c "cat <<EOT >> /usr/share/X11/xorg.conf.d/10-monitor.conf
+Section \"ServerLayout\"
+    Identifier \"ServerLayout0\"
+    Option \"StandbyTime\" \"0\"
+    Option \"SuspendTime\" \"0\"
+    Option \"OffTime\"     \"0\"
+    Option \"BlankTime\"   \"0\"
+EndSection
+EOT"
+
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody
 
+# edit system video settings in /boot/config.txt
+# hdmi_force_hotplug=1
+# hdmi_group=2
+# hdmi_mode=87
+# hdmi_cvt=640 480 60 1 0 0 0
+# gpu_mem=192
