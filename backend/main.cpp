@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <climits>
 #include <unistd.h>
 #include <signal.h>
 
@@ -27,7 +28,7 @@ typedef server::message_ptr message_ptr;
 vector<DeviceManager> deviceManagers;
 unsigned _w;
 unsigned _h;
-unsigned char brightness;
+float brightness = 0.15f;
 bool receivedScreenshotCommand = false;
 bool receivedQuitSignal = false;
 
@@ -186,8 +187,8 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                 cout << "key1 is window" << endl;
                 if (element1.value().find("brightness") != element1.value().end())
                 {
-                    cout << "brightness: " << element1.value()["brightness"] << endl;
-                    brightness = element1.value()["brightness"];
+                    brightness = element1.value()["brightness"].get<int>() / (float)UCHAR_MAX;
+                    cout << "brightness: " + brightness << endl;
                 }
             }
             else if (key1 == "command")
