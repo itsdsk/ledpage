@@ -162,7 +162,7 @@ document.addEventListener('click', function (event) {
         diskDirectory = event.target.parentElement.parentElement.dataset.diskDirectory;
         filename = event.target.parentElement.firstElementChild.innerHTML;
         fileindex = event.target.parentElement.dataset.rowId;
-        text = event.target.parentElement.children[1].value;
+        text = event.target.parentElement.getElementsByTagName("textarea")[0].value;
         // format
         data = {
             directory: diskDirectory,
