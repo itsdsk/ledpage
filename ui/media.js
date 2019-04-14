@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const net = require('net');
 const Dat = require('dat-node');
+const WebSocket = require('ws');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
@@ -26,31 +27,77 @@ db.serialize(function () {
     // db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
+// directory of disk requiring screenshot
+var diskRequiringScreenshot;
+var screenshotPath = "/screenshot.ppm";
+
 // renderer inter-process communication
 var rendererPort = 2845;
 var rendererSocket = new net.Socket();
 rendererSocket.connect(rendererPort, function () {
-    console.log("connected to engine");
+    console.log("connected to renderer");
 });
 rendererSocket.on('error', function (err) {
-    console.log('backend not connected:');
+    console.log('renderer not connected:');
     console.log(err);
 });
 // receive msg from renderer
 rendererSocket.on('data', function (data) {
     console.log('Received: ' + data);
-    // TODO: send command to backend to save screenshot
-    // if (backendWS.readyState != 1) {
-    //     backendWS = new WebSocket('ws://localhost:9002');
-    // }
-    // backendWS.send(JSON.stringify({
-    //     "command": "screenshot"
-    // }));
+    // check directory of disk
+    if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+        // try connect to backend if not already open
+        if (backendSocket.readyState != 1) {
+            backendSocket = new WebSocket('ws://localhost:9002');
+        }
+        // send command to backend to save screenshot
+        backendSocket.send(JSON.stringify({
+            "command": "screenshot"
+        }), (error) => {
+            console.log('sent screenshot command to backend', error);
+            // check screenshot command was sent successfully
+            if (!error) {
+                // watch screenshot file for changes // TODO: make work if file does not exist yet
+                const watcher = fs.watch(screenshotPath, (eventType, filename) => {
+                    // stop watching once file has been changed
+                    watcher.close();
+                    // wait 1 second for backend to finish changing file
+                    setTimeout(function () {
+                        // get demo.json and add image to it
+                        var metaPath = path.join(mediaDir, diskRequiringScreenshot, 'demo.json');
+                        var meta = require(metaPath);
+                        meta.demo.image = "thumb.jpg";
+                        //
+                        var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
+                        var convertCommand = 'convert ' + screenshotPath + ' ' + targetJpegPath;
+                        // convert to jpeg
+                        runCommand(convertCommand, function (stdout) {
+                            // add thumbnail to database
+                            fs.readFile(targetJpegPath, function (err, buf) {
+                                if (err) throw err;
+                                var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
+                                var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
+                                db.run(addImgQuery, [decodedImage, diskRequiringScreenshot], function (err) {
+                                    // save demo.json
+                                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                                        if (err) console.log(err);
+                                        // reset
+                                        diskRequiringScreenshot = null;
+                                    });
+                                });
+                            });
+                        });
+                    }, 1000);
+                });
+            }
+        });
+    }
 });
-// // connect to backend
-// var backendWS = new WebSocket();
-// backendWS.url = 'ws://localhost:9002';
-// //var backendWS = new WebSocket('ws://localhost:9002');
+// backend inter-process communication
+var backendSocket = new WebSocket('ws://localhost:9002');
+backendSocket.on('error', function (err) {
+    console.log('backend not connected', err);
+});
 
 // add basic iteration/for-loop helper
 Handlebars.registerHelper('iterate', function (n, block) {
@@ -394,6 +441,8 @@ module.exports = {
             rendererSocket.connect(rendererPort, function () {
                 // send media file path to renderer
                 rendererSocket.write('file://' + filePath + "/index.html");
+                // store disk directory to take new screenshot and add it as new thumbnail
+                diskRequiringScreenshot = dirAndVersion.directory;
             });
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
