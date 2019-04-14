@@ -398,6 +398,19 @@ document.addEventListener('keyup', function (event) {
             // send to server
             socket.emit('renamefile', data);
         }
+    } else if (event.target.matches('.editorTitleInput')) {
+        if (event.keyCode == 13) { // 'Enter'
+            // get data
+            var diskDirectory = event.target.parentElement.dataset.diskDirectory;
+            var newName = event.target.value;
+            // format
+            var data = {
+                directory: diskDirectory,
+                newName: newName
+            };
+            // send to server
+            socket.emit('renamedisk', data);
+        }
     } else if (event.target.matches('#editorChannelsInput')) {
         // filter channels when text is entered into channel search box
         // declare variables

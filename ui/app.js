@@ -80,6 +80,15 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // rename disk
+  socket.on('renamedisk', function (msg) {
+    media.renameDisk(msg, function () {
+      io.emit('changeddisk', JSON.stringify({
+        page: 'editor',
+        disk: msg.directory
+      }));
+    });
+  });
   // create file
   socket.on('createfile', function (msg) {
     media.createFile(msg, function () {

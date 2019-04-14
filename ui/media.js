@@ -210,6 +210,23 @@ module.exports = {
             }
         });
     },
+    renameDisk: function (msg, callback) {
+        // get demo.json
+        var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+        var meta = require(metaPath);
+        console.log("USER INPUT::renaming disk " + msg.directory + " from " + meta.demo.title + " to " + msg.newName);
+        // add new title to demo.json
+        meta.demo.title = msg.newName;
+        // update name in database
+        var updateTitleQuery = "UPDATE disks SET title = ? WHERE directory = ?";
+        db.run(updateTitleQuery, [msg.newName, msg.directory], function (err) {
+            // save demo.json
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+                callback();
+            });
+        });
+    },
     listDatabase: function () {
         // log entries
         db.each("SELECT * FROM disks", function (err, row) {

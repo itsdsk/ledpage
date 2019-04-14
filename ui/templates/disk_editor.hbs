@@ -1,5 +1,6 @@
 <div data-disk-directory="{{directory}}">
     <h1>{{title}}</h1>
+    <input class="editorTitleInput" type="search" value="{{title}}">
     <p>{{description}}</p>
     <input type="text" id="editorChannelsInput" placeholder="Channels...">
     <span id="newChannelButton">Create new channel</span>
@@ -15,7 +16,7 @@
     {{#each files}}
     <div data-row-id="{{this.id}}">
         <h4>{{this.filename}}</h4>
-        <input class="filenameInput" type="search" placeholder="{{this.filename}}">
+        <input class="filenameInput" type="search" value="{{this.filename}}">
         <textarea>{{{this.data}}}</textarea>
         <button class="editorUpdateFileButton">Sync</button>
         <button class="editorRemoveFileButton">Remove</button>
