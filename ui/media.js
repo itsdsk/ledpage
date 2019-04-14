@@ -26,17 +26,18 @@ db.serialize(function () {
     // db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
-// connect to engine
-var backendSocket = new net.Socket();
-backendSocket.connect(2845, function () {
+// renderer inter-process communication
+var rendererPort = 2845;
+var rendererSocket = new net.Socket();
+rendererSocket.connect(rendererPort, function () {
     console.log("connected to engine");
 });
-backendSocket.on('error', function (err) {
+rendererSocket.on('error', function (err) {
     console.log('backend not connected:');
     console.log(err);
 });
 // receive msg from renderer
-backendSocket.on('data', function (data) {
+rendererSocket.on('data', function (data) {
     console.log('Received: ' + data);
     // TODO: send command to backend to save screenshot
     // if (backendWS.readyState != 1) {
@@ -245,12 +246,13 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
-            // refresh window
-            if (backendSocket.pending == false) {
+            // connect to renderer
+            rendererSocket.connect(rendererPort, function () {
+                // send file path to renderer to refresh display
                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                backendSocket.write(updatedDir);
+                rendererSocket.write(updatedDir);
                 console.log("refreshing " + updatedDir);
-            }
+            });
         });
     },
     removeFile: function (msg, callback) {
@@ -274,15 +276,14 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
-                // refresh window
-                if (backendSocket.pending == false) {
+                // connect to renderer
+                rendererSocket.connect(rendererPort, function () {
+                    // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    backendSocket.write(updatedDir);
-                    console.log("refreshing " + updatedDir);
-                    callback();
-                } else {
-                    callback();
-                }
+                    rendererSocket.write(updatedDir);
+                    console.log('refreshing ' + updatedDir);
+                });
+                callback();
             });
         });
     },
@@ -381,29 +382,29 @@ module.exports = {
                 datHttpServer = dat.serveHttp({
                     port: 8731
                 });
-                // send file path to engine if socket is connected
-                //if (backendSocket.pending == false) {
+                // connect to renderer
+                rendererSocket.connect(rendererPort, function () {
+                    // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    backendSocket.write(rendererURL);
-                //}
+                    rendererSocket.write(rendererURL);
+                });
             });
         } else {
-            //if (backendSocket.pending == false) {
-                // send file path to engine if socket is connected
-                backendSocket.write('file://' + filePath + "/index.html");
-            //}
+            // connect to renderer
+            rendererSocket.connect(rendererPort, function () {
+                // send media file path to renderer
+                rendererSocket.write('file://' + filePath + "/index.html");
+            });
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
     playRemoteMedia: function (name) {
-        // TODO: check if URL is valid?
-        if (backendSocket.pending == false) {
-            // send file path to engine if socket is connected
-            backendSocket.write(name);
-            console.log('USER INPUT::playing remote media: ' + name);
-        } else {
-            console.log("USER INPUT::Cannot play " + name + " because renderer is disconnected");
-        }
+        // connect to renderer // TODO: check if URL is valid?
+        rendererSocket.connect(rendererPort, function () {
+            // send media file path to renderer
+            rendererSocket.write(name);
+        });
+        console.log('USER INPUT::playing remote media: ' + name);
     },
     loadFeed: function (callback) {
         // get list of distinct disks in connections
