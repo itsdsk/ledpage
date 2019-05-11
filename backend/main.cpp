@@ -188,7 +188,7 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                 if (element1.value().find("brightness") != element1.value().end())
                 {
                     brightness = element1.value()["brightness"].get<int>() / (float)UCHAR_MAX;
-                    cout << "brightness: " + brightness << endl;
+                    cout << "brightness: " << brightness << endl;
                 }
             }
             else if (key1 == "command")
