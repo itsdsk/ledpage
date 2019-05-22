@@ -1,9 +1,8 @@
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
-const net = require('net');
 const Dat = require('dat-node');
-const WebSocket = require('ws');
+var sockets = require('./sockets.js');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
@@ -34,59 +33,20 @@ var screenshotPath = "/screenshot.ppm";
 // prevent duplicate exit messages
 var SHUTDOWN = false;
 
-// renderer inter-process communication
-const SOCKETFILE = "/tmp/renderer.sock";
-var rendererConnected = false;
-var rendererSocket;
-
-var connectToRendererInterval;
-
-function startConnectingToRenderer() {
-    clearInterval(connectToRendererInterval);
-    connectToRendererInterval = setInterval(connectToRenderer, 2500);
-}
-
-startConnectingToRenderer();
-
-function connectToRenderer() {
-    console.log("Connecting to renderer");
-    rendererSocket = net.createConnection(SOCKETFILE)
-        .on('connect', () => {
-            console.log("Connected to renderer");
-            rendererConnected = true;
-            clearInterval(connectToRendererInterval);
-        })
-        .on('data', function (data) {
-            console.log("Received data from renderer: " + data.toString());
-            if (data.toString() === '__disconnect') {
-                cleanup();
-            } else {
-                saveScreenshot();
-            }
-        })
-        .on('end', function () {
-            console.log("Renderer ended communiction");
-            rendererConnected = false;
-            rendererSocket.end();
-            startConnectingToRenderer();
-        })
-        .on('close', function () {
-            console.log("Renderer communiction closed");
-            //startConnectingToRenderer();
-        })
-        .on('error', function (data) {
-            console.log("Error communicating with renderer: " + data);
-            rendererConnected = false;
-            rendererSocket.end();
-            startConnectingToRenderer();
-        });
-}
+sockets.rendererEvent.on('data', function (data) {
+    console.log("media in data from renderer: " + data.toString());
+    if (data.toString() === '__disconnect') {
+        cleanup();
+    } else {
+        saveScreenshot();
+    }
+});
 
 function cleanup() {
     if (!SHUTDOWN) {
         SHUTDOWN = true;
         console.log('\n', "Terminating.", '\n');
-        rendererSocket.end();
+        sockets.renderer.end();
         process.exit(0);
     }
 }
@@ -96,11 +56,9 @@ function saveScreenshot() {
     // check directory of disk
     if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
         // try connect to backend if not already open
-        if (backendSocket.readyState != 1) {
-            backendSocket = new WebSocket('ws://localhost:9002');
-        }
+        sockets.initialiseBackend();
         // send command to backend to save screenshot
-        backendSocket.send(JSON.stringify({
+        sockets.backend.send(JSON.stringify({
             "command": "screenshot"
         }), (error) => {
             console.log('sent screenshot command to backend', error);
@@ -142,12 +100,6 @@ function saveScreenshot() {
         });
     }
 }
-
-// backend inter-process communication
-var backendSocket = new WebSocket('ws://localhost:9002');
-backendSocket.on('error', function (err) {
-    console.log('backend not connected', err);
-});
 
 // add basic iteration/for-loop helper
 Handlebars.registerHelper('iterate', function (n, block) {
@@ -360,10 +312,10 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
-            if (rendererConnected) {
+            if (sockets.rendererConnected) {
                 // send file path to renderer to refresh display
                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                rendererSocket.write(updatedDir);
+                sockets.renderer.write(updatedDir);
                 console.log("refreshing " + updatedDir);
             }
         });
@@ -389,10 +341,10 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
-                if (rendererConnected) {
+                if (sockets.rendererConnected) {
                     // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    rendererSocket.write(updatedDir);
+                    sockets.renderer.write(updatedDir);
                     console.log('refreshing ' + updatedDir);
                 }
                 callback();
@@ -494,16 +446,16 @@ module.exports = {
                 datHttpServer = dat.serveHttp({
                     port: 8731
                 });
-                if (rendererConnected) {
+                if (sockets.rendererConnected) {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    rendererSocket.write(rendererURL);
+                    sockets.renderer.write(rendererURL);
                 }
             });
         } else {
-            if (rendererConnected) {
+            if (sockets.rendererConnected) {
                 // send media file path to renderer
-                rendererSocket.write('file://' + filePath + "/index.html");
+                sockets.renderer.write('file://' + filePath + "/index.html");
                 // store disk directory to take new screenshot and add it as new thumbnail
                 diskRequiringScreenshot = dirAndVersion.directory;
             }
@@ -512,9 +464,9 @@ module.exports = {
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
-        if (rendererConnected) {
+        if (sockets.rendererConnected) {
             // send media file path to renderer
-            rendererSocket.write(name);
+            sockets.renderer.write(name);
         }
         console.log('USER INPUT::playing remote media: ' + name);
     },
