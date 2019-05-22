@@ -31,19 +31,68 @@ db.serialize(function () {
 var diskRequiringScreenshot;
 var screenshotPath = "/screenshot.ppm";
 
+// prevent duplicate exit messages
+var SHUTDOWN = false;
+
 // renderer inter-process communication
-var rendererPort = 2845;
-var rendererSocket = new net.Socket();
-rendererSocket.connect(rendererPort, function () {
-    console.log("connected to renderer");
-});
-rendererSocket.on('error', function (err) {
-    console.log('renderer not connected:');
-    console.log(err);
-});
-// receive msg from renderer
-rendererSocket.on('data', function (data) {
-    console.log('Received: ' + data);
+const SOCKETFILE = "/tmp/renderer.sock";
+var rendererConnected = false;
+var rendererSocket;
+
+var connectToRendererInterval;
+
+function startConnectingToRenderer() {
+    clearInterval(connectToRendererInterval);
+    connectToRendererInterval = setInterval(connectToRenderer, 2500);
+}
+
+startConnectingToRenderer();
+
+function connectToRenderer() {
+    console.log("Connecting to renderer");
+    rendererSocket = net.createConnection(SOCKETFILE)
+        .on('connect', () => {
+            console.log("Connected to renderer");
+            rendererConnected = true;
+            clearInterval(connectToRendererInterval);
+        })
+        .on('data', function (data) {
+            console.log("Received data from renderer: " + data.toString());
+            if (data.toString() === '__disconnect') {
+                cleanup();
+            } else {
+                saveScreenshot();
+            }
+        })
+        .on('end', function () {
+            console.log("Renderer ended communiction");
+            rendererConnected = false;
+            rendererSocket.end();
+            startConnectingToRenderer();
+        })
+        .on('close', function () {
+            console.log("Renderer communiction closed");
+            //startConnectingToRenderer();
+        })
+        .on('error', function (data) {
+            console.log("Error communicating with renderer: " + data);
+            rendererConnected = false;
+            rendererSocket.end();
+            startConnectingToRenderer();
+        });
+}
+
+function cleanup() {
+    if (!SHUTDOWN) {
+        SHUTDOWN = true;
+        console.log('\n', "Terminating.", '\n');
+        rendererSocket.end();
+        process.exit(0);
+    }
+}
+process.on('SIGINT', cleanup);
+
+function saveScreenshot() {
     // check directory of disk
     if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
         // try connect to backend if not already open
@@ -92,7 +141,8 @@ rendererSocket.on('data', function (data) {
             }
         });
     }
-});
+}
+
 // backend inter-process communication
 var backendSocket = new WebSocket('ws://localhost:9002');
 backendSocket.on('error', function (err) {
@@ -310,13 +360,12 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
-            // connect to renderer
-            rendererSocket.connect(rendererPort, function () {
+            if (rendererConnected) {
                 // send file path to renderer to refresh display
                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
                 rendererSocket.write(updatedDir);
                 console.log("refreshing " + updatedDir);
-            });
+            }
         });
     },
     removeFile: function (msg, callback) {
@@ -340,13 +389,12 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
-                // connect to renderer
-                rendererSocket.connect(rendererPort, function () {
+                if (rendererConnected) {
                     // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
                     rendererSocket.write(updatedDir);
                     console.log('refreshing ' + updatedDir);
-                });
+                }
                 callback();
             });
         });
@@ -446,30 +494,28 @@ module.exports = {
                 datHttpServer = dat.serveHttp({
                     port: 8731
                 });
-                // connect to renderer
-                rendererSocket.connect(rendererPort, function () {
+                if (rendererConnected) {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
                     rendererSocket.write(rendererURL);
-                });
+                }
             });
         } else {
-            // connect to renderer
-            rendererSocket.connect(rendererPort, function () {
+            if (rendererConnected) {
                 // send media file path to renderer
                 rendererSocket.write('file://' + filePath + "/index.html");
                 // store disk directory to take new screenshot and add it as new thumbnail
                 diskRequiringScreenshot = dirAndVersion.directory;
-            });
+            }
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
     playRemoteMedia: function (name) {
-        // connect to renderer // TODO: check if URL is valid?
-        rendererSocket.connect(rendererPort, function () {
+        // TODO: check if URL is valid?
+        if (rendererConnected) {
             // send media file path to renderer
             rendererSocket.write(name);
-        });
+        }
         console.log('USER INPUT::playing remote media: ' + name);
     },
     loadFeed: function (callback) {

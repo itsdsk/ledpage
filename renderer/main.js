@@ -51,7 +51,7 @@ app.on('ready', () => {
       mainWindowB.hide();
       mainWindowB.minimize();
       // report loaded to client
-      if(client) client.write("loaded");
+      if (client) client.write("loaded");
     }, 300);
   });
   mainWindowB.webContents.on('did-finish-load', () => {
@@ -65,7 +65,7 @@ app.on('ready', () => {
       mainWindowA.hide();
       mainWindowA.minimize();
       // report loaded to client
-      if(client) client.write("loaded");
+      if (client) client.write("loaded");
     }, 300);
   });
 
@@ -80,25 +80,60 @@ app.on('ready', () => {
   // bool state to say which window to load to
   var flipWindow = false;
 
-  // create server to receive URLs on
-  var tcpServer = net.createServer(onClientConnected);
-  tcpServer.listen(2845);
-  var client; // keep track of connected TCP client
-  function onClientConnected(sock) {
-    console.log("Client connected");
-    // receive URL to display
-    sock.on('data', function (data) {
-      console.log("recieved: " + data.toString());
-      // save client
-      client = sock;
-      // display recieved URI
-      if (flipWindow) {
-        mainWindowA.loadURL(data.toString());
-      } else {
-        mainWindowB.loadURL(data.toString());
+
+  // create UNIX socket to receive URLs on
+  var client; // keep track of connected client
+  const SOCKETFILE = "/tmp/renderer.sock";
+  // check for failed cleanup
+  require('fs').stat(SOCKETFILE, function (err, stats) {
+    if (err) {
+      // no leftover socket found... start server
+      createServer(SOCKETFILE);
+      return;
+    }
+    // remove leftover socket file then start server
+    require('fs').unlink(SOCKETFILE, function (err) {
+      if (err) {
+        console.log("ERROR REMOVING LEFTOVER SOCKET FILE");
       }
-      // flip window to display on
-      flipWindow = !flipWindow;
+      createServer(SOCKETFILE);
+      return;
     });
+  });
+
+  function createServer(socket) {
+    console.log('Creating server.');
+    var server = net.createServer(function (stream) {
+        console.log('Connection acknowledged.');
+
+        stream.on('end', function () {
+          console.log('Client disconnected.');
+        });
+
+        stream.on('data', function (msg) {
+          // parse buffer to string
+          msg = msg.toString();
+
+          console.log('Client:', msg);
+
+          // save client
+          client = stream;
+
+          // display recieved URI
+          if (flipWindow) {
+            mainWindowA.loadURL(msg);
+          } else {
+            mainWindowB.loadURL(msg);
+          }
+          // flip window to display on
+          flipWindow = !flipWindow;
+
+        });
+      })
+      .listen(socket)
+      .on('connection', function (socket) {
+        console.log('Client connected.');
+      });
+    return server;
   }
 });
