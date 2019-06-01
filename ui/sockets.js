@@ -95,11 +95,15 @@ function connectToBackend() {
             console.log("Connected to backend");
             exports.backendConnected = true;
             clearInterval(connectToBackendInterval);
-            exports.backend.write("weifywkf");
+            //exports.backend.write("weifywkf");
         })
         .on('data', function (data) {
             console.log("Received data from backend: " + data.toString());
             exports.backendEvent.emit('data', data);
+            setTimeout(function() {
+                console.log("responding to broadcast");
+                exports.backend.write("responsetobroadcast");
+            }, 1500);
             // if (data.toString() === '__disconnect') {
             //     cleanup();
             // } else {

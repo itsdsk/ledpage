@@ -50,6 +50,16 @@ public:
           boost::asio::placeholders::bytes_transferred));
   }
 
+  void sendMessage(std::string message) {
+      std::cout << "sending message: " << message << std::endl;
+      boost::asio::async_write(socket_,
+          boost::asio::buffer(message, message.length()),
+          boost::bind(&session::handle_write,
+            shared_from_this(),
+            boost::asio::placeholders::error));
+
+  }
+
   void handle_read(const boost::system::error_code& error,
       size_t bytes_transferred)
   {
@@ -58,12 +68,18 @@ public:
         std::string receivedData(data_.begin(), data_.begin() + bytes_transferred);
         std::cout << "received data: " << receivedData << std::endl;
         std::cout << "length: " << bytes_transferred << std::endl;
-        std::string rtrn = on_socket_message(receivedData);
-      boost::asio::async_write(socket_,
-          boost::asio::buffer(rtrn, rtrn.length()),
-          boost::bind(&session::handle_write,
+              socket_.async_read_some(boost::asio::buffer(data_),
+          boost::bind(&session::handle_read,
             shared_from_this(),
-            boost::asio::placeholders::error));
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
+
+    //     std::string rtrn = on_socket_message(receivedData);
+    //   boost::asio::async_write(socket_,
+    //       boost::asio::buffer(rtrn, rtrn.length()),
+    //       boost::bind(&session::handle_write,
+    //         shared_from_this(),
+    //         boost::asio::placeholders::error));
     //   boost::asio::async_write(socket_,
     //       boost::asio::buffer(data_, bytes_transferred),
     //       boost::bind(&session::handle_write,
@@ -76,11 +92,12 @@ public:
   {
     if (!error)
     {
-      socket_.async_read_some(boost::asio::buffer(data_),
-          boost::bind(&session::handle_read,
-            shared_from_this(),
-            boost::asio::placeholders::error,
-            boost::asio::placeholders::bytes_transferred));
+        std::cout << "write without error" << std::endl;
+    //   socket_.async_read_some(boost::asio::buffer(data_),
+    //       boost::bind(&session::handle_read,
+    //         shared_from_this(),
+    //         boost::asio::placeholders::error,
+    //         boost::asio::placeholders::bytes_transferred));
     }
   }
 
@@ -115,13 +132,24 @@ public:
       new_session->start();
     }
 
+    currentSession = session_ptr(new_session);
+    //broadcast("ygkreuk");
+
     new_session.reset(new session(io_service_));
     acceptor_.async_accept(new_session->socket(),
         boost::bind(&server1::handle_accept, this, new_session,
           boost::asio::placeholders::error));
   }
 
+  void broadcast(std::string message) {
+      if(currentSession.get() != nullptr) {
+      std::cout << "sending broadcast msg" << std::endl;
+      currentSession->sendMessage("broadcast!!!!");
+      }
+  }
+
 private:
+  session_ptr currentSession;
   boost::asio::io_service& io_service_;
   stream_protocol::acceptor acceptor_;
 };
@@ -216,6 +244,9 @@ int main(int argc, char *argv[])
     // display screen on device
     while (receivedQuitSignal == false)
     {
+        unsigned int microseconds = 2000000;
+        usleep(microseconds);
+        s.broadcast("kuybefkyb");
         grabber->grabFrame(_image);
         //
         if(receivedScreenshotCommand)
