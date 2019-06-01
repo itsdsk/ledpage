@@ -16,6 +16,116 @@
 #include <thirdparty/websocketpp/websocketpp/server.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 
+#include <cstdio>
+#include <boost/array.hpp>
+#include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
+
+using boost::asio::local::stream_protocol;
+
+std::string on_socket_message(std::string message);
+
+class session
+  : public boost::enable_shared_from_this<session>
+{
+public:
+  session(boost::asio::io_service& io_service)
+    : socket_(io_service)
+  {
+  }
+
+  stream_protocol::socket& socket()
+  {
+    return socket_;
+  }
+
+  void start()
+  {
+    socket_.async_read_some(boost::asio::buffer(data_),
+        boost::bind(&session::handle_read,
+          shared_from_this(),
+          boost::asio::placeholders::error,
+          boost::asio::placeholders::bytes_transferred));
+  }
+
+  void handle_read(const boost::system::error_code& error,
+      size_t bytes_transferred)
+  {
+    if (!error)
+    {
+        std::string receivedData(data_.begin(), data_.begin() + bytes_transferred);
+        std::cout << "received data: " << receivedData << std::endl;
+        std::cout << "length: " << bytes_transferred << std::endl;
+        std::string rtrn = on_socket_message(receivedData);
+      boost::asio::async_write(socket_,
+          boost::asio::buffer(rtrn, rtrn.length()),
+          boost::bind(&session::handle_write,
+            shared_from_this(),
+            boost::asio::placeholders::error));
+    //   boost::asio::async_write(socket_,
+    //       boost::asio::buffer(data_, bytes_transferred),
+    //       boost::bind(&session::handle_write,
+    //         shared_from_this(),
+    //         boost::asio::placeholders::error));
+    }
+  }
+
+  void handle_write(const boost::system::error_code& error)
+  {
+    if (!error)
+    {
+      socket_.async_read_some(boost::asio::buffer(data_),
+          boost::bind(&session::handle_read,
+            shared_from_this(),
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
+    }
+  }
+
+private:
+  // The socket used to communicate with the client.
+  stream_protocol::socket socket_;
+
+  // Buffer used to store data received from the client.
+  boost::array<char, 1024> data_;
+};
+
+typedef boost::shared_ptr<session> session_ptr;
+
+class server1
+{
+public:
+  server1(boost::asio::io_service& io_service, const std::string& file)
+    : io_service_(io_service),
+      acceptor_(io_service, stream_protocol::endpoint(file))
+  {
+    session_ptr new_session(new session(io_service_));
+    acceptor_.async_accept(new_session->socket(),
+        boost::bind(&server1::handle_accept, this, new_session,
+          boost::asio::placeholders::error));
+  }
+
+  void handle_accept(session_ptr new_session,
+      const boost::system::error_code& error)
+  {
+    if (!error)
+    {
+      new_session->start();
+    }
+
+    new_session.reset(new session(io_service_));
+    acceptor_.async_accept(new_session->socket(),
+        boost::bind(&server1::handle_accept, this, new_session,
+          boost::asio::placeholders::error));
+  }
+
+private:
+  boost::asio::io_service& io_service_;
+  stream_protocol::acceptor acceptor_;
+};
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -64,6 +174,14 @@ int main(int argc, char *argv[])
     {
         deviceManagers.emplace_back(config, i);
     }
+
+    // unix sock server
+    const char* sockPath = "/tmp/backend.sock";
+    boost::asio::io_service io_service1;
+    std::remove(sockPath);
+    server1 s(io_service1, sockPath);
+    //io_service1.run();
+    boost::thread t1(boost::bind(&boost::asio::io_service::run, boost::ref(io_service1)));
 
     // websockets server
     server ws_server;
@@ -136,6 +254,12 @@ void saveScreenshot(Image<ColorRgba> &_image)
     }
     cout << "Saving screenshot" << endl;
     myfile.close();
+}
+
+std::string on_socket_message(std::string message)
+{
+    std::cout << "on socke tmessage got : " << message << std::endl;
+    return "reyfbkhybkueysbvkjbvheukbhsvh";
 }
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)

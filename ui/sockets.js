@@ -72,3 +72,54 @@ function connectToRenderer() {
             startConnectingToRenderer();
         });
 }
+
+// backend inter-process communication
+const BACKENDSOCKETFILE = "/tmp/backend.sock";
+exports.backendConnected = false;
+exports.backend = null;
+exports.backendEvent = new EventEmitter();
+
+var connectToBackendInterval;
+
+function startConnectingToBackend() {
+    clearInterval(connectToBackendInterval);
+    connectToBackendInterval = setInterval(connectToBackend, 2500);
+}
+
+startConnectingToBackend();
+
+function connectToBackend() {
+    console.log("Connecting to backend");
+    exports.backend = net.createConnection(BACKENDSOCKETFILE)
+        .on('connect', () => {
+            console.log("Connected to backend");
+            exports.backendConnected = true;
+            clearInterval(connectToBackendInterval);
+            exports.backend.write("weifywkf");
+        })
+        .on('data', function (data) {
+            console.log("Received data from backend: " + data.toString());
+            exports.backendEvent.emit('data', data);
+            // if (data.toString() === '__disconnect') {
+            //     cleanup();
+            // } else {
+            //     saveScreenshot();
+            // }
+        })
+        .on('end', function () {
+            console.log("Backend ended communiction");
+            exports.backendConnected = false;
+            exports.backend.end();
+            startConnectingToBackend();
+        })
+        .on('close', function () {
+            console.log("Backend communiction closed");
+            //startConnectingToRenderer();
+        })
+        .on('error', function (data) {
+            console.log("Error communicating with backend: " + data);
+            exports.backendConnected = false;
+            exports.backend.end();
+            startConnectingToBackend();
+        });
+}
