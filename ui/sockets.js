@@ -16,114 +16,63 @@ exports.initialiseBackend = function () {
 exports.initialiseBackend();
 
 exports.backend.on('error', function (err) {
-    console.log('backend not connected', err);
+    console.log('backend WS not connected', err);
 });
 
 exports.backend.on('open', function () {
-    console.log('backend connected');
+    console.log('backend WS connected');
 });
 
-// renderer inter-process communication
-const SOCKETFILE = "/tmp/renderer.sock";
-exports.rendererConnected = false;
-exports.renderer = null;
-exports.rendererEvent = new EventEmitter();
+// unix socket class
+exports.DomainClient = class DomainClient {
+    constructor(name) {
+        // 
+        this.name = name;
+        //
+        this.socketname = "/tmp/" + this.name + ".sock";
+        //
+        this.connected = false;
+        this.socket = null;
+        this.event = new EventEmitter();
+        this.connectInterval = null;
+        //
+        this.startConnecting();
+        //
+        console.log("Constructing client " + this.name + " with path " + this.socketname);
+    }
 
-var connectToRendererInterval;
+    startConnecting() {
+        clearInterval(this.connectInterval);
+        this.connectInterval = setInterval(this.connectToSocket.bind(this), 2500);
+    }
 
-function startConnectingToRenderer() {
-    clearInterval(connectToRendererInterval);
-    connectToRendererInterval = setInterval(connectToRenderer, 2500);
-}
-
-startConnectingToRenderer();
-
-function connectToRenderer() {
-    console.log("Connecting to renderer");
-    exports.renderer = net.createConnection(SOCKETFILE)
-        .on('connect', () => {
-            console.log("Connected to renderer");
-            exports.rendererConnected = true;
-            clearInterval(connectToRendererInterval);
-        })
-        .on('data', function (data) {
-            console.log("Received data from renderer: " + data.toString());
-            exports.rendererEvent.emit('data', data);
-            // if (data.toString() === '__disconnect') {
-            //     cleanup();
-            // } else {
-            //     saveScreenshot();
-            // }
-        })
-        .on('end', function () {
-            console.log("Renderer ended communiction");
-            exports.rendererConnected = false;
-            exports.renderer.end();
-            startConnectingToRenderer();
-        })
-        .on('close', function () {
-            console.log("Renderer communiction closed");
-            //startConnectingToRenderer();
-        })
-        .on('error', function (data) {
-            console.log("Error communicating with renderer: " + data);
-            exports.rendererConnected = false;
-            exports.renderer.end();
-            startConnectingToRenderer();
-        });
-}
-
-// backend inter-process communication
-const BACKENDSOCKETFILE = "/tmp/backend.sock";
-exports.backendConnected = false;
-exports.backend = null;
-exports.backendEvent = new EventEmitter();
-
-var connectToBackendInterval;
-
-function startConnectingToBackend() {
-    clearInterval(connectToBackendInterval);
-    connectToBackendInterval = setInterval(connectToBackend, 2500);
-}
-
-startConnectingToBackend();
-
-function connectToBackend() {
-    console.log("Connecting to backend");
-    exports.backend = net.createConnection(BACKENDSOCKETFILE)
-        .on('connect', () => {
-            console.log("Connected to backend");
-            exports.backendConnected = true;
-            clearInterval(connectToBackendInterval);
-            //exports.backend.write("weifywkf");
-        })
-        .on('data', function (data) {
-            console.log("Received data from backend: " + data.toString());
-            exports.backendEvent.emit('data', data);
-            setTimeout(function() {
-                console.log("responding to broadcast");
-                exports.backend.write("responsetobroadcast");
-            }, 1500);
-            // if (data.toString() === '__disconnect') {
-            //     cleanup();
-            // } else {
-            //     saveScreenshot();
-            // }
-        })
-        .on('end', function () {
-            console.log("Backend ended communiction");
-            exports.backendConnected = false;
-            exports.backend.end();
-            startConnectingToBackend();
-        })
-        .on('close', function () {
-            console.log("Backend communiction closed");
-            //startConnectingToRenderer();
-        })
-        .on('error', function (data) {
-            console.log("Error communicating with backend: " + data);
-            exports.backendConnected = false;
-            exports.backend.end();
-            startConnectingToBackend();
-        });
-}
+    connectToSocket() {
+        console.log("Connecting to " + this.name);
+        this.socket = net.createConnection(this.socketname)
+            .on('connect', () => {
+                console.log("Connected to " + this.name);
+                this.connected = true;
+                clearInterval(this.connectInterval);
+                console.log("... Connected to " + this.name);
+            })
+            .on('data', (data) => {
+                console.log("Received data from " + this.name + ": " + data.toString());
+                this.event.emit('data', data);
+            })
+            .on('end', () => {
+                console.log(this.name + " ended communiction");
+                this.connected = false;
+                this.socket.end();
+                this.startConnecting();
+            })
+            .on('close', () => {
+                console.log(this.name + " communiction closed");
+            })
+            .on('error', (data) => {
+                console.log("Error communicating with " + this.name + ": " + data);
+                this.connected = false;
+                this.socket.end();
+                this.startConnecting();
+            });
+    }
+};

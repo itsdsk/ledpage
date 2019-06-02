@@ -30,10 +30,21 @@ db.serialize(function () {
 var diskRequiringScreenshot;
 var screenshotPath = "/screenshot.ppm";
 
+//
+var backendSocket = new sockets.DomainClient("backend");
+backendSocket.event.on('data', function (data) {
+    console.log("backend socket got data in media: " + data.toString());
+    setTimeout(function () {
+        console.log("responding to broadcast");
+        backendSocket.socket.write("responsetobroadcast");
+    }, 1500);
+});
+
 // prevent duplicate exit messages
 var SHUTDOWN = false;
 
-sockets.rendererEvent.on('data', function (data) {
+var rendererSocket = new sockets.DomainClient("renderer");
+rendererSocket.event.on('data', function (data) {
     console.log("media in data from renderer: " + data.toString());
     if (data.toString() === '__disconnect') {
         cleanup();
@@ -46,7 +57,7 @@ function cleanup() {
     if (!SHUTDOWN) {
         SHUTDOWN = true;
         console.log('\n', "Terminating.", '\n');
-        sockets.renderer.end();
+        rendererSocket.socket.end();
         process.exit(0);
     }
 }
@@ -312,10 +323,10 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
-            if (sockets.rendererConnected) {
+            if (rendererSocket.connected) {
                 // send file path to renderer to refresh display
                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                sockets.renderer.write(updatedDir);
+                rendererSocket.socket.write(updatedDir);
                 console.log("refreshing " + updatedDir);
             }
         });
@@ -341,10 +352,10 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
-                if (sockets.rendererConnected) {
+                if (rendererSocket.connected) {
                     // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    sockets.renderer.write(updatedDir);
+                    rendererSocket.socket.write(updatedDir);
                     console.log('refreshing ' + updatedDir);
                 }
                 callback();
@@ -446,16 +457,16 @@ module.exports = {
                 datHttpServer = dat.serveHttp({
                     port: 8731
                 });
-                if (sockets.rendererConnected) {
+                if (rendererSocket.connected) {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    sockets.renderer.write(rendererURL);
+                    rendererSocket.socket.write(rendererURL);
                 }
             });
         } else {
-            if (sockets.rendererConnected) {
+            if (rendererSocket.connected) {
                 // send media file path to renderer
-                sockets.renderer.write('file://' + filePath + "/index.html");
+                rendererSocket.socket.write('file://' + filePath + "/index.html");
                 // store disk directory to take new screenshot and add it as new thumbnail
                 diskRequiringScreenshot = dirAndVersion.directory;
             }
@@ -464,9 +475,9 @@ module.exports = {
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
-        if (sockets.rendererConnected) {
+        if (rendererSocket.connected) {
             // send media file path to renderer
-            sockets.renderer.write(name);
+            rendererSocket.socket.write(name);
         }
         console.log('USER INPUT::playing remote media: ' + name);
     },
