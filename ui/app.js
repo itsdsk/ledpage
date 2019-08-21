@@ -120,6 +120,11 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // set blur
+  socket.on('setblur', function (msg) {
+    // update media
+    media.setBlur(msg);
+  });
   // save version (DAT)
   socket.on('saveversion', function (msg) {
     media.saveVersion(msg);

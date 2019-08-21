@@ -11,7 +11,7 @@ var datHttpServer;
 
 db.serialize(function () {
     // create tables for primitive types (disk and channel)
-    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
+    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, blur_amt INT DEFAULT 50, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
     // create tables for relational types (files and connections)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
@@ -461,17 +461,55 @@ module.exports = {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
                     rendererSocket.socket.write(rendererURL);
+                    // send blur amt to backend
+                    // select disk
+                    var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                    db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+                        // send size to app
+                        backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                    });
                 }
             });
         } else {
             if (rendererSocket.connected) {
                 // send media file path to renderer
                 rendererSocket.socket.write('file://' + filePath + "/index.html");
+                // send blur amt to backend
+                // select disk
+                var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+                    // send size to app
+                    backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                });
+
                 // store disk directory to take new screenshot and add it as new thumbnail
                 diskRequiringScreenshot = dirAndVersion.directory;
             }
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
+    },
+    setBlur: function (msg) {
+        //
+        console.log(`set blur msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.socket.write(`{"window":{"size":${msg.size}}}`);
+        // update in database
+        if (msg.directory) {
+            // get demo.json
+            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+            var meta = require(metaPath);
+            // set new blur
+            meta.demo.blur_amt = msg.size;
+            console.log("USER INPUT::updating disk blur");
+            // update name in database
+            var updateBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+            db.run(updateBlurQuery, [msg.size, msg.directory], function (err) {
+                // save demo.json
+                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
+                });
+            });
+        }
     },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
@@ -641,7 +679,7 @@ function templateChannel(channel_name, create_flag, callback) {
 
 function templateDisk(disk_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from disks table
-    var sql = "SELECT directory, title, description, image, dat_key, dat_versions FROM disks WHERE directory = ?";
+    var sql = "SELECT directory, title, description, image, blur_amt, dat_key, dat_versions FROM disks WHERE directory = ?";
     db.get(sql, [disk_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
@@ -689,6 +727,11 @@ function parseDiskDirectory(directory, meta, callback) {
                 var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
                 db.run(addImgQuery, [decodedImage, directory]);
             });
+        }
+        // add blur amount to database
+        if (meta.demo.blur_amt) {
+            var addBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+            db.run(addBlurQuery, [meta.demo.blur_amt, directory]);
         }
         // add files to database
         var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";

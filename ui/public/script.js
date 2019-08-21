@@ -92,20 +92,36 @@ function changeStyleToView(view) {
 document.addEventListener('DOMContentLoaded', function () {
     // load page
     refresh();
-    // events to handle user interactions on main page
-    document.querySelector('#brightnessInput').onchange = function () {
+}, false);
+
+document.addEventListener('change', function (event) {
+    // handle input change events
+    if (event.target.matches('.blurAmount')) {
+        // get blur value
+        var data = {
+            "size": parseInt(event.target.value)
+        };
+        // get disk
+        if (true) {
+            data.directory = event.target.parentElement.dataset.directory;
+        }
+        // send msg to server
+        socket.emit('setblur', data);
+    } else if (event.target.matches('#brightnessInput')) {
+        // get brightness value
         var data = {
             "window": {
-                "brightness": parseInt(this.value)
+                "brightness": parseInt(event.target.value)
             }
         };
-        console.log(JSON.stringify(data));
-        if(mainSocket.readyState != 1) {
+        if (mainSocket.readyState != 1) {
             mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
         }
+        // send msg to backend
         mainSocket.send(JSON.stringify(data));
-    };
-}, false);
+    }
+});
+
 document.addEventListener('click', function (event) {
     // handle mouseclick events
     var channelName, diskDirectory, data;
@@ -310,7 +326,7 @@ document.addEventListener('mouseup', function () {
         };
         // send updated led(s) to server
         //socket.emit('updateconfig', data); // sends full structure of LEDs?
-        if(mainSocket.readyState != 1) {
+        if (mainSocket.readyState != 1) {
             mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
         }
         mainSocket.send(JSON.stringify(data)); // send direct to host backend?
