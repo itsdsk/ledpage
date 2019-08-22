@@ -269,7 +269,7 @@ document.addEventListener('click', function (event) {
         socket.emit('systempower', 'shutdown');
     } else if (event.target.matches('#rebootButton')) {
         socket.emit('systempower', 'reboot');
-    } else {
+    } else if (event.target.matches('#takeScreenshotButton')) {
         // test to save screenshot on click
         if (mainSocket.readyState != 1) {
             mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
