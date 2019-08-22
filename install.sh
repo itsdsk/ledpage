@@ -50,7 +50,7 @@ Description=Disk Renderer
 After=disk-ui-daemon.service
 
 [Service]
-ExecStart=/usr/bin/startx /home/pi/disk/renderer/node_modules/electron/dist/electron /home/pi/disk/renderer/main.js
+ExecStart=/usr/bin/startx /home/pi/disk/renderer/node_modules/electron/dist/electron --no-sandbox /home/pi/disk/renderer/main.js
 
 [Install]
 WantedBy=multi-user.target
