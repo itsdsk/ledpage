@@ -16,18 +16,22 @@ const {
  we initialize our application display as a callback of the electronJS "ready" event
  */
 app.on('ready', () => {
+  // get screen resolution
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+  console.log(`Detected screen size: ${JSON.stringify({ width, height })}`);
   // window options (electronJS)
   const windowOpts = {
-    width: 720,
-    height: 720,
+    width: (width / 2),
+    height: height,
     // useContentSize: true,
     // fullscreen: true,
     // enableLargerThanScreen: true,
     show: false,
+    autoHideMenuBar: true,
     // center: true,
     // useContentSize: true,
-    frame: false, // frameless window without chrome graphical interfaces (borders, toolbars etc)
-    kiosk: true, // chromium kiosk mode (fullscreen without icons or taskbar)
+    frame: true, // frameless window without chrome graphical interfaces (borders, toolbars etc)
+    kiosk: false, // chromium kiosk mode (fullscreen without icons or taskbar)
     backgroundColor: '#000000', // set backgrounnd
     webPreferences: {
       sandbox: false,
@@ -38,7 +42,12 @@ app.on('ready', () => {
   // create 2 windows
   mainWindowA = new BrowserWindow(windowOpts);
   mainWindowB = new BrowserWindow(windowOpts);
-
+  // move windows next to each other
+  mainWindowA.setPosition(0, 0);
+  mainWindowB.setPosition((width / 2), 0);
+  // log
+  console.log(`Window positions: ${JSON.stringify(mainWindowA.getPosition())}, ${JSON.stringify(mainWindowB.getPosition())}`);
+  console.log(`Window sizes: ${JSON.stringify(mainWindowA.getContentSize())}, ${JSON.stringify(mainWindowB.getContentSize())}`);
   // behaviour on pageload
   mainWindowA.webContents.on('did-finish-load', () => {
     setTimeout(() => {
