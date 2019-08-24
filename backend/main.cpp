@@ -207,12 +207,6 @@ int main(int argc, char *argv[])
     json config;
     confFile >> config;
 
-    // add output objects based on config
-    for (unsigned i = 0; i < config["outputs"].size(); i++)
-    {
-        deviceManagers.emplace_back(config, i);
-    }
-
     // unix sock server
     const char *sockPath = "/tmp/backend.sock";
     boost::asio::io_service io_service1;
@@ -247,8 +241,15 @@ int main(int argc, char *argv[])
     _w = config["window"]["width"];
     _h = config["window"]["height"];
     cout << "config window size: " << _w << " x " << _h << endl;
-    FrameGrabber *grabber = new FrameGrabber(_w, _h);
+    FrameGrabber *grabber = new FrameGrabber();
     Image<ColorRgba> _image(_w, _h);
+
+    // add output objects based on config
+    for (unsigned i = 0; i < config["outputs"].size(); i++)
+    {
+        deviceManagers.emplace_back(config, i);
+    }
+
 
     // display screen on device
     while (receivedQuitSignal == false)

@@ -30,9 +30,9 @@ class FrameGrabber
     int _vc_flags;
 
     /// With of the captured snapshot [pixels]
-    const unsigned _width;
+    unsigned _width;
     /// Height of the captured snapshot [pixels]
-    const unsigned _height;
+    unsigned _height;
 
     // the selected VideoMode
     // VideoMode _videoMode;
@@ -48,14 +48,12 @@ class FrameGrabber
     unsigned _captureBufferSize;
 
     // constructor
-    FrameGrabber(const unsigned width, const unsigned height) :
+    FrameGrabber() :
 //#ifdef RPI
                                                                 _vc_display(0),
                                                                 _vc_resource(0),
 //#endif
                                                                 _vc_flags(0),
-                                                                _width(width),
-                                                                _height(height),
                                                                 // _videoMode(VIDEO_2D),
                                                                 _cropLeft(0),
                                                                 _cropRight(0),
@@ -80,7 +78,10 @@ class FrameGrabber
             // Keep compiler happy in 'release' mode
             (void)result;
             assert(result == 0);
-            std::cout << "DISPMANXGRABBER INFO: Display opened with resolution: " << vc_info.width << "x" << vc_info.height << std::endl;
+
+            _width = vc_info.width;
+            _height = vc_info.height;
+            std::cout << "DISPMANXGRABBER INFO: Display opened with resolution: " << _width << "x" << _height << std::endl;
 
             // Close the displaye
             vc_dispmanx_display_close(_vc_display);
@@ -90,13 +91,13 @@ class FrameGrabber
         uint32_t vc_nativeImageHandle;
         _vc_resource = vc_dispmanx_resource_create(
             VC_IMAGE_RGBA32,
-            width,
-            height,
+            _width,
+            _height,
             &vc_nativeImageHandle);
         assert(_vc_resource);
 
         // Define the capture rectangle with the same size
-        vc_dispmanx_rect_set(&_rectangle, 0, 0, width, height);
+        vc_dispmanx_rect_set(&_rectangle, 0, 0, _width, _height);
 
 //#endif
     }
