@@ -174,6 +174,7 @@ using websocketpp::lib::placeholders::_2;
 typedef server::message_ptr message_ptr;
 
 vector<DeviceManager> deviceManagers;
+FrameGrabber *grabber;
 unsigned _w;
 unsigned _h;
 float brightness = 0.15f;
@@ -241,13 +242,13 @@ int main(int argc, char *argv[])
     _w = config["window"]["width"];
     _h = config["window"]["height"];
     cout << "config window size: " << _w << " x " << _h << endl;
-    FrameGrabber *grabber = new FrameGrabber();
+    grabber = new FrameGrabber();
     Image<ColorRgba> _image(_w, _h);
 
     // add output objects based on config
     for (unsigned i = 0; i < config["outputs"].size(); i++)
     {
-        deviceManagers.emplace_back(config, i);
+        deviceManagers.emplace_back(config, i, grabber->_width, grabber->_height);
     }
 
 
@@ -267,7 +268,7 @@ int main(int argc, char *argv[])
                 for (int k = 0; k < deviceManagers[i].ledNodes.size(); k++)
                 {
                     // reset with new radius
-                    deviceManagers[i].ledNodes[k].setPosition(deviceManagers[i].ledNodes[k].x_pos, deviceManagers[i].ledNodes[k].y_pos, changeSize, _w, _h);
+                    deviceManagers[i].ledNodes[k].setPosition(deviceManagers[i].ledNodes[k].x_pos, deviceManagers[i].ledNodes[k].y_pos, changeSize, _w, _h, grabber->_width, grabber->_height);
                 }
             }
             // complete signal
@@ -347,7 +348,7 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                                 // log
                                 cout << "Received LED in device \"" << deviceManagers[outputIndex].nameTEMP << "\" at index " << index << " position " << x << "," << y << " r:" << r << endl;
                                 // set led node position and radius
-                                deviceManagers[outputIndex].ledNodes[index].setPosition(x, y, r, _w, _h);
+                                deviceManagers[outputIndex].ledNodes[index].setPosition(x, y, r, _w, _h, grabber->_width, grabber->_height);
                             }
                         }
                     }

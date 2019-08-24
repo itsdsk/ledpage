@@ -16,11 +16,11 @@ struct LedNode
     unsigned r;
     unsigned pos;
     vector<unsigned> positions;
-    LedNode(unsigned x, unsigned y, unsigned r, unsigned width, unsigned height)
+    LedNode(unsigned x, unsigned y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
     {
-        setPosition(x, y, r, width, height);
+        setPosition(x, y, r, confW, confH, screenX, screenY);
     };
-    void setPosition(unsigned x, unsigned y, unsigned r, unsigned width, unsigned height)
+    void setPosition(unsigned x, unsigned y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
     {
         // set absolute position and radius
         x_pos = x;
@@ -30,15 +30,15 @@ struct LedNode
         positions.clear();
         // get sampling area boundary
         unsigned min_x = max((int)x_pos - (int)r, (0));
-        unsigned max_x = min((int)x_pos + (int)r, (int)width);
+        unsigned max_x = min((int)x_pos + (int)r, (int)confW);
         unsigned min_y = max((int)y_pos - (int)r, (0));
-        unsigned max_y = min((int)y_pos + (int)r, (int)height);
+        unsigned max_y = min((int)y_pos + (int)r, (int)confH);
         // go through pixels to sample
         for (unsigned ix = min_x; ix < max_x; ix++)
             for (unsigned iy = min_y; iy < max_y; iy++)
             {
                 // get 1-dimensional index of pixel in image and add to positions
-                unsigned position = iy * width + ix;
+                unsigned position = iy * confW + ix;
                 positions.emplace_back(position);
             }
         //cout << "Set LED: " << x_pos << "," << y_pos << " r:" << r << " samples: " << positions.size() << endl;
@@ -48,16 +48,16 @@ struct LedNode
 class DeviceManager
 {
   public:
-    DeviceManager(const json &config, unsigned &outputIndex)
+    DeviceManager(const json &config, unsigned &outputIndex, unsigned &screenX, unsigned &screenY)
     {
         //
         cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
-        unsigned width = config["window"]["width"];
-        unsigned height = config["window"]["height"];
+        unsigned configW = config["window"]["width"];
+        unsigned configH = config["window"]["height"];
         // add leds
         for (auto &led : config["outputs"][outputIndex]["leds"])
         {
-            ledNodes.emplace_back(led["x"], led["y"], led["r"], width, height);
+            ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
         }
         // create output object
         const string deviceName = config["outputs"][outputIndex]["properties"]["port"];
