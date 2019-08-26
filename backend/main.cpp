@@ -4,6 +4,7 @@
 #include <climits>
 #include <unistd.h>
 #include <signal.h>
+#include <chrono>
 
 #include <device/DeviceManager.h>
 #include <grabber/Image.h>
@@ -24,10 +25,13 @@
 #include <boost/asio.hpp>
 
 using boost::asio::local::stream_protocol;
-
+using namespace std::chrono;
 // signal/radius to change sampling radius for all LEDs
 unsigned changeSize = 0;
 unsigned screenHalf = 0; // side of screen media is playing on (0 = left, 1 = right)
+unsigned int fadeDuration = 2500; // fade transition duration in ms
+unsigned int endChangeTime = 0; // unix epoch time to stop fading
+float fadeAmt = 1.0f; // 0-1 transition amount
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -86,11 +90,20 @@ public:
                         changeSize = element1.value()["size"].get<int>();
                         std::cout << "user changing size to: " << std::to_string(changeSize) << std::endl;
                     }
+                    if (element1.value().find("fade") != element1.value().end())
+                    {
+                        // get size
+                        fadeDuration = element1.value()["fade"].get<int>();
+                        std::cout << "user changing fade to: " << std::to_string(fadeDuration) << std::endl;
+                    }
                     if (element1.value().find("half") != element1.value().end())
                     {
                         // get half
                         screenHalf = element1.value()["half"].get<int>();
                         std::cout << "user switching window side to : " << std::to_string(screenHalf) << std::endl;
+                        // save time
+                        fadeAmt = 0.0f;
+                        endChangeTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() + fadeDuration;
                     }
                 }
             }
@@ -290,10 +303,21 @@ int main(int argc, char *argv[])
         }
         // get number of pixels to shift (0 or screenwidth / 2)
         unsigned positionShiftAmt = (screenHalf == 0 ? 0 : unsigned(grabber->_width / 2.0f));
+        if (fadeAmt < 1.0f) {
+            // get crossfade amt
+            unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+            if (currentms < endChangeTime) {
+                //
+                fadeAmt = (currentms - (endChangeTime - fadeDuration)) / float(fadeDuration);
+            } else {
+                fadeAmt = 1.0f;
+                //s.broadcast("test broadcast");
+            }
+        }
         // update
         for (auto &deviceManager : deviceManagers)
         {
-            deviceManager.update(_image, brightness, positionShiftAmt);
+            deviceManager.update(_image, brightness, positionShiftAmt, fadeAmt);
         }
     }
 

@@ -51,8 +51,9 @@ struct LedNode
 class DeviceManager
 {
   public:
-    DeviceManager(const json &config, unsigned &outputIndex, unsigned &screenX, unsigned &screenY)
+    DeviceManager(const json &config, unsigned &outputIndex, unsigned &_screenX, unsigned &screenY)
     {
+        screenX = _screenX;
         //
         cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
         unsigned configW = config["window"]["width"];
@@ -70,7 +71,7 @@ class DeviceManager
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness, unsigned &positionShift)
+    int update(const Image<Pixel_T> &image, float &brightness, unsigned &positionShift, float &fadeAmt)
     {
         std::vector<ColorRgb> ledValues;
         // get colours
@@ -92,6 +93,32 @@ class DeviceManager
             uint8_t avgR = uint8_t(cummR / ledNode.positions.size());
             uint8_t avgG = uint8_t(cummG / ledNode.positions.size());
             uint8_t avgB = uint8_t(cummB / ledNode.positions.size());
+
+
+            if (fadeAmt < 1.0f) {
+                // get sum of other colours
+                uint_fast16_t cummR2 = 0;
+                uint_fast16_t cummG2 = 0;
+                uint_fast16_t cummB2 = 0;
+                for (unsigned position : ledNode.positions)
+                {
+                    unsigned adjustedPos = position + (positionShift == 0 ? unsigned(screenX/2.0f) : 0);
+                    const Pixel_T &pixel = image.memptr()[adjustedPos];
+                    cummR2 += pixel.red;
+                    cummG2 += pixel.green;
+                    cummB2 += pixel.blue;
+                }
+                // compute mean average of each colours
+                uint8_t avgR2 = uint8_t(cummR2 / ledNode.positions.size());
+                uint8_t avgG2 = uint8_t(cummG2 / ledNode.positions.size());
+                uint8_t avgB2 = uint8_t(cummB2 / ledNode.positions.size());
+                // calculate fade
+                avgR = uint8_t(avgR2 + fadeAmt * (avgR - avgR2));
+                avgG = uint8_t(avgG2 + fadeAmt * (avgG - avgG2));
+                avgB = uint8_t(avgB2 + fadeAmt * (avgB - avgB2));
+            }
+
+
             // apply brightness
             avgR = uint8_t(avgR * brightness);
             avgG = uint8_t(avgG * brightness);
@@ -109,6 +136,7 @@ class DeviceManager
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
     string nameTEMP;
+    unsigned screenX;
 
   private:
     //
