@@ -101,10 +101,10 @@ document.addEventListener('change', function (event) {
         var data = {
             "size": parseInt(event.target.value)
         };
-        // get disk
-        if (true) {
-            data.directory = event.target.parentElement.dataset.directory;
-        }
+        // // get disk
+        // if (true) {
+        //     data.directory = event.target.parentElement.dataset.directory;
+        // }
         // send msg to server
         socket.emit('setblur', data);
     } else if (event.target.matches('#brightnessInput')) {

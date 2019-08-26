@@ -34,10 +34,10 @@ var screenshotPath = "/screenshot.ppm";
 var backendSocket = new sockets.DomainClient("backend");
 backendSocket.event.on('data', function (data) {
     console.log("backend socket got data in media: " + data.toString());
-    setTimeout(function () {
-        //console.log("responding to broadcast");
-        //backendSocket.socket.write("responsetobroadcast");
-    }, 1500);
+    // setTimeout(function () {
+    //     //console.log("responding to broadcast");
+    //     //backendSocket.socket.write("responsetobroadcast");
+    // }, 1500);
 });
 
 // prevent duplicate exit messages
@@ -477,26 +477,26 @@ module.exports = {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
                     rendererSocket.socket.write(rendererURL);
-                    // send blur amt to backend
-                    // select disk
-                    var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
-                    db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
-                        // send size to app
-                        backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
-                    });
+                    // // send blur amt to backend
+                    // // select disk
+                    // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                    // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+                    //     // send size to app
+                    //     backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                    // });
                 }
             });
         } else {
             if (rendererSocket.connected) {
                 // send media file path to renderer
                 rendererSocket.socket.write('file://' + filePath + "/index.html");
-                // send blur amt to backend
-                // select disk
-                var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
-                db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
-                    // send size to app
-                    backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
-                });
+                // // send blur amt to backend
+                // // select disk
+                // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+                //     // send size to app
+                //     backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                // });
 
                 // store disk directory to take new screenshot and add it as new thumbnail
                 diskRequiringScreenshot = dirAndVersion.directory;
@@ -509,23 +509,23 @@ module.exports = {
         console.log(`set blur msg: ${JSON.stringify(msg)}`);
         // update backend
         backendSocket.socket.write(`{"window":{"size":${msg.size}}}`);
-        // update in database
-        if (msg.directory) {
-            // get demo.json
-            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
-            var meta = require(metaPath);
-            // set new blur
-            meta.demo.blur_amt = msg.size;
-            console.log("USER INPUT::updating disk blur");
-            // update name in database
-            var updateBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
-            db.run(updateBlurQuery, [msg.size, msg.directory], function (err) {
-                // save demo.json
-                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                    if (err) console.log(err);
-                });
-            });
-        }
+        // // update in database
+        // if (msg.directory) {
+        //     // get demo.json
+        //     var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+        //     var meta = require(metaPath);
+        //     // set new blur
+        //     meta.demo.blur_amt = msg.size;
+        //     console.log("USER INPUT::updating disk blur");
+        //     // update name in database
+        //     var updateBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+        //     db.run(updateBlurQuery, [msg.size, msg.directory], function (err) {
+        //         // save demo.json
+        //         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+        //             if (err) console.log(err);
+        //         });
+        //     });
+        // }
     },
     setCrossfadeTime: function (msg) {
         crossfadeTime = msg;
@@ -776,11 +776,11 @@ function parseDiskDirectory(directory, meta, callback) {
                 db.run(addImgQuery, [decodedImage, directory]);
             });
         }
-        // add blur amount to database
-        if (meta.demo.blur_amt) {
-            var addBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
-            db.run(addBlurQuery, [meta.demo.blur_amt, directory]);
-        }
+        // // add blur amount to database
+        // if (meta.demo.blur_amt) {
+        //     var addBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+        //     db.run(addBlurQuery, [meta.demo.blur_amt, directory]);
+        // }
         // add files to database
         var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
         meta.demo.files.forEach(filename => {
