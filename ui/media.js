@@ -54,12 +54,17 @@ rendererSocket.event.on('data', function (data) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
                 backendSocket.socket.write(`{"window":{"half":0}}`);
+                if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+                    saveScreenshot('A');
+                }
             } else if (rendererMsg.whichWindow == 'B') {
                 // send side of screen media is playing on to backend
                 backendSocket.socket.write(`{"window":{"half":1}}`);
+                if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+                    saveScreenshot('B');
+                }
             }
         }
-        //saveScreenshot();
     }
 });
 
@@ -73,7 +78,7 @@ function cleanup() {
 }
 process.on('SIGINT', cleanup);
 
-function saveScreenshot() {
+function saveScreenshot(side) {
     // check directory of disk
     if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
         // try connect to backend if not already open
@@ -97,7 +102,8 @@ function saveScreenshot() {
                         meta.demo.image = "thumb.jpg";
                         //
                         var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
-                        var convertCommand = 'convert ' + screenshotPath + ' ' + targetJpegPath;
+                        // convert and crop half of image
+                        var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'East' : 'West')} -crop 50x100% +repage ${targetJpegPath}`;
                         // convert to jpeg
                         runCommand(convertCommand, function (stdout) {
                             // add thumbnail to database
