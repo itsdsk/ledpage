@@ -27,6 +27,7 @@ using boost::asio::local::stream_protocol;
 
 // signal/radius to change sampling radius for all LEDs
 unsigned changeSize = 0;
+unsigned screenHalf = 0; // side of screen media is playing on (0 = left, 1 = right)
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -84,6 +85,12 @@ public:
                         // get size
                         changeSize = element1.value()["size"].get<int>();
                         std::cout << "user changing size to: " << std::to_string(changeSize) << std::endl;
+                    }
+                    if (element1.value().find("half") != element1.value().end())
+                    {
+                        // get half
+                        screenHalf = element1.value()["half"].get<int>();
+                        std::cout << "user switching window side to : " << std::to_string(screenHalf) << std::endl;
                     }
                 }
             }
@@ -281,9 +288,12 @@ int main(int argc, char *argv[])
             saveScreenshot(_image);
             receivedScreenshotCommand = false;
         }
+        // get number of pixels to shift (0 or screenwidth / 2)
+        unsigned positionShiftAmt = (screenHalf == 0 ? 0 : unsigned(grabber->_width / 2.0f));
+        // update
         for (auto &deviceManager : deviceManagers)
         {
-            deviceManager.update(_image, brightness);
+            deviceManager.update(_image, brightness, positionShiftAmt);
         }
     }
 

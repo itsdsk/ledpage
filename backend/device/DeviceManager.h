@@ -70,7 +70,7 @@ class DeviceManager
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness)
+    int update(const Image<Pixel_T> &image, float &brightness, unsigned &positionShift)
     {
         std::vector<ColorRgb> ledValues;
         // get colours
@@ -82,7 +82,8 @@ class DeviceManager
             uint_fast16_t cummB = 0;
             for (unsigned position : ledNode.positions)
             {
-                const Pixel_T &pixel = image.memptr()[position];
+                unsigned adjustedPos = position + positionShift;
+                const Pixel_T &pixel = image.memptr()[adjustedPos];
                 cummR += pixel.red;
                 cummG += pixel.green;
                 cummB += pixel.blue;
