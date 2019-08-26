@@ -119,6 +119,14 @@ document.addEventListener('change', function (event) {
         }
         // send msg to backend
         mainSocket.send(JSON.stringify(data));
+    } else if (event.target.matches('#autoplayMinRange') || event.target.matches('#autoplayMaxRange')) {
+        // get autoplay time range values
+        var data = {
+            [event.target.getAttribute('id')]: parseInt(event.target.value)
+        };
+        console.log(`Sending autoplay range update: ${JSON.stringify(data)}`);
+        // send msg to server
+        socket.emit('setautoplaytimerange', data);
     }
 });
 
@@ -278,6 +286,9 @@ document.addEventListener('click', function (event) {
         mainSocket.send(JSON.stringify({
             "command": "screenshot"
         }));
+    } else if (event.target.matches('.autoplayButton')) {
+        // send message to autoplay
+        socket.emit('autoplay');
     }
 }, false);
 document.addEventListener('mousedown', function (event) {

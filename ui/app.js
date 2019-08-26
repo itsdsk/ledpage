@@ -73,6 +73,14 @@ io.on('connection', function (socket) {
   socket.on('playURL', function (msg) {
     media.playRemoteMedia(msg);
   });
+  // autoplay
+  socket.on('autoplay', function (msg) {
+    media.startAutoplay(msg);
+  });
+  // set autoplay time range
+  socket.on('setautoplaytimerange', function (msg) {
+    media.setAutoplayTimeRange(msg);
+  });
   // create disk
   socket.on('createdisk', function (msg) {
     media.createDisk(msg, function (diskDirectory) {

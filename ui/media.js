@@ -540,6 +540,15 @@ module.exports = {
             autoplayTimerID = setTimeout(autoplayNext, 0);
         });
     },
+    setAutoplayTimeRange: function (msg) {
+        console.log(`USER INPUT::setting autoplay time range: ${JSON.stringify(msg)}`);
+        if (msg.autoplayMinRange) {
+            minAutoplayTime = msg.autoplayMinRange;
+        }
+        if (msg.autoplayMaxRange) {
+            maxAutoplayTime = msg.autoplayMaxRange;
+        }
+    },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
         if (rendererSocket.connected) {
@@ -824,11 +833,9 @@ function autoplayNext() {
         if (autoplayPos == 0) {
             // shuffle list at start
             autoplayList.sort(function () { return 0.5 - Math.random() });
-            console.log(`Shuffling autoplay list: ${JSON.stringify(autoplayList)}`);
         } else if (autoplayPos >= autoplayList.length) {
             // reset counter at end
             autoplayPos = 0;
-            console.log(`autoplay position back to 0`);
         }
         // play item
         module.exports.playLocalMedia({ directory: autoplayList[autoplayPos] });
@@ -836,8 +843,6 @@ function autoplayNext() {
         var delayTime = Math.random() * Math.abs(maxAutoplayTime - minAutoplayTime);
         delayTime += Math.min(maxAutoplayTime, minAutoplayTime); // add min of range
         delayTime *= 1000; // convert seconds to milliseconds
-        // log
-        console.log(`Autoplaying ${autoplayList[autoplayPos]} (${autoplayPos}/${autoplayList.length - 1}), next in ${delayTime}ms`);
         // increment autoplay position
         autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // start timer to autoplay next
