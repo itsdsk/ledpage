@@ -98,9 +98,14 @@ EOT"
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody
 
-# edit system video settings in /boot/config.txt
+# edit system video settings in /boot/config.txt:
+# force HDMI output
 # hdmi_force_hotplug=1
+# HDMI mode
 # hdmi_group=2
+# custom size:
 # hdmi_mode=87
 # hdmi_cvt=640 480 60 1 0 0 0
+# 640 x 350 @ 85Hz:
+# hdmi_mode=1
 # gpu_mem=192
