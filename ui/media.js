@@ -51,7 +51,7 @@ rendererSocket.event.on('data', function (data) {
     } else {
         var rendererMsg = JSON.parse(data.toString());
         if (rendererMsg.loaded) {
-            if(rendererMsg.whichWindow == 'A') {
+            if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
                 backendSocket.socket.write(`{"window":{"half":0}}`);
             } else if (rendererMsg.whichWindow == 'B') {
@@ -521,6 +521,25 @@ module.exports = {
             });
         }
     },
+    startAutoplay: function (msg) {
+        console.log(`Starting autoplay:`);// ${JSON.stringify(msg)}`);
+        // get list of media to autoplay
+        autoplayList = [];
+        var selectAllQuery = "SELECT directory FROM disks";
+        db.all(selectAllQuery, (error, rows) => {
+            if (error) console.log(`error getting all disks: ${error}`);
+            console.log(`start autoplay: ${JSON.stringify(rows)}`);
+            // add directories to autoplay list
+            rows.forEach(function (row) { autoplayList.push(row.directory); });
+            // stop autoplay
+            clearTimeout(autoplayTimerID);
+            autoplayTimerID = null;
+            // reset index
+            autoplayPos = 0;
+            // start autoplay
+            autoplayTimerID = setTimeout(autoplayNext, 0);
+        });
+    },
     playRemoteMedia: function (name) {
         // TODO: check if URL is valid?
         if (rendererSocket.connected) {
@@ -790,4 +809,41 @@ function runCommand(command, callback) {
             if (callback) callback(stdout);
         }
     });
+}
+
+var autoplayTimerID; // ID used to stop autoplay
+var autoplayList = []; // list of items to autoplay
+var autoplayPos = 0; // index in autoplay list
+var minAutoplayTime = 5; // seconds
+var maxAutoplayTime = 10;
+
+function autoplayNext() {
+    // check there are items in playlist
+    if (autoplayList && autoplayList.length > 0) {
+        // check randomness and bounds
+        if (autoplayPos == 0) {
+            // shuffle list at start
+            autoplayList.sort(function () { return 0.5 - Math.random() });
+            console.log(`Shuffling autoplay list: ${JSON.stringify(autoplayList)}`);
+        } else if (autoplayPos >= autoplayList.length) {
+            // reset counter at end
+            autoplayPos = 0;
+            console.log(`autoplay position back to 0`);
+        }
+        // play item
+        module.exports.playLocalMedia({ directory: autoplayList[autoplayPos] });
+        // choose random timespan in min-max range to wait before playing next
+        var delayTime = Math.random() * Math.abs(maxAutoplayTime - minAutoplayTime);
+        delayTime += Math.min(maxAutoplayTime, minAutoplayTime); // add min of range
+        delayTime *= 1000; // convert seconds to milliseconds
+        // log
+        console.log(`Autoplaying ${autoplayList[autoplayPos]} (${autoplayPos}/${autoplayList.length - 1}), next in ${delayTime}ms`);
+        // increment autoplay position
+        autoplayPos = (autoplayPos + 1) % autoplayList.length;
+        // start timer to autoplay next
+        autoplayTimerID = setTimeout(autoplayNext, delayTime);
+    } else {
+        // error autoplaying
+        console.log(`error autoplaying - list is empty`);
+    }
 }

@@ -10,6 +10,8 @@ http.listen(process.env.PORT || 3000, function () {
 
 // scan content
 media.generateDb();
+// autoplay (TEST) 5s after launch
+setTimeout(media.startAutoplay, 5000);
 
 // serve static files
 app.get('/', function (req, res) {
