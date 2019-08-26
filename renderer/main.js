@@ -57,8 +57,8 @@ app.on('ready', () => {
       }
       mainWindowA.show();
       // hide previous window
-      mainWindowB.hide();
-      mainWindowB.minimize();
+      //mainWindowB.hide();
+      //mainWindowB.minimize();
       // report loaded to client
       if (client) client.write(JSON.stringify({loaded: true, whichWindow: 'A'}));
     }, 300);
@@ -71,8 +71,8 @@ app.on('ready', () => {
       }
       mainWindowB.show();
       // hide previous window
-      mainWindowA.hide();
-      mainWindowA.minimize();
+      //mainWindowA.hide();
+      //mainWindowA.minimize();
       // report loaded to client
       if (client) client.write(JSON.stringify({loaded: true, whichWindow: 'B'}));
     }, 300);
