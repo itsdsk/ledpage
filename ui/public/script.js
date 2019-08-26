@@ -127,6 +127,10 @@ document.addEventListener('change', function (event) {
         console.log(`Sending autoplay range update: ${JSON.stringify(data)}`);
         // send msg to server
         socket.emit('setautoplaytimerange', data);
+    } else if (event.target.matches('#crossfadeRange')) {
+        //
+        socket.emit('setcrossfadetime', parseInt(event.target.value));
+        console.log(`sending crossfade time to server ${parseInt(event.target.value)}`);
     }
 });
 

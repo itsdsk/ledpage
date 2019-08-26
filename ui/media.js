@@ -42,7 +42,7 @@ backendSocket.event.on('data', function (data) {
 
 // prevent duplicate exit messages
 var SHUTDOWN = false;
-
+var crossfadeTime = 2500;
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('data', function (data) {
     console.log("media in data from renderer: " + data.toString());
@@ -53,13 +53,13 @@ rendererSocket.event.on('data', function (data) {
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":0}}`);
+                backendSocket.socket.write(`{"window":{"half":0,"fade":${crossfadeTime}}}`);
                 if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
                     saveScreenshot('A');
                 }
             } else if (rendererMsg.whichWindow == 'B') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":1}}`);
+                backendSocket.socket.write(`{"window":{"half":1,"fade":${crossfadeTime}}}`);
                 if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
                     saveScreenshot('B');
                 }
@@ -526,6 +526,10 @@ module.exports = {
                 });
             });
         }
+    },
+    setCrossfadeTime: function (msg) {
+        crossfadeTime = msg;
+        console.log(`setting crossfade time: ${crossfadeTime}`);
     },
     startAutoplay: function (msg) {
         console.log(`Starting autoplay:`);// ${JSON.stringify(msg)}`);

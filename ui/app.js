@@ -81,6 +81,10 @@ io.on('connection', function (socket) {
   socket.on('setautoplaytimerange', function (msg) {
     media.setAutoplayTimeRange(msg);
   });
+  // set crossfade time
+  socket.on('setcrossfadetime', function (msg) {
+    media.setCrossfadeTime(msg);
+  });
   // create disk
   socket.on('createdisk', function (msg) {
     media.createDisk(msg, function (diskDirectory) {
