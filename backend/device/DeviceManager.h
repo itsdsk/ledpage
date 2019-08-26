@@ -22,17 +22,20 @@ struct LedNode
     };
     void setPosition(unsigned x, unsigned y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
     {
-        // map position and set radius
-        x_pos = unsigned((x / float(confW)) * (screenX / 2));
-        y_pos = unsigned((y / float(confH)) * (screenY));
+        // set original positions and radius in config
+        x_pos = x;
+        y_pos = y;
         this->r = r;
+        // map position into screen area
+        unsigned mapped_x = unsigned((x / float(confW)) * (screenX / 2));
+        unsigned mapped_y = unsigned((y / float(confH)) * (screenY));
         // reset sample points
         positions.clear();
         // get sampling area boundary
-        unsigned min_x = max((int)x_pos - (int)r, (0));
-        unsigned max_x = min((int)x_pos + (int)r, (int)(screenX / 2));
-        unsigned min_y = max((int)y_pos - (int)r, (0));
-        unsigned max_y = min((int)y_pos + (int)r, (int)screenY);
+        unsigned min_x = max((int)mapped_x - (int)r, (0));
+        unsigned max_x = min((int)mapped_x + (int)r, (int)(screenX / 2));
+        unsigned min_y = max((int)mapped_y - (int)r, (0));
+        unsigned max_y = min((int)mapped_y + (int)r, (int)screenY);
         // go through pixels to sample
         for (unsigned ix = min_x; ix < max_x; ix++)
             for (unsigned iy = min_y; iy < max_y; iy++)
