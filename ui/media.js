@@ -35,8 +35,8 @@ var backendSocket = new sockets.DomainClient("backend");
 backendSocket.event.on('data', function (data) {
     console.log("backend socket got data in media: " + data.toString());
     setTimeout(function () {
-        console.log("responding to broadcast");
-        backendSocket.socket.write("responsetobroadcast");
+        //console.log("responding to broadcast");
+        //backendSocket.socket.write("responsetobroadcast");
     }, 1500);
 });
 
@@ -49,7 +49,17 @@ rendererSocket.event.on('data', function (data) {
     if (data.toString() === '__disconnect') {
         cleanup();
     } else {
-        saveScreenshot();
+        var rendererMsg = JSON.parse(data.toString());
+        if (rendererMsg.loaded) {
+            if(rendererMsg.whichWindow == 'A') {
+                // send side of screen media is playing on to backend
+                backendSocket.socket.write(`{"window":{"half":0}}`);
+            } else if (rendererMsg.whichWindow == 'B') {
+                // send side of screen media is playing on to backend
+                backendSocket.socket.write(`{"window":{"half":1}}`);
+            }
+        }
+        //saveScreenshot();
     }
 });
 
