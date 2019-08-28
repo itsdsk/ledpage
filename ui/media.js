@@ -202,6 +202,8 @@ module.exports = {
         }
     },
     createDisk: function (channelName, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // path of new disk
         var randomName = "disk_" + Math.random().toString(36).substring(2, 8);
         var newDirectory = path.join(mediaDir, randomName);
@@ -240,6 +242,8 @@ module.exports = {
         });
     },
     renameDisk: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // get demo.json
         var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
         var meta = require(metaPath);
@@ -278,11 +282,15 @@ module.exports = {
         });
     },
     createChannel: function (msg) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         console.log("USER INPUT::creating channel: " + msg);
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
         db.run(createQuery, [msg]);
     },
     createFile: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         //
         var filepath = path.join(mediaDir, msg, 'new_file.txt');
         console.log("USER INPUT::creating file " + filepath);
@@ -304,6 +312,8 @@ module.exports = {
         });
     },
     renameFile: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // get path of file on disk
         var oldPath = path.join(mediaDir, msg.directory, msg.oldName);
         var newPath = path.join(mediaDir, msg.directory, msg.newName);
@@ -330,6 +340,8 @@ module.exports = {
         });
     },
     updateFile: function (msg) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // update file in database
         var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";
         db.run(updateQuery, [msg.text, msg.fileID]);
@@ -348,6 +360,8 @@ module.exports = {
         });
     },
     removeFile: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // remove file in database
         var removeQuery = "DELETE FROM files WHERE rowid = ?";
         db.run(removeQuery, [msg.fileID]);
@@ -379,6 +393,8 @@ module.exports = {
         });
     },
     saveVersion: function (msg) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         // save version of media to Dat
         Dat(path.join(mediaDir, msg), function (err, dat) {
             if (err) throw err;
@@ -423,6 +439,8 @@ module.exports = {
         // });
     },
     deleteConnection: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE disk_directory = ? AND channel_name = ?";
@@ -443,6 +461,8 @@ module.exports = {
         });
     },
     createConnection: function (msg, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
         console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
         var sql = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
@@ -531,6 +551,13 @@ module.exports = {
         crossfadeTime = msg;
         console.log(`setting crossfade time: ${crossfadeTime}`);
     },
+    stopAutoplay: function () {
+        // stop autoplay
+        clearTimeout(autoplayTimerID);
+        autoplayTimerID = null;
+        // reset index
+        autoplayPos = 0;
+    },
     startAutoplay: function (msg) {
         console.log(`Starting autoplay:`);// ${JSON.stringify(msg)}`);
         // get list of media to autoplay
@@ -542,10 +569,7 @@ module.exports = {
             // add directories to autoplay list
             rows.forEach(function (row) { autoplayList.push(row.directory); });
             // stop autoplay
-            clearTimeout(autoplayTimerID);
-            autoplayTimerID = null;
-            // reset index
-            autoplayPos = 0;
+            module.exports.stopAutoplay();
             // start autoplay
             autoplayTimerID = setTimeout(autoplayNext, 0);
         });
