@@ -559,13 +559,28 @@ module.exports = {
         autoplayPos = 0;
     },
     startAutoplay: function (msg) {
-        console.log(`Starting autoplay:`);// ${JSON.stringify(msg)}`);
-        // get list of media to autoplay
+        console.log(`USER INPUT::starting autoplay (${(msg && msg.length > 0 ? msg.toString() : 'all')})`);
+        // clear list of media
         autoplayList = [];
-        var selectAllQuery = "SELECT directory FROM disks";
-        db.all(selectAllQuery, (error, rows) => {
+        // declare SQL query and params
+        var selectDisksQuery;
+        var queryParams = [];
+        // check type of autoplay (shuffle all or shuffle channel)
+        if (msg && msg.length > 0) {
+            // select all disks in specified channel
+            selectDisksQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
+            "ON disks.directory = connections.disk_directory " +
+            "AND connections.channel_name = ?";
+            // add channel name as query parameter
+            queryParams.push(msg);
+        } else {
+            // select all disks
+            selectDisksQuery = "SELECT directory FROM disks";
+        }
+        // get list of media to autoplay
+        db.all(selectDisksQuery, queryParams, (error, rows) => {
             if (error) console.log(`error getting all disks: ${error}`);
-            console.log(`start autoplay: ${JSON.stringify(rows)}`);
+            console.log(`${rows.length} items in autoplay list`);
             // add directories to autoplay list
             rows.forEach(function (row) { autoplayList.push(row.directory); });
             // stop autoplay

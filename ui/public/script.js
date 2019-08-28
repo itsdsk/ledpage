@@ -291,8 +291,16 @@ document.addEventListener('click', function (event) {
             "command": "screenshot"
         }));
     } else if (event.target.matches('.autoplayButton')) {
-        // send message to autoplay
-        socket.emit('autoplay');
+        // check shuffle type
+        if (event.target.parentElement && event.target.parentElement.dataset.channel) {
+            // get channel name
+            var channelName = event.target.parentElement.dataset.channel;
+            // send autoplay msg with channel name
+            socket.emit('autoplay', channelName);
+        } else {
+            // send msg to autoplay
+            socket.emit('autoplay');
+        }
     }
 }, false);
 document.addEventListener('mousedown', function (event) {
