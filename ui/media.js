@@ -564,6 +564,8 @@ module.exports = {
         if (rendererSocket.connected) {
             // send media file path to renderer
             rendererSocket.socket.write(name);
+            // do not take screenshot
+            diskRequiringScreenshot = null;
         }
         console.log('USER INPUT::playing remote media: ' + name);
     },
