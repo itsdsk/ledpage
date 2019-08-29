@@ -37,8 +37,9 @@ struct LedNode
         unsigned min_y = max((int)mapped_y - (int)r, (0));
         unsigned max_y = min((int)mapped_y + (int)r, (int)screenY);
         // go through pixels to sample
-        for (unsigned ix = min_x; ix < max_x; ix++)
-            for (unsigned iy = min_y; iy < max_y; iy++)
+        unsigned samplingResolution = 2;
+        for (unsigned ix = min_x; ix < max_x; ix+=samplingResolution)
+            for (unsigned iy = min_y; iy < max_y; iy+=samplingResolution)
             {
                 // get 1-dimensional index of pixel in image and add to positions
                 unsigned position = iy * screenX + ix;
