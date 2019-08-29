@@ -232,7 +232,6 @@ module.exports = {
                                     if (err) console.log(err);
                                     // add to database
                                     parseDiskDirectory(randomName, meta, callback(randomName));
-
                                 });
                             });
                         });
@@ -351,12 +350,8 @@ module.exports = {
         // update file on disk
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
-            if (rendererSocket.connected) {
-                // send file path to renderer to refresh display
-                var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                rendererSocket.socket.write(updatedDir);
-                console.log("refreshing " + updatedDir);
-            }
+            // refresh display
+            module.exports.playLocalMedia({directory: msg.directory});
         });
     },
     removeFile: function (msg, callback) {
