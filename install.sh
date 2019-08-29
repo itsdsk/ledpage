@@ -32,6 +32,8 @@ After=disk-renderer-daemon.service
 
 [Service]
 ExecStart=/home/pi/disk/backend/main -d -c \"/home/pi/disk/renderer/config.json\"
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -51,6 +53,8 @@ After=disk-ui-daemon.service
 
 [Service]
 ExecStart=/usr/bin/startx /home/pi/disk/renderer/node_modules/electron/dist/electron --no-sandbox /home/pi/disk/renderer/main.js
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
@@ -71,6 +75,8 @@ Description=Disk UI
 User=root
 WorkingDirectory=/home/pi/disk/ui
 ExecStart=/usr/bin/node app.js
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
