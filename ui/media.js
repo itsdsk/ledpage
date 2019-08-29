@@ -42,7 +42,7 @@ backendSocket.event.on('data', function (data) {
 
 // prevent duplicate exit messages
 var SHUTDOWN = false;
-var crossfadeTime = 2500;
+var crossfadeTime = 7500; // ms
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('data', function (data) {
     console.log("media in data from renderer: " + data.toString());
@@ -874,8 +874,8 @@ function runCommand(command, callback) {
 var autoplayTimerID; // ID used to stop autoplay
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
-var minAutoplayTime = 5; // seconds
-var maxAutoplayTime = 10;
+var minAutoplayTime = 30; // seconds
+var maxAutoplayTime = 120;
 
 function autoplayNext() {
     // check there are items in playlist
