@@ -55,6 +55,7 @@ class DeviceManager
     DeviceManager(const json &config, unsigned &outputIndex, unsigned &_screenX, unsigned &screenY)
     {
         screenX = _screenX;
+        screenHalfX = unsigned(screenX/2.0f);
         //
         cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
         unsigned configW = config["window"]["width"];
@@ -72,58 +73,87 @@ class DeviceManager
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness, unsigned &positionShift, float &fadeAmt)
+    int update(const Image<Pixel_T> &image, float &brightness, float &crossfadeNorm)
     {
         std::vector<ColorRgb> ledValues;
+        float fadeThreshold = 0.99f;
+        bool sampleL = crossfadeNorm < fadeThreshold;
+        bool sampleR = crossfadeNorm > (1.0f - fadeThreshold);
         // get colours
         for (auto &ledNode : ledNodes)
         {
-            // get sum of colours
-            uint_fast16_t cummR = 0;
-            uint_fast16_t cummG = 0;
-            uint_fast16_t cummB = 0;
-            for (unsigned position : ledNode.positions)
-            {
-                unsigned adjustedPos = position + positionShift;
-                const Pixel_T &pixel = image.memptr()[adjustedPos];
-                cummR += pixel.red;
-                cummG += pixel.green;
-                cummB += pixel.blue;
-            }
-            // compute mean average of each colours
-            uint8_t avgR = uint8_t(cummR / ledNode.positions.size());
-            uint8_t avgG = uint8_t(cummG / ledNode.positions.size());
-            uint8_t avgB = uint8_t(cummB / ledNode.positions.size());
+            // initialise colours
+            uint8_t avgR_L = 0;
+            uint8_t avgG_L = 0;
+            uint8_t avgB_L = 0;
+            uint8_t avgR_R = 0;
+            uint8_t avgG_R = 0;
+            uint8_t avgB_R = 0;
+            uint8_t avgR = 0;
+            uint8_t avgG = 0;
+            uint8_t avgB = 0;
 
-
-            if (fadeAmt < 1.0f) {
-                // get sum of other colours
-                uint_fast16_t cummR2 = 0;
-                uint_fast16_t cummG2 = 0;
-                uint_fast16_t cummB2 = 0;
+            // get colors on left side
+            if (sampleL) {
+                // initialise sum of colours
+                uint_fast16_t cummR = 0;
+                uint_fast16_t cummG = 0;
+                uint_fast16_t cummB = 0;
+                // iterate through pixels
                 for (unsigned position : ledNode.positions)
                 {
-                    unsigned adjustedPos = position + (positionShift == 0 ? unsigned(screenX/2.0f) : 0);
-                    const Pixel_T &pixel = image.memptr()[adjustedPos];
-                    cummR2 += pixel.red;
-                    cummG2 += pixel.green;
-                    cummB2 += pixel.blue;
+                    // get pixel address
+                    const Pixel_T &pixel = image.memptr()[position];
+                    // sample colour from pixel
+                    cummR += pixel.red;
+                    cummG += pixel.green;
+                    cummB += pixel.blue;
                 }
-                // compute mean average of each colours
-                uint8_t avgR2 = uint8_t(cummR2 / ledNode.positions.size());
-                uint8_t avgG2 = uint8_t(cummG2 / ledNode.positions.size());
-                uint8_t avgB2 = uint8_t(cummB2 / ledNode.positions.size());
-                // calculate fade
-                avgR = uint8_t(avgR2 + fadeAmt * (avgR - avgR2));
-                avgG = uint8_t(avgG2 + fadeAmt * (avgG - avgG2));
-                avgB = uint8_t(avgB2 + fadeAmt * (avgB - avgB2));
+                // calc mean average of sampled colours
+                avgR_L = uint8_t(cummR / ledNode.positions.size());
+                avgG_L = uint8_t(cummG / ledNode.positions.size());
+                avgB_L = uint8_t(cummB / ledNode.positions.size());
+            }
+            // get colours on right side
+            if (sampleR) {
+                // initialise sum of colours
+                uint_fast16_t cummR = 0;
+                uint_fast16_t cummG = 0;
+                uint_fast16_t cummB = 0;
+                // iterate through pixels
+                for (unsigned position : ledNode.positions)
+                {
+                    // get pixel address (add display width / 2 to get right hand side)
+                    const Pixel_T &pixel = image.memptr()[position + screenHalfX];
+                    // sample colour from pixel
+                    cummR += pixel.red;
+                    cummG += pixel.green;
+                    cummB += pixel.blue;
+                }
+                // calc mean average of sampled colours
+                avgR_R = uint8_t(cummR / ledNode.positions.size());
+                avgG_R = uint8_t(cummG / ledNode.positions.size());
+                avgB_R = uint8_t(cummB / ledNode.positions.size());
             }
 
+            // set final LED colour
+            if (sampleL && sampleR) {
+                // interpolate (fade)
+                avgR = uint8_t(avgR_L + crossfadeNorm * (avgR_R - avgR_L));
+                avgG = uint8_t(avgG_L + crossfadeNorm * (avgG_R - avgG_L));
+                avgB = uint8_t(avgB_L + crossfadeNorm * (avgB_R - avgB_L));
+            } else {
+                // absolute
+                avgR = sampleL ? avgR_L : avgR_R;
+                avgG = sampleL ? avgG_L : avgG_R;
+                avgB = sampleL ? avgB_L : avgB_R;
+            }
 
             // apply brightness
             avgR = uint8_t(avgR * brightness);
             avgG = uint8_t(avgG * brightness);
             avgB = uint8_t(avgB * brightness);
+
             // store colour
             ColorRgb col = {avgR, avgG, avgB};
             ledValues.emplace_back(col);
@@ -138,6 +168,7 @@ class DeviceManager
     std::shared_ptr<Output> output;
     string nameTEMP;
     unsigned screenX;
+    unsigned screenHalfX;
 
   private:
     //

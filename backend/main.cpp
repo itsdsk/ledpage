@@ -28,10 +28,9 @@ using boost::asio::local::stream_protocol;
 using namespace std::chrono;
 // signal/radius to change sampling radius for all LEDs
 unsigned changeSize = 0;
-unsigned screenHalf = 0; // side of screen media is playing on (0 = left, 1 = right)
 unsigned int fadeDuration = 2500; // fade transition duration in ms
-unsigned int endChangeTime = 0; // unix epoch time to stop fading
-float fadeAmt = 1.0f; // 0-1 transition amount
+unsigned int timeLoadedL = 0; // unix epoch time ms left window loaded
+unsigned int timeLoadedR = 1; // unix epoch time ms right window loaded
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -73,8 +72,8 @@ public:
         if (!error)
         {
             std::string receivedData(data_.begin(), data_.begin() + bytes_transferred);
-            std::cout << "received data: " << receivedData << std::endl;
-            std::cout << "length: " << bytes_transferred << std::endl;
+            // std::cout << "received data: " << receivedData << std::endl;
+            // std::cout << "length: " << bytes_transferred << std::endl;
             // parse msg redeiced as json
             auto jdata = json::parse(receivedData);
             // go through top level of JSON object received
@@ -98,12 +97,17 @@ public:
                     }
                     if (element1.value().find("half") != element1.value().end())
                     {
-                        // get half
-                        screenHalf = element1.value()["half"].get<int>();
-                        std::cout << "user switching window side to : " << std::to_string(screenHalf) << std::endl;
-                        // save time
-                        fadeAmt = 0.0f;
-                        endChangeTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() + fadeDuration;
+                        // check which half of the window content has loaded on
+                        int screenHalf = element1.value()["half"].get<int>();
+                        unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+                        if (screenHalf == 0) {
+                            // save time left window loaded
+                            timeLoadedL = currentms;
+                        } else if (screenHalf == 1) {
+                            // save time right window loaded
+                            timeLoadedR = currentms;
+                        }
+                        std::cout << "user switching window side to " << (timeLoadedL > timeLoadedR ? "left" : "right") << std::endl;
                     }
                 }
             }
@@ -301,23 +305,25 @@ int main(int argc, char *argv[])
             saveScreenshot(_image);
             receivedScreenshotCommand = false;
         }
-        // get number of pixels to shift (0 or screenwidth / 2)
-        unsigned positionShiftAmt = (screenHalf == 0 ? 0 : unsigned(grabber->_width / 2.0f));
-        if (fadeAmt < 1.0f) {
-            // get crossfade amt
-            unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-            if (currentms < endChangeTime) {
-                //
-                fadeAmt = (currentms - (endChangeTime - fadeDuration)) / float(fadeDuration);
-            } else {
-                fadeAmt = 1.0f;
-                //s.broadcast("test broadcast");
-            }
+        // 
+        float crossfadeNorm = 0.0f; // interpolate value: 0 = left screen, 1 = right
+        unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        // check if currently transitioning media
+        if (currentms - fadeDuration > max(timeLoadedL, timeLoadedR)) {
+            // set to 100% opacity to most recently updated side of screen
+            crossfadeNorm = timeLoadedL > timeLoadedR ? 0.0f : 1.0f;
+        } else {
+            // get phase of crossfade in ms (0 - fadeDuration)
+            unsigned int fadems = currentms - max(timeLoadedL, timeLoadedR);
+            // get phase of crossfade in pc (0 - 1)
+            float fadepc = float(fadems) / fadeDuration;
+            // set in direction
+            crossfadeNorm = timeLoadedL > timeLoadedR ? 1.0f - fadepc : fadepc;
         }
         // update
         for (auto &deviceManager : deviceManagers)
         {
-            deviceManager.update(_image, brightness, positionShiftAmt, fadeAmt);
+            deviceManager.update(_image, brightness, crossfadeNorm);
         }
     }
 
