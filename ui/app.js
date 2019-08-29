@@ -1,4 +1,5 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const media = require("./media.js");
 
 var http = require('http').Server(app);
@@ -14,15 +15,7 @@ media.generateDb();
 setTimeout(media.startAutoplay, 5000);
 
 // serve static files
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/public/index.html');
-});
-app.get('/style.css', function (req, res) {
-  res.sendFile(__dirname + '/public/style.css');
-});
-app.get('/script.js', function (req, res) {
-  res.sendFile(__dirname + '/public/script.js');
-});
+app.use(express.static('public'));
 
 // client websocket routes
 io.on('connection', function (socket) {
