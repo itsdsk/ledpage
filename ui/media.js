@@ -40,6 +40,11 @@ backendSocket.event.on('data', function (data) {
     // }, 1500);
 });
 
+setInterval(function () {
+    module.exports.setBlur({size: (1 + Math.floor(Math.random() * 20))});
+    //backendSocket.socket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
+}, 180000);
+
 // prevent duplicate exit messages
 var SHUTDOWN = false;
 var crossfadeTime = 7500; // ms
@@ -869,7 +874,7 @@ function runCommand(command, callback) {
 var autoplayTimerID; // ID used to stop autoplay
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
-var minAutoplayTime = 30; // seconds
+var minAutoplayTime = 15; // seconds
 var maxAutoplayTime = 120;
 
 function autoplayNext() {

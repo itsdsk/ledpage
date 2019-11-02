@@ -16,7 +16,8 @@ sudo apt install xserver-xorg-core \
   libnss3 \
   sqlite3 \
   libboost-all-dev \
-  nodejs
+  nodejs \
+  cmake # for raspberry pi 4
 
 # compile backend
 cd ./backend

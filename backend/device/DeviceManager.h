@@ -154,8 +154,8 @@ class DeviceManager
             avgG = uint8_t(avgG * brightness);
             avgB = uint8_t(avgB * brightness);
 
-            // store colour
-            ColorRgb col = {avgR, avgG, avgB};
+            // store colour {R, G, B}
+            ColorRgb col = {avgB, avgG, avgR}; // temp switch RGB -> BGR **TODO: IMPLEMENT COLOR ORDER PROPERLY**
             ledValues.emplace_back(col);
             //cout << col << endl;
         }
