@@ -9,11 +9,35 @@
 </head>
 
 <body>
+    <div class="Navbar">
+            <div class="Navbar__Link Navbar__Link-brand">
+                    💿 <input id="urlInput" type="search" placeholder="Enter URL to display">
+             </div>
+             <div class="Navbar__Link Navbar__Link-toggle">
+               dot
+             </div>
+           <!-- <nav class="Navbar__Items">
+             <div class="Navbar__Link">
+               Longer Link
+             </div>
+             <div class="Navbar__Link">
+               Longer Link
+             </div>
+           </nav> -->
+           <nav class="Navbar__Items Navbar__Items--right">
+             <div class="Navbar__Link">
+                <input type="range" min="0" max="255" step="1">
+             </div>
+             <div class="Navbar__Link">
+               <a href="/settings">Settings</a>
+             </div>
+           </nav>
+         </div>
     <div id="indexContainer">
-        <input id="urlInput" type="search" placeholder="Enter URL to display">
-        <div id="outputGraphic"></div>
+        <!-- <input id="urlInput" type="search" placeholder="Enter URL to display"> -->
         <div id="diskFeedContainer"></div>
         <div id="diskChannelContainer"></div>
+        <div id="outputGraphic"></div>
     </div>
     <div id="diskContainer"></div>
 </body>

@@ -301,6 +301,10 @@ document.addEventListener('click', function (event) {
             // send msg to autoplay
             socket.emit('autoplay');
         }
+    } else if (event.target.matches('.Navbar__Link-toggle')) {
+        // navbar dropdown
+        const navs = document.querySelectorAll('.Navbar__Items');
+        navs.forEach(nav => nav.classList.toggle('Navbar__ToggleShow'));
     }
 }, false);
 document.addEventListener('mousedown', function (event) {

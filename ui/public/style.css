@@ -23,8 +23,79 @@ textarea {
 body {
     background: #202020;
     color: white;
+    margin: 0px;
 }
 
 #outputGraphic {
+    text-align: center;
+}
+
+.Navbar {
+    background-color: #202020;
+    display: flex;
+    padding: 16px;
+    font-family: sans-serif;
+    color: white;
+    position: sticky;
+}
+
+.Navbar__Link {
+    margin: 10px;
+}
+
+.Navbar__Items {
+    display: flex;
+}
+
+.Navbar__Items--right {
+    margin-left: auto;
+}
+
+.Navbar__Link-toggle {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+
+    .Navbar__Items,
+    .Navbar {
+        flex-direction: column;
+    }
+
+    .Navbar__Items {
+        display: none;
+    }
+
+    .Navbar__Items--right {
+        margin-left: 0;
+    }
+
+    .Navbar__ToggleShow {
+        display: flex;
+    }
+
+    .Navbar__Link-toggle {
+        align-self: flex-end;
+        display: initial;
+        position: absolute;
+        cursor: pointer;
+    }
+}
+
+.NavBar input {
+    height: 100%;
+    color: white;
+}
+
+#urlInput {
+    color: white;
+    background-color: #202020;
+    text-decoration: none;
+    border: 10;
+    border-radius: 1px;
+    border-style: none none double none;
+}
+
+.Navbar__Items--right {
     text-align: center;
 }
