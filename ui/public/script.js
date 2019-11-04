@@ -45,39 +45,42 @@ function refresh() {
 
 function setConfig(msg = lastReceivedOutputMsg) {
     // add svg to HTML
-    document.getElementById("outputGraphic").innerHTML = msg;
-    // 2D euclidean distance helper
-    function distanceBetweenPoints(p1, p2) {
-        return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
-    }
-    // try to get shortest distance between points (for SVG styling)
-    var min_distance = 9999;
-    var circles = document.getElementsByClassName('circle');
-    for (var i = 1; i < circles.length; i++) {
-        var p1 = [circles[i].getAttribute('x1'), circles[i].getAttribute('y1')];
-        var p2 = [circles[0].getAttribute('x1'), circles[0].getAttribute('y1')];
-        var dist = distanceBetweenPoints(p1, p2);
-        if (dist < min_distance) min_distance = dist;
-    }
-    // use calculated min_distance between points as SVG circle width
-    var circleWidth = Math.min(0.8 * min_distance, 25);
-    // style SVG
-    var svgStyle = document.createElement('style');
-    svgStyle.innerHTML = `
+    var outputGraphicElement = document.getElementById("outputGraphic");
+    if (outputGraphicElement) {
+        outputGraphicElement.innerHTML = msg;
+        // 2D euclidean distance helper
+        function distanceBetweenPoints(p1, p2) {
+            return Math.sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]));
+        }
+        // try to get shortest distance between points (for SVG styling)
+        var min_distance = 9999;
+        var circles = document.getElementsByClassName('circle');
+        for (var i = 1; i < circles.length; i++) {
+            var p1 = [circles[i].getAttribute('x1'), circles[i].getAttribute('y1')];
+            var p2 = [circles[0].getAttribute('x1'), circles[0].getAttribute('y1')];
+            var dist = distanceBetweenPoints(p1, p2);
+            if (dist < min_distance) min_distance = dist;
+        }
+        // use calculated min_distance between points as SVG circle width
+        var circleWidth = Math.min(0.8 * min_distance, 25);
+        // style SVG
+        var svgStyle = document.createElement('style');
+        svgStyle.innerHTML = `
         .circle{stroke:white;stroke-width:` + circleWidth.toString() + `px;stroke-linecap:round;}
         .circle:hover{stroke-width:` + (circleWidth + 5).toString() + `px;}
         .line{stroke:white;stroke-width:` + (0.25 * circleWidth).toString() + `px;}
     `;
-    document.body.appendChild(svgStyle);
-    // get SVG width+height
-    s_width = document.querySelector("svg").width.baseVal.value;
-    s_height = document.querySelector("svg").height.baseVal.value;
-    // set boundary values for SVG interaction
-    gap = 0.5 * min_distance;
-    x_min = gap;
-    y_min = gap;
-    x_max = s_width - gap;
-    y_max = s_height - gap;
+        document.body.appendChild(svgStyle);
+        // get SVG width+height
+        s_width = document.querySelector("svg").width.baseVal.value;
+        s_height = document.querySelector("svg").height.baseVal.value;
+        // set boundary values for SVG interaction
+        gap = 0.5 * min_distance;
+        x_min = gap;
+        y_min = gap;
+        x_max = s_width - gap;
+        y_max = s_height - gap;
+    }
 }
 
 function changeStyleToView(view) {
