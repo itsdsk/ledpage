@@ -9,10 +9,21 @@
 
 .item {
     flex-basis: 29%;
+    border-color: #202020;
     border-style: solid;
     border-width: 1px;
     margin: 1%;
     padding: 1%;
+    text-align: center;
+}
+
+.item:hover {
+    border-color: white;
+}
+
+.item img {
+    display: block;
+    margin: auto;
 }
 
 textarea {
