@@ -105,6 +105,9 @@ EOT"
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody
 
+# edit /etc/X11/xinit/xserverrc so the exec line is:
+# exec /usr/bin/X -nocursor -nolisten tcp "$@"
+
 # edit system video settings in /boot/config.txt:
 # force HDMI output
 # hdmi_force_hotplug=1
