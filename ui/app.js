@@ -174,5 +174,5 @@ io.on('connection', function (socket) {
   // shutdown/reboot system
   socket.on('systempower', function (msg) {
     media.systemPower(msg);
-  })
+  });
 });

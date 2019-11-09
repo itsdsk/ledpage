@@ -113,32 +113,32 @@ app.on('ready', () => {
   function createServer(socket) {
     console.log('Creating server.');
     var server = net.createServer(function (stream) {
-        console.log('Connection acknowledged.');
+      console.log('Connection acknowledged.');
 
-        stream.on('end', function () {
-          console.log('Client disconnected.');
-        });
+      stream.on('end', function () {
+        console.log('Client disconnected.');
+      });
 
-        stream.on('data', function (msg) {
-          // parse buffer to string
-          msg = msg.toString();
+      stream.on('data', function (msg) {
+        // parse buffer to string
+        msg = msg.toString();
 
-          console.log('Client:', msg);
+        console.log('Client:', msg);
 
-          // save client
-          client = stream;
+        // save client
+        client = stream;
 
-          // display recieved URI
-          if (flipWindow) {
-            mainWindowA.loadURL(msg);
-          } else {
-            mainWindowB.loadURL(msg);
-          }
-          // flip window to display on
-          flipWindow = !flipWindow;
+        // display recieved URI
+        if (flipWindow) {
+          mainWindowA.loadURL(msg);
+        } else {
+          mainWindowB.loadURL(msg);
+        }
+        // flip window to display on
+        flipWindow = !flipWindow;
 
-        });
-      })
+      });
+    })
       .listen(socket)
       .on('connection', function (socket) {
         console.log('Client connected.');

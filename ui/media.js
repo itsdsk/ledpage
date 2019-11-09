@@ -41,7 +41,7 @@ backendSocket.event.on('data', function (data) {
 });
 
 setInterval(function () {
-    module.exports.setBlur({size: (1 + Math.floor(Math.random() * 20))});
+    module.exports.setBlur({ size: (1 + Math.floor(Math.random() * 20)) });
     //backendSocket.socket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
 }, 180000);
 
@@ -356,7 +356,7 @@ module.exports = {
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
             // refresh display
-            module.exports.playLocalMedia({directory: msg.directory});
+            module.exports.playLocalMedia({ directory: msg.directory });
         });
     },
     removeFile: function (msg, callback) {
@@ -569,8 +569,8 @@ module.exports = {
         if (msg && msg.length > 0) {
             // select all disks in specified channel
             selectDisksQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
-            "ON disks.directory = connections.disk_directory " +
-            "AND connections.channel_name = ?";
+                "ON disks.directory = connections.disk_directory " +
+                "AND connections.channel_name = ?";
             // add channel name as query parameter
             queryParams.push(msg);
         } else {
