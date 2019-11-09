@@ -60,7 +60,7 @@ app.on('ready', () => {
       //mainWindowB.hide();
       //mainWindowB.minimize();
       // report loaded to client
-      if (client) client.write(JSON.stringify({loaded: true, whichWindow: 'A'}));
+      if (client) client.write(JSON.stringify({ loaded: true, whichWindow: 'A', URL: mainWindowA.webContents.getURL() }));
     }, 300);
   });
   mainWindowB.webContents.on('did-finish-load', () => {
@@ -74,7 +74,7 @@ app.on('ready', () => {
       //mainWindowA.hide();
       //mainWindowA.minimize();
       // report loaded to client
-      if (client) client.write(JSON.stringify({loaded: true, whichWindow: 'B'}));
+      if (client) client.write(JSON.stringify({ loaded: true, whichWindow: 'B', URL: mainWindowB.webContents.getURL() }));
     }, 300);
   });
 
