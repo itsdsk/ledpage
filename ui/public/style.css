@@ -161,7 +161,7 @@ body {
 }
 
 .bottomNavigationMenu {
-    background-color: #B5BCBE;
+    background-color: rgba(181, 188, 190, 0.95);
     display: flex;
     position: sticky;
     bottom: 16px;
@@ -173,7 +173,8 @@ body {
     padding: 16px;
 }
 
-.bottomNavigationMenu img {
-    max-height: 200px;
-    max-width: auto;
+#previewFrame {
+    border: none;
+    width: 350px;
+    height: 350px;
 }

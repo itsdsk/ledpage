@@ -524,15 +524,35 @@ socket.on('getlogs', function (msg) {
     console.log(msg);
 });
 socket.on('nowplaying', function (currentURL) {
-    // check if playing local media
-    if (currentURL.startsWith('file:///')) {
-        // get directory name
-        var splitURL = currentURL.split('/');
-        var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
-        currentURL = directory;
-        // load thumbnail
-        document.getElementById('nowPlayingThumb').src = `/public/${currentURL}/thumb.jpg`;
+    // check if playing anything
+    if (currentURL && currentURL.length > 0) {
+        // check if playing local media
+        if (currentURL.startsWith('file:///')) {
+            // get directory name
+            var splitURL = currentURL.split('/');
+            var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+            currentURL = directory;
+            // load iframe
+            if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+                document.getElementById('previewFrame').src = `/public/${currentURL}/index.html`;
+            }
+        } else {
+            // load iframe for remote media
+            if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+                document.getElementById('previewFrame').src = currentURL;
+            }
+        }
+        // add URL to DOM
+        document.getElementById("nowPlaying").innerHTML = currentURL;
+    } else {
+        // not playing anything
+        // load default media
+        var defaultPreview = `/public/.default/index.html`;
+        if (document.getElementById('previewFrame').src.includes(defaultPreview) == false) {
+            // load default iframe
+            document.getElementById('previewFrame').src = defaultPreview;
+            // insert text
+            document.getElementById("nowPlaying").innerHTML = `Nothing...`;
+        }
     }
-    // add URL to DOM
-    document.getElementById("nowPlaying").innerHTML = currentURL;
 });
