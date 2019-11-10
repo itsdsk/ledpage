@@ -5,15 +5,16 @@
     flex-wrap: wrap;
     max-width: 100%;
     margin: auto;
+    justify-content: center;
+    align-content: flex-start;
 }
 
 .item {
-    flex-basis: 29%;
+    flex: 1 0 content;
     border-color: #202020;
     border-style: solid;
     border-width: 1px;
     margin: 1%;
-    padding: 1%;
     text-align: center;
 }
 
