@@ -16,14 +16,15 @@
         <div class="Navbar__Link Navbar__Link-toggle">
             dot
         </div>
-        <nav class="Navbar__Items">
+        <!-- <nav class="Navbar__Items">
             <div class="Navbar__Link">
+                <img src="/public/.default/thumb.jpg" />
                 Now playing: <span id="nowPlaying"></span>
             </div>
-            <!-- <div class="Navbar__Link">
+            <div class="Navbar__Link">
                Longer Link
-             </div> -->
-        </nav>
+             </div>
+        </nav> -->
         <nav class="Navbar__Items Navbar__Items--right">
             <div class="Navbar__Link">
                 <input id="brightnessInput" type="range" min="0" max="255" step="1">
@@ -34,12 +35,17 @@
         </nav>
     </div>
     <div id="indexContainer">
-        <!-- <input id="urlInput" type="search" placeholder="Enter URL to display"> -->
         <div id="diskFeedContainer"></div>
         <div id="diskChannelContainer"></div>
-        <!-- <div id="outputGraphic"></div> -->
     </div>
     <div id="diskContainer"></div>
+    <div class="bottomNavigationMenu">
+        <img id="nowPlayingThumb" />
+        <div class="bottomMenuTextDiv">
+            <p>Now playing:</p>
+            <p><b><span id="nowPlaying"></span></b></p>
+        </div>
+    </div>
 </body>
 
 </html>

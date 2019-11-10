@@ -524,6 +524,15 @@ socket.on('getlogs', function (msg) {
     console.log(msg);
 });
 socket.on('nowplaying', function (currentURL) {
+    // check if playing local media
+    if (currentURL.startsWith('file:///')) {
+        // get directory name
+        var splitURL = currentURL.split('/');
+        var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+        currentURL = directory;
+        // load thumbnail
+        document.getElementById('nowPlayingThumb').src = `/public/${currentURL}/thumb.jpg`;
+    }
     // add URL to DOM
     document.getElementById("nowPlaying").innerHTML = currentURL;
 });

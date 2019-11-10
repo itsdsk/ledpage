@@ -159,3 +159,21 @@ body {
 .Navbar__Items--right {
     text-align: center;
 }
+
+.bottomNavigationMenu {
+    background-color: #B5BCBE;
+    display: flex;
+    position: sticky;
+    bottom: 16px;
+    margin: 16px 64px;
+    color: black;
+}
+
+.bottomMenuTextDiv {
+    padding: 16px;
+}
+
+.bottomNavigationMenu img {
+    max-height: 200px;
+    max-width: auto;
+}
