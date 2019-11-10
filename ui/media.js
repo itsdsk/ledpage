@@ -62,18 +62,24 @@ rendererSocket.event.on('data', function (data) {
         setTimeout(function (URL) {
             currentURL = URL;
         }, crossfadeTime / 2, rendererMsg.URL);
+        // message backend to switch
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
                 backendSocket.socket.write(`{"window":{"half":0,"fade":${crossfadeTime}}}`);
-                if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
-                    saveScreenshot('A');
-                }
             } else if (rendererMsg.whichWindow == 'B') {
                 // send side of screen media is playing on to backend
                 backendSocket.socket.write(`{"window":{"half":1,"fade":${crossfadeTime}}}`);
-                if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
-                    saveScreenshot('B');
+            }
+            // take screenshot
+            if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+                //
+                if (rendererMsg.URL.startsWith('file:///')) {
+                    //
+                    var doSaveScreenshot = true;
+                    if (doSaveScreenshot) {
+                        saveScreenshot(rendererMsg.whichWindow);
+                    }
                 }
             }
         }
