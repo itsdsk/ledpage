@@ -62,7 +62,7 @@
     padding: 16px;
 }
 
-.item:hover {
+.item[data-directory]:hover {
     border-color: white;
 }
 
@@ -81,6 +81,7 @@ body {
     background: #202020;
     color: white;
     margin: 0px;
+    font-family: sans-serif;
 }
 
 #outputGraphic {
@@ -91,7 +92,6 @@ body {
     background-color: #202020;
     display: flex;
     padding: 16px;
-    font-family: sans-serif;
     color: white;
     position: sticky;
 }
