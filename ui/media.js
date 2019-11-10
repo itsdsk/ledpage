@@ -115,7 +115,7 @@ function saveScreenshot(side) {
                         //
                         var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
                         // convert and crop half of image
-                        var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'East' : 'West')} -crop 50x100% +repage ${targetJpegPath}`;
+                        var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'West' : 'East')} -crop 50x100% +repage ${targetJpegPath}`;
                         // convert to jpeg
                         runCommand(convertCommand, function (stdout) {
                             // add thumbnail to database
