@@ -155,13 +155,13 @@ document.addEventListener('click', function (event) {
         refresh();
     } else if (event.target.matches('.playDiskButton')) {
         //
-        diskDirectory = event.target.parentElement.dataset.directory;
+        diskDirectory = event.target.parentElement.parentElement.dataset.directory;
         socket.emit('play', {
             directory: diskDirectory
         });
     } else if (event.target.matches('.editDiskButton')) {
         //
-        diskDirectory = event.target.parentElement.dataset.directory;
+        diskDirectory = event.target.parentElement.parentElement.dataset.directory;
         window.history.pushState({
             page: 'editor',
             disk: diskDirectory
