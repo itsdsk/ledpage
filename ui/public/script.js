@@ -20,6 +20,9 @@ var lastReceivedOutputMsg;
 
 socket.emit('loadoutput');
 
+var nowPlayingUpdatePeriod = 5000; // ms to update nowplaying
+setInterval(function () { socket.emit('nowplaying'); }, nowPlayingUpdatePeriod);
+
 function refresh() {
     // load page
     var url = new URL(document.location);
@@ -517,4 +520,8 @@ socket.on('loadeditor', function (msg) {
 });
 socket.on('getlogs', function (msg) {
     console.log(msg);
+});
+socket.on('nowplaying', function (currentURL) {
+    // add URL to DOM
+    document.getElementById("nowPlaying").innerHTML = currentURL;
 });

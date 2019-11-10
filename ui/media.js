@@ -46,6 +46,7 @@ setInterval(function () {
 }, 180000);
 
 // prevent duplicate exit messages
+var currentURL = "";
 var SHUTDOWN = false;
 var crossfadeTime = 25000; // ms
 var rendererSocket = new sockets.DomainClient("renderer");
@@ -55,6 +56,8 @@ rendererSocket.event.on('data', function (data) {
         cleanup();
     } else {
         var rendererMsg = JSON.parse(data.toString());
+        // update currentURL when halfway through transition
+        setTimeout(function (URL) { currentURL = URL; }, crossfadeTime / 2, rendererMsg.URL);
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
@@ -205,6 +208,9 @@ module.exports = {
                 }
             });
         }
+    },
+    nowPlaying: function (callback) {
+        callback(currentURL);
     },
     createDisk: function (channelName, callback) {
         // stop autoplay
@@ -891,6 +897,7 @@ function autoplayNext() {
         // play item
         module.exports.playLocalMedia({ directory: autoplayList[autoplayPos] });
         // choose random timespan in min-max range to wait before playing next
+        // TODO: add crossfadetime to delay time (and add props to config.json)
         var delayTime = Math.random() * Math.abs(maxAutoplayTime - minAutoplayTime);
         delayTime += Math.min(maxAutoplayTime, minAutoplayTime); // add min of range
         delayTime *= 1000; // convert seconds to milliseconds

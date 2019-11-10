@@ -43,6 +43,12 @@ io.on('connection', function (socket) {
       io.emit('loadoutput', elements);
     });
   });
+  // get now playing
+  socket.on('nowplaying', function () {
+    media.nowPlaying(function (currentURL) {
+      io.emit('nowplaying', currentURL);
+    });
+  });
   // update config
   socket.on('updateconfig', function (msg) {
     media.updateConfig(msg);
