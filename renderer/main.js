@@ -17,7 +17,10 @@ const {
  */
 app.on('ready', () => {
   // get screen resolution
-  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
+  const {
+    width,
+    height
+  } = electron.screen.getPrimaryDisplay().workAreaSize
   console.log(`Detected screen size: ${JSON.stringify({ width, height })}`);
   // window options (electronJS)
   const windowOpts = {
@@ -60,7 +63,11 @@ app.on('ready', () => {
       //mainWindowB.hide();
       //mainWindowB.minimize();
       // report loaded to client
-      if (client) client.write(JSON.stringify({ loaded: true, whichWindow: 'A', URL: mainWindowA.webContents.getURL() }));
+      if (client) client.write(JSON.stringify({
+        loaded: true,
+        whichWindow: 'A',
+        URL: mainWindowA.webContents.getURL()
+      }));
     }, 300);
   });
   mainWindowB.webContents.on('did-finish-load', () => {
@@ -74,7 +81,11 @@ app.on('ready', () => {
       //mainWindowA.hide();
       //mainWindowA.minimize();
       // report loaded to client
-      if (client) client.write(JSON.stringify({ loaded: true, whichWindow: 'B', URL: mainWindowB.webContents.getURL() }));
+      if (client) client.write(JSON.stringify({
+        loaded: true,
+        whichWindow: 'B',
+        URL: mainWindowB.webContents.getURL()
+      }));
     }, 300);
   });
 
@@ -113,32 +124,32 @@ app.on('ready', () => {
   function createServer(socket) {
     console.log('Creating server.');
     var server = net.createServer(function (stream) {
-      console.log('Connection acknowledged.');
+        console.log('Connection acknowledged.');
 
-      stream.on('end', function () {
-        console.log('Client disconnected.');
-      });
+        stream.on('end', function () {
+          console.log('Client disconnected.');
+        });
 
-      stream.on('data', function (msg) {
-        // parse buffer to string
-        msg = msg.toString();
+        stream.on('data', function (msg) {
+          // parse buffer to string
+          msg = msg.toString();
 
-        console.log('Client:', msg);
+          console.log('Client:', msg);
 
-        // save client
-        client = stream;
+          // save client
+          client = stream;
 
-        // display recieved URI
-        if (flipWindow) {
-          mainWindowA.loadURL(msg);
-        } else {
-          mainWindowB.loadURL(msg);
-        }
-        // flip window to display on
-        flipWindow = !flipWindow;
+          // display recieved URI
+          if (flipWindow) {
+            mainWindowA.loadURL(msg);
+          } else {
+            mainWindowB.loadURL(msg);
+          }
+          // flip window to display on
+          flipWindow = !flipWindow;
 
-      });
-    })
+        });
+      })
       .listen(socket)
       .on('connection', function (socket) {
         console.log('Client connected.');

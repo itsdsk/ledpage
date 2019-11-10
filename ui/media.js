@@ -41,7 +41,9 @@ backendSocket.event.on('data', function (data) {
 });
 
 setInterval(function () {
-    module.exports.setBlur({ size: (1 + Math.floor(Math.random() * 20)) });
+    module.exports.setBlur({
+        size: (1 + Math.floor(Math.random() * 20))
+    });
     //backendSocket.socket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
 }, 180000);
 
@@ -57,7 +59,9 @@ rendererSocket.event.on('data', function (data) {
     } else {
         var rendererMsg = JSON.parse(data.toString());
         // update currentURL when halfway through transition
-        setTimeout(function (URL) { currentURL = URL; }, crossfadeTime / 2, rendererMsg.URL);
+        setTimeout(function (URL) {
+            currentURL = URL;
+        }, crossfadeTime / 2, rendererMsg.URL);
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
@@ -362,7 +366,9 @@ module.exports = {
         fs.writeFile(filepath, msg.text, function (err) {
             if (err) console.log(err);
             // refresh display
-            module.exports.playLocalMedia({ directory: msg.directory });
+            module.exports.playLocalMedia({
+                directory: msg.directory
+            });
         });
     },
     removeFile: function (msg, callback) {
@@ -588,7 +594,9 @@ module.exports = {
             if (error) console.log(`error getting all disks: ${error}`);
             console.log(`${rows.length} items in autoplay list`);
             // add directories to autoplay list
-            rows.forEach(function (row) { autoplayList.push(row.directory); });
+            rows.forEach(function (row) {
+                autoplayList.push(row.directory);
+            });
             // stop autoplay
             module.exports.stopAutoplay();
             // start autoplay
@@ -889,13 +897,17 @@ function autoplayNext() {
         // check randomness and bounds
         if (autoplayPos == 0) {
             // shuffle list at start
-            autoplayList.sort(function () { return 0.5 - Math.random() });
+            autoplayList.sort(function () {
+                return 0.5 - Math.random()
+            });
         } else if (autoplayPos >= autoplayList.length) {
             // reset counter at end
             autoplayPos = 0;
         }
         // play item
-        module.exports.playLocalMedia({ directory: autoplayList[autoplayPos] });
+        module.exports.playLocalMedia({
+            directory: autoplayList[autoplayPos]
+        });
         // choose random timespan in min-max range to wait before playing next
         // TODO: add crossfadetime to delay time (and add props to config.json)
         var delayTime = Math.random() * Math.abs(maxAutoplayTime - minAutoplayTime);

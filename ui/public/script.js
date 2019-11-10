@@ -21,7 +21,9 @@ var lastReceivedOutputMsg;
 socket.emit('loadoutput');
 
 var nowPlayingUpdatePeriod = 5000; // ms to update nowplaying
-setInterval(function () { socket.emit('nowplaying'); }, nowPlayingUpdatePeriod);
+setInterval(function () {
+    socket.emit('nowplaying');
+}, nowPlayingUpdatePeriod);
 
 function refresh() {
     // load page
