@@ -60,6 +60,9 @@
     grid-column: 1 / -1;
     text-align: left;
     padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .item[data-directory]:hover {

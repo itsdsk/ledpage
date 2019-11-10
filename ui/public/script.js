@@ -148,7 +148,7 @@ document.addEventListener('click', function (event) {
     // mouseclick events
     if (event.target.matches('.viewChannelButton')) {
         //
-        channelName = event.target.parentElement.dataset.channel;
+        channelName = event.target.parentElement.parentElement.dataset.channel;
         window.history.pushState({
             page: 'channel'
         }, channelName, "?page=channel&channel=" + channelName);
@@ -169,7 +169,7 @@ document.addEventListener('click', function (event) {
         refresh();
     } else if (event.target.matches('.newDiskButton')) {
         //
-        channelName = event.target.parentElement.dataset.channel;
+        channelName = event.target.parentElement.parentElement.dataset.channel;
         socket.emit('createdisk', channelName);
     } else if (event.target.matches('#newChannelButton')) {
         // get new channel name
@@ -300,9 +300,9 @@ document.addEventListener('click', function (event) {
         }));
     } else if (event.target.matches('.autoplayButton')) {
         // check shuffle type
-        if (event.target.parentElement && event.target.parentElement.dataset.channel) {
+        if (event.target.parentElement.parentElement && event.target.parentElement.parentElement.dataset.channel) {
             // get channel name
-            var channelName = event.target.parentElement.dataset.channel;
+            var channelName = event.target.parentElement.parentElement.dataset.channel;
             // send autoplay msg with channel name
             socket.emit('autoplay', channelName);
         } else {
