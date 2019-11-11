@@ -1,6 +1,7 @@
 #include <vector>
 #include <device/Output.h>
 #include <device/OutputSerialDefault.h>
+#include <device/OutputGPIO.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -70,6 +71,8 @@ class DeviceManager
         nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
         const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
         output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
+        // TEST: create GPIO output object
+        outputGPIO = std::shared_ptr<Output>(new OutputGPIO(deviceName, baudRate));
     }
 
     template <typename Pixel_T>
@@ -159,6 +162,9 @@ class DeviceManager
             ledValues.emplace_back(col);
             //cout << col << endl;
         }
+        // TEST: write on GPIO
+        outputGPIO->write(ledValues);
+        // write LED colours to serial
         return output->write(ledValues);
     }
     ~DeviceManager()
@@ -166,6 +172,7 @@ class DeviceManager
     }
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
+    std::shared_ptr<Output> outputGPIO; // *TEST*
     string nameTEMP;
     unsigned screenX;
     unsigned screenHalfX;
