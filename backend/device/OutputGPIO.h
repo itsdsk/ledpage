@@ -8,8 +8,7 @@
 class OutputGPIO : public Output
 {
 public:
-    OutputGPIO(const std::string &name, const unsigned baudRate)
-        : _deviceName(name), _baudRate(baudRate)
+    OutputGPIO()
     {
         //
         //Initiate the SPI Data Frame
@@ -137,9 +136,7 @@ public:
         bcm2835_close();
         std::cout << "Closed GPIO" << std::endl;
     };
-    const std::string _deviceName;
-    const int _baudRate;
-    std::vector<uint8_t> _ledBuffer;
+    std::vector<char> _ledBuffer;
 
     // setup data block for LEDs
     static const uint8_t bytesPerLED = 4;

@@ -72,7 +72,7 @@ class DeviceManager
         const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
         output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
         // TEST: create GPIO output object
-        outputGPIO = std::shared_ptr<Output>(new OutputGPIO(deviceName, baudRate));
+        outputGPIO = std::shared_ptr<Output>(new OutputGPIO());
     }
 
     template <typename Pixel_T>
