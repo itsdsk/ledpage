@@ -532,18 +532,41 @@ socket.on('nowplaying', function (currentURL) {
             var splitURL = currentURL.split('/');
             var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
             currentURL = directory;
-            // load iframe
+            // check if already loaded
             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+                // load iframe
                 document.getElementById('previewFrame').src = `/public/${currentURL}/index.html`;
+                // path to metadata
+                var metadataURL = `/public/${currentURL}/demo.json`;
+                // fetch metadata
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        // parse metadata
+                        var metadata = JSON.parse(this.responseText);
+                        // add media title to DOM
+                        document.getElementById("nowPlaying").innerHTML = `<a href="/?page=editor&disk=${currentURL}">${metadata.demo.title}</a>`;
+                        // add media channels to DOM
+                        var numChannels = metadata.demo.channels.length;
+                        var channelsDOM = `In ${numChannels} ${numChannels > 1 ? 'channels' : 'channel'}: `;
+                        metadata.demo.channels.forEach((channel, idx) => channelsDOM += `<a href="/?page=channel&channel=${channel}">${channel}</a>${numChannels > 1 && idx < numChannels - 1 ? ', ' : '.'}`);
+                        document.getElementById("nowPlayingChannels").innerHTML = channelsDOM;
+                    }
+                };
+                xmlhttp.open("GET", metadataURL, true);
+                xmlhttp.send();
             }
         } else {
-            // load iframe for remote media
+            // check if remote media is already loaded
             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+                // load iframe for remote media
                 document.getElementById('previewFrame').src = currentURL;
+                // add URL to DOM
+                document.getElementById("nowPlaying").innerHTML = currentURL;
+                // clear channels
+                document.getElementById("nowPlayingChannels").innerHTML = "";
             }
         }
-        // add URL to DOM
-        document.getElementById("nowPlaying").innerHTML = currentURL;
     } else {
         // not playing anything
         // load default media
