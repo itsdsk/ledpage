@@ -549,7 +549,9 @@ module.exports = {
         //
         console.log(`set blur msg: ${JSON.stringify(msg)}`);
         // update backend
-        backendSocket.socket.write(`{"window":{"size":${msg.size}}}`);
+        if (backendSocket.socket !== null) {
+            backendSocket.socket.write(`{"window":{"size":${msg.size}}}`);
+        }
         // // update in database
         // if (msg.directory) {
         //     // get demo.json

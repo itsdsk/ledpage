@@ -4,6 +4,15 @@ const EventEmitter = require('events');
 
 var exports = module.exports = {};
 
+var connectFlag = true;
+process.argv.forEach(function (val, index, array) {
+    if (val == '--connect' || val == '-c') {
+        connectFlag = true;
+    } else if (val == '--no-connect' || val == '-n') {
+        connectFlag = false;
+    }
+});
+
 // backend inter-process communication
 exports.backend = null;
 
@@ -36,7 +45,7 @@ exports.DomainClient = class DomainClient {
         this.event = new EventEmitter();
         this.connectInterval = null;
         //
-        this.startConnecting();
+        if (connectFlag) this.startConnecting();
         //
         console.log("Constructing client " + this.name + " with path " + this.socketname);
     }
