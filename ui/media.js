@@ -193,11 +193,14 @@ module.exports = {
                     if (err) console.log("err: " + err);
                     // check if subpath is a directory
                     if (stats.isDirectory()) {
-                        // load media metadata
-                        var meta = require(path.join(itemPath, 'demo.json'));
-                        if (meta) {
-                            // add to database
-                            parseDiskDirectory(file, meta);
+                        // check folder is not hidden
+                        if (itemPath.includes('/.') == false) {
+                            // load media metadata
+                            var meta = require(path.join(itemPath, 'demo.json'));
+                            if (meta) {
+                                // add to database
+                                parseDiskDirectory(file, meta);
+                            }
                         }
                     }
                 });
