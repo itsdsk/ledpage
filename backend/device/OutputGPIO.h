@@ -67,65 +67,48 @@ public:
 
         //
         std::cout << "Opened GPIO" << std::endl;
-        initData();
     };
-    void initData()
-    {
-        int16_t ledIndex = 0;
-
-        //Init the start Frame
-        ledDataBlock[0] = 0;
-        ledDataBlock[1] = 0;
-        ledDataBlock[2] = 0;
-        ledDataBlock[3] = 0;
-        //Init the Driver LED
-        ledDataBlock[4] = 255;
-        ledDataBlock[5] = 0;
-        ledDataBlock[6] = 0;
-        ledDataBlock[7] = 0;
-        //init each LED
-        for (ledIndex = 8; ledIndex < spiFrameLength - (endFrameLength * bytesPerLED); ledIndex += bytesPerLED)
-        {
-            ledDataBlock[ledIndex] = 255;
-            ledDataBlock[ledIndex + 1] = 0;
-            ledDataBlock[ledIndex + 2] = 0;
-            ledDataBlock[ledIndex + 3] = 0;
-        }
-        //init the end frame
-        for (ledIndex; ledIndex < spiFrameLength; ledIndex += bytesPerLED)
-        {
-            ledDataBlock[ledIndex] = 255;
-            ledDataBlock[ledIndex + 1] = 255;
-            ledDataBlock[ledIndex + 2] = 255;
-            ledDataBlock[ledIndex + 3] = 255;
-        }
-        return;
-    }
     int write(const std::vector<ColorRgb> &ledValues)
     {
-        int16_t ledIndexCounter = 0;
-
-        // TEST: flash red - green - blue
-        uint16_t modulF = frameCount % 300;
-        tmpColour[0] = modulF < 150 ? 255 : 0;
-        tmpColour[1] = modulF > 150 && modulF < 250 ? 255 : 0;
-        tmpColour[2] = modulF > 250 ? 255 : 0;
-        frameCount++;
-        // set 1st pixel
-        ledDataBlock[8] = 255;
-        ledDataBlock[9] = tmpColour[2];
-        ledDataBlock[10] = tmpColour[1];
-        ledDataBlock[11] = tmpColour[0];
-        // copy colour to every other pixel
-        for (ledIndexCounter = (spiFrameLength - (endFrameLength * bytesPerLED)) - bytesPerLED; ledIndexCounter > 8; ledIndexCounter -= bytesPerLED)
+        // check output buffer object is initialised
+        if (_ledBuffer.size() == 0)
         {
-            ledDataBlock[ledIndexCounter] = ledDataBlock[ledIndexCounter - bytesPerLED];
-            ledDataBlock[ledIndexCounter + 1] = ledDataBlock[ledIndexCounter + 1 - bytesPerLED];
-            ledDataBlock[ledIndexCounter + 2] = ledDataBlock[ledIndexCounter + 2 - bytesPerLED];
-            ledDataBlock[ledIndexCounter + 3] = ledDataBlock[ledIndexCounter + 3 - bytesPerLED];
+            // set output buffer size
+            spiFrameLength = (startFrameLength + voltageBoostPixel + ledValues.size() + endFrameLength) * bytesPerLED;
+            _ledBuffer.resize(spiFrameLength);
+            // init the start frame
+            for (int i = 0; i < startFrameLength * bytesPerLED; i++)
+            {
+                _ledBuffer[i] = 0;
+            }
+            // init the driver LED / voltage boost pixel
+            for (int i = startFrameLength * bytesPerLED; i < (startFrameLength + voltageBoostPixel) * bytesPerLED; i += bytesPerLED)
+            {
+                _ledBuffer[i] = 255;
+                _ledBuffer[i + 1] = 0;
+                _ledBuffer[i + 2] = 0;
+                _ledBuffer[i + 3] = 0;
+            }
+            // init the end frame
+            for (int ledIndex = spiFrameLength - (endFrameLength * bytesPerLED); ledIndex < spiFrameLength; ledIndex += bytesPerLED)
+            {
+                _ledBuffer[ledIndex] = 255;
+                _ledBuffer[ledIndex + 1] = 255;
+                _ledBuffer[ledIndex + 2] = 255;
+                _ledBuffer[ledIndex + 3] = 255;
+            }
+        }
+        // insert colours into output buffer
+        for (int ledIndex = 0; ledIndex < ledValues.size(); ledIndex++)
+        {
+            int bufferIndex = (startFrameLength + voltageBoostPixel + ledIndex) * bytesPerLED;
+            _ledBuffer[bufferIndex] = 255;
+            _ledBuffer[bufferIndex + 1] = ledValues[ledIndex].red;
+            _ledBuffer[bufferIndex + 2] = ledValues[ledIndex].green;
+            _ledBuffer[bufferIndex + 3] = ledValues[ledIndex].blue;
         }
         // send to LEDs
-        bcm2835_spi_writenb(ledDataBlock, spiFrameLength);
+        bcm2835_spi_writenb(_ledBuffer.data(), spiFrameLength);
         bcm2835_delay(5);
         return 0;
     }
@@ -140,14 +123,8 @@ public:
 
     // setup data block for LEDs
     static const uint8_t bytesPerLED = 4;
-    static const uint8_t numOfLEDs = 40;
-    static const int16_t endFrameLength = 9; //round( (numOfLEDs/2)/8 );
-    static const int16_t spiFrameLength = (2 + numOfLEDs + endFrameLength) * bytesPerLED;
-    char ledDataBlock[spiFrameLength];
-
-    // colour data
-    unsigned long frameCount = 0;
-    uint8_t tmpColour[3] = {0, 0, 0};
-    uint8_t maxValue = 128;
-    int16_t rainbowSize = maxValue * 6;
+    static const int16_t endFrameLength = 4;   //round( (numOfLEDs/2)/8 );
+    static const int16_t startFrameLength = 1; // n * bytesPerLED
+    static const int16_t voltageBoostPixel = 1;
+    int16_t spiFrameLength = 0;
 };
