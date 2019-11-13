@@ -225,6 +225,21 @@ module.exports = {
     nowPlaying: function (callback) {
         callback(currentURL);
     },
+    reloadPage: function () {
+        if (currentURL.includes('file:///')) {
+            // get directory name
+            var splitURL = currentURL.split('/');
+            var directoryname = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+            // send message to play local media
+            module.exports.playLocalMedia({
+                directory: directoryname
+            });
+        } else {
+            // send full URL to play remote media
+            module.exports.playRemoteMedia(currentURL);
+        }
+        diskRequiringScreenshot = null;
+    },
     createDisk: function (channelName, callback) {
         // stop autoplay
         module.exports.stopAutoplay();

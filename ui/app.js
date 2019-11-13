@@ -75,6 +75,9 @@ io.on('connection', function (socket) {
     media.stopAutoplay();
     media.playRemoteMedia(msg);
   });
+  socket.on('reloadpage', function () {
+    media.reloadPage();
+  });
   // autoplay
   socket.on('autoplay', function (msg) {
     media.startAutoplay(msg);

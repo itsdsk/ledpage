@@ -313,6 +313,11 @@ document.addEventListener('click', function (event) {
         // navbar dropdown
         const navs = document.querySelectorAll('.Navbar__Items');
         navs.forEach(nav => nav.classList.toggle('Navbar__ToggleShow'));
+    } else if (event.target.matches('#reloadCurrentPageButton')) {
+        // send msg to reload page
+        socket.emit('reloadpage');
+        // refresh iframe
+        document.getElementById('previewFrame').src = document.getElementById('previewFrame').src;
     }
 }, false);
 document.addEventListener('mousedown', function (event) {
