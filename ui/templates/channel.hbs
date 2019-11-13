@@ -1,13 +1,13 @@
 <div class="item" data-channel="{{channel_name}}">
     <span>
-        <p><b>{{channel_name}}</b> ({{count}})</p>
+        <h1>
+            <a href="/?page=channel&channel={{channel_name}}">{{channel_name}} (<u>{{count}}</u>)</a>
+        </h1>
     </span>
     <span>
         <button class="autoplayButton">Play</button>
         {{#if create}}
         <button class="newDiskButton">New</button>
-        {{else}}
-        <button class="viewChannelButton">View</button>
         {{/if}}
     </span>
 </div>

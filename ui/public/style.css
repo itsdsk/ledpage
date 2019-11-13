@@ -13,10 +13,7 @@
 }
 
 .item {
-    border-color: #202020;
-    border-style: solid;
-    border-width: 1px;
-    margin: 4px;
+    margin: 8px;
     text-align: center;
     position: relative;
 }
@@ -29,12 +26,17 @@
     -ms-transform: translate(-50%, -50%);
 }
 
-.item button {
-    font-size: 16px;
+.item[data-channel] button {
+    font-size: 1.17em;
+    padding: 0.5em;
 }
 
 .item[data-directory] button {
     opacity: 0;
+    font-size: 1.17em;
+    width: 100%;
+    padding: 1em;
+    margin: 1em 0em;
 }
 
 .item[data-directory]:hover button {
@@ -53,16 +55,38 @@
 }
 
 .item[data-directory]:hover::before {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(181, 188, 190, 0.5);
+}
+
+html {
+    font-size: 16px;
+}
+
+@media screen and (min-width: 320px) {
+    html {
+        font-size: calc(16px + 6 * ((100vw - 320px) / 680));
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    html {
+        font-size: 22px;
+    }
 }
 
 .item[data-channel] {
     grid-column: 1 / -1;
     text-align: left;
-    padding: 16px;
+    padding: 0px 1em;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background-color: rgba(181, 188, 190, 0.10);
+}
+
+.item[data-directory] {
+    background-color: rgba(181, 188, 190, 0.95);
+    color: black;
 }
 
 .item[data-directory]:hover {
@@ -92,11 +116,12 @@ body {
 }
 
 .Navbar {
-    background-color: #202020;
+    background-color: white;
     display: flex;
-    padding: 16px;
-    color: white;
+    padding: 0px 8px;
+    color: black;
     position: sticky;
+    align-items: baseline;
 }
 
 .Navbar__Link {
@@ -144,16 +169,25 @@ body {
 
 .NavBar input {
     height: 100%;
-    color: white;
+    color: black;
 }
 
 #urlInput {
-    color: white;
-    background-color: #202020;
+    color: black;
+    background-color: white;
     text-decoration: none;
     border: 10;
     border-radius: 1px;
+    border-width: 2px;
+    border-color: black;
     border-style: none none double none;
+    display: inline-block;
+    width: 100%;
+    font-size: 1.5em;
+}
+
+.Navbar__Link-brand {
+    flex: 1;
 }
 
 .Navbar__Items--right {
@@ -161,20 +195,61 @@ body {
 }
 
 .bottomNavigationMenu {
-    background-color: rgba(181, 188, 190, 0.95);
+    background-color: white;
     display: flex;
     position: sticky;
     bottom: 16px;
-    margin: 16px 64px;
+    margin: 16px 16px;
+    border: 5px solid white;
     color: black;
+    justify-content: space-between;
+    float: right;
+    width: 350px;
+}
+
+.bottomNavigationMenu:hover {
+    width: 100%;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    width: fill-available;
+}
+
+.bottomNavigationMenu:hover .bottomMenuTextDiv {
+    display: block;
+}
+
+.bottomNavigationMenu .bottomMenuTextDiv {
+    display: none;
 }
 
 .bottomMenuTextDiv {
-    padding: 16px;
+    padding: 0 32px;
+    flex: 1;
+    text-align: right;
+}
+
+.bottomMenuTextDiv button {
+    font-size: 1em;
+}
+
+.bottomMenuTextDiv input {
+    width: 100%;
 }
 
 #previewFrame {
     border: none;
     width: 350px;
     height: 350px;
+}
+
+nav :link,
+nav :visited {
+    color: black;
+    text-decoration: none;
+}
+
+.item :link,
+.item :visited {
+    color: white;
+    text-decoration: none;
 }

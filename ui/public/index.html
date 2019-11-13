@@ -11,26 +11,23 @@
 <body>
     <div class="Navbar">
         <div class="Navbar__Link Navbar__Link-brand">
-            💿 <input id="urlInput" type="search" placeholder="Enter URL to display">
+            <input id="urlInput" type="search" placeholder="Enter URL to display">
         </div>
         <div class="Navbar__Link Navbar__Link-toggle">
             dot
         </div>
-        <!-- <nav class="Navbar__Items">
+        <nav class="Navbar__Items">
             <div class="Navbar__Link">
-                <img src="/public/.default/thumb.jpg" />
-                Now playing: <span id="nowPlaying"></span>
+                <h3>
+                    <a href="/">Feed</a>
+                </h3>
             </div>
-            <div class="Navbar__Link">
-               Longer Link
-             </div>
-        </nav> -->
+        </nav>
         <nav class="Navbar__Items Navbar__Items--right">
             <div class="Navbar__Link">
-                <input id="brightnessInput" type="range" min="0" max="255" step="1">
-            </div>
-            <div class="Navbar__Link">
-                <a href="/settings">Settings</a>
+                <h3>
+                    <a href="/settings">Settings</a>
+                </h3>
             </div>
         </nav>
     </div>
@@ -40,13 +37,31 @@
     </div>
     <div id="diskContainer"></div>
     <div class="bottomNavigationMenu">
-        <iframe id="previewFrame"></iframe>
         <div class="bottomMenuTextDiv">
-            <p>Now playing:</p>
-            <p><b><span id="nowPlaying"></span></b></p>
+            <p>
+                <b>Now playing:</b>
+            </p>
+            <h3>
+                <span id="nowPlaying"></span>
+            </h3>
             <p id="nowPlayingChannels"></p>
-            <p><button id="reloadCurrentPageButton">Reload</button></p>
+            <p>
+                <button id="reloadCurrentPageButton">Reload</button>
+            </p>
+            <div>
+                <label>
+                    Brightness
+                    <input id="brightnessInput" type="range" min="0" max="255" step="1">
+                </label>
+            </div>
+            <div>
+                <label>
+                    Blur
+                    <input class="blurAmount" type="range" min="1" max="48" step="1">
+                </label>
+            </div>
         </div>
+        <iframe id="previewFrame"></iframe>
     </div>
 </body>
 
