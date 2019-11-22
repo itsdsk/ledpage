@@ -125,7 +125,18 @@ body {
 }
 
 .Navbar__Link {
-    margin: 10px;
+    padding: 10px 32px;
+    margin: 0px 20px;
+}
+
+.Navbar__Items .Navbar__Link.active,
+.Navbar__Items .Navbar__Link:hover {
+    background: #202020;
+}
+
+.Navbar__Link.active a,
+.Navbar__Link:hover a {
+    color: white;
 }
 
 .Navbar__Items {
