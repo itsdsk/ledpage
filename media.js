@@ -28,7 +28,7 @@ db.serialize(function () {
 
 // directory of disk requiring screenshot
 var diskRequiringScreenshot;
-var screenshotPath = "/screenshot.ppm";
+var screenshotPath = path.join(__dirname, 'public', 'screenshot.ppm');
 
 //
 var backendSocket = new sockets.DomainClient("backend");
@@ -182,7 +182,7 @@ fs.readFile(path.join(__dirname, "templates", "disk_editor.hbs"), function (err,
     diskEditorCompiler = Handlebars.compile(data.toString());
 });
 
-var mediaDir = path.join(__dirname, 'disks');
+var mediaDir = path.join(__dirname, 'public', 'disks');
 var config; // device config
 module.exports = {
     // build local database in memory
@@ -209,12 +209,12 @@ module.exports = {
             });
         });
         // get config JSON
-        var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
+        var configPath = path.join(__dirname, 'public', 'config.json');
         try {
             config = require(configPath);
         } catch (ex) {
             console.log("Error getting config: " + ex);
-            var pathToDefault = path.join(__dirname, '..', 'renderer', '.default', 'config.json');
+            var pathToDefault = path.join(__dirname, 'public', 'disks', '.default', 'config.json');
             fs.copyFile(pathToDefault, configPath, (err) => {
                 if (err) console.log(err)
                 else {
@@ -742,7 +742,7 @@ module.exports = {
         callback();
     },
     saveConfig: function () {
-        var configPath = path.join(__dirname, '..', 'renderer', 'config.json');
+        var configPath = path.join(__dirname, 'public', 'config.json');
         console.log("USER INPUT::saving output config to " + configPath);
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);

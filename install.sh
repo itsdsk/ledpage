@@ -32,7 +32,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
-ExecStart=/home/pi/disk/backend/main -d -c \"/home/pi/disk/renderer/config.json\"
+ExecStart=/home/pi/disk/backend/main -d -c \"/home/pi/disk/public/config.json\"
 Restart=on-failure
 RestartSec=5s
 
@@ -63,9 +63,7 @@ EOT"
 sudo systemctl enable disk-renderer-daemon
 
 # get app dependencies
-cd ./ui/
 npm install
-cd ../
 # add renderer to service manager
 sudo bash -c "> /etc/systemd/system/disk-ui-daemon.service"
 sudo bash -c "cat <<EOT >> /etc/systemd/system/disk-ui-daemon.service
@@ -74,7 +72,7 @@ Description=Disk UI
 
 [Service]
 User=root
-WorkingDirectory=/home/pi/disk/ui
+WorkingDirectory=/home/pi/disk
 ExecStart=/usr/bin/node app.js
 Restart=on-failure
 RestartSec=5s

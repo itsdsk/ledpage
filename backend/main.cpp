@@ -336,7 +336,7 @@ void saveScreenshot(Image<ColorRgba> &_image)
 {
     // write ppm file
     ofstream myfile;
-    myfile.open("screenshot.ppm");
+    myfile.open("/home/pi/disk/public/screenshot.ppm");
     myfile << "P6"
            << "\n"
            << _image.width() << " " << _image.height() << "\n"

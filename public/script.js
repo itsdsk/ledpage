@@ -553,9 +553,9 @@ socket.on('nowplaying', function (currentURL) {
             // check if already loaded
             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
                 // load iframe
-                document.getElementById('previewFrame').src = `/public/${currentURL}/index.html`;
+                document.getElementById('previewFrame').src = `/disks/${currentURL}/index.html`;
                 // path to metadata
-                var metadataURL = `/public/${currentURL}/demo.json`;
+                var metadataURL = `/disks/${currentURL}/demo.json`;
                 // fetch metadata
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.onreadystatechange = function () {
@@ -588,7 +588,7 @@ socket.on('nowplaying', function (currentURL) {
     } else {
         // not playing anything
         // load default media
-        var defaultPreview = `/public/.default/index.html`;
+        var defaultPreview = `/disks/.default/index.html`;
         if (document.getElementById('previewFrame').src.includes(defaultPreview) == false) {
             // load default iframe
             document.getElementById('previewFrame').src = defaultPreview;

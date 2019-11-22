@@ -17,7 +17,6 @@ setTimeout(media.startAutoplay, 5000);
 
 // serve static files
 app.use(express.static('public'));
-app.use('/public', express.static('disks'));
 
 // client websocket routes
 io.on('connection', function (socket) {
