@@ -58,7 +58,7 @@ class DeviceManager
         screenX = _screenX;
         screenHalfX = unsigned(screenX/2.0f);
         //
-        cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
+        cout << "Output type: " << config["outputs"][outputIndex]["properties"]["type"] << ", port: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
         unsigned configW = config["window"]["width"];
         unsigned configH = config["window"]["height"];
         // add leds
@@ -66,13 +66,25 @@ class DeviceManager
         {
             ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
         }
-        // create output object
+        // get output properties
         const string deviceName = config["outputs"][outputIndex]["properties"]["port"];
         nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
         const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
-        output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
-        // TEST: create GPIO output object
-        outputGPIO = std::shared_ptr<Output>(new OutputGPIO());
+        const string outputType = config["outputs"][outputIndex]["properties"]["type"];
+        // create output object
+        if (outputType == "WS2812")
+        {
+            output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
+        }
+        else if (outputType == "GPIO")
+        {
+            output = std::shared_ptr<Output>(new OutputGPIO());
+        }
+        else
+        {
+            cout << "Error: could not create device output because type not recognised: " << outputType << endl;
+        }
+        
     }
 
     template <typename Pixel_T>
@@ -162,9 +174,7 @@ class DeviceManager
             ledValues.emplace_back(col);
             //cout << col << endl;
         }
-        // TEST: write on GPIO
-        outputGPIO->write(ledValues);
-        // write LED colours to serial
+        // write LED colours to device
         return output->write(ledValues);
     }
     ~DeviceManager()
@@ -172,7 +182,6 @@ class DeviceManager
     }
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
-    std::shared_ptr<Output> outputGPIO; // *TEST*
     string nameTEMP;
     unsigned screenX;
     unsigned screenHalfX;
