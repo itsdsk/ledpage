@@ -90,7 +90,9 @@ function cleanup() {
     if (!SHUTDOWN) {
         SHUTDOWN = true;
         console.log('\n', "Terminating.", '\n');
-        rendererSocket.socket.end();
+        if (rendererSocket.connected) {
+            rendererSocket.socket.end();
+        }
         process.exit(0);
     }
 }

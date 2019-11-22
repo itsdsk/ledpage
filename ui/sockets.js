@@ -25,7 +25,7 @@ exports.initialiseBackend = function () {
 exports.initialiseBackend();
 
 exports.backend.on('error', function (err) {
-    console.log('backend WS not connected', err);
+    if (connectFlag) console.log('backend WS not connected', err);
 });
 
 exports.backend.on('open', function () {
@@ -45,9 +45,10 @@ exports.DomainClient = class DomainClient {
         this.event = new EventEmitter();
         this.connectInterval = null;
         //
-        if (connectFlag) this.startConnecting();
-        //
-        console.log("Constructing client " + this.name + " with path " + this.socketname);
+        if (connectFlag) {
+            console.log("Constructing client " + this.name + " with path " + this.socketname);
+            this.startConnecting();
+        }
     }
 
     startConnecting() {

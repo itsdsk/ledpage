@@ -5,8 +5,9 @@ const media = require("./media.js");
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-http.listen(process.env.PORT || 3000, function () {
-  //console.log('listening on *:3000');
+var httpPort = process.env.PORT || 3000;
+http.listen(httpPort, function () {
+  console.log(`Opened HTTP server on *:${httpPort}`);
 });
 
 // scan content
