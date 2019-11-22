@@ -201,7 +201,7 @@ vector<DeviceManager> deviceManagers;
 FrameGrabber *grabber;
 unsigned _w;
 unsigned _h;
-float brightness = 0.15f;
+float brightness = 0.0125f;
 bool receivedScreenshotCommand = false;
 bool receivedQuitSignal = false;
 
