@@ -18,8 +18,6 @@ var y_min = gap;
 var y_max = 0;
 var lastReceivedOutputMsg;
 
-socket.emit('loadoutput');
-
 var nowPlayingUpdatePeriod = 5000; // ms to update nowplaying
 setInterval(function () {
     socket.emit('nowplaying');
@@ -28,7 +26,14 @@ setInterval(function () {
 function refresh() {
     // load page
     var url = new URL(document.location);
+    // get URL parameter for page
     var page = url.searchParams.get('page');
+    // if page query is empty
+    if (page == null) {
+        // change page parameter to URL path
+        var paths = url.pathname.split('/');
+        page = paths[1];
+    }
     switch (page) {
         case 'editor':
             socket.emit('loadeditor', url.searchParams.get('disk'));
@@ -36,9 +41,12 @@ function refresh() {
         case 'channel':
             socket.emit('loadchannel', url.searchParams.get('channel'));
             break;
+        case 'settings':
+            socket.emit('loadoutput');
+            break;
         default:
             // check if index page is loaded
-            if (document.getElementById("diskFeedContainer").childNodes.length === 0) {
+            if (document.getElementById("diskFeedContainer") && document.getElementById("diskFeedContainer").childNodes.length === 0) {
                 socket.emit('load');
             } else {
                 // show feed div and hide other containers
