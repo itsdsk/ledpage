@@ -1,6 +1,7 @@
 #include <vector>
 #include <device/Output.h>
 #include <device/OutputSerialDefault.h>
+#include <device/OutputGPIO.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -38,8 +39,8 @@ struct LedNode
         unsigned max_y = min((int)mapped_y + (int)r, (int)screenY);
         // go through pixels to sample
         unsigned samplingResolution = 2;
-        for (unsigned ix = min_x; ix < max_x; ix+=samplingResolution)
-            for (unsigned iy = min_y; iy < max_y; iy+=samplingResolution)
+        for (unsigned ix = min_x; ix < max_x; ix += samplingResolution)
+            for (unsigned iy = min_y; iy < max_y; iy += samplingResolution)
             {
                 // get 1-dimensional index of pixel in image and add to positions
                 unsigned position = iy * screenX + ix;
@@ -51,13 +52,13 @@ struct LedNode
 
 class DeviceManager
 {
-  public:
+public:
     DeviceManager(const json &config, unsigned &outputIndex, unsigned &_screenX, unsigned &screenY)
     {
         screenX = _screenX;
-        screenHalfX = unsigned(screenX/2.0f);
+        screenHalfX = unsigned(screenX / 2.0f);
         //
-        cout << "Output: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
+        cout << "Output type: " << config["outputs"][outputIndex]["properties"]["type"] << ", port: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
         unsigned configW = config["window"]["width"];
         unsigned configH = config["window"]["height"];
         // add leds
@@ -65,11 +66,24 @@ class DeviceManager
         {
             ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
         }
-        // create output object
+        // get output properties
         const string deviceName = config["outputs"][outputIndex]["properties"]["port"];
         nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
         const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
-        output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
+        const string outputType = config["outputs"][outputIndex]["properties"]["type"];
+        // create output object
+        if (outputType == "WS2812")
+        {
+            output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
+        }
+        else if (outputType == "GPIO")
+        {
+            output = std::shared_ptr<Output>(new OutputGPIO());
+        }
+        else
+        {
+            cout << "Error: could not create device output because type not recognised: " << outputType << endl;
+        }
     }
 
     template <typename Pixel_T>
@@ -94,7 +108,8 @@ class DeviceManager
             uint8_t avgB = 0;
 
             // get colors on left side
-            if (sampleL) {
+            if (sampleL)
+            {
                 // initialise sum of colours
                 uint_fast16_t cummR = 0;
                 uint_fast16_t cummG = 0;
@@ -115,7 +130,8 @@ class DeviceManager
                 avgB_L = uint8_t(cummB / ledNode.positions.size());
             }
             // get colours on right side
-            if (sampleR) {
+            if (sampleR)
+            {
                 // initialise sum of colours
                 uint_fast16_t cummR = 0;
                 uint_fast16_t cummG = 0;
@@ -137,12 +153,15 @@ class DeviceManager
             }
 
             // set final LED colour
-            if (sampleL && sampleR) {
+            if (sampleL && sampleR)
+            {
                 // interpolate (fade)
                 avgR = uint8_t(avgR_L + crossfadeNorm * (avgR_R - avgR_L));
                 avgG = uint8_t(avgG_L + crossfadeNorm * (avgG_R - avgG_L));
                 avgB = uint8_t(avgB_L + crossfadeNorm * (avgB_R - avgB_L));
-            } else {
+            }
+            else
+            {
                 // absolute
                 avgR = sampleL ? avgR_L : avgR_R;
                 avgG = sampleL ? avgG_L : avgG_R;
@@ -159,6 +178,7 @@ class DeviceManager
             ledValues.emplace_back(col);
             //cout << col << endl;
         }
+        // write LED colours to device
         return output->write(ledValues);
     }
     ~DeviceManager()
@@ -170,6 +190,6 @@ class DeviceManager
     unsigned screenX;
     unsigned screenHalfX;
 
-  private:
+private:
     //
 };
