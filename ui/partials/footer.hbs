@@ -1,0 +1,27 @@
+<div class="bottomNavigationMenu">
+    <div class="bottomMenuTextDiv">
+        <p>
+            <b>Now playing:</b>
+        </p>
+        <h3>
+            <span id="nowPlaying"></span>
+        </h3>
+        <p id="nowPlayingChannels"></p>
+        <p>
+            <button id="reloadCurrentPageButton">Reload</button>
+        </p>
+        <div>
+            <label>
+                Brightness
+                <input id="brightnessInput" type="range" min="0" max="255" step="1">
+            </label>
+        </div>
+        <div>
+            <label>
+                Blur
+                <input class="blurAmount" type="range" min="1" max="48" step="1">
+            </label>
+        </div>
+    </div>
+    <iframe id="previewFrame"></iframe>
+</div>
