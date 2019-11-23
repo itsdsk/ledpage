@@ -23,7 +23,10 @@ fs.readdir(path.join(__dirname, `views`), function (err, files) {
             if (err) throw err;
             // compile page
             var compiler = Handlebars.compile(data.toString());
-            var rendered = compiler({});
+            // put name of page in object to be sent to template
+            var page = {};
+            page[path.basename(file, `.hbs`)] = true;
+            var rendered = compiler(page);
             // save to file
             if (file.startsWith(`home`)) {
                 fs.writeFile(path.join(__dirname, `public`, `index.html`), rendered, function (err) {

@@ -6,14 +6,14 @@
         dot
     </div>
     <nav class="Navbar__Items">
-        <div class="Navbar__Link" id="feedBtn">
+        <div class="Navbar__Link {{#if home}}active{{/if}}" id="feedBtn">
             <h3>
                 <a href="/">Feed</a>
             </h3>
         </div>
     </nav>
     <nav class="Navbar__Items Navbar__Items--right">
-        <div class="Navbar__Link" id="settingsBtn">
+        <div class="Navbar__Link {{#if settings}}active{{/if}}" id="settingsBtn">
             <h3>
                 <a href="/settings">Settings</a>
             </h3>

@@ -44,12 +44,8 @@ function refresh() {
         case 'settings':
             // request configuration form from server
             socket.emit('loadoutput');
-            // highlight active link in navbar
-            document.querySelector('#settingsBtn').className += " active";
             break;
         default:
-            // highlight active link in navbar
-            document.querySelector('#feedBtn').className += " active";
             // check if index page is loaded
             if (document.getElementById("diskFeedContainer") && document.getElementById("diskFeedContainer").childNodes.length === 0) {
                 socket.emit('load');
