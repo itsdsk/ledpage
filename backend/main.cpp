@@ -31,6 +31,7 @@ unsigned changeSize = 0;
 unsigned int fadeDuration = 2500; // fade transition duration in ms
 unsigned int timeLoadedL = 0; // unix epoch time ms left window loaded
 unsigned int timeLoadedR = 1; // unix epoch time ms right window loaded
+bool receivedScreenshotCommand = false;
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -108,6 +109,15 @@ public:
                             timeLoadedR = currentms;
                         }
                         std::cout << "user switching window side to " << (timeLoadedL > timeLoadedR ? "left" : "right") << std::endl;
+                    }
+                }
+                else if (key1 == "command")
+                {
+                    cout << "key1 is command" << endl;
+                    if (element1.value() == "screenshot")
+                    {
+                        cout << "screenshot" << endl;
+                        receivedScreenshotCommand = true;
                     }
                 }
             }
@@ -202,7 +212,6 @@ FrameGrabber *grabber;
 unsigned _w;
 unsigned _h;
 float brightness = 0.0125f;
-bool receivedScreenshotCommand = false;
 bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
