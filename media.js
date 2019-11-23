@@ -93,6 +93,9 @@ function cleanup() {
         if (rendererSocket.connected) {
             rendererSocket.socket.end();
         }
+        if (backendSocket.connected) {
+            backendSocket.socket.end();
+        }
         process.exit(0);
     }
 }
