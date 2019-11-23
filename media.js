@@ -101,49 +101,43 @@ process.on('SIGINT', cleanup);
 function saveScreenshot(side) {
     // check directory of disk
     if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
-        // try connect to backend if not already open
-        sockets.initialiseBackend();
         // send command to backend to save screenshot
-        sockets.backend.send(JSON.stringify({
+        backendSocket.socket.write(JSON.stringify({
             "command": "screenshot"
-        }), (error) => {
-            console.log('sent screenshot command to backend', error);
-            // check screenshot command was sent successfully
-            if (!error) {
-                // watch screenshot file for changes // TODO: make work if file does not exist yet
-                const watcher = fs.watch(screenshotPath, (eventType, filename) => {
-                    // stop watching once file has been changed
-                    watcher.close();
-                    // wait 1 second for backend to finish changing file
-                    setTimeout(function () {
-                        // get demo.json and add image to it
-                        var metaPath = path.join(mediaDir, diskRequiringScreenshot, 'demo.json');
-                        var meta = require(metaPath);
-                        meta.demo.image = "thumb.jpg";
-                        //
-                        var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
-                        // convert and crop half of image
-                        var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'West' : 'East')} -crop 50x100% +repage ${targetJpegPath}`;
-                        // convert to jpeg
-                        runCommand(convertCommand, function (stdout) {
-                            // add thumbnail to database
-                            fs.readFile(targetJpegPath, function (err, buf) {
-                                if (err) throw err;
-                                var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                                var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
-                                db.run(addImgQuery, [decodedImage, diskRequiringScreenshot], function (err) {
-                                    // save demo.json
-                                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                                        if (err) console.log(err);
-                                        // reset
-                                        diskRequiringScreenshot = null;
-                                    });
-                                });
+        }));
+        console.log('sent screenshot command to backend');
+        // watch screenshot file for changes // TODO: make work if file does not exist yet
+        const watcher = fs.watch(screenshotPath, (eventType, filename) => {
+            // stop watching once file has been changed
+            watcher.close();
+            // wait 1 second for backend to finish changing file
+            setTimeout(function () {
+                // get demo.json and add image to it
+                var metaPath = path.join(mediaDir, diskRequiringScreenshot, 'demo.json');
+                var meta = require(metaPath);
+                meta.demo.image = "thumb.jpg";
+                //
+                var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
+                // convert and crop half of image
+                var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'West' : 'East')} -crop 50x100% +repage ${targetJpegPath}`;
+                // convert to jpeg
+                runCommand(convertCommand, function (stdout) {
+                    // add thumbnail to database
+                    fs.readFile(targetJpegPath, function (err, buf) {
+                        if (err) throw err;
+                        var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
+                        var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
+                        db.run(addImgQuery, [decodedImage, diskRequiringScreenshot], function (err) {
+                            // save demo.json
+                            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                                if (err) console.log(err);
+                                // reset
+                                diskRequiringScreenshot = null;
                             });
                         });
-                    }, 1000);
+                    });
                 });
-            }
+            }, 1000);
         });
     }
 }

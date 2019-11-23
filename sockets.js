@@ -1,5 +1,4 @@
 const net = require('net');
-const WebSocket = require('ws');
 const EventEmitter = require('events');
 
 var exports = module.exports = {};
@@ -11,25 +10,6 @@ process.argv.forEach(function (val, index, array) {
     } else if (val == '--no-connect' || val == '-n') {
         connectFlag = false;
     }
-});
-
-// backend inter-process communication
-exports.backend = null;
-
-exports.initialiseBackend = function () {
-    if (exports.backend == null || exports.backend.readyState != 1) {
-        exports.backend = new WebSocket('ws://localhost:9002');
-    }
-};
-
-exports.initialiseBackend();
-
-exports.backend.on('error', function (err) {
-    if (connectFlag) console.log('backend WS not connected', err);
-});
-
-exports.backend.on('open', function () {
-    console.log('backend WS connected');
 });
 
 // unix socket class
