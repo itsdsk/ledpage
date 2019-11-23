@@ -10,3 +10,4 @@ public/disks
 .directory*
 public/index.html
 public/settings/index.html
+config_gens
