@@ -1,14 +1,12 @@
 node_modules
-renderer/config.json
 backend/CMakeFiles
 backend/build
-
 backend/main
 backend/libserial.a
 backend/CMakeCache.txt
 backend/cmake_install.cmake
 backend/Makefile
-
-ui/disks
-
+public/disks
 .directory*
+public/index.html
+public/settings/index.html
