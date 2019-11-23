@@ -64,6 +64,8 @@ sudo systemctl enable disk-renderer-daemon
 
 # get app dependencies
 npm install
+# run script to build web pages
+node generate_pages.js
 # add renderer to service manager
 sudo bash -c "> /etc/systemd/system/disk-ui-daemon.service"
 sudo bash -c "cat <<EOT >> /etc/systemd/system/disk-ui-daemon.service
