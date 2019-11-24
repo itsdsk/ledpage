@@ -8,6 +8,7 @@ backend/cmake_install.cmake
 backend/Makefile
 public/disks
 .directory*
+public/config.json
 public/index.html
 public/settings/index.html
 config_gens
