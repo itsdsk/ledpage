@@ -211,7 +211,7 @@ module.exports = {
             config = require(configPath);
         } catch (ex) {
             console.log("Error getting config: " + ex);
-            var pathToDefault = path.join(__dirname, 'public', 'disks', '.default', 'config.json');
+            var pathToDefault = path.join(__dirname, 'public', '.default_config.json');
             fs.copyFile(pathToDefault, configPath, (err) => {
                 if (err) console.log(err)
                 else {
