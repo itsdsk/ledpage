@@ -8,6 +8,7 @@
             "style.css"
         ],
         "channels": ["firstchannel"],
-        "image": "thumb.jpg"
+        "image": "thumb.jpg",
+        "modified": "1970-01-01T00:00:00"
     }
 }

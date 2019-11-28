@@ -11,7 +11,7 @@ var datHttpServer;
 
 db.serialize(function () {
     // create tables for primitive types (disk and channel)
-    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, blur_amt INT DEFAULT 50, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
+    db.run("CREATE TABLE disks (directory TEXT PRIMARY KEY, title TEXT, description TEXT, image BLOB, blur_amt INT DEFAULT 50, modified TEXT, dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT)");
     db.run("CREATE TABLE channels (name TEXT PRIMARY KEY)");
     // create tables for relational types (files and connections)
     db.run("CREATE TABLE files (disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL," +
@@ -437,21 +437,22 @@ module.exports = {
                 dat.importFiles();
                 dat.joinNetwork();
                 console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
+                // get datetime
+                var timestamp = new Date().toISOString();
+                timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
                 // update key+version in database
-                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
-                db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, msg]);
-                // update key in JSON
+                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ?, modified = ? WHERE directory = ?";
+                db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, timestamp, msg]);
+                // update dat key and datetime in JSON
                 var metaPath = path.join(mediaDir, msg, 'demo.json');
                 var meta = require(metaPath);
-                if (!meta.demo.datKey) {
-                    meta.demo = Object.assign(meta.demo, {
-                        datKey: dat.key.toString('hex')
-                    });
-                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                        if (err) console.log(err);
-                        // callback(msg[0]);
-                    });
-                }
+                meta.demo = Object.assign(meta.demo, {
+                    datKey: dat.key.toString('hex'),
+                    modified: timestamp
+                });
+                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
+                });
             } else {
                 console.log("USER INPUT ERROR::Could not save version because dat is not writable (must be owner to import files)");
             }
@@ -807,7 +808,7 @@ function templateChannel(channel_name, create_flag, callback) {
 
 function templateDisk(disk_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from disks table
-    var sql = "SELECT directory, title, description, image, blur_amt, dat_key, dat_versions FROM disks WHERE directory = ?";
+    var sql = "SELECT directory, title, description, image, blur_amt, modified, dat_key, dat_versions FROM disks WHERE directory = ?";
     db.get(sql, [disk_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
@@ -843,8 +844,8 @@ function templateDisk(disk_directory, templateCompiler, callback) {
 
 function parseDiskDirectory(directory, meta, callback) {
     // add metadata to disks table in database
-    var insertQuery = "INSERT INTO disks (directory, title, description) VALUES (?, ?, ?)";
-    db.run(insertQuery, [directory, meta.demo.title, meta.demo.description], function () {
+    var insertQuery = "INSERT INTO disks (directory, title, description, modified) VALUES (?, ?, ?, ?)";
+    db.run(insertQuery, [directory, meta.demo.title, meta.demo.description, meta.demo.modified], function () {
         var itemPath = path.join(mediaDir, directory);
         // add image to disks database TODO: check if files exist
         if (meta.demo.image && meta.demo.image.length > 0) {
