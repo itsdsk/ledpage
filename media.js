@@ -417,7 +417,10 @@ module.exports = {
                 if (rendererSocket.connected) {
                     // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    rendererSocket.socket.write(updatedDir);
+                    rendererSocket.socket.write(JSON.stringify({
+                        command: 'loadURL',
+                        path: updatedDir
+                    }));
                     console.log('refreshing ' + updatedDir);
                 }
                 callback();
@@ -529,7 +532,10 @@ module.exports = {
                 if (rendererSocket.connected) {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    rendererSocket.socket.write(rendererURL);
+                    rendererSocket.socket.write(JSON.stringify({
+                        command: 'loadURL',
+                        path: rendererURL
+                    }));
                     // // send blur amt to backend
                     // // select disk
                     // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
@@ -542,7 +548,10 @@ module.exports = {
         } else {
             if (rendererSocket.connected) {
                 // send media file path to renderer
-                rendererSocket.socket.write('file://' + filePath + "/index.html");
+                rendererSocket.socket.write(JSON.stringify({
+                    command: 'loadURL',
+                    path: ('file://' + filePath + "/index.html")
+                }));
                 // // send blur amt to backend
                 // // select disk
                 // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
@@ -639,7 +648,10 @@ module.exports = {
         // TODO: check if URL is valid?
         if (rendererSocket.connected) {
             // send media file path to renderer
-            rendererSocket.socket.write(name);
+            rendererSocket.socket.write(JSON.stringify({
+                command: 'loadURL',
+                path: name
+            }));
             // do not take screenshot
             diskRequiringScreenshot = null;
         }

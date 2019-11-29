@@ -131,23 +131,25 @@ app.on('ready', () => {
         });
 
         stream.on('data', function (msg) {
-          // parse buffer to string
-          msg = msg.toString();
+          // parse buffer
+          msg = JSON.parse(msg.toString());
 
-          console.log('Client:', msg);
+          console.log('Client:', JSON.stringify(msg));
 
           // save client
           client = stream;
 
-          // display recieved URI
-          if (flipWindow) {
-            mainWindowA.loadURL(msg);
-          } else {
-            mainWindowB.loadURL(msg);
+          // check type of message received
+          if (msg.command == "loadURL") {
+            // display recieved URI
+            if (flipWindow) {
+              mainWindowA.loadURL(msg.path);
+            } else {
+              mainWindowB.loadURL(msg.path);
+            }
+            // flip window to display on
+            flipWindow = !flipWindow;
           }
-          // flip window to display on
-          flipWindow = !flipWindow;
-
         });
       })
       .listen(socket)
