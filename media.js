@@ -21,9 +21,6 @@ db.serialize(function () {
         "FOREIGN KEY(disk_directory) REFERENCES disks(directory)," +
         "FOREIGN KEY(channel_name) REFERENCES channels(name)," +
         "UNIQUE(disk_directory, channel_name))");
-    // add test data
-    // db.run("INSERT INTO channels (name) VALUES ('channel2')");
-    // db.run("INSERT INTO channels (name) VALUES ('channel3')");
 });
 
 // directory of disk requiring screenshot
