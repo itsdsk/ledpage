@@ -52,13 +52,24 @@ app.on('ready', () => {
   console.log(`Window positions: ${JSON.stringify(mainWindowA.getPosition())}, ${JSON.stringify(mainWindowB.getPosition())}`);
   console.log(`Window sizes: ${JSON.stringify(mainWindowA.getContentSize())}, ${JSON.stringify(mainWindowB.getContentSize())}`);
   // behaviour on pageload
-  mainWindowA.webContents.on('did-finish-load', () => {
+  mainWindowA.webContents.on('did-finish-load', async () => {
     setTimeout(() => {
       // show newly opened window
       if (mainWindowA.isMinimized()) {
         mainWindowA.restore();
       }
       mainWindowA.show();
+      // save page to disk
+      if (savePage == true) {
+        var saveLocation = '/tmp/index.html'; // TODO: add media path
+        console.log(`saving page ${saveLocation} (${mainWindowA.webContents.getURL()})`);
+        mainWindowA.webContents.savePage(saveLocation, 'HTMLComplete').then(() => {
+          console.log(`saved page successfully`);
+        }).catch(err => {
+          console.log(`didnt save page successfully: ${err}`);
+        });
+        savePage = false;
+      }
       // hide previous window
       //mainWindowB.hide();
       //mainWindowB.minimize();
@@ -70,13 +81,24 @@ app.on('ready', () => {
       }));
     }, 300);
   });
-  mainWindowB.webContents.on('did-finish-load', () => {
+  mainWindowB.webContents.on('did-finish-load', async () => {
     setTimeout(() => {
       // show newly opened window
       if (mainWindowB.isMinimized()) {
         mainWindowB.restore();
       }
       mainWindowB.show();
+      // save page to disk
+      if (savePage == true) {
+        var saveLocation = '/tmp/index.html'; // TODO: add media path
+        console.log(`saving page ${saveLocation} (${mainWindowB.webContents.getURL()})`);
+        mainWindowB.webContents.savePage(saveLocation, 'HTMLComplete').then(() => {
+          console.log(`saved page successfully`);
+        }).catch(err => {
+          console.log(`didnt save page successfully: ${err}`);
+        });
+        savePage = false;
+      }
       // hide previous window
       //mainWindowA.hide();
       //mainWindowA.minimize();
@@ -94,12 +116,14 @@ app.on('ready', () => {
   });
 
   // initial page load
-  var initialURL = `file:///${path.join(__dirname, 'index.html')}`;
-  mainWindowA.loadURL(initialURL);
+  var initialURL = `index.html`;
+  mainWindowA.loadFile(initialURL);
 
   // bool state to say which window to load to
   var flipWindow = false;
 
+  // bool state to say whether to save page
+  var savePage = false;
 
   // create UNIX socket to receive URLs on
   var client; // keep track of connected client
@@ -141,6 +165,8 @@ app.on('ready', () => {
 
           // check type of message received
           if (msg.command == "loadURL") {
+            // check save request
+            savePage = (msg.save ? true : false);
             // display recieved URI
             if (flipWindow) {
               mainWindowA.loadURL(msg.path);
