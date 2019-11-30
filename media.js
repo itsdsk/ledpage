@@ -711,8 +711,7 @@ module.exports = {
         });
     },
     loadOutput: function (callback) {
-        var element = outputGraphicCompiler(config);
-        element += "<br>" + outputFormCompiler(config);
+        var element = outputFormCompiler(config) + outputGraphicCompiler(config);
         console.log("USER INPUT::loading output");
         callback(element);
     },

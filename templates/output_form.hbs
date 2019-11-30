@@ -1,5 +1,6 @@
 <div id="outputForm">
     <div class="window">
+        <h3>Output configuration</h3>
         <label for="windowWidth">Width:</label>
         <input type="number" id="windowWidth" rows="1" class="width" value="{{window.width}}">
         <label for="windowHeight">Height:</label>
@@ -12,7 +13,7 @@
             <textarea id="o_device{{@index}}" rows="1" class="device">{{device}}</textarea> --}}
             {{!-- <label>{{device}}</label> --}}
             <div class="properties">
-                <b>{{index}}:&emsp;</b>
+                <h4>Chain {{index}}:</h4>
                 <label for="o_port{{@index}}">Port:</label>
                 <textarea id="o_port{{@index}}" rows="1" class="port">{{properties.port}}</textarea>
                 <label for="o_type{{@index}}">Type:</label>
@@ -25,6 +26,7 @@
         </div>
         {{/each}}
     </div>
+    <h3>Actions</h3>
     <button id="saveOutputButton">Save</button>
     <button id="updateOutputButton">Update Output</button>
     <button id="resetOutputButton">Reset</button>
@@ -34,14 +36,14 @@
     <button id="getLogsButton">Get logs</button>
     <button id="shutdownButton">Shutdown</button>
     <button id="rebootButton">Reboot</button>
-    <br>
+    <button class="autoplayButton">Autoplay all</button>
+    <h3>Controls</h3>
     <label>Brightness
         <input id="brightnessInput" type="range" min="0" max="255" step="1">
     </label>
     <label>Blur amount
         <input class="blurAmount" type="range" min="1" max="48" step="1">
     </label>
-    <button class="autoplayButton">Autoplay all</button>
     <label>Minimum autoplay time (15 - 300s):
         <input id="autoplayMinRange" type="range" min="15" max="300" step="1">
     </label>

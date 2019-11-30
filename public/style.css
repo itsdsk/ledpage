@@ -112,7 +112,25 @@ body {
 }
 
 #outputGraphic {
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    justify-content: space-around;
+    align-content: flex-start;
+    align-items: flex-end;
+}
+
+#outputForm {
+    flex-basis: 50%;
+    flex-grow: 1;
+}
+
+.properties * {
+    width: 100%;
+}
+
+#outputForm button,
+#outputForm input[type="range"] {
+    width: 100%;
 }
 
 .Navbar {
