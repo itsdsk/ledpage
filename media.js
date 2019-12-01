@@ -47,7 +47,6 @@ setInterval(function () {
 // prevent duplicate exit messages
 var currentURL = "";
 var SHUTDOWN = false;
-var crossfadeTime = 25000; // ms
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('data', function (data) {
     console.log("media in data from renderer: " + data.toString());
@@ -58,15 +57,15 @@ rendererSocket.event.on('data', function (data) {
         // update currentURL when halfway through transition
         setTimeout(function (URL) {
             currentURL = URL;
-        }, crossfadeTime / 2, rendererMsg.URL);
+        }, config.settings.fadeDuration / 2, rendererMsg.URL);
         // message backend to switch
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":0,"fade":${crossfadeTime}}}`);
+                backendSocket.socket.write(`{"window":{"half":0,"fade":${config.settings.fadeDuration}}}`);
             } else if (rendererMsg.whichWindow == 'B') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":1,"fade":${crossfadeTime}}}`);
+                backendSocket.socket.write(`{"window":{"half":1,"fade":${config.settings.fadeDuration}}}`);
             }
             // take screenshot
             if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
@@ -592,8 +591,8 @@ module.exports = {
         // }
     },
     setCrossfadeTime: function (msg) {
-        crossfadeTime = msg;
-        console.log(`setting crossfade time: ${crossfadeTime}`);
+        config.settings.fadeDuration = msg;
+        console.log(`setting crossfade time: ${config.settings.fadeDuration}`);
     },
     stopAutoplay: function () {
         // stop autoplay
@@ -638,10 +637,10 @@ module.exports = {
     setAutoplayTimeRange: function (msg) {
         console.log(`USER INPUT::setting autoplay time range: ${JSON.stringify(msg)}`);
         if (msg.autoplayMinRange) {
-            minAutoplayTime = msg.autoplayMinRange;
+            config.settings.autoplayDuration.min = msg.autoplayMinRange;
         }
         if (msg.autoplayMaxRange) {
-            maxAutoplayTime = msg.autoplayMaxRange;
+            config.settings.autoplayDuration.max = msg.autoplayMaxRange;
         }
     },
     playRemoteMedia: function (name) {
@@ -922,8 +921,6 @@ function runCommand(command, callback) {
 var autoplayTimerID; // ID used to stop autoplay
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
-var minAutoplayTime = 30; // seconds
-var maxAutoplayTime = 60;
 
 function autoplayNext() {
     // check there are items in playlist
@@ -944,9 +941,8 @@ function autoplayNext() {
         });
         // choose random timespan in min-max range to wait before playing next
         // TODO: add crossfadetime to delay time (and add props to config.json)
-        var delayTime = Math.random() * Math.abs(maxAutoplayTime - minAutoplayTime);
-        delayTime += Math.min(maxAutoplayTime, minAutoplayTime); // add min of range
-        delayTime *= 1000; // convert seconds to milliseconds
+        var delayTime = Math.random() * Math.abs(config.settings.autoplayDuration.max - config.settings.autoplayDuration.min);
+        delayTime += Math.min(config.settings.autoplayDuration.max, config.settings.autoplayDuration.min); // add min of range
         // increment autoplay position
         autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // start timer to autoplay next

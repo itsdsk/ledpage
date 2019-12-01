@@ -39,18 +39,18 @@
     <button class="autoplayButton">Autoplay all</button>
     <h3>Controls</h3>
     <label>Brightness
-        <input id="brightnessInput" type="range" min="0" max="255" step="1">
+        <input id="brightnessInput" type="range" min="0" max="255" step="1" value="{{settings.brightness}}">
     </label>
     <label>Blur amount
-        <input class="blurAmount" type="range" min="1" max="48" step="1">
+        <input class="blurAmount" type="range" min="1" max="48" step="1" value="{{settings.blur}}">
     </label>
     <label>Minimum autoplay time (15 - 300s):
-        <input id="autoplayMinRange" type="range" min="15" max="300" step="1">
+        <input id="autoplayMinRange" type="range" min="15000" max="300000" step="1000" value="{{settings.autoplayDuration.min}}">
     </label>
     <label>Maximum autoplay time (15 - 300s):
-        <input id="autoplayMaxRange" type="range" min="15" max="300" step="1">
+        <input id="autoplayMaxRange" type="range" min="15000" max="300000" step="1000" value="{{settings.autoplayDuration.max}}">
     </label>
     <label>Crossfade time (0 - 25,000ms):
-        <input id="crossfadeRange" type="range" min="0" max="25000" step="100">
+        <input id="crossfadeRange" type="range" min="0" max="25000" step="100" value="{{settings.fadeDuration}}">
     </label>
 </div>

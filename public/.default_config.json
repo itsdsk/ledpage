@@ -3,6 +3,15 @@
         "width": 640,
         "height": 480
     },
+    "settings": {
+        "brightness": 0.0125,
+        "blur": 50,
+        "fadeDuration": 25000,
+        "autoplayDuration": {
+            "min": 30000,
+            "max": 60000
+        }
+    },
     "outputs": [
         {
             "index": 0,
