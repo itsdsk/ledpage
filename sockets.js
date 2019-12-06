@@ -38,6 +38,16 @@ exports.DomainClient = class DomainClient {
         this.connectInterval = setInterval(this.connectToSocket.bind(this), 2500);
     }
 
+    write(msg) {
+        if (this.socket) {
+            this.socket.write(msg);
+        } else {
+            if (connectFlag) {
+                console.log(`Error sending msg to ${this.name}: socket is null`);
+            }
+        }
+    }
+
     connectToSocket() {
         console.log(`Connecting to ${this.name}`);
         this.socket = net.createConnection(this.socketname)

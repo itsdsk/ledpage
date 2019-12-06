@@ -43,7 +43,7 @@ backendSocket.event.on('data', function (data) {
     console.log("backend socket got data in media: " + data.toString());
     // setTimeout(function () {
     //     //console.log("responding to broadcast");
-    //     //backendSocket.socket.write("responsetobroadcast");
+    //     //backendSocket.write("responsetobroadcast");
     // }, 1500);
 });
 
@@ -51,7 +51,7 @@ setInterval(function () {
     module.exports.setBlur({
         size: (1 + Math.floor(Math.random() * 20))
     });
-    //backendSocket.socket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
+    //backendSocket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
 }, 180000);
 
 // prevent duplicate exit messages
@@ -72,10 +72,10 @@ rendererSocket.event.on('data', function (data) {
         if (rendererMsg.loaded) {
             if (rendererMsg.whichWindow == 'A') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":0,"fade":${config.settings.fadeDuration}}}`);
+                backendSocket.write(`{"window":{"half":0,"fade":${config.settings.fadeDuration}}}`);
             } else if (rendererMsg.whichWindow == 'B') {
                 // send side of screen media is playing on to backend
-                backendSocket.socket.write(`{"window":{"half":1,"fade":${config.settings.fadeDuration}}}`);
+                backendSocket.write(`{"window":{"half":1,"fade":${config.settings.fadeDuration}}}`);
             }
             // take screenshot
             if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
@@ -111,7 +111,7 @@ function saveScreenshot(side) {
     // check directory of disk
     if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
         // send command to backend to save screenshot
-        backendSocket.socket.write(JSON.stringify({
+        backendSocket.write(JSON.stringify({
             "command": "screenshot"
         }));
         console.log('sent screenshot command to backend');
@@ -426,7 +426,7 @@ module.exports = {
                 if (rendererSocket.connected) {
                     // send file path to renderer to refresh display
                     var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    rendererSocket.socket.write(JSON.stringify({
+                    rendererSocket.write(JSON.stringify({
                         command: 'loadURL',
                         path: updatedDir
                     }));
@@ -541,7 +541,7 @@ module.exports = {
                 if (rendererSocket.connected) {
                     // send media path to renderer
                     var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    rendererSocket.socket.write(JSON.stringify({
+                    rendererSocket.write(JSON.stringify({
                         command: 'loadURL',
                         path: rendererURL
                     }));
@@ -550,14 +550,14 @@ module.exports = {
                     // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
                     // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
                     //     // send size to app
-                    //     backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                    //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
                     // });
                 }
             });
         } else {
             if (rendererSocket.connected) {
                 // send media file path to renderer
-                rendererSocket.socket.write(JSON.stringify({
+                rendererSocket.write(JSON.stringify({
                     command: 'loadURL',
                     path: ('file://' + filePath + "/index.html")
                 }));
@@ -566,7 +566,7 @@ module.exports = {
                 // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
                 // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
                 //     // send size to app
-                //     backendSocket.socket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+                //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
                 // });
 
                 // store disk directory to take new screenshot and add it as new thumbnail
@@ -580,7 +580,7 @@ module.exports = {
         console.log(`set blur msg: ${JSON.stringify(msg)}`);
         // update backend
         if (backendSocket.socket !== null) {
-            backendSocket.socket.write(`{"window":{"size":${msg.size}}}`);
+            backendSocket.write(`{"window":{"size":${msg.size}}}`);
         }
         // // update in database
         // if (msg.directory) {
@@ -657,7 +657,7 @@ module.exports = {
         // TODO: check if URL is valid?
         if (rendererSocket.connected) {
             // send media file path to renderer
-            rendererSocket.socket.write(JSON.stringify({
+            rendererSocket.write(JSON.stringify({
                 command: 'loadURL',
                 path: name
             }));
