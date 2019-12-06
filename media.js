@@ -710,6 +710,16 @@ module.exports = {
             }
         });
     },
+    loadAll: function (callback) {
+        // get list of media sorted by date modified
+        var selectQuery = `SELECT directory FROM disks ORDER BY modified ASC`;
+        db.all(selectQuery, (err, rows) => {
+            // get array of directories from result
+            var directories = Array.from(rows, x => x.directory);
+            // generate and return HTML
+            serveDiskArray(directories, callback);
+        });
+    },
     loadEditor: function (directory, callback) {
         templateDisk(directory, diskEditorCompiler, function (elements) {
             console.log("USER INPUT::loading editor: " + directory);
