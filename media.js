@@ -14,6 +14,7 @@ db.serialize(function () {
     db.run(`CREATE TABLE disks (
         directory TEXT PRIMARY KEY, title TEXT, description TEXT,
         image BLOB, blur_amt INT DEFAULT 50, modified TEXT,
+        playcount INT DEFAULT 0,
         dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT
     )`);
     db.run(`CREATE TABLE channels (
@@ -556,6 +557,23 @@ module.exports = {
             });
         } else {
             if (rendererSocket.connected) {
+                // update playcount in database
+                db.run(`UPDATE disks SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
+                    if (err) console.log(`error updating playcount in database: ${err}`);
+                    // get playcount
+                    db.get(`SELECT playcount FROM disks WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
+                        if (err) console.log(`Error getting media info from db: ${err}`);
+                        // get demo.json
+                        var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
+                        var meta = require(metaPath);
+                        // update playcount
+                        meta.demo.playcount = +row.playcount;
+                        // save demo.json
+                        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                            if (err) console.log(err);
+                        });
+                    });
+                });
                 // send media file path to renderer
                 rendererSocket.write(JSON.stringify({
                     command: 'loadURL',
@@ -873,6 +891,10 @@ function parseDiskDirectory(directory, meta, callback) {
                 var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
                 db.run(addImgQuery, [decodedImage, directory]);
             });
+        }
+        // add playcount
+        if (meta.demo.playcount) {
+            db.run(`UPDATE disks SET playcount = ? WHERE directory = ?`, [meta.demo.playcount, directory]);
         }
         // // add blur amount to database
         // if (meta.demo.blur_amt) {
