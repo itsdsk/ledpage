@@ -39,7 +39,14 @@ function refresh() {
             socket.emit('loadeditor', url.searchParams.get('disk'));
             break;
         case 'channel':
-            socket.emit('loadchannel', url.searchParams.get('channel'));
+            var params = {};
+            params.name = url.searchParams.get('channel');
+            params.sort = url.searchParams.get('sort');
+            if (params.sort == null) {
+                // default
+                params.sort = 'new';
+            }
+            socket.emit('loadchannel', params);
             break;
         case 'settings':
             // request configuration form from server
@@ -48,7 +55,13 @@ function refresh() {
         default:
             // check if index page is loaded
             if (document.getElementById("diskFeedContainer") && document.getElementById("diskFeedContainer").childNodes.length === 0) {
-                socket.emit('load');
+                var params = {};
+                params.sort = url.searchParams.get('sort');
+                if (params.sort == null) {
+                    // default
+                    params.sort = 'new';
+                }
+                socket.emit('load', params);
             } else {
                 // show feed div and hide other containers
                 changeStyleToView('feed');
@@ -148,6 +161,22 @@ document.addEventListener('change', function (event) {
         //
         socket.emit('setcrossfadetime', parseInt(event.target.value));
         console.log(`sending crossfade time to server ${parseInt(event.target.value)}`);
+    } else if (event.target.matches('select[name="sort"]')) {
+        //
+        console.log(`Changed to sort by ${event.target.value}`);
+        // load page
+        var url = new URL(document.location);
+        var params = new URLSearchParams(url.search);
+        // get URL parameter for page
+        params.set('sort', event.target.value);
+        //
+        window.history.pushState(Object.assign({
+            'sort': event.target.value
+        }, window.history.state), '', `?${params.toString()}`);
+        // clear loaded content before reloading
+        document.getElementById("diskFeedContainer").innerHTML = '';
+        document.getElementById("diskChannelContainer").innerHTML = '';
+        refresh();
     }
 });
 

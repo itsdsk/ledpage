@@ -710,14 +710,37 @@ module.exports = {
             }
         });
     },
-    loadAll: function (callback) {
-        // get list of media sorted by date modified
-        var selectQuery = `SELECT directory FROM disks ORDER BY modified ASC`;
-        db.all(selectQuery, (err, rows) => {
-            // get array of directories from result
-            var directories = Array.from(rows, x => x.directory);
-            // generate and return HTML
-            serveDiskArray(directories, callback);
+    loadAll: function (params, callback) {
+        // count number of disks
+        db.get(`SELECT count(*) AS count FROM disks`, (err, info) => {
+            console.log(`USER INPUT::loading all`);
+            // get list of media sorted by date modified
+            var selectQuery = `SELECT directory FROM disks `;
+            // order
+            switch (params.sort) {
+                case 'new':
+                    info.new = true;
+                    selectQuery += `ORDER BY modified ASC`;
+                    break;
+                case 'top':
+                    info.top = true;
+                    selectQuery += `ORDER BY playcount ASC`;
+                    break;
+                default:
+                    info.new = true;
+                    selectQuery += `ORDER BY modified ASC`;
+            }
+            // get template
+            var element = channelCompiler(info);
+            // get sorted media from database
+            db.all(selectQuery, (err, rows) => {
+                // get array of directories from result
+                var directories = Array.from(rows, x => x.directory);
+                // generate and return HTML
+                serveDiskArray(directories, function (mediaElements) {
+                    callback(element + mediaElements);
+                });
+            });
         });
     },
     loadEditor: function (directory, callback) {
@@ -726,15 +749,26 @@ module.exports = {
             callback(elements);
         });
     },
-    loadChannel: function (channel_name, callback) {
+    loadChannel: function (params, callback) {
+        var channel_name = params.name;
         var elements = "";
         // get channel element at start
-        templateChannel(channel_name, true, function (channel_element) {
+        templateChannel(channel_name, params.sort, true, function (channel_element) {
             elements = channel_element;
             // get all disks in specified channel
             var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
                 "ON disks.directory = connections.disk_directory " +
-                "AND connections.channel_name = ?";
+                "AND connections.channel_name = ? ";
+            switch (params.sort) {
+                case 'new':
+                    selectQuery += `ORDER BY modified ASC`;
+                    break;
+                case 'top':
+                    selectQuery += `ORDER BY playcount ASC`;
+                    break;
+                default:
+                    selectQuery += `ORDER BY modified ASC`;
+            }
             db.all(selectQuery, [channel_name], function (err, rows) {
                 // get disk PKs as array of strings
                 let disk_directories = rows.map(a => a.directory);
@@ -816,7 +850,7 @@ module.exports = {
 
 function serveChannelAndDisks(channel_name, disk_directories, callback) {
     var element = "";
-    templateChannel(channel_name, false, function (channel_element) {
+    templateChannel(channel_name, 'new', false, function (channel_element) {
         element += channel_element;
         serveDiskArray(disk_directories, function (disk_elements) {
             element += disk_elements;
@@ -841,11 +875,12 @@ function serveDiskArray(titles, callback) {
     repeat(titles.pop());
 }
 
-function templateChannel(channel_name, create_flag, callback) {
+function templateChannel(channel_name, sort, create_flag, callback) {
     // count number of disks in channel
     var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
     db.get(countQuery, [channel_name], (err, count) => {
         count.create = create_flag;
+        count[sort] = true;
         var element = channelCompiler(count);
         callback(element);
     });

@@ -21,10 +21,13 @@ app.use(express.static('public'));
 // client websocket routes
 io.on('connection', function (socket) {
   // request feed
-  socket.on('load', function () {
-    media.loadFeed(function (elements) {
+  socket.on('load', function (params) {
+    media.loadAll(params, function (elements) {
       io.emit('load', elements);
     });
+    // media.loadFeed(function (elements) {
+    //   io.emit('load', elements);
+    // });
   });
   // request editor
   socket.on('loadeditor', function (msg) {

@@ -26,7 +26,7 @@
     -ms-transform: translate(-50%, -50%);
 }
 
-.item[data-channel] button {
+.item[data-main-item] button {
     font-size: 1.17em;
     padding: 0.5em;
 }
@@ -74,7 +74,7 @@ html {
     }
 }
 
-.item[data-channel] {
+.item[data-main-item] {
     grid-column: 1 / -1;
     text-align: left;
     padding: 0px 1em;
