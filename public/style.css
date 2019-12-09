@@ -31,7 +31,7 @@
     padding: 0.5em;
 }
 
-.item[data-directory] button {
+.item-thin button {
     opacity: 0;
     font-size: 1.17em;
     width: 100%;
@@ -39,11 +39,11 @@
     margin: 1em 0em;
 }
 
-.item[data-directory]:hover button {
+.item-thin:hover button {
     opacity: 1;
 }
 
-.item[data-directory]:before {
+.item-thin:before {
     content: "";
     position: absolute;
     width: 100%;
@@ -54,7 +54,7 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
-.item[data-directory]:hover::before {
+.item-thin:hover::before {
     background-color: rgba(181, 188, 190, 0.5);
 }
 
@@ -84,12 +84,12 @@ html {
     background-color: rgba(181, 188, 190, 0.10);
 }
 
-.item[data-directory] {
+.item-thin {
     background-color: rgba(181, 188, 190, 0.95);
     color: black;
 }
 
-.item[data-directory]:hover {
+.item-thin:hover {
     border-color: white;
 }
 
