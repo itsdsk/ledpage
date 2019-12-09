@@ -170,6 +170,11 @@ fs.readFile(path.join(__dirname, "templates", "channel.hbs"), function (err, dat
     if (err) throw err;
     channelCompiler = Handlebars.compile(data.toString());
 });
+var channelBlockCompiler;
+fs.readFile(path.join(__dirname, "templates", "channel_block.hbs"), function (err, data) {
+    if (err) throw err;
+    channelBlockCompiler = Handlebars.compile(data.toString());
+});
 var outputGraphicCompiler;
 fs.readFile(path.join(__dirname, "templates", "output_graphic.hbs"), function (err, data) {
     if (err) throw err;
@@ -736,10 +741,20 @@ module.exports = {
             db.all(selectQuery, (err, rows) => {
                 // get array of directories from result
                 var directories = Array.from(rows, x => x.directory);
-                // generate and return HTML
-                serveDiskArray(directories, function (mediaElements) {
-                    callback(element + mediaElements);
-                });
+                // get channel names and size
+                db.all("SELECT connections.channel_name, count(disks.directory) AS count FROM connections INNER JOIN disks " +
+                    "ON disks.directory = connections.disk_directory " +
+                    "GROUP BY connections.channel_name ORDER BY count(disks.directory) ASC",
+                    function (err, chan_rows) {
+                        // generate HTML for channels
+                        serveChannelBlockArray(chan_rows, function (channelElements) {
+                            element += channelElements;
+                            // generate HTML for media and return all
+                            serveDiskArray(directories, function (mediaElements) {
+                                callback(element + mediaElements);
+                            });
+                        });
+                    });
             });
         });
     },
@@ -873,6 +888,27 @@ function serveDiskArray(titles, callback) {
         });
     }
     repeat(titles.pop());
+}
+
+function serveChannelBlockArray(channels, callback) {
+    var object = "";
+
+    function repeat(channel) {
+        templateChannelBlock(channel, function (element) {
+            object += element;
+            if (channels.length) {
+                repeat(channels.pop());
+            } else {
+                callback(object);
+            }
+        });
+    }
+    repeat(channels.pop());
+}
+
+function templateChannelBlock(data, callback) {
+    var element = channelBlockCompiler(data);
+    callback(element);
 }
 
 function templateChannel(channel_name, sort, create_flag, callback) {

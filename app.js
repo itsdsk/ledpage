@@ -22,12 +22,15 @@ app.use(express.static('public'));
 io.on('connection', function (socket) {
   // request feed
   socket.on('load', function (params) {
-    media.loadAll(params, function (elements) {
-      io.emit('load', elements);
-    });
-    // media.loadFeed(function (elements) {
-    //   io.emit('load', elements);
-    // });
+    if (true) {
+      media.loadAll(params, function (elements) {
+        io.emit('load', elements);
+      });
+    } else {
+      media.loadFeed(function (elements) {
+        io.emit('load', elements);
+      });
+    }
   });
   // request editor
   socket.on('loadeditor', function (msg) {
