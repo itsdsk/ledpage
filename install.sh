@@ -19,6 +19,9 @@ sudo apt install xserver-xorg-core \
   nodejs \
   cmake # for raspberry pi 4
 
+# get absolute path to directory
+BASEDIR=$(dirname $(readlink -f $0))
+
 # compile backend
 cd ./backend
 chmod +x ./compile.sh
@@ -32,7 +35,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
-ExecStart=/home/pi/disk/backend/main -d -c \"/home/pi/disk/public/config.json\"
+ExecStart=$BASEDIR/backend/main -d -c \"$BASEDIR/public/config.json\"
 Restart=on-failure
 RestartSec=5s
 
@@ -53,7 +56,7 @@ Description=Disk Renderer
 After=disk-ui-daemon.service
 
 [Service]
-ExecStart=/usr/bin/startx /home/pi/disk/renderer/node_modules/electron/dist/electron --no-sandbox /home/pi/disk/renderer/main.js
+ExecStart=/usr/bin/startx $BASEDIR/renderer/node_modules/electron/dist/electron --no-sandbox $BASEDIR/renderer/main.js
 Restart=on-failure
 RestartSec=5s
 
@@ -74,7 +77,7 @@ Description=Disk UI
 
 [Service]
 User=root
-WorkingDirectory=/home/pi/disk
+WorkingDirectory=$BASEDIR
 ExecStart=/usr/bin/node app.js
 Restart=on-failure
 RestartSec=5s
