@@ -10,8 +10,8 @@ const db = new sqlite3.Database(':memory:');
 var datHttpServer;
 
 db.serialize(function () {
-    // create tables for primitive types (disk and channel)
-    db.run(`CREATE TABLE disks (
+    // create tables for primitive types (media and channel)
+    db.run(`CREATE TABLE media (
         directory TEXT PRIMARY KEY, title TEXT, description TEXT,
         image BLOB, blur_amt INT DEFAULT 50, modified TEXT,
         playcount INT DEFAULT 0,
@@ -22,20 +22,20 @@ db.serialize(function () {
     )`);
     // create tables for relational types (files and connections)
     db.run(`CREATE TABLE files (
-        disk_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL,
-        FOREIGN KEY(disk_directory) REFERENCES disks(directory),
-        UNIQUE(disk_directory, filename)
+        media_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL,
+        FOREIGN KEY(media_directory) REFERENCES media(directory),
+        UNIQUE(media_directory, filename)
     )`);
     db.run(`CREATE TABLE connections (
-        disk_directory TEXT NOT NULL, channel_name TEXT NOT NULL,
-        FOREIGN KEY(disk_directory) REFERENCES disks(directory),
+        media_directory TEXT NOT NULL, channel_name TEXT NOT NULL,
+        FOREIGN KEY(media_directory) REFERENCES media(directory),
         FOREIGN KEY(channel_name) REFERENCES channels(name),
-        UNIQUE(disk_directory, channel_name)
+        UNIQUE(media_directory, channel_name)
     )`);
 });
 
-// directory of disk requiring screenshot
-var diskRequiringScreenshot;
+// directory of media requiring screenshot
+var mediaRequiringScreenshot;
 var screenshotPath = path.join(__dirname, 'public', 'screenshot.ppm');
 
 //
@@ -79,7 +79,7 @@ rendererSocket.event.on('data', function (data) {
                 backendSocket.write(`{"window":{"half":1,"fade":${config.settings.fadeDuration}}}`);
             }
             // take screenshot
-            if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+            if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
                 //
                 if (rendererMsg.URL.startsWith('file:///')) {
                     //
@@ -109,8 +109,8 @@ function cleanup() {
 process.on('SIGINT', cleanup);
 
 function saveScreenshot(side) {
-    // check directory of disk
-    if (diskRequiringScreenshot && diskRequiringScreenshot.length > 0) {
+    // check directory of media
+    if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
         // send command to backend to save screenshot
         backendSocket.write(JSON.stringify({
             "command": "screenshot"
@@ -123,11 +123,11 @@ function saveScreenshot(side) {
             // wait 1 second for backend to finish changing file
             setTimeout(function () {
                 // get demo.json and add image to it
-                var metaPath = path.join(mediaDir, diskRequiringScreenshot, 'demo.json');
+                var metaPath = path.join(mediaDir, mediaRequiringScreenshot, 'demo.json');
                 var meta = require(metaPath);
                 meta.demo.image = "thumb.jpg";
                 //
-                var targetJpegPath = path.join(mediaDir, diskRequiringScreenshot, meta.demo.image);
+                var targetJpegPath = path.join(mediaDir, mediaRequiringScreenshot, meta.demo.image);
                 // convert and crop half of image
                 var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'West' : 'East')} -crop 50x100% +repage ${targetJpegPath}`;
                 // convert to jpeg
@@ -136,13 +136,13 @@ function saveScreenshot(side) {
                     fs.readFile(targetJpegPath, function (err, buf) {
                         if (err) throw err;
                         var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                        var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
-                        db.run(addImgQuery, [decodedImage, diskRequiringScreenshot], function (err) {
+                        var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
+                        db.run(addImgQuery, [decodedImage, mediaRequiringScreenshot], function (err) {
                             // save demo.json
                             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                                 if (err) console.log(err);
                                 // reset
-                                diskRequiringScreenshot = null;
+                                mediaRequiringScreenshot = null;
                             });
                         });
                     });
@@ -160,10 +160,10 @@ Handlebars.registerHelper('iterate', function (n, block) {
     return accum;
 });
 // compile media
-var diskCompiler;
+var feedMediaItemCompiler;
 fs.readFile(path.join(__dirname, "templates", "disk.hbs"), function (err, data) {
     if (err) throw err;
-    diskCompiler = Handlebars.compile(data.toString());
+    feedMediaItemCompiler = Handlebars.compile(data.toString());
 });
 var channelCompiler;
 fs.readFile(path.join(__dirname, "templates", "channel.hbs"), function (err, data) {
@@ -185,13 +185,13 @@ fs.readFile(path.join(__dirname, "templates", "output_form.hbs"), function (err,
     if (err) throw err;
     outputFormCompiler = Handlebars.compile(data.toString());
 });
-var diskEditorCompiler;
+var mediaEditorCompiler;
 fs.readFile(path.join(__dirname, "templates", "disk_editor.hbs"), function (err, data) {
     if (err) throw err;
-    diskEditorCompiler = Handlebars.compile(data.toString());
+    mediaEditorCompiler = Handlebars.compile(data.toString());
 });
 
-var mediaDir = path.join(__dirname, 'public', 'disks');
+var mediaDir = path.join(__dirname, 'public', 'media');
 var config; // device config
 module.exports = {
     // build local database in memory
@@ -210,7 +210,7 @@ module.exports = {
                             var meta = require(path.join(itemPath, 'demo.json'));
                             if (meta) {
                                 // add to database
-                                parseDiskDirectory(file, meta);
+                                parseMediaItemDirectory(file, meta);
                             }
                         }
                     }
@@ -249,15 +249,15 @@ module.exports = {
             // send full URL to play remote media
             module.exports.playRemoteMedia(currentURL);
         }
-        diskRequiringScreenshot = null;
+        mediaRequiringScreenshot = null;
     },
-    createDisk: function (channelName, callback) {
+    createMedia: function (channelName, callback) {
         // stop autoplay
         module.exports.stopAutoplay();
-        // path of new disk
-        var randomName = "disk_" + Math.random().toString(36).substring(2, 8);
+        // path of new media
+        var randomName = "item_" + Math.random().toString(36).substring(2, 8);
         var newDirectory = path.join(mediaDir, randomName);
-        console.log("USER INPUT::creating disk: " + newDirectory);
+        console.log("USER INPUT::creating media: " + newDirectory);
         // make directory
         fs.mkdir(newDirectory, function (err) {
             if (err) console.log(err)
@@ -281,7 +281,7 @@ module.exports = {
                                 fs.copyFile(path.join(pathToDefault, 'thumb.jpg'), path.join(newDirectory, 'thumb.jpg'), (err) => {
                                     if (err) console.log(err);
                                     // add to database
-                                    parseDiskDirectory(randomName, meta, callback(randomName));
+                                    parseMediaItemDirectory(randomName, meta, callback(randomName));
                                 });
                             });
                         });
@@ -290,17 +290,17 @@ module.exports = {
             }
         });
     },
-    renameDisk: function (msg, callback) {
+    renameMedia: function (msg, callback) {
         // stop autoplay
         module.exports.stopAutoplay();
         // get demo.json
         var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
         var meta = require(metaPath);
-        console.log("USER INPUT::renaming disk " + msg.directory + " from " + meta.demo.title + " to " + msg.newName);
+        console.log("USER INPUT::renaming media " + msg.directory + " from " + meta.demo.title + " to " + msg.newName);
         // add new title to demo.json
         meta.demo.title = msg.newName;
         // update name in database
-        var updateTitleQuery = "UPDATE disks SET title = ? WHERE directory = ?";
+        var updateTitleQuery = "UPDATE media SET title = ? WHERE directory = ?";
         db.run(updateTitleQuery, [msg.newName, msg.directory], function (err) {
             // save demo.json
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
@@ -311,17 +311,17 @@ module.exports = {
     },
     listDatabase: function () {
         // log entries
-        db.each("SELECT * FROM disks", function (err, row) {
-            console.log("DISK: " + row.directory + " " + row.title + " " + row.description);
+        db.each("SELECT * FROM media", function (err, row) {
+            console.log("MEDIA: " + row.directory + " " + row.title + " " + row.description);
         });
-        db.each("SELECT rowid AS id, disk_directory, filename FROM files", function (err, row) {
-            console.log("FILE: " + row.disk_directory + " " + row.filename + " " + row.id);
+        db.each("SELECT rowid AS id, media_directory, filename FROM files", function (err, row) {
+            console.log("FILE: " + row.media_directory + " " + row.filename + " " + row.id);
         });
         db.each("SELECT * FROM channels", function (err, row) {
             console.log("CHANNEL: " + row.name);
         });
         db.each("SELECT * FROM connections", function (err, row) {
-            console.log("CONNECTION: " + row.disk_directory + " " + row.channel_name);
+            console.log("CONNECTION: " + row.media_directory + " " + row.channel_name);
         });
         db.each("SELECT * FROM outputs", function (err, row) {
             console.log("OUTPUT: " + JSON.stringify(row));
@@ -353,7 +353,7 @@ module.exports = {
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
                 // add file to database
-                var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
+                var addFileQuery = "INSERT INTO files (media_directory, filename, data) VALUES (?, ?, ?)";
                 db.run(addFileQuery, [msg, 'new_file.txt', ""], function () {
                     callback();
                 });
@@ -456,7 +456,7 @@ module.exports = {
                 var timestamp = new Date().toISOString();
                 timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
                 // update key+version in database
-                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ?, modified = ? WHERE directory = ?";
+                var addDatQuery = "UPDATE media SET dat_key = ?, dat_versions = ?, modified = ? WHERE directory = ?";
                 db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, timestamp, msg]);
                 // update dat key and datetime in JSON
                 var metaPath = path.join(mediaDir, msg, 'demo.json');
@@ -473,7 +473,7 @@ module.exports = {
             }
         });
         // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
-        // Dat('/home/disk/ui/disks/item/', {
+        // Dat('/home/testmediaitem/', {
         //     key: '0c2f952a505a2bffc913a79e0fdc2cccf2654a31ff555dc6248a407036c69cd5'
         // }, function (err, dat) {
         //     if(err) throw err;
@@ -494,7 +494,7 @@ module.exports = {
         module.exports.stopAutoplay();
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
-        var sql = "DELETE FROM connections WHERE disk_directory = ? AND channel_name = ?";
+        var sql = "DELETE FROM connections WHERE media_directory = ? AND channel_name = ?";
         db.run(sql, msg);
         // get path and load json
         var metaPath = path.join(mediaDir, msg[0], 'demo.json');
@@ -516,7 +516,7 @@ module.exports = {
         module.exports.stopAutoplay();
         console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
-        var sql = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
+        var sql = "INSERT INTO connections (media_directory, channel_name) VALUES (?, ?)";
         db.run(sql, msg);
         // get path and load json
         var metaPath = path.join(mediaDir, msg[0], 'demo.json');
@@ -552,8 +552,8 @@ module.exports = {
                         path: rendererURL
                     }));
                     // // send blur amt to backend
-                    // // select disk
-                    // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                    // // select media item
+                    // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
                     // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
                     //     // send size to app
                     //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
@@ -563,10 +563,10 @@ module.exports = {
         } else {
             if (rendererSocket.connected) {
                 // update playcount in database
-                db.run(`UPDATE disks SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
+                db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
                     if (err) console.log(`error updating playcount in database: ${err}`);
                     // get playcount
-                    db.get(`SELECT playcount FROM disks WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
+                    db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
                         if (err) console.log(`Error getting media info from db: ${err}`);
                         // get demo.json
                         var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
@@ -585,15 +585,15 @@ module.exports = {
                     path: ('file://' + filePath + "/index.html")
                 }));
                 // // send blur amt to backend
-                // // select disk
-                // var selectQuery = "SELECT blur_amt FROM disks WHERE directory = ?";
+                // // select media item
+                // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
                 // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
                 //     // send size to app
                 //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
                 // });
 
-                // store disk directory to take new screenshot and add it as new thumbnail
-                diskRequiringScreenshot = dirAndVersion.directory;
+                // store media directory to take new screenshot and add it as new thumbnail
+                mediaRequiringScreenshot = dirAndVersion.directory;
             }
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
@@ -612,9 +612,9 @@ module.exports = {
         //     var meta = require(metaPath);
         //     // set new blur
         //     meta.demo.blur_amt = msg.size;
-        //     console.log("USER INPUT::updating disk blur");
+        //     console.log("USER INPUT::updating media blur");
         //     // update name in database
-        //     var updateBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+        //     var updateBlurQuery = "UPDATE media SET blur_amt = ? WHERE directory = ?";
         //     db.run(updateBlurQuery, [msg.size, msg.directory], function (err) {
         //         // save demo.json
         //         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
@@ -639,23 +639,23 @@ module.exports = {
         // clear list of media
         autoplayList = [];
         // declare SQL query and params
-        var selectDisksQuery;
+        var selectMediaItemsQuery;
         var queryParams = [];
         // check type of autoplay (shuffle all or shuffle channel)
         if (msg && msg.length > 0) {
-            // select all disks in specified channel
-            selectDisksQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
-                "ON disks.directory = connections.disk_directory " +
+            // select all media items in specified channel
+            selectMediaItemsQuery = "SELECT media.directory FROM media INNER JOIN connections " +
+                "ON media.directory = connections.media_directory " +
                 "AND connections.channel_name = ?";
             // add channel name as query parameter
             queryParams.push(msg);
         } else {
-            // select all disks
-            selectDisksQuery = "SELECT directory FROM disks";
+            // select all media items
+            selectMediaItemsQuery = "SELECT directory FROM media";
         }
         // get list of media to autoplay
-        db.all(selectDisksQuery, queryParams, (error, rows) => {
-            if (error) console.log(`error getting all disks: ${error}`);
+        db.all(selectMediaItemsQuery, queryParams, (error, rows) => {
+            if (error) console.log(`error getting all media: ${error}`);
             console.log(`${rows.length} items in autoplay list`);
             // add directories to autoplay list
             rows.forEach(function (row) {
@@ -685,13 +685,13 @@ module.exports = {
                 path: name
             }));
             // do not take screenshot
-            diskRequiringScreenshot = null;
+            mediaRequiringScreenshot = null;
         }
         console.log('USER INPUT::playing remote media: ' + name);
     },
     loadFeed: function (callback) {
-        // get list of distinct disks in connections
-        var selectQuery = "SELECT * FROM connections GROUP BY disk_directory";
+        // get list of distinct media items in connections
+        var selectQuery = "SELECT * FROM connections GROUP BY media_directory";
         db.all(selectQuery, function (err, rows) {
             // group into channels
             var grouped = {};
@@ -707,8 +707,8 @@ module.exports = {
                 if (!grouped.hasOwnProperty(key)) continue;
                 // 
                 var obj = grouped[key];
-                let disk_directories = obj.map(a => a.disk_directory);
-                serveChannelAndDisks(key, disk_directories, function (element) {
+                let media_directories = obj.map(a => a.media_directory);
+                serveChannelAndItems(key, media_directories, function (element) {
                     console.log("USER INPUT::loading feed");
                     callback(element);
                 });
@@ -716,11 +716,11 @@ module.exports = {
         });
     },
     loadAll: function (params, callback) {
-        // count number of disks
-        db.get(`SELECT count(*) AS count FROM disks`, (err, info) => {
+        // count number of media items
+        db.get(`SELECT count(*) AS count FROM media`, (err, info) => {
             console.log(`USER INPUT::loading all`);
             // get list of media sorted by date modified
-            var selectQuery = `SELECT directory FROM disks `;
+            var selectQuery = `SELECT directory FROM media `;
             // order
             switch (params.sort) {
                 case 'new':
@@ -742,15 +742,15 @@ module.exports = {
                 // get array of directories from result
                 var directories = Array.from(rows, x => x.directory);
                 // get channel names and size
-                db.all("SELECT connections.channel_name, count(disks.directory) AS count FROM connections INNER JOIN disks " +
-                    "ON disks.directory = connections.disk_directory " +
-                    "GROUP BY connections.channel_name ORDER BY count(disks.directory) ASC",
+                db.all("SELECT connections.channel_name, count(media.directory) AS count FROM connections INNER JOIN media " +
+                    "ON media.directory = connections.media_directory " +
+                    "GROUP BY connections.channel_name ORDER BY count(media.directory) ASC",
                     function (err, chan_rows) {
                         // generate HTML for channels
                         serveChannelBlockArray(chan_rows, function (channelElements) {
                             element += channelElements;
                             // generate HTML for media and return all
-                            serveDiskArray(directories, function (mediaElements) {
+                            serveMediaArray(directories, function (mediaElements) {
                                 callback(element + mediaElements);
                             });
                         });
@@ -759,7 +759,7 @@ module.exports = {
         });
     },
     loadEditor: function (directory, callback) {
-        templateDisk(directory, diskEditorCompiler, function (elements) {
+        templateMediaItem(directory, mediaEditorCompiler, function (elements) {
             console.log("USER INPUT::loading editor: " + directory);
             callback(elements);
         });
@@ -770,9 +770,9 @@ module.exports = {
         // get channel element at start
         templateChannel(channel_name, params.sort, true, function (channel_element) {
             elements = channel_element;
-            // get all disks in specified channel
-            var selectQuery = "SELECT disks.directory FROM disks INNER JOIN connections " +
-                "ON disks.directory = connections.disk_directory " +
+            // get all media in specified channel
+            var selectQuery = "SELECT media.directory FROM media INNER JOIN connections " +
+                "ON media.directory = connections.media_directory " +
                 "AND connections.channel_name = ? ";
             switch (params.sort) {
                 case 'new':
@@ -785,11 +785,11 @@ module.exports = {
                     selectQuery += `ORDER BY modified ASC`;
             }
             db.all(selectQuery, [channel_name], function (err, rows) {
-                // get disk PKs as array of strings
-                let disk_directories = rows.map(a => a.directory);
+                // get media PKs as array of strings
+                let media_directories = rows.map(a => a.directory);
                 // 
-                serveDiskArray(disk_directories, function (disk_elements) {
-                    elements += disk_elements;
+                serveMediaArray(media_directories, function (media_elements) {
+                    elements += media_elements;
                     console.log("USER INPUT::loading feed for channel: " + channel_name);
                     callback(elements);
                 });
@@ -863,22 +863,22 @@ module.exports = {
     }
 };
 
-function serveChannelAndDisks(channel_name, disk_directories, callback) {
+function serveChannelAndItems(channel_name, media_directories, callback) {
     var element = "";
     templateChannel(channel_name, 'new', false, function (channel_element) {
         element += channel_element;
-        serveDiskArray(disk_directories, function (disk_elements) {
-            element += disk_elements;
+        serveMediaArray(media_directories, function (media_elements) {
+            element += media_elements;
             callback(element);
         });
     });
 }
 
-function serveDiskArray(titles, callback) {
+function serveMediaArray(titles, callback) {
     var object = "";
 
     function repeat(title) {
-        templateDisk(title, diskCompiler, function (element) {
+        templateMediaItem(title, feedMediaItemCompiler, function (element) {
             object += element;
             if (titles.length) {
                 repeat(titles.pop());
@@ -912,7 +912,7 @@ function templateChannelBlock(data, callback) {
 }
 
 function templateChannel(channel_name, sort, create_flag, callback) {
-    // count number of disks in channel
+    // count number of items in channel
     var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
     db.get(countQuery, [channel_name], (err, count) => {
         count.create = create_flag;
@@ -922,13 +922,13 @@ function templateChannel(channel_name, sort, create_flag, callback) {
     });
 }
 
-function templateDisk(disk_directory, templateCompiler, callback) {
-    // fetch entry requested in [key] arg from disks table
-    var sql = "SELECT directory, title, description, image, blur_amt, modified, dat_key, dat_versions FROM disks WHERE directory = ?";
-    db.get(sql, [disk_directory], (err, itemrow) => {
+function templateMediaItem(media_directory, templateCompiler, callback) {
+    // fetch entry requested in [key] arg from media table
+    var sql = "SELECT directory, title, description, image, blur_amt, modified, dat_key, dat_versions FROM media WHERE directory = ?";
+    db.get(sql, [media_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
-        db.all("SELECT rowid AS id, disk_directory, filename, data FROM files WHERE disk_directory = ?", [disk_directory], function (err, filerows) {
+        db.all("SELECT rowid AS id, media_directory, filename, data FROM files WHERE media_directory = ?", [media_directory], function (err, filerows) {
             filerows.forEach(function (filerow) {
                 // add each file to object
                 itemrow.files.push(filerow);
@@ -937,14 +937,14 @@ function templateDisk(disk_directory, templateCompiler, callback) {
             itemrow.connectedChannels = new Array();
             itemrow.unconnectedChannels = new Array();
             // get channels
-            var getChannelsQuery = "SELECT channels.name, connections.disk_directory FROM channels LEFT JOIN connections " +
+            var getChannelsQuery = "SELECT channels.name, connections.media_directory FROM channels LEFT JOIN connections " +
                 "ON channels.name = connections.channel_name " +
-                "AND connections.disk_directory = ?";
-            db.all(getChannelsQuery, [disk_directory], function (err, chanrows) {
+                "AND connections.media_directory = ?";
+            db.all(getChannelsQuery, [media_directory], function (err, chanrows) {
                 // loop through channels
                 chanrows.forEach(function (chanrow) {
                     // check if channel is connected
-                    if (chanrow.disk_directory) {
+                    if (chanrow.media_directory) {
                         itemrow.connectedChannels.push(chanrow);
                     } else {
                         itemrow.unconnectedChannels.push(chanrow);
@@ -958,32 +958,32 @@ function templateDisk(disk_directory, templateCompiler, callback) {
     });
 }
 
-function parseDiskDirectory(directory, meta, callback) {
-    // add metadata to disks table in database
-    var insertQuery = "INSERT INTO disks (directory, title, description, modified) VALUES (?, ?, ?, ?)";
+function parseMediaItemDirectory(directory, meta, callback) {
+    // add metadata to media table in database
+    var insertQuery = "INSERT INTO media (directory, title, description, modified) VALUES (?, ?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.description, meta.demo.modified], function () {
         var itemPath = path.join(mediaDir, directory);
-        // add image to disks database TODO: check if files exist
+        // add image to media database TODO: check if files exist
         if (meta.demo.image && meta.demo.image.length > 0) {
             var imagePath = path.join(itemPath, meta.demo.image);
             fs.readFile(imagePath, function (err, buf) {
                 if (err) throw err;
                 var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                var addImgQuery = "UPDATE disks SET image = ? WHERE directory = ?";
+                var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
                 db.run(addImgQuery, [decodedImage, directory]);
             });
         }
         // add playcount
         if (meta.demo.playcount) {
-            db.run(`UPDATE disks SET playcount = ? WHERE directory = ?`, [meta.demo.playcount, directory]);
+            db.run(`UPDATE media SET playcount = ? WHERE directory = ?`, [meta.demo.playcount, directory]);
         }
         // // add blur amount to database
         // if (meta.demo.blur_amt) {
-        //     var addBlurQuery = "UPDATE disks SET blur_amt = ? WHERE directory = ?";
+        //     var addBlurQuery = "UPDATE media SET blur_amt = ? WHERE directory = ?";
         //     db.run(addBlurQuery, [meta.demo.blur_amt, directory]);
         // }
         // add files to database
-        var addFileQuery = "INSERT INTO files (disk_directory, filename, data) VALUES (?, ?, ?)";
+        var addFileQuery = "INSERT INTO files (media_directory, filename, data) VALUES (?, ?, ?)";
         meta.demo.files.forEach(filename => {
             var filepath = path.join(itemPath, filename);
             fs.readFile(filepath, 'utf8', function (err, buf) {
@@ -993,7 +993,7 @@ function parseDiskDirectory(directory, meta, callback) {
         });
         // add channels to database
         var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
-        var addConnectQuery = "INSERT INTO connections (disk_directory, channel_name) VALUES (?, ?)";
+        var addConnectQuery = "INSERT INTO connections (media_directory, channel_name) VALUES (?, ?)";
         meta.demo.channels.forEach(channelName => {
             // add name to channels table
             db.run(addChannelQuery, [channelName], function () {
@@ -1011,7 +1011,7 @@ function parseDiskDirectory(directory, meta, callback) {
                 if (err) throw err;
                 dat.joinNetwork();
                 // update Dat fields in database
-                var addDatQuery = "UPDATE disks SET dat_key = ?, dat_versions = ? WHERE directory = ?";
+                var addDatQuery = "UPDATE media SET dat_key = ?, dat_versions = ? WHERE directory = ?";
                 db.run(addDatQuery, [meta.demo.datKey, dat.archive.version, directory]);
             });
         }

@@ -96,19 +96,19 @@ io.on('connection', function (socket) {
   socket.on('setcrossfadetime', function (msg) {
     media.setCrossfadeTime(msg);
   });
-  // create disk
-  socket.on('createdisk', function (msg) {
-    media.createDisk(msg, function (diskDirectory) {
-      io.emit('changeddisk', JSON.stringify({
+  // create media
+  socket.on('createmedia', function (msg) {
+    media.createMedia(msg, function (mediaDirectory) {
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
-        disk: diskDirectory
+        disk: mediaDirectory
       }));
     });
   });
-  // rename disk
-  socket.on('renamedisk', function (msg) {
-    media.renameDisk(msg, function () {
-      io.emit('changeddisk', JSON.stringify({
+  // rename media
+  socket.on('renamemedia', function (msg) {
+    media.renameMedia(msg, function () {
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
         disk: msg.directory
       }));
@@ -117,7 +117,7 @@ io.on('connection', function (socket) {
   // create file
   socket.on('createfile', function (msg) {
     media.createFile(msg, function () {
-      io.emit('changeddisk', JSON.stringify({
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
         disk: msg
       }));
@@ -126,7 +126,7 @@ io.on('connection', function (socket) {
   // rename file
   socket.on('renamefile', function (msg) {
     media.renameFile(msg, function () {
-      io.emit('changeddisk', JSON.stringify({
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
         disk: msg.directory
       }));
@@ -139,7 +139,7 @@ io.on('connection', function (socket) {
   // remove file
   socket.on('removefile', function (msg) {
     media.removeFile(msg, function () {
-      io.emit('changeddisk', JSON.stringify({
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
         disk: msg.directory
       }));
@@ -161,19 +161,19 @@ io.on('connection', function (socket) {
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    media.deleteConnection(msg, function (diskDirectory) {
-      io.emit('changeddisk', JSON.stringify({
+    media.deleteConnection(msg, function (mediaDirectory) {
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
-        disk: diskDirectory
+        disk: mediaDirectory
       }));
     });
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    media.createConnection(msg, function (diskDirectory) {
-      io.emit('changeddisk', JSON.stringify({
+    media.createConnection(msg, function (mediaDirectory) {
+      io.emit('changedmedia', JSON.stringify({
         page: 'editor',
-        disk: diskDirectory
+        disk: mediaDirectory
       }));
     });
   });

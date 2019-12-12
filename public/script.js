@@ -208,7 +208,7 @@ document.addEventListener('click', function (event) {
     } else if (event.target.matches('.newDiskButton')) {
         //
         channelName = event.target.parentElement.parentElement.dataset.channel;
-        socket.emit('createdisk', channelName);
+        socket.emit('createmedia', channelName);
     } else if (event.target.matches('#newChannelButton')) {
         // get new channel name
         var name = document.getElementById("editorChannelsInput").value;
@@ -503,7 +503,7 @@ document.addEventListener('keyup', function (event) {
                 newName: newName
             };
             // send to server
-            socket.emit('renamedisk', data);
+            socket.emit('renamemedia', data);
         }
     } else if (event.target.matches('#editorChannelsInput')) {
         // filter channels when text is entered into channel search box
@@ -542,8 +542,8 @@ socket.on('loadchannel', function (msg) {
     // show channel div and hide other containers
     changeStyleToView('channel');
 });
-socket.on('changeddisk', function (msg) {
-    // load editor on disk received from server, adding to URL history if new
+socket.on('changedmedia', function (msg) {
+    // load editor on media received from server, adding to URL history if new
     if (JSON.stringify(window.history.state) !== msg) {
         var parsedMsg = JSON.parse(msg);
         window.history.pushState({
@@ -578,9 +578,9 @@ socket.on('nowplaying', function (currentURL) {
             // check if already loaded
             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
                 // load iframe
-                document.getElementById('previewFrame').src = `/disks/${currentURL}/index.html`;
+                document.getElementById('previewFrame').src = `/media/${currentURL}/index.html`;
                 // path to metadata
-                var metadataURL = `/disks/${currentURL}/demo.json`;
+                var metadataURL = `/media/${currentURL}/demo.json`;
                 // fetch metadata
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.onreadystatechange = function () {
@@ -613,7 +613,7 @@ socket.on('nowplaying', function (currentURL) {
     } else {
         // not playing anything
         // load default media
-        var defaultPreview = `/disks/.default/index.html`;
+        var defaultPreview = `/media/.default/index.html`;
         if (document.getElementById('previewFrame').src.includes(defaultPreview) == false) {
             // load default iframe
             document.getElementById('previewFrame').src = defaultPreview;

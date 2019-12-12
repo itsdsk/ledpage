@@ -6,7 +6,8 @@ backend/libserial.a
 backend/CMakeCache.txt
 backend/cmake_install.cmake
 backend/Makefile
-public/disks
+public/media/*
+!public/media/.default
 .directory*
 public/config.json
 public/index.html
