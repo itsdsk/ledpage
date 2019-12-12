@@ -71,24 +71,22 @@ rendererSocket.event.on('data', function (data) {
         }, config.settings.fadeDuration / 2, rendererMsg.URL);
         // message backend to switch
         if (rendererMsg.loaded) {
-            if (rendererMsg.whichWindow == 'A') {
-                // send side of screen media is playing on to backend
-                backendSocket.write(`{"window":{"half":0,"fade":${config.settings.fadeDuration}}}`);
-            } else if (rendererMsg.whichWindow == 'B') {
-                // send side of screen media is playing on to backend
-                backendSocket.write(`{"window":{"half":1,"fade":${config.settings.fadeDuration}}}`);
+            // object containing commands for backend
+            var backendMsg = {};
+            // tell backend where media is playing and how to transition
+            backendMsg.window = {
+                half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
+                fade: config.settings.fadeDuration
             }
-            // take screenshot
-            if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
-                //
-                if (rendererMsg.URL.startsWith('file:///')) {
-                    //
-                    var doSaveScreenshot = true;
-                    if (doSaveScreenshot) {
-                        saveScreenshot(rendererMsg.whichWindow);
-                    }
-                }
+            // check if screenshot is needed
+            if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
+                // tell backend to take screenshot
+                backendMsg.command = "screenshot";
+                // start watching for screenshot to be saved
+                saveScreenshot(rendererMsg.whichWindow);
             }
+            // send message to backend
+            backendSocket.write(JSON.stringify(backendMsg));
         }
     }
 });
@@ -111,11 +109,7 @@ process.on('SIGINT', cleanup);
 function saveScreenshot(side) {
     // check directory of media
     if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
-        // send command to backend to save screenshot
-        backendSocket.write(JSON.stringify({
-            "command": "screenshot"
-        }));
-        console.log('sent screenshot command to backend');
+        console.log('waiting for screenshot from backend');
         // watch screenshot file for changes // TODO: make work if file does not exist yet
         const watcher = fs.watch(screenshotPath, (eventType, filename) => {
             // stop watching once file has been changed
