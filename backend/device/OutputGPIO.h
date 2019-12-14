@@ -41,7 +41,7 @@ public:
 	BCM2835_SPI_MODE2 		CPOL = 1, CPHA = 0
 	BCM2835_SPI_MODE3 		CPOL = 1, CPHA = 1	
 	*/
-        bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_16); // The default
+        bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); // The default
                                                                    /*
 
 		BCM2835_SPI_CLOCK_DIVIDER_65536 	65536 = 262.144us = 3.814697260kHz
@@ -123,7 +123,7 @@ public:
 
     // setup data block for LEDs
     static const uint8_t bytesPerLED = 4;
-    static const int16_t endFrameLength = 4;   //round( (numOfLEDs/2)/8 );
+    static const int16_t endFrameLength = 15;   //round( (numOfLEDs/2)/8 );
     static const int16_t startFrameLength = 1; // n * bytesPerLED
     static const int16_t voltageBoostPixel = 1;
     int16_t spiFrameLength = 0;
