@@ -58,7 +58,7 @@ public:
         screenX = _screenX;
         screenHalfX = unsigned(screenX / 2.0f);
         //
-        cout << "Output type: " << config["outputs"][outputIndex]["properties"]["type"] << ", port: " << config["outputs"][outputIndex]["properties"]["port"] << endl;
+        cout << "Output type: " << config["outputs"][outputIndex]["properties"]["type"] << ", port: " << config["outputs"][outputIndex]["properties"]["port"] << ", leds: " << config["outputs"][outputIndex]["leds"].size() << endl;
         unsigned configW = config["window"]["width"];
         unsigned configH = config["window"]["height"];
         // add leds
