@@ -1047,13 +1047,12 @@ function autoplayNext() {
             directory: autoplayList[autoplayPos]
         });
         // choose random timespan in min-max range to wait before playing next
-        // TODO: add crossfadetime to delay time (and add props to config.json)
         var delayTime = Math.random() * Math.abs(config.settings.autoplayDuration.max - config.settings.autoplayDuration.min);
         delayTime += Math.min(config.settings.autoplayDuration.max, config.settings.autoplayDuration.min); // add min of range
         // increment autoplay position
         autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // start timer to autoplay next
-        autoplayTimerID = setTimeout(autoplayNext, delayTime);
+        autoplayTimerID = setTimeout(autoplayNext, config.settings.fadeDuration + delayTime);
     } else {
         // error autoplaying
         console.log(`error autoplaying - list is empty`);
