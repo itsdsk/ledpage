@@ -56,8 +56,18 @@ setInterval(function () {
 }, 180000);
 
 // prevent duplicate exit messages
-var currentURL = "";
+var playback = {
+    currentURL: false,
+    playing: false,
+    playingFadeIn: false,
+    playingAutoNext: false,
+    channel: false,
+    transitioningTimerID: false,
+    autoplayTimerID: false
+}
+// program exit flag
 var SHUTDOWN = false;
+// IPC definition, data events
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('data', function (data) {
     console.log("media in data from renderer: " + data.toString());
@@ -66,8 +76,8 @@ rendererSocket.event.on('data', function (data) {
     } else {
         var rendererMsg = JSON.parse(data.toString());
         // update currentURL when halfway through transition
-        setTimeout(function (URL) {
-            currentURL = URL;
+        changePlaybackID = setTimeout(function (URL) {
+            playback.currentURL = URL;
         }, config.settings.fadeDuration / 2, rendererMsg.URL);
         // message backend to switch
         if (rendererMsg.loaded) {
@@ -228,22 +238,28 @@ module.exports = {
         }
     },
     nowPlaying: function (callback) {
-        callback(currentURL);
+        callback(JSON.stringify({
+            playing: playback.playing,
+            playingFadeIn: playback.playingFadeIn,
+            playingAutoNext: playback.playingAutoNext
+        }));
     },
     reloadPage: function () {
-        if (currentURL.includes('file:///')) {
-            // get directory name
-            var splitURL = currentURL.split('/');
-            var directoryname = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
-            // send message to play local media
-            module.exports.playLocalMedia({
-                directory: directoryname
-            });
-        } else {
-            // send full URL to play remote media
-            module.exports.playRemoteMedia(currentURL);
+        if (playback.currentURL) {
+            if (playback.currentURL.includes('file:///')) {
+                // get directory name
+                var splitURL = playback.currentURL.split('/');
+                var directoryname = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+                // send message to play local media
+                module.exports.playLocalMedia({
+                    directory: directoryname
+                });
+            } else {
+                // send full URL to play remote media
+                module.exports.playRemoteMedia(playback.currentURL);
+            }
+            mediaRequiringScreenshot = null;
         }
-        mediaRequiringScreenshot = null;
     },
     createMedia: function (channelName, callback) {
         // stop autoplay
@@ -578,6 +594,22 @@ module.exports = {
                     command: 'loadURL',
                     path: ('file://' + filePath + "/index.html")
                 }));
+                // update playback status
+                playback.playingFadeIn = {
+                    directory: dirAndVersion.directory,
+                    startTime: Date.now(),
+                    fadeDuration: config.settings.fadeDuration
+                };
+                // update playback status when fade is over
+                clearTimeout(playback.transitioningTimerID);
+                playback.transitioningTimerID = null;
+                playback.transitioningTimerID = setTimeout(function (playingDirectory) {
+                    //
+                    playback.playing = {
+                        directory: playingDirectory
+                    };
+                    playback.playingFadeIn = false;
+                }, config.settings.fadeDuration, dirAndVersion.directory);
                 // // send blur amt to backend
                 // // select media item
                 // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
@@ -622,14 +654,19 @@ module.exports = {
         console.log(`setting crossfade time: ${config.settings.fadeDuration}`);
     },
     stopAutoplay: function () {
+        // update playback status
+        playback.channel = false;
+        playback.playingAutoNext = false;
         // stop autoplay
-        clearTimeout(autoplayTimerID);
-        autoplayTimerID = null;
+        clearTimeout(playback.autoplayTimerID);
+        playback.autoplayTimerID = null;
         // reset index
         autoplayPos = 0;
     },
     startAutoplay: function (msg) {
         console.log(`USER INPUT::starting autoplay (${(msg && msg.length > 0 ? msg.toString() : 'all')})`);
+        // stop autoplay
+        module.exports.stopAutoplay();
         // clear list of media
         autoplayList = [];
         // declare SQL query and params
@@ -643,9 +680,13 @@ module.exports = {
                 "AND connections.channel_name = ?";
             // add channel name as query parameter
             queryParams.push(msg);
+            // update playback status
+            playback.channel = msg;
         } else {
             // select all media items
             selectMediaItemsQuery = "SELECT directory FROM media";
+            // update playback status
+            playback.channel = false;
         }
         // get list of media to autoplay
         db.all(selectMediaItemsQuery, queryParams, (error, rows) => {
@@ -655,10 +696,8 @@ module.exports = {
             rows.forEach(function (row) {
                 autoplayList.push(row.directory);
             });
-            // stop autoplay
-            module.exports.stopAutoplay();
             // start autoplay
-            autoplayTimerID = setTimeout(autoplayNext, 0);
+            playback.autoplayTimerID = setTimeout(autoplayNext, 0);
         });
     },
     setAutoplayTimeRange: function (msg) {
@@ -1025,7 +1064,6 @@ function runCommand(command, callback) {
     });
 }
 
-var autoplayTimerID; // ID used to stop autoplay
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
 
@@ -1051,8 +1089,14 @@ function autoplayNext() {
         delayTime += Math.min(config.settings.autoplayDuration.max, config.settings.autoplayDuration.min); // add min of range
         // increment autoplay position
         autoplayPos = (autoplayPos + 1) % autoplayList.length;
+        // update playback status
+        playback.playingAutoNext = {
+            directory: autoplayList[autoplayPos],
+            startTime: Date.now() + config.settings.fadeDuration + delayTime,
+            fadeDuration: config.settings.fadeDuration
+        }
         // start timer to autoplay next
-        autoplayTimerID = setTimeout(autoplayNext, config.settings.fadeDuration + delayTime);
+        playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fadeDuration + delayTime);
     } else {
         // error autoplaying
         console.log(`error autoplaying - list is empty`);

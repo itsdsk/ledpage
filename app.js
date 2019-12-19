@@ -52,8 +52,8 @@ io.on('connection', function (socket) {
   });
   // get now playing
   socket.on('nowplaying', function () {
-    media.nowPlaying(function (currentURL) {
-      io.emit('nowplaying', currentURL);
+    media.nowPlaying(function (playbackStatus) {
+      io.emit('nowplaying', (playbackStatus));
     });
   });
   // update config

@@ -566,21 +566,21 @@ socket.on('loadeditor', function (msg) {
 socket.on('getlogs', function (msg) {
     console.log(msg);
 });
-socket.on('nowplaying', function (currentURL) {
+var nowPlayingTimerID;
+socket.on('nowplaying', function (playback) {
+    // parse status object
+    playback = JSON.parse(playback);
+    console.log(`playback: ${JSON.stringify(playback)}`);
     // check if playing anything
-    if (currentURL && currentURL.length > 0) {
+    if (playback.playing && (playback.playing.URL || playback.playing.directory)) {
         // check if playing local media
-        if (currentURL.startsWith('file:///')) {
-            // get directory name
-            var splitURL = currentURL.split('/');
-            var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
-            currentURL = directory;
+        if (playback.playing.directory && playback.playing.directory.length > 0) {
             // check if already loaded
-            if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+            if (document.getElementById('previewFrame').src.includes(playback.playing.directory) == false) {
                 // load iframe
-                document.getElementById('previewFrame').src = `/media/${currentURL}/index.html`;
+                document.getElementById('previewFrame').src = `/media/${playback.playing.directory}/index.html`;
                 // path to metadata
-                var metadataURL = `/media/${currentURL}/demo.json`;
+                var metadataURL = `/media/${playback.playing.directory}/demo.json`;
                 // fetch metadata
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.onreadystatechange = function () {
@@ -588,7 +588,7 @@ socket.on('nowplaying', function (currentURL) {
                         // parse metadata
                         var metadata = JSON.parse(this.responseText);
                         // add media title to DOM
-                        document.getElementById("nowPlaying").innerHTML = `<a href="/?page=editor&disk=${currentURL}">${metadata.demo.title}</a>`;
+                        document.getElementById("nowPlaying").innerHTML = `<a href="/?page=editor&disk=${playback.playing.directory}">${metadata.demo.title}</a>`;
                         // add media channels to DOM
                         var numChannels = metadata.demo.channels.length;
                         var channelsDOM = `In ${numChannels} ${numChannels > 1 ? 'channels' : 'channel'}: `;
@@ -599,13 +599,34 @@ socket.on('nowplaying', function (currentURL) {
                 xmlhttp.open("GET", metadataURL, true);
                 xmlhttp.send();
             }
-        } else {
+            // update ui
+            // todo: add case for playback.playingAutoNext as this only works when fading
+            if (playback.playingFadeIn) {
+                var elem1 = document.getElementById("playback-status");
+                // calc time when media is finished fading in
+                var fadeEnd = playback.playingFadeIn.startTime + playback.playingFadeIn.fadeDuration;
+                console.log(`fade end: ${fadeEnd}`);
+                // run ui update loop
+                nowPlayingTimerID = setInterval(updatePlaybackStatus, 100, fadeEnd);
+
+                function updatePlaybackStatus(fadeEnd1) {
+                    var currentTime = Date.now();
+                    if (currentTime > fadeEnd1) {
+                        clearInterval(nowPlayingTimerID);
+                        elem1.innerHTML = ``;
+                    } else {
+                        // todo: not use unix time
+                        elem1.innerHTML = `crossfade ${currentTime}/${fadeEnd1} ms`;
+                    }
+                }
+            }
+        } else if (playback.playing.URL && playback.playing.URL.length > 0) {
             // check if remote media is already loaded
-            if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+            if (document.getElementById('previewFrame').src.includes(playback.playing.URL) == false) {
                 // load iframe for remote media
-                document.getElementById('previewFrame').src = currentURL;
+                document.getElementById('previewFrame').src = playback.playing.URL;
                 // add URL to DOM
-                document.getElementById("nowPlaying").innerHTML = currentURL;
+                document.getElementById("nowPlaying").innerHTML = playback.playing.URL;
                 // clear channels
                 document.getElementById("nowPlayingChannels").innerHTML = "";
             }
