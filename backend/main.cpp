@@ -32,6 +32,7 @@ unsigned int fadeDuration = 2500; // fade transition duration in ms
 unsigned int timeLoadedL = 0; // unix epoch time ms left window loaded
 unsigned int timeLoadedR = 1; // unix epoch time ms right window loaded
 bool receivedScreenshotCommand = false;
+float desaturation = 0.0f; // 0.0 = normal colour, 1.0 = grayscale
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -332,7 +333,7 @@ int main(int argc, char *argv[])
         // update
         for (auto &deviceManager : deviceManagers)
         {
-            deviceManager.update(_image, brightness, crossfadeNorm);
+            deviceManager.update(_image, brightness, desaturation, crossfadeNorm);
         }
     }
 

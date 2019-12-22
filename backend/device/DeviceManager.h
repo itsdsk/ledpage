@@ -92,7 +92,7 @@ public:
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness, float &crossfadeNorm)
+    int update(const Image<Pixel_T> &image, float &brightness, float &desaturation, float &crossfadeNorm)
     {
         std::vector<ColorRgb> ledValues;
         float fadeThreshold = 0.99f;
@@ -171,6 +171,16 @@ public:
                 avgR = sampleL ? avgR_L : avgR_R;
                 avgG = sampleL ? avgG_L : avgG_R;
                 avgB = sampleL ? avgB_L : avgB_R;
+            }
+            
+            // apply desaturation
+            if (desaturation > 0.0f) {
+                // calculate avg luminosity
+                float gray = (0.2989*avgR) + (0.5870*avgG) + (0.1140*avgB); //weights from CCIR 601 spec
+                // mix gray and colour channels
+                avgR = uint8_t(gray * desaturation + avgR * (1.0-desaturation));
+                avgG = uint8_t(gray * desaturation + avgG * (1.0-desaturation));
+                avgB = uint8_t(gray * desaturation + avgB * (1.0-desaturation));
             }
 
             // apply brightness
