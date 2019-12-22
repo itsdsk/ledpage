@@ -137,6 +137,13 @@ document.addEventListener('change', function (event) {
         // }
         // send msg to server
         socket.emit('setblur', data);
+    } else if (event.target.matches('.desaturationInput')) {
+        // get desaturation value
+        var data = {
+            "desaturation": parseInt(event.target.value)
+        }
+        // send msg to server
+        socket.emit('setdesaturation', data);
     } else if (event.target.matches('#brightnessInput')) {
         // get brightness value
         var data = {
