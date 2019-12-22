@@ -1,5 +1,7 @@
 const Handlebars = require('handlebars');
+const util = require('util');
 const fs = require('fs');
+const copyFilePromise = util.promisify(fs.copyFile);
 const path = require('path');
 const Dat = require('dat-node');
 var sockets = require('./sockets.js');
@@ -298,6 +300,51 @@ module.exports = {
                     });
                 });
             }
+        });
+    },
+    duplicateMedia: function (sourceDir, callback) {
+        // stop autoplay
+        module.exports.stopAutoplay();
+        // get path of media to duplicate
+        var pathToOriginal = path.join(mediaDir, sourceDir);
+        // get source metadata
+        var originalMeta = require(path.join(pathToOriginal, 'demo.json'));
+        // make directory for new media
+        var destName = `${originalMeta.demo.title}_copy_${Math.random().toString(36).substring(2, 8)}`;
+        var destDir = path.join(mediaDir, destName);
+        console.log("USER INPUT::duplicating media: " + destName);
+        fs.mkdir(destDir, function (err) {
+            if (err) console.log(`error creating directory for duplicated media: ${err}`);
+            // get datetime
+            var timestamp = new Date().toISOString();
+            timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+            // create metadata object for new media
+            var destMeta = {
+                "demo": {
+                    "title": `${originalMeta.demo.title} copy`,
+                    "description": `original description: ${originalMeta.demo.description}`,
+                    "files": originalMeta.demo.files,
+                    "channels": originalMeta.demo.channels,
+                    "playcount": 0,
+                    "modified": timestamp
+                }
+            };
+            // copy files (function credit: https://stackoverflow.com/a/54818489)
+            function copyFiles(srcDir, dstDir, files) {
+                return Promise.all(files.map(f => {
+                    return copyFilePromise(path.join(srcDir, f), path.join(dstDir, f));
+                }));
+            }
+            copyFiles(pathToOriginal, destDir, destMeta.demo.files).then(() => {
+                // save metadata
+                fs.writeFile(path.join(destDir, 'demo.json'), JSON.stringify(destMeta, null, 4), function (err) {
+                    if (err) console.log(`error saving metadata for duplicated media: ${err}`);
+                    // add to database
+                    parseMediaItemDirectory(destName, destMeta, callback(destName));
+                });
+            }).catch(err => {
+                console.log(`error copying files to duplicate media: ${err}`);
+            });
         });
     },
     renameMedia: function (msg, callback) {

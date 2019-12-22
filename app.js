@@ -105,6 +105,15 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // create media as copy
+  socket.on('duplicatemedia', function (msg) {
+    media.duplicateMedia(msg, function (mediaDirectory) {
+      io.emit('changedmedia', JSON.stringify({
+        page: 'editor',
+        disk: mediaDirectory
+      }));
+    });
+  });
   // rename media
   socket.on('renamemedia', function (msg) {
     media.renameMedia(msg, function () {

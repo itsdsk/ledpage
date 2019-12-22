@@ -216,6 +216,10 @@ document.addEventListener('click', function (event) {
         //
         channelName = event.target.parentElement.parentElement.dataset.channel;
         socket.emit('createmedia', channelName);
+    } else if (event.target.matches('.duplicateMediaButton')) {
+        // create new media as a copy of existing
+        diskDirectory = event.target.parentElement.dataset.diskDirectory;
+        socket.emit('duplicatemedia', diskDirectory);
     } else if (event.target.matches('#newChannelButton')) {
         // get new channel name
         var name = document.getElementById("editorChannelsInput").value;
