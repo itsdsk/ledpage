@@ -111,6 +111,12 @@ public:
                         }
                         std::cout << "user switching window side to " << (timeLoadedL > timeLoadedR ? "left" : "right") << std::endl;
                     }
+                    if (element1.value().find("desaturation") != element1.value().end())
+                    {
+                        // get desaturation amt as float mapped 0.0 to 1.0 from char (0-255)
+                        desaturation = element1.value()["desaturation"].get<int>() / (float)UCHAR_MAX;
+                        std::cout << "user changing desaturation to: " << desaturation << std::endl;
+                    }
                 }
                 else if (key1 == "command")
                 {

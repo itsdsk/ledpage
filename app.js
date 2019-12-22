@@ -150,6 +150,11 @@ io.on('connection', function (socket) {
     // update media
     media.setBlur(msg);
   });
+  // set desaturation
+  socket.on('setdesaturation', function (msg) {
+    // update media
+    media.setDesaturation(msg);
+  });
   // save version (DAT)
   socket.on('saveversion', function (msg) {
     media.saveVersion(msg);

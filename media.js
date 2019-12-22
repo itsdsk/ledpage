@@ -649,6 +649,11 @@ module.exports = {
         //     });
         // }
     },
+    setDesaturation: function (msg) {
+        console.log(`set desaturation msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.write(`{"window":{"desaturation":${msg.desaturation}}}`);
+    },
     setCrossfadeTime: function (msg) {
         config.settings.fadeDuration = msg;
         console.log(`setting crossfade time: ${config.settings.fadeDuration}`);
