@@ -92,7 +92,7 @@ public:
     }
 
     template <typename Pixel_T>
-    int update(const Image<Pixel_T> &image, float &brightness, float &desaturation, float &crossfadeNorm)
+    int update(const Image<Pixel_T> &image, float &brightness, float &desaturation, float &gamma, float &crossfadeNorm)
     {
         std::vector<ColorRgb> ledValues;
         float fadeThreshold = 0.99f;
@@ -182,6 +182,11 @@ public:
                 avgG = uint8_t(gray * desaturation + avgG * (1.0-desaturation));
                 avgB = uint8_t(gray * desaturation + avgB * (1.0-desaturation));
             }
+
+            // apply gamma 255 * (Image/255)^(1/2.2)
+            avgR = uint8_t(255 * pow(avgR/255.0f, 1.0f/gamma));
+            avgG = uint8_t(255 * pow(avgG/255.0f, 1.0f/gamma));
+            avgB = uint8_t(255 * pow(avgB/255.0f, 1.0f/gamma));
 
             // apply brightness
             avgR = uint8_t(avgR * brightness);
