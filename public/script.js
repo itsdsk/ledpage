@@ -144,6 +144,13 @@ document.addEventListener('change', function (event) {
         }
         // send msg to server
         socket.emit('setdesaturation', data);
+    } else if (event.target.matches('.gammaInput')) {
+        // get gamma value
+        var data = {
+            "gamma": parseFloat(event.target.value)
+        }
+        // send msg to server
+        socket.emit('setgamma', data);
     } else if (event.target.matches('#brightnessInput')) {
         // get brightness value
         var data = {

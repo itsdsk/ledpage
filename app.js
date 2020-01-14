@@ -164,6 +164,11 @@ io.on('connection', function (socket) {
     // update media
     media.setDesaturation(msg);
   });
+  // set gamma
+  socket.on('setgamma', function (msg) {
+    // update media
+    media.setGamma(msg);
+  });
   // save version (DAT)
   socket.on('saveversion', function (msg) {
     media.saveVersion(msg);

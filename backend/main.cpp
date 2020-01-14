@@ -118,6 +118,12 @@ public:
                         desaturation = element1.value()["desaturation"].get<int>() / (float)UCHAR_MAX;
                         std::cout << "user changing desaturation to: " << desaturation << std::endl;
                     }
+                    if (element1.value().find("gamma") != element1.value().end())
+                    {
+                        // get gammaValue amt
+                        gammaValue = element1.value()["gamma"].get<float>();
+                        std::cout << "user changing gammaValue to: " << gammaValue << std::endl;
+                    }
                 }
                 else if (key1 == "command")
                 {

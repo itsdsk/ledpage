@@ -701,6 +701,11 @@ module.exports = {
         // update backend
         backendSocket.write(`{"window":{"desaturation":${msg.desaturation}}}`);
     },
+    setGamma: function (msg) {
+        console.log(`set gamma msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.write(`{"window":{"gamma":${msg.gamma}}}`);
+    },
     setCrossfadeTime: function (msg) {
         config.settings.fadeDuration = msg;
         console.log(`setting crossfade time: ${config.settings.fadeDuration}`);
