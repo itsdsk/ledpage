@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 
 
-// read partials directory
-fs.readdirSync(path.join(__dirname, `partials`)).forEach(file => {
+// read partials directory // TODO: move views dir into templates and make this function skip directories
+fs.readdirSync(path.join(__dirname, `templates`)).forEach(file => {
     // read file
-    fs.readFile(path.join(__dirname, `partials`, file), function (err, data) {
+    fs.readFile(path.join(__dirname, `templates`, file), function (err, data) {
         if (err) throw err;
         // register partial
         console.log(`Registered partial: ${path.basename(file, `.hbs`)}`);
