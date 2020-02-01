@@ -105,6 +105,15 @@ Section \"ServerLayout\"
 EndSection
 EOT"
 
+
+# for UART output:
+# run `sudo raspi-config`
+# go to 'Interfacing options'
+# go to 'Serial' and press Enter
+# select No to 'Login shell to be accessible over serial'
+# select Yes to 'Serial port hardware'
+# reboot
+
 # edit /etc/X11/Xwrapper.config to include the line:
 # allowed_users=anybody
 

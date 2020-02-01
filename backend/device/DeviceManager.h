@@ -3,6 +3,7 @@
 #include <device/OutputSerialDefault.h>
 #include <device/OutputGPIO.h>
 #include <device/OutputSPI1.h>
+#include <device/OutputUART.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -84,6 +85,10 @@ public:
         else if (outputType == "SPI1")
         {
             output = std::shared_ptr<Output>(new OutputSPI1());
+        }
+        else if (outputType == "UART")
+        {
+            output = std::shared_ptr<Output>(new OutputUART());
         }
         else
         {
