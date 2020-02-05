@@ -59,67 +59,34 @@ public:
     };
     int write(const std::vector<ColorRgb> &ledValues)
     {
-        // check output buffer object is initialised
-        if (_ledBuffer.size() == 0)
+        // check if output buffer object is initialised
+        if (_ledBuffer.length() == 0)
         {
             // set output buffer size
-            UARTFrameLength = (startFrameLength + ledValues.size() + endFrameLength) * bytesPerLED;
-            _ledBuffer.resize(UARTFrameLength);
-            // init the start frame
-            for (int i = 0; i < startFrameLength * bytesPerLED; i++)
-            {
-                _ledBuffer[i] = 0;
-            }
-            // init the driver LED / voltage boost pixel
-            for (int i = startFrameLength * bytesPerLED; i < (startFrameLength)*bytesPerLED; i += bytesPerLED)
-            {
-                _ledBuffer[i] = 255;
-                _ledBuffer[i + 1] = 0;
-                _ledBuffer[i + 2] = 0;
-                _ledBuffer[i + 3] = 0;
-            }
-            // init the end frame
-            for (int ledIndex = UARTFrameLength - (endFrameLength * bytesPerLED); ledIndex < UARTFrameLength; ledIndex += bytesPerLED)
-            {
-                _ledBuffer[ledIndex] = 255;
-                _ledBuffer[ledIndex + 1] = 255;
-                _ledBuffer[ledIndex + 2] = 255;
-                _ledBuffer[ledIndex + 3] = 255;
-            }
+            _ledBuffer.resize(6 + 3 * ledValues.size());
+            // set header
+            _ledBuffer[0] = 'A';
+            _ledBuffer[1] = 'd';
+            _ledBuffer[2] = 'a';
+            _ledBuffer[3] = ((ledValues.size() - 1) >> 8) & 0xFF; // LED count high byte
+            _ledBuffer[4] = (ledValues.size() - 1) & 0xFF;        // LED count low byte
+            _ledBuffer[5] = _ledBuffer[3] ^ _ledBuffer[4] ^ 0x55; // Checksum
         }
-        // insert colours into output buffer
-        for (int ledIndex = 0; ledIndex < ledValues.size(); ledIndex++)
-        {
-            int bufferIndex = (startFrameLength + ledIndex) * bytesPerLED;
-            _ledBuffer[bufferIndex] = 255;
-            _ledBuffer[bufferIndex + 1] = ledValues[ledIndex].red;
-            _ledBuffer[bufferIndex + 2] = ledValues[ledIndex].green;
-            _ledBuffer[bufferIndex + 3] = ledValues[ledIndex].blue;
-        }
-        // send to LEDs
-        //----- TX BYTES -----
-        unsigned char tx_buffer[20];
-        unsigned char *p_tx_buffer;
-
-        p_tx_buffer = &tx_buffer[0];
-        *p_tx_buffer++ = 'H';
-        *p_tx_buffer++ = 'e';
-        *p_tx_buffer++ = 'l';
-        *p_tx_buffer++ = 'l';
-        *p_tx_buffer++ = 'o';
-
+        // copy led data to mesage
+        memcpy(6 + (char*)_ledBuffer.data(), ledValues.data(), ledValues.size() * 3);
+        // write data
         if (uart0_filestream != -1)
         {
-            int count = ::write(uart0_filestream, &tx_buffer[0], (p_tx_buffer - &tx_buffer[0])); //Filestream, bytes to write, number of bytes to write
+            int count = ::write(uart0_filestream, (char*)_ledBuffer.c_str(), _ledBuffer.length());
             if (count < 0)
             {
-                printf("UART TX error\n");
+                //std::cout << "UART TX error\n" << std::endl;
             }
-            std::cout << "sending out of uart" << std::endl;
-        }
-        else
-        {
-            std::cout << "not sending out of uart" << std::endl;
+            else
+            {
+                //std::cout << "sending out of uart\n" << std::endl; 
+            }
+            
         }
         return 0;
     }
@@ -129,12 +96,7 @@ public:
         close(uart0_filestream);
         std::cout << "Closed UART" << std::endl;
     };
-    std::vector<char> _ledBuffer;
-
-    // setup data block for LEDs
-    static const uint8_t bytesPerLED = 4;
-    static const int16_t endFrameLength = 15;  //round( (numOfLEDs/2)/8 );
-    static const int16_t startFrameLength = 1; // n * bytesPerLED
-    int16_t UARTFrameLength = 0;
+    // data block for arduino
+    std::string _ledBuffer = "";
     int uart0_filestream = -1;
 };
