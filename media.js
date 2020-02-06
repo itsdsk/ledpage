@@ -669,6 +669,11 @@ module.exports = {
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
+    setBrightness: function (msg) {
+        console.log(`set brightness msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.write(`{"window":{"brightness":${msg.brightness}}}`);
+    },
     setBlur: function (msg) {
         //
         console.log(`set blur msg: ${JSON.stringify(msg)}`);

@@ -154,6 +154,11 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // set brightness
+  socket.on('setbrightness', function (msg) {
+    // update media
+    media.setBrightness(msg);
+  });
   // set blur
   socket.on('setblur', function (msg) {
     // update media

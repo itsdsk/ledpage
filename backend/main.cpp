@@ -32,6 +32,7 @@ unsigned int fadeDuration = 2500; // fade transition duration in ms
 unsigned int timeLoadedL = 0; // unix epoch time ms left window loaded
 unsigned int timeLoadedR = 1; // unix epoch time ms right window loaded
 bool receivedScreenshotCommand = false;
+float brightness = 0.0125f;
 float desaturation = 0.0f; // 0.0 = normal colour, 1.0 = grayscale
 float gammaValue = 2.2f;
 
@@ -86,6 +87,12 @@ public:
                 if (key1 == "window")
                 {
                     std::cout << "key1 is window" << std::endl;
+                    if (element1.value().find("brightness") != element1.value().end())
+                    {
+                        // get brightness amt
+                        brightness = element1.value()["brightness"].get<float>();
+                        std::cout << "user changing brightness to: " << brightness << std::endl;
+                    }
                     if (element1.value().find("size") != element1.value().end())
                     {
                         // get size
@@ -225,7 +232,6 @@ vector<DeviceManager> deviceManagers;
 FrameGrabber *grabber;
 unsigned _w;
 unsigned _h;
-float brightness = 0.0125f;
 bool receivedQuitSignal = false;
 
 void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg);
@@ -420,15 +426,6 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                     {
                         cout << "could not get index" << endl;
                     }
-                }
-            }
-            else if (key1 == "window")
-            {
-                cout << "key1 is window" << endl;
-                if (element1.value().find("brightness") != element1.value().end())
-                {
-                    brightness = element1.value()["brightness"].get<int>() / (float)UCHAR_MAX;
-                    cout << "brightness: " << brightness << endl;
                 }
             }
             else if (key1 == "command")

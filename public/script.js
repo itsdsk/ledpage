@@ -154,15 +154,10 @@ document.addEventListener('change', function (event) {
     } else if (event.target.matches('#brightnessInput')) {
         // get brightness value
         var data = {
-            "window": {
-                "brightness": parseInt(event.target.value)
-            }
-        };
-        if (mainSocket.readyState != 1) {
-            mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+            "brightness": parseFloat(event.target.value)
         }
-        // send msg to backend
-        mainSocket.send(JSON.stringify(data));
+        // send msg to server
+        socket.emit('setbrightness', data);
     } else if (event.target.matches('#autoplayMinRange') || event.target.matches('#autoplayMaxRange')) {
         // get autoplay time range values
         var data = {
