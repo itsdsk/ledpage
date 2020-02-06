@@ -671,6 +671,8 @@ module.exports = {
     },
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config.settings.brightness = msg.brightness;
         // update backend
         backendSocket.write(`{"window":{"brightness":${msg.brightness}}}`);
     },
