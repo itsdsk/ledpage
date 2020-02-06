@@ -291,6 +291,9 @@ int main(int argc, char *argv[])
         std::cout << "other exception" << std::endl;
     }
 
+    // load settings from config file
+    brightness = config["settings"]["brightness"];
+
     // create framegrabber and image object
     _w = config["window"]["width"];
     _h = config["window"]["height"];
