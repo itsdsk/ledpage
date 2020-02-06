@@ -703,6 +703,8 @@ module.exports = {
     },
     setDesaturation: function (msg) {
         console.log(`set desaturation msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config.settings.desaturation = msg.desaturation;
         // update backend
         backendSocket.write(`{"window":{"desaturation":${msg.desaturation}}}`);
     },

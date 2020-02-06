@@ -140,7 +140,7 @@ document.addEventListener('change', function (event) {
     } else if (event.target.matches('.desaturationInput')) {
         // get desaturation value
         var data = {
-            "desaturation": parseInt(event.target.value)
+            "desaturation": parseFloat(event.target.value)
         }
         // send msg to server
         socket.emit('setdesaturation', data);

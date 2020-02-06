@@ -121,8 +121,8 @@ public:
                     }
                     if (element1.value().find("desaturation") != element1.value().end())
                     {
-                        // get desaturation amt as float mapped 0.0 to 1.0 from char (0-255)
-                        desaturation = element1.value()["desaturation"].get<int>() / (float)UCHAR_MAX;
+                        // get desaturation amt
+                        desaturation = element1.value()["desaturation"].get<float>();
                         std::cout << "user changing desaturation to: " << desaturation << std::endl;
                     }
                     if (element1.value().find("gamma") != element1.value().end())
@@ -293,6 +293,7 @@ int main(int argc, char *argv[])
 
     // load settings from config file
     brightness = config["settings"]["brightness"];
+    desaturation = config["settings"]["desaturation"];
 
     // create framegrabber and image object
     _w = config["window"]["width"];
