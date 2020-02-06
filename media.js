@@ -618,56 +618,54 @@ module.exports = {
                 }
             });
         } else {
-            if (rendererSocket.connected) {
-                // update playcount in database
-                db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
-                    if (err) console.log(`error updating playcount in database: ${err}`);
-                    // get playcount
-                    db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
-                        if (err) console.log(`Error getting media info from db: ${err}`);
-                        // get demo.json
-                        var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
-                        var meta = require(metaPath);
-                        // update playcount
-                        meta.demo.playcount = +row.playcount;
-                        // save demo.json
-                        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                            if (err) console.log(err);
-                        });
+            // update playcount in database
+            db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
+                if (err) console.log(`error updating playcount in database: ${err}`);
+                // get playcount
+                db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
+                    if (err) console.log(`Error getting media info from db: ${err}`);
+                    // get demo.json
+                    var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
+                    var meta = require(metaPath);
+                    // update playcount
+                    meta.demo.playcount = +row.playcount;
+                    // save demo.json
+                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                        if (err) console.log(err);
                     });
                 });
-                // send media file path to renderer
-                rendererSocket.write(JSON.stringify({
-                    command: 'loadURL',
-                    path: ('file://' + filePath + "/index.html")
-                }));
-                // update playback status
-                playback.playingFadeIn = {
-                    directory: dirAndVersion.directory,
-                    startTime: Date.now(),
-                    fadeDuration: config.settings.fadeDuration
+            });
+            // send media file path to renderer
+            rendererSocket.write(JSON.stringify({
+                command: 'loadURL',
+                path: ('file://' + filePath + "/index.html")
+            }));
+            // update playback status
+            playback.playingFadeIn = {
+                directory: dirAndVersion.directory,
+                startTime: Date.now(),
+                fadeDuration: config.settings.fadeDuration
+            };
+            // update playback status when fade is over
+            clearTimeout(playback.transitioningTimerID);
+            playback.transitioningTimerID = null;
+            playback.transitioningTimerID = setTimeout(function (playingDirectory) {
+                //
+                playback.playing = {
+                    directory: playingDirectory
                 };
-                // update playback status when fade is over
-                clearTimeout(playback.transitioningTimerID);
-                playback.transitioningTimerID = null;
-                playback.transitioningTimerID = setTimeout(function (playingDirectory) {
-                    //
-                    playback.playing = {
-                        directory: playingDirectory
-                    };
-                    playback.playingFadeIn = false;
-                }, config.settings.fadeDuration, dirAndVersion.directory);
-                // // send blur amt to backend
-                // // select media item
-                // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
-                // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
-                //     // send size to app
-                //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
-                // });
+                playback.playingFadeIn = false;
+            }, config.settings.fadeDuration, dirAndVersion.directory);
+            // // send blur amt to backend
+            // // select media item
+            // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
+            // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+            //     // send size to app
+            //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+            // });
 
-                // store media directory to take new screenshot and add it as new thumbnail
-                mediaRequiringScreenshot = dirAndVersion.directory;
-            }
+            // store media directory to take new screenshot and add it as new thumbnail
+            mediaRequiringScreenshot = dirAndVersion.directory;
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
