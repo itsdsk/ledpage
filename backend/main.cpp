@@ -294,6 +294,7 @@ int main(int argc, char *argv[])
     // load settings from config file
     brightness = config["settings"]["brightness"];
     desaturation = config["settings"]["desaturation"];
+    gammaValue = config["settings"]["gamma"];
 
     // create framegrabber and image object
     _w = config["window"]["width"];

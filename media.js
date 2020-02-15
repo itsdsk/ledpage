@@ -710,6 +710,8 @@ module.exports = {
     },
     setGamma: function (msg) {
         console.log(`set gamma msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config.settings.gamma = msg.gamma;
         // update backend
         backendSocket.write(`{"window":{"gamma":${msg.gamma}}}`);
     },

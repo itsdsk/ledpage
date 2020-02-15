@@ -6,6 +6,7 @@
     "settings": {
         "brightness": 0.0125,
         "desaturation": 0.0,
+        "gamma": 2.2,
         "blur": 50,
         "fadeDuration": 25000,
         "autoplayDuration": {
