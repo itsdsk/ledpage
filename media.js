@@ -621,7 +621,7 @@ module.exports = {
             // update playcount in database
             db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
                 if (err) console.log(`error updating playcount in database: ${err}`);
-                // get playcount
+                // get playcount and check screenshot
                 db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
                     if (err) console.log(`Error getting media info from db: ${err}`);
                     // get demo.json
@@ -633,6 +633,14 @@ module.exports = {
                     fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                         if (err) console.log(err);
                     });
+                    // check if screenshot is missing
+                    if (meta.demo.image && meta.demo.image.length > 0) {
+                        // do not take screenshot
+                        mediaRequiringScreenshot = null;
+                    } else {
+                        // flag media directory to take screenshot of
+                        mediaRequiringScreenshot = dirAndVersion.directory;
+                    }
                 });
             });
             // send media file path to renderer
@@ -663,9 +671,6 @@ module.exports = {
             //     // send size to app
             //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
             // });
-
-            // store media directory to take new screenshot and add it as new thumbnail
-            mediaRequiringScreenshot = dirAndVersion.directory;
         }
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
