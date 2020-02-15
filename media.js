@@ -52,7 +52,7 @@ backendSocket.event.on('data', function (data) {
 
 setInterval(function () {
     module.exports.setBlur({
-        size: (1 + Math.floor(Math.random() * 20))
+        blur: (1 + Math.floor(Math.random() * 20))
     });
     //backendSocket.write(`{"window":{"size":${1 + Math.floor(random() * 47)}}}`);
 }, 180000);
