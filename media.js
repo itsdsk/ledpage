@@ -679,10 +679,10 @@ module.exports = {
     setBlur: function (msg) {
         //
         console.log(`set blur msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config.settings.blur = msg.blur;
         // update backend
-        if (backendSocket.socket !== null) {
-            backendSocket.write(`{"window":{"size":${msg.size}}}`);
-        }
+        backendSocket.write(`{"window":{"blur":${msg.blur}}}`);
         // // update in database
         // if (msg.directory) {
         //     // get demo.json

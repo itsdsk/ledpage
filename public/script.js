@@ -129,7 +129,7 @@ document.addEventListener('change', function (event) {
     if (event.target.matches('.blurAmount')) {
         // get blur value
         var data = {
-            "size": parseInt(event.target.value)
+            "blur": parseInt(event.target.value)
         };
         // // get disk
         // if (true) {

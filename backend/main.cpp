@@ -93,11 +93,11 @@ public:
                         brightness = element1.value()["brightness"].get<float>();
                         std::cout << "user changing brightness to: " << brightness << std::endl;
                     }
-                    if (element1.value().find("size") != element1.value().end())
+                    if (element1.value().find("blur") != element1.value().end())
                     {
                         // get size
-                        changeSize = element1.value()["size"].get<int>();
-                        std::cout << "user changing size to: " << std::to_string(changeSize) << std::endl;
+                        changeSize = element1.value()["blur"].get<int>();
+                        std::cout << "user changing blur size to: " << std::to_string(changeSize) << std::endl;
                     }
                     if (element1.value().find("fade") != element1.value().end())
                     {
@@ -295,6 +295,7 @@ int main(int argc, char *argv[])
     brightness = config["settings"]["brightness"];
     desaturation = config["settings"]["desaturation"];
     gammaValue = config["settings"]["gamma"];
+    changeSize = config["settings"]["blur"];
 
     // create framegrabber and image object
     _w = config["window"]["width"];
@@ -318,7 +319,7 @@ int main(int argc, char *argv[])
         // should pixel sample radi change size
         if (changeSize > 0)
         {
-            cout << "changing size in while : " << std::to_string(changeSize) << endl;
+            cout << "changing blur size: " << std::to_string(changeSize) << endl;
             // iterate over each device in manager
             for (int i = 0; i < deviceManagers.size(); i++)
             {
