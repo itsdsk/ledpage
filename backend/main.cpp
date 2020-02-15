@@ -291,11 +291,12 @@ int main(int argc, char *argv[])
         std::cout << "other exception" << std::endl;
     }
 
-    // load settings from config file
+    // load settings from config file // TODO: check values exist in config
     brightness = config["settings"]["brightness"];
     desaturation = config["settings"]["desaturation"];
     gammaValue = config["settings"]["gamma"];
     changeSize = config["settings"]["blur"];
+    fadeDuration = config["settings"]["fade"];
 
     // create framegrabber and image object
     _w = config["window"]["width"];

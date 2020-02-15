@@ -167,8 +167,12 @@ document.addEventListener('change', function (event) {
         // send msg to server
         socket.emit('setautoplaytimerange', data);
     } else if (event.target.matches('#crossfadeRange')) {
-        //
-        socket.emit('setcrossfadetime', parseInt(event.target.value));
+        // get crossfade duration value
+        var data = {
+            "fade": parseInt(event.target.value)
+        }
+        // send message to server
+        socket.emit('setcrossfadetime', data);
         console.log(`sending crossfade time to server ${parseInt(event.target.value)}`);
     } else if (event.target.matches('select[name="sort"]')) {
         //

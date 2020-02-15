@@ -80,7 +80,7 @@ rendererSocket.event.on('data', function (data) {
         // update currentURL when halfway through transition
         changePlaybackID = setTimeout(function (URL) {
             playback.currentURL = URL;
-        }, config.settings.fadeDuration / 2, rendererMsg.URL);
+        }, config.settings.fade / 2, rendererMsg.URL);
         // message backend to switch
         if (rendererMsg.loaded) {
             // object containing commands for backend
@@ -88,7 +88,7 @@ rendererSocket.event.on('data', function (data) {
             // tell backend where media is playing and how to transition
             backendMsg.window = {
                 half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
-                fade: config.settings.fadeDuration
+                fade: config.settings.fade
             }
             // check if screenshot is needed
             if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
@@ -644,7 +644,7 @@ module.exports = {
             playback.playingFadeIn = {
                 directory: dirAndVersion.directory,
                 startTime: Date.now(),
-                fadeDuration: config.settings.fadeDuration
+                fadeDuration: config.settings.fade
             };
             // update playback status when fade is over
             clearTimeout(playback.transitioningTimerID);
@@ -655,7 +655,7 @@ module.exports = {
                     directory: playingDirectory
                 };
                 playback.playingFadeIn = false;
-            }, config.settings.fadeDuration, dirAndVersion.directory);
+            }, config.settings.fade, dirAndVersion.directory);
             // // send blur amt to backend
             // // select media item
             // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
@@ -716,8 +716,9 @@ module.exports = {
         backendSocket.write(`{"window":{"gamma":${msg.gamma}}}`);
     },
     setCrossfadeTime: function (msg) {
-        config.settings.fadeDuration = msg;
-        console.log(`setting crossfade time: ${config.settings.fadeDuration}`);
+        console.log(`set crossfade msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config.settings.fade = msg.fade;
     },
     stopAutoplay: function () {
         // update playback status
@@ -1158,11 +1159,11 @@ function autoplayNext() {
         // update playback status
         playback.playingAutoNext = {
             directory: autoplayList[autoplayPos],
-            startTime: Date.now() + config.settings.fadeDuration + delayTime,
-            fadeDuration: config.settings.fadeDuration
+            startTime: Date.now() + config.settings.fade + delayTime,
+            fadeDuration: config.settings.fade
         }
         // start timer to autoplay next
-        playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fadeDuration + delayTime);
+        playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fade + delayTime);
     } else {
         // error autoplaying
         console.log(`error autoplaying - list is empty`);

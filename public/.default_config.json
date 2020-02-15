@@ -8,7 +8,7 @@
         "desaturation": 0.0,
         "gamma": 2.2,
         "blur": 50,
-        "fadeDuration": 25000,
+        "fade": 25000,
         "autoplayDuration": {
             "min": 30000,
             "max": 60000
