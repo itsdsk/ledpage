@@ -637,7 +637,7 @@ socket.on('nowplaying', function (playback) {
                         var timePassed = Math.round((currentTime - playback.playingFadeIn.startTime) / 1000);
                         var timeLimit = Math.round(playback.playingFadeIn.fadeDuration / 1000);
                         // add playback string with crossfade state to page
-                        elem1.innerHTML = `crossfade ${timePassed}/${timeLimit}s (${playback.playing.metadata.title} to ${playback.playingFadeIn.metadata.title})`;
+                        //elem1.innerHTML = `crossfade ${timePassed}/${timeLimit}s (${playback.playing.metadata.title} to ${playback.playingFadeIn.metadata.title})`;
                     }
                 }
             }
@@ -671,16 +671,42 @@ setTimeout(function updatePlaybackStateTest() {
     var playbackStateElement = document.getElementById('playback-status2');
     if (playbackState.playing) {
         var playbackStateString = `playing ${playbackState.playing.metadata.title}`;
+        var playingString, nextString;
+        playingString = `playing ${playbackState.playing.metadata.title}`;
         var currentTime = Date.now();
         if (playbackState.playingFadeIn) {
             var timePassed = Math.round((currentTime - playbackState.playingFadeIn.startTime) / 1000);
             var timeLimit = Math.round(playbackState.playingFadeIn.fadeDuration / 1000);
             playbackStateString += `, fading ${timePassed}/${timeLimit}s to ${playbackState.playingFadeIn.metadata.title}`;
+            if (timePassed >= timeLimit) {
+                playbackState.playing = playbackState.playingFadeIn;
+                playbackState.playingFadeIn = false;
+            }
         }
         if (playbackState.playingAutoNext) {
             var timeLeft = Math.round((playbackState.playingAutoNext.startTime - currentTime) / 1000);
             playbackStateString += `, playing ${playbackState.playingAutoNext.metadata.title} in ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                playbackState.playingFadeIn = playbackState.playingAutoNext;
+                playbackState.playingAutoNext = false;
+            }
         }
+        //
+        if (playbackState.playingFadeIn) {
+            var timePassed = Math.round((currentTime - playbackState.playingFadeIn.startTime) / 1000);
+            var timeLimit = Math.round(playbackState.playingFadeIn.fadeDuration / 1000);
+            playingString = `fading ${playbackState.playing.metadata.title} to ${playbackState.playingFadeIn.metadata.title} (${timePassed}/${timeLimit}s)`;
+        } else {
+            playingString = `playing ${playbackState.playing.metadata.title}`;
+        }
+        if (playbackState.playingAutoNext) {
+            var timeLeft = Math.round((playbackState.playingAutoNext.startTime - currentTime) / 1000);
+            nextString = `up next ${playbackState.playingAutoNext.metadata.title} (${timeLeft}s)`;
+        } else {
+            nextString = `nothing in queue`;
+        }
+        playbackStateString = playingString + ', ' + nextString;
+        //
         playbackStateElement.innerHTML = playbackStateString;
     } else {
         playbackStateElement.innerHTML = `not playing anything`;
@@ -688,3 +714,60 @@ setTimeout(function updatePlaybackStateTest() {
     // repeat
     setTimeout(updatePlaybackStateTest, playbackUpdatePeriod);
 }, playbackUpdatePeriod);
+
+// socket.on('nowplaying', function (currentURL) {
+//     // check if playing anything
+//     if (currentURL && currentURL.length > 0) {
+//         // check if playing local media
+//         if (currentURL.startsWith('file:///')) {
+//             // get directory name
+//             var splitURL = currentURL.split('/');
+//             var directory = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+//             currentURL = directory;
+//             // check if already loaded
+//             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+//                 // load iframe
+//                 document.getElementById('previewFrame').src = `/media/${currentURL}/index.html`;
+//                 // path to metadata
+//                 var metadataURL = `/media/${currentURL}/demo.json`;
+//                 // fetch metadata
+//                 var xmlhttp = new XMLHttpRequest();
+//                 xmlhttp.onreadystatechange = function () {
+//                     if (this.readyState == 4 && this.status == 200) {
+//                         // parse metadata
+//                         var metadata = JSON.parse(this.responseText);
+//                         // add media title to DOM
+//                         document.getElementById("nowPlaying").innerHTML = `<a href="/?page=editor&disk=${currentURL}">${metadata.demo.title}</a>`;
+//                         // add media channels to DOM
+//                         var numChannels = metadata.demo.channels.length;
+//                         var channelsDOM = `In ${numChannels} ${numChannels > 1 ? 'channels' : 'channel'}: `;
+//                         metadata.demo.channels.forEach((channel, idx) => channelsDOM += `<a href="/?page=channel&channel=${channel}">${channel}</a>${numChannels > 1 && idx < numChannels - 1 ? ', ' : '.'}`);
+//                         document.getElementById("nowPlayingChannels").innerHTML = channelsDOM;
+//                     }
+//                 };
+//                 xmlhttp.open("GET", metadataURL, true);
+//                 xmlhttp.send();
+//             }
+//         } else {
+//             // check if remote media is already loaded
+//             if (document.getElementById('previewFrame').src.includes(currentURL) == false) {
+//                 // load iframe for remote media
+//                 document.getElementById('previewFrame').src = currentURL;
+//                 // add URL to DOM
+//                 document.getElementById("nowPlaying").innerHTML = currentURL;
+//                 // clear channels
+//                 document.getElementById("nowPlayingChannels").innerHTML = "";
+//             }
+//         }
+//     } else {
+//         // not playing anything
+//         // load default media
+//         var defaultPreview = `/media/.default/index.html`;
+//         if (document.getElementById('previewFrame').src.includes(defaultPreview) == false) {
+//             // load default iframe
+//             document.getElementById('previewFrame').src = defaultPreview;
+//             // insert text
+//             document.getElementById("nowPlaying").innerHTML = `Nothing...`;
+//         }
+//     }
+// });
