@@ -584,9 +584,11 @@ socket.on('getlogs', function (msg) {
     console.log(msg);
 });
 var nowPlayingTimerID;
+var playbackState = {};
 socket.on('nowplaying', function (playback) {
     // parse status object
     playback = JSON.parse(playback);
+    playbackState = playback;
     console.log(`received playback status from server`);
     // check if playing anything
     if (playback.playing && (playback.playing.URL || playback.playing.directory)) {
@@ -662,3 +664,27 @@ socket.on('nowplaying', function (playback) {
         }
     }
 });
+
+var playbackUpdatePeriod = 500; // ms
+setTimeout(function updatePlaybackStateTest() {
+    //
+    var playbackStateElement = document.getElementById('playback-status2');
+    if (playbackState.playing) {
+        var playbackStateString = `playing ${playbackState.playing.metadata.title}`;
+        var currentTime = Date.now();
+        if (playbackState.playingFadeIn) {
+            var timePassed = Math.round((currentTime - playbackState.playingFadeIn.startTime) / 1000);
+            var timeLimit = Math.round(playbackState.playingFadeIn.fadeDuration / 1000);
+            playbackStateString += `, fading ${timePassed}/${timeLimit}s to ${playbackState.playingFadeIn.metadata.title}`;
+        }
+        if (playbackState.playingAutoNext) {
+            var timeLeft = Math.round((playbackState.playingAutoNext.startTime - currentTime) / 1000);
+            playbackStateString += `, playing ${playbackState.playingAutoNext.metadata.title} in ${timeLeft}s`;
+        }
+        playbackStateElement.innerHTML = playbackStateString;
+    } else {
+        playbackStateElement.innerHTML = `not playing anything`;
+    }
+    // repeat
+    setTimeout(updatePlaybackStateTest, playbackUpdatePeriod);
+}, playbackUpdatePeriod);
