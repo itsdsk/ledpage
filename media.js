@@ -654,6 +654,11 @@ module.exports = {
                 startTime: Date.now(),
                 fadeDuration: config.settings.fade
             };
+            // add metadata from database to playback status
+            db.get(`SELECT title, image FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
+                if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
+                playback.playingFadeIn.metadata = itemrow;
+            });
             // update playback status when fade is over
             clearTimeout(playback.transitioningTimerID);
             playback.transitioningTimerID = null;
@@ -662,6 +667,12 @@ module.exports = {
                 playback.playing = {
                     directory: playingDirectory
                 };
+                // add metadata from database to playback status
+                db.get(`SELECT title FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
+                    if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
+                    playback.playing.metadata = itemrow;
+                });
+                //
                 playback.playingFadeIn = false;
             }, config.settings.fade, dirAndVersion.directory);
             // // send blur amt to backend
@@ -1167,6 +1178,13 @@ function autoplayNext() {
             startTime: Date.now() + config.settings.fade + delayTime,
             fadeDuration: config.settings.fade
         }
+        // get metadata for next media from database
+        var selectQuery = `SELECT title, image FROM media WHERE directory = ?`;
+        db.get(selectQuery, [autoplayList[autoplayPos]], (err, itemrow) => {
+            if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
+            // store media metadata in playback object
+            playback.playingAutoNext.metadata = itemrow;
+        });
         // start timer to autoplay next
         playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fade + delayTime);
     } else {
