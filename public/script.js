@@ -587,7 +587,7 @@ var nowPlayingTimerID;
 socket.on('nowplaying', function (playback) {
     // parse status object
     playback = JSON.parse(playback);
-    console.log(`playback: ${JSON.stringify(playback)}`);
+    console.log(`received playback status from server`);
     // check if playing anything
     if (playback.playing && (playback.playing.URL || playback.playing.directory)) {
         // check if playing local media
@@ -622,7 +622,6 @@ socket.on('nowplaying', function (playback) {
                 var elem1 = document.getElementById("playback-status");
                 // calc time when media is finished fading in
                 var fadeEnd = playback.playingFadeIn.startTime + playback.playingFadeIn.fadeDuration;
-                console.log(`fade end: ${fadeEnd}`);
                 // run ui update loop
                 nowPlayingTimerID = setInterval(updatePlaybackStatus, 100, fadeEnd);
 
@@ -632,8 +631,11 @@ socket.on('nowplaying', function (playback) {
                         clearInterval(nowPlayingTimerID);
                         elem1.innerHTML = ``;
                     } else {
-                        // todo: not use unix time
-                        elem1.innerHTML = `crossfade ${currentTime}/${fadeEnd1} ms`;
+                        // calc current crossfade
+                        var timePassed = Math.round((currentTime - playback.playingFadeIn.startTime) / 1000);
+                        var timeLimit = Math.round(playback.playingFadeIn.fadeDuration / 1000);
+                        // add playback string with crossfade state to page
+                        elem1.innerHTML = `crossfade ${timePassed}/${timeLimit}s (${playback.playing.metadata.title} to ${playback.playingFadeIn.metadata.title})`;
                     }
                 }
             }
