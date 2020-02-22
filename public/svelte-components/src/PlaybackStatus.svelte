@@ -96,3 +96,6 @@ NOW PLAYING:
   NEXT:
   <PlaybackStatusElement {...nxtPlaying} />
 {/if}
+
+<iframe
+  src={nowPlaying.directory ? `/media/${nowPlaying.directory}/index.html` : '/media/.default/index.html'} />
