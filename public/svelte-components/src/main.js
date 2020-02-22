@@ -1,5 +1,5 @@
-import App from './App.svelte';
+import PlaybackStatus from './PlaybackStatus.svelte';
 
-new App({
+new PlaybackStatus({
 	target: document.querySelector('#playback-status')
 });
