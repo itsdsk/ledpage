@@ -9,6 +9,10 @@
 <p>
   {title}
   {#if timeFromStart}
-    {timeFromStart < 0 ? `in ${Math.abs(timeFromStart)}s` : `${timeFromStart}/${fadeDuration}s`}
+    (
+    {#if timeFromStart < 0}
+      {Math.abs(timeFromStart)}
+    {:else}{timeFromStart}/{fadeDuration}{/if}
+    s)
   {/if}
 </p>
