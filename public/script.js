@@ -371,8 +371,8 @@ document.addEventListener('click', function (event) {
     } else if (event.target.matches('#reloadCurrentPageButton')) {
         // send msg to reload page
         socket.emit('reloadpage');
-        // refresh iframe
-        document.getElementById('previewFrame').src = document.getElementById('previewFrame').src;
+        // refresh iframe // TODO: make work with svelte
+        //document.getElementById('previewFrame').src = document.getElementById('previewFrame').src;
     }
 }, false);
 document.addEventListener('mousedown', function (event) {

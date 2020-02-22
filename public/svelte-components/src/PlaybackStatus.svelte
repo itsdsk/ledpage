@@ -99,3 +99,5 @@ NOW PLAYING:
 
 <iframe
   src={nowPlaying.directory ? `/media/${nowPlaying.directory}/index.html` : '/media/.default/index.html'} />
+
+<button id="reloadCurrentPageButton">Reload</button>
