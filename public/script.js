@@ -583,6 +583,7 @@ socket.on('loadeditor', function (msg) {
 socket.on('getlogs', function (msg) {
     console.log(msg);
 });
+/*
 var nowPlayingTimerID;
 var playbackState = {};
 socket.on('nowplaying', function (playback) {
@@ -664,7 +665,8 @@ socket.on('nowplaying', function (playback) {
         }
     }
 });
-
+*/
+/*
 var playbackUpdatePeriod = 500; // ms
 setTimeout(function updatePlaybackStateTest() {
     //
@@ -710,7 +712,7 @@ setTimeout(function updatePlaybackStateTest() {
     // repeat
     setTimeout(updatePlaybackStateTest, playbackUpdatePeriod);
 }, playbackUpdatePeriod);
-
+*/
 // socket.on('nowplaying', function (currentURL) {
 //     // check if playing anything
 //     if (currentURL && currentURL.length > 0) {

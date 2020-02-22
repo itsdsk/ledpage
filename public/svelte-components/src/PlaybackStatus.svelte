@@ -50,7 +50,7 @@
   });
   let playbackState2 = {};
 
-  socket.on("nowplaying2", function(playback) {
+  socket.on("nowplaying", function(playback) {
     // parse status object
     playbackState2 = JSON.parse(playback);
 
