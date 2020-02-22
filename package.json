@@ -7,11 +7,19 @@
     "express": "^4.16.4",
     "handlebars": "^4.1.2",
     "socket.io": "2.2.0",
-    "sqlite3": "4.0.4"
+    "sqlite3": "4.0.4",
+    "rollup": "^1.20.0",
+    "rollup-plugin-svelte": "^5.0.3",
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "@rollup/plugin-commonjs": "^11.0.0",
+    "rollup-plugin-livereload": "^1.0.0",
+    "svelte": "^3.0.0"
   },
   "scripts": {
     "lint": "eslint .",
     "postinstall": "node generate_pages.js",
-    "start": "node app.js -n"
+    "start": "node app.js -n",
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
   }
 }

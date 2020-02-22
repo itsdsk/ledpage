@@ -12,4 +12,5 @@ public/media/*
 public/config.json
 public/index.html
 public/settings/index.html
+public/svelte-bundle.*
 config_gens
