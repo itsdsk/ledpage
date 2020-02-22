@@ -3,17 +3,13 @@
 
   import PlaybackStatus from "./PlaybackStatus.svelte";
 
-  let time = Date.now();
-
-  let fadeInTimeFromStart = 0;
-  let fadeInDuration = 1;
-  let autoplayTimeTillStart = 1;
+  let time = Math.round(Date.now() / 1000);
 
   let playbackStatusTemplate = {
     title: false,
     directory: "",
     startTime: 0,
-    fadeDuration: false
+    fadeDuration: 0
   };
 
   let nowPlaying = Object.assign({}, playbackStatusTemplate);
@@ -23,28 +19,22 @@
   onMount(() => {
     const interval = setInterval(() => {
       if (playbackState2 && playbackState2.playing) {
-        time = Date.now();
+        time = Math.round(Date.now() / 1000);
         if (playbackState2.playingFadeIn) {
-          fadeInTimeFromStart = Math.round(
-            (time - playbackState2.playingFadeIn.startTime) / 1000
+          fadingPlaying.timeFromStart = Math.round(
+            time - fadingPlaying.startTime
           );
-          fadeInDuration = Math.round(
-            playbackState2.playingFadeIn.fadeDuration / 1000
-          );
-          if (fadeInTimeFromStart >= fadeInDuration) {
+          if (fadingPlaying.timeFromStart > fadingPlaying.fadeDuration) {
             playbackState2.playing = playbackState2.playingFadeIn;
             playbackState2.playingFadeIn = false;
-            fadeInTimeFromStart = 0;
-            fadeInDuration = 1;
             nowPlaying = fadingPlaying;
+            delete nowPlaying.timeFromStart;
             fadingPlaying = false;
           }
         }
         if (playbackState2.playingAutoNext) {
-          autoplayTimeTillStart = Math.round(
-            (playbackState2.playingAutoNext.startTime - time) / 1000
-          );
-          if (autoplayTimeTillStart <= 0) {
+          nxtPlaying.timeFromStart = Math.round(time - nxtPlaying.startTime);
+          if (nxtPlaying.timeFromStart >= 0) {
             playbackState2.playingFadeIn = playbackState2.playingAutoNext;
             playbackState2.playingAutoNext = false;
             fadingPlaying = nxtPlaying;
@@ -68,37 +58,41 @@
       nowPlaying = Object.assign(nowPlaying, {
         title: playbackState2.playing.metadata.title,
         directory: playbackState2.playing.directory,
-        startTime: playbackState2.playing.startTime,
-        fadeDuration: playbackState2.playing.fadeDuration
+        startTime: Math.round(playbackState2.playing.startTime / 1000),
+        fadeDuration: Math.round(playbackState2.playing.fadeDuration / 1000)
       });
     }
     if (playbackState2.playingFadeIn) {
       fadingPlaying = Object.assign(fadingPlaying, {
         title: playbackState2.playingFadeIn.metadata.title,
         directory: playbackState2.playingFadeIn.directory,
-        startTime: playbackState2.playingFadeIn.startTime,
-        fadeDuration: playbackState2.playingFadeIn.fadeDuration
+        startTime: Math.round(playbackState2.playingFadeIn.startTime / 1000),
+        fadeDuration: Math.round(
+          playbackState2.playingFadeIn.fadeDuration / 1000
+        )
       });
     }
     if (playbackState2.playingAutoNext) {
       nxtPlaying = Object.assign(nxtPlaying, {
         title: playbackState2.playingAutoNext.metadata.title,
         directory: playbackState2.playingAutoNext.directory,
-        startTime: playbackState2.playingAutoNext.startTime,
-        fadeDuration: playbackState2.playingAutoNext.fadeDuration
+        startTime: Math.round(playbackState2.playingAutoNext.startTime / 1000),
+        fadeDuration: Math.round(
+          playbackState2.playingAutoNext.fadeDuration / 1000
+        )
       });
     }
     console.log(`svelte received playback status from server`);
   });
 </script>
 
-now playing:
+NOW PLAYING:
 <PlaybackStatus {...nowPlaying} />
 
 {#if fadingPlaying.title}
-  fading:
+  FADING:
   <PlaybackStatus {...fadingPlaying} />
 {:else if nxtPlaying.title}
-  next:
+  NEXT:
   <PlaybackStatus {...nxtPlaying} />
 {/if}
