@@ -785,6 +785,7 @@ module.exports = {
     },
     setAutoplayTimeRange: function (msg) {
         console.log(`USER INPUT::setting autoplay time range: ${JSON.stringify(msg)}`);
+        // update local config object
         if (msg.autoplayMinRange) {
             config.settings.autoplayDuration.min = msg.autoplayMinRange;
         }

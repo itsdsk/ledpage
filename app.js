@@ -7,7 +7,7 @@ var io = require('socket.io')(http);
 
 var httpPort = process.env.PORT || 3000;
 http.listen(httpPort, function () {
-  console.log(`Opened HTTP server on *:${httpPort}`);
+  console.log(`Opened server on http://localhost:${httpPort}`);
 });
 
 // scan content
