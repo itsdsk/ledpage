@@ -204,20 +204,20 @@ document.addEventListener('click', function (event) {
             page: 'channel'
         }, channelName, "?page=channel&channel=" + channelName);
         refresh();
-    } else if (event.target.matches('.playDiskButton')) {
-        //
-        diskDirectory = event.target.parentElement.parentElement.dataset.directory;
-        socket.emit('play', {
-            directory: diskDirectory
-        });
-    } else if (event.target.matches('.editDiskButton')) {
-        //
-        diskDirectory = event.target.parentElement.parentElement.dataset.directory;
-        window.history.pushState({
-            page: 'editor',
-            disk: diskDirectory
-        }, diskDirectory, "?page=editor&disk=" + diskDirectory);
-        refresh();
+    // } else if (event.target.matches('.playDiskButton')) {
+    //     //
+    //     diskDirectory = event.target.parentElement.parentElement.dataset.directory;
+    //     socket.emit('play', {
+    //         directory: diskDirectory
+    //     });
+    // } else if (event.target.matches('.editDiskButton')) {
+    //     //
+    //     diskDirectory = event.target.parentElement.parentElement.dataset.directory;
+    //     window.history.pushState({
+    //         page: 'editor',
+    //         disk: diskDirectory
+    //     }, diskDirectory, "?page=editor&disk=" + diskDirectory);
+    //     refresh();
     } else if (event.target.matches('.newDiskButton')) {
         //
         channelName = event.target.parentElement.parentElement.dataset.channel;
