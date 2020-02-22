@@ -631,7 +631,7 @@ socket.on('nowplaying', function (playback) {
                     var currentTime = Date.now();
                     if (currentTime > fadeEnd1) {
                         clearInterval(nowPlayingTimerID);
-                        elem1.innerHTML = ``;
+                        //elem1.innerHTML = ``;
                     } else {
                         // calc current crossfade
                         var timePassed = Math.round((currentTime - playback.playingFadeIn.startTime) / 1000);
@@ -670,14 +670,11 @@ setTimeout(function updatePlaybackStateTest() {
     //
     var playbackStateElement = document.getElementById('playback-status2');
     if (playbackState.playing) {
-        var playbackStateString = `playing ${playbackState.playing.metadata.title}`;
         var playingString, nextString;
-        playingString = `playing ${playbackState.playing.metadata.title}`;
         var currentTime = Date.now();
         if (playbackState.playingFadeIn) {
             var timePassed = Math.round((currentTime - playbackState.playingFadeIn.startTime) / 1000);
             var timeLimit = Math.round(playbackState.playingFadeIn.fadeDuration / 1000);
-            playbackStateString += `, fading ${timePassed}/${timeLimit}s to ${playbackState.playingFadeIn.metadata.title}`;
             if (timePassed >= timeLimit) {
                 playbackState.playing = playbackState.playingFadeIn;
                 playbackState.playingFadeIn = false;
@@ -685,29 +682,28 @@ setTimeout(function updatePlaybackStateTest() {
         }
         if (playbackState.playingAutoNext) {
             var timeLeft = Math.round((playbackState.playingAutoNext.startTime - currentTime) / 1000);
-            playbackStateString += `, playing ${playbackState.playingAutoNext.metadata.title} in ${timeLeft}s`;
             if (timeLeft <= 0) {
                 playbackState.playingFadeIn = playbackState.playingAutoNext;
                 playbackState.playingAutoNext = false;
             }
         }
-        //
+        // set string for now-playing status
         if (playbackState.playingFadeIn) {
             var timePassed = Math.round((currentTime - playbackState.playingFadeIn.startTime) / 1000);
             var timeLimit = Math.round(playbackState.playingFadeIn.fadeDuration / 1000);
-            playingString = `fading ${playbackState.playing.metadata.title} to ${playbackState.playingFadeIn.metadata.title} (${timePassed}/${timeLimit}s)`;
+            playingString = `fading<br>${playbackState.playing.metadata.title} to ${playbackState.playingFadeIn.metadata.title} (${timePassed}/${timeLimit}s)`;
         } else {
-            playingString = `playing ${playbackState.playing.metadata.title}`;
+            playingString = `playing<br>${playbackState.playing.metadata.title}`;
         }
+        // set string for playing-next status
         if (playbackState.playingAutoNext) {
             var timeLeft = Math.round((playbackState.playingAutoNext.startTime - currentTime) / 1000);
-            nextString = `up next ${playbackState.playingAutoNext.metadata.title} (${timeLeft}s)`;
+            nextString = `<br>up next<br>${playbackState.playingAutoNext.metadata.title} (${timeLeft}s)`;
         } else {
-            nextString = `nothing in queue`;
+            nextString = `<br>nothing in queue`;
         }
-        playbackStateString = playingString + ', ' + nextString;
         //
-        playbackStateElement.innerHTML = playbackStateString;
+        playbackStateElement.innerHTML = `${playingString}${nextString}`;
     } else {
         playbackStateElement.innerHTML = `not playing anything`;
     }
