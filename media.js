@@ -832,6 +832,13 @@ module.exports = {
             }
         });
     },
+    loadMediaFeed: function (params, callback) {
+        //
+        db.all('SELECT directory, title, image, modified FROM media', (err, dbreturn) => {
+            if (err) console.log(`err: ${err}`);
+            callback(dbreturn);
+        });
+    },
     loadAll: function (params, callback) {
         // count number of media items
         db.get(`SELECT count(*) AS count FROM media`, (err, info) => {
