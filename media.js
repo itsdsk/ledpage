@@ -839,6 +839,16 @@ module.exports = {
             callback(dbreturn);
         });
     },
+    loadChannelList: function (params, callback) {
+        db.all(`SELECT channel_name, count(media_directory) AS count FROM connections GROUP BY channel_name`, (err, info) => {
+            if (err) console.log(`err: ${err}`);
+            db.get('SELECT count(*) AS count FROM media', (err, countall) => {
+                if (err) console.log(`err: ${err}`);
+                info = [...info, countall];
+                callback(info);
+            });
+        })
+    },
     loadAll: function (params, callback) {
         // count number of media items
         db.get(`SELECT count(*) AS count FROM media`, (err, info) => {

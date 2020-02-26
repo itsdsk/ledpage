@@ -29,6 +29,9 @@ io.on('connection', function (socket) {
       media.loadMediaFeed({}, function (elements) {
         io.emit('mediafeed', elements)
       });
+      media.loadChannelList({}, function (elements) {
+        io.emit('channellist', elements);
+      });
     } else {
       media.loadFeed(function (elements) {
         io.emit('load', elements);
