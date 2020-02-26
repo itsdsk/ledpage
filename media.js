@@ -833,8 +833,10 @@ module.exports = {
         });
     },
     loadMediaFeed: function (params, callback) {
-        //
-        db.all('SELECT directory, title, image, modified FROM media', (err, dbreturn) => {
+        // get media items from db with list of channels
+        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, GROUP_CONCAT(connections.channel_name) AS channels
+        FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
+        db.all(mediaQuery, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
             callback(dbreturn);
         });
