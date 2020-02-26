@@ -3,6 +3,8 @@
   export let title;
   export let image;
   export let modified;
+  export let channels;
+  $: channels_parsed = JSON.parse(channels);
 
   function handlePlay(event) {
     socket.emit("play", { directory: directory });
@@ -22,6 +24,13 @@
 
 <div>
   <p>{title}</p>
+  <p> channels:
+    {#each channels_parsed as channel}
+      <span>
+        {channel}
+      </span>
+    {/each}
+  </p>
   <img src={image} alt={title} />
   <button on:click={handlePlay}>Play</button>
   <button on:click={handleEdit}>Edit</button>
