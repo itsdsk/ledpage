@@ -838,7 +838,13 @@ module.exports = {
         FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
         db.all(mediaQuery, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
-            callback(dbreturn);
+            // parse list of channels to json array from string
+            for(var i = 0; i < dbreturn.length; i++) {
+                dbreturn[i].channels = JSON.parse(dbreturn[i].channels);
+                if (i == dbreturn.length - 1) {
+                    callback(dbreturn);
+                }
+            }
         });
     },
     loadChannelList: function (params, callback) {

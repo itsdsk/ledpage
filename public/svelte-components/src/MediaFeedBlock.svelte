@@ -4,7 +4,6 @@
   export let image;
   export let modified;
   export let channels;
-  $: channels_parsed = JSON.parse(channels);
 
   function handlePlay(event) {
     socket.emit("play", { directory: directory });
@@ -25,7 +24,7 @@
 <div>
   <p>{title}</p>
   <p> channels:
-    {#each channels_parsed as channel}
+    {#each channels as channel}
       <span>
         {channel}
       </span>
