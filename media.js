@@ -852,7 +852,7 @@ module.exports = {
             if (err) console.log(`err: ${err}`);
             db.get('SELECT count(*) AS count FROM media', (err, countall) => {
                 if (err) console.log(`err: ${err}`);
-                info = [...info, countall];
+                info = [countall, ...info];
                 callback(info);
             });
         })

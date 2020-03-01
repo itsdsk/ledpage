@@ -10,7 +10,20 @@
   socket.on("channellist", function(newChannelObjects) {
     channelObjects = newChannelObjects;
   });
+
+  let selectedChannel = 'all media';
 </script>
+
+<select bind:value={selectedChannel} on:change="{() => console.log(selectedChannel)}">
+  {#each channelObjects as channelObject}
+    <option value={channelObject.channel_name || 'all media'}>
+      {channelObject.channel_name || 'all media'} ({channelObject.count})
+    </option>
+  {/each}
+</select>
+{#each mediaFeedObjects.filter(m => selectedChannel === 'all media' || m.channels.includes(selectedChannel)) as mediaFeedObject}
+  <p>{mediaFeedObject.title} ({JSON.stringify(mediaFeedObject.channels)})</p>
+{/each}
 
 <p>
   {#each channelObjects as channelObject}
