@@ -4,6 +4,7 @@
   export let image;
   export let modified;
   export let channels;
+  export let playcount;
 
   function handlePlay(event) {
     socket.emit("play", { directory: directory });

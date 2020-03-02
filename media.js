@@ -834,7 +834,7 @@ module.exports = {
     },
     loadMediaFeed: function (params, callback) {
         // get media items from db with list of channels
-        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, json_group_array(connections.channel_name) AS channels
+        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
         FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
         db.all(mediaQuery, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
