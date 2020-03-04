@@ -938,6 +938,9 @@ module.exports = {
             });
         });
     },
+    loadConfiguration: function (callback) {
+        callback(config);
+    },
     loadOutput: function (callback) {
         var element = outputFormCompiler(config) + outputGraphicCompiler(config);
         console.log("USER INPUT::loading output");
