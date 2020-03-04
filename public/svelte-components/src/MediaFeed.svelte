@@ -50,17 +50,5 @@
 </select>
 
 {#each mediaFeedObjects.filter(m => selectedChannel === 'all media' || m.channels.includes(selectedChannel)) as mediaFeedObject}
-  <p>{mediaFeedObject.modified} {mediaFeedObject.playcount} {mediaFeedObject.title}</p>
-{/each}
-
-<p>
-  {#each channelObjects as channelObject}
-    <span>
-      {channelObject.channel_name || 'all media'} ({channelObject.count})
-    </span>
-  {/each}
-</p>
-
-{#each mediaFeedObjects as mediaFeedObject}
   <MediaFeedBlock {...mediaFeedObject} />
 {/each}
