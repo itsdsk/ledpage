@@ -9,6 +9,8 @@
     gamma.value = config.settings.gamma;
     blur.value = config.settings.blur;
     fade.value = config.settings.fade;
+    autoplayDurationMin.value = config.settings.autoplayDuration.min;
+    autoplayDurationMax.value = config.settings.autoplayDuration.max;
   });
   let brightness = {
     name: "brightness",
@@ -27,8 +29,10 @@
   let gamma = { name: "gamma", value: 2.2, min: 0.0, max: 5.0, step: 0.01 };
   let blur = { name: "blur", value: 50, min: 1, max: 48, step: 1 };
   let fade = { name: "fade", value: 25000, min: 0, max: 25000, step: 100 };
+  let autoplayDurationMin = { name: "autoplayMinRange", value: 30000, min: 15000, max: 300000, step: 1000 };
+  let autoplayDurationMax = { name: "autoplayMaxRange", value: 60000, min: 15000, max: 300000, step: 1000 };
 </script>
 
-{#each [brightness, desaturation, gamma, blur, fade] as item}
+{#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
   <ConfigurationSlider {...item} />
 {/each}

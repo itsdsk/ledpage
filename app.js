@@ -187,6 +187,12 @@ io.on('connection', function (socket) {
       case 'fade':
         media.setCrossfadeTime(updateObj);
         break;
+      case 'autoplayMinRange':
+        media.setAutoplayTimeRange(updateObj);
+        break;
+      case 'autoplayMaxRange':
+        media.setAutoplayTimeRange(updateObj);
+        break;
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }
