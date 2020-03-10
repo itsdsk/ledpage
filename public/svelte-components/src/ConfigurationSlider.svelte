@@ -7,10 +7,11 @@
 
   function handleChange (event) {
     var data = {
-      [name]: value
+      name: name,
+      value: value
     };
     //console.log(`sending updated ${name} value to server: ${JSON.stringify(data)}`);
-    socket.emit(name, data);
+    socket.emit("config/update", data);
   }
 </script>
 

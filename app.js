@@ -164,6 +164,33 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // general config update handler
+  socket.on('config/update', function (msg) {
+    // make object in old style of update
+    var updateObj = {
+      [msg.name]: msg.value
+    }
+    // look which setting is being updated
+    switch (msg.name) {
+      case 'brightness':
+        media.setBrightness(updateObj);
+        break;
+      case 'desaturation':
+        media.setDesaturation(updateObj);
+        break;
+      case 'gamma':
+        media.setGamma(updateObj);
+        break;
+      case 'blur':
+        media.setBlur(updateObj);
+        break;
+      case 'fade':
+        media.setCrossfadeTime(updateObj);
+        break;
+      default:
+        console.log(`error parsing ${JSON.stringify(msg)}`);
+    }
+  });
   // set brightness
   socket.on('setbrightness', function (msg) {
     // update media
