@@ -23,7 +23,7 @@
 </script>
 
 <div>
-  <p>{title}</p>
+  <h3>{title}</h3>
   <p> channels:
     {#each channels as channel}
       <span>
@@ -31,7 +31,7 @@
       </span>
     {/each}
   </p>
-  <img src={image} alt={title} />
+  <img src={image} alt="no image available" />
   <button on:click={handlePlay}>Play</button>
   <button on:click={handleEdit}>Edit</button>
 </div>
