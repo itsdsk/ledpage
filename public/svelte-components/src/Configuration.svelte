@@ -1,6 +1,9 @@
 <script>
   import ConfigurationSlider from "./ConfigurationSlider.svelte";
+  import MapContainer from "./MapContainer.svelte";
+  import MapChain from "./MapChain.svelte";
   let config;
+  let activeChain;
   socket.on("configuration", function(conf) {
     config = conf;
     // set values from config
@@ -36,3 +39,12 @@
 {#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
   <ConfigurationSlider {...item} />
 {/each}
+
+{#if config}
+<h1>{JSON.stringify(activeChain)}</h1>
+<MapContainer>
+  {#each config.outputs as output}
+    <MapChain fillColour={activeChain === output ? 'white' : 'black'} {output} on:click={() => { activeChain = output; console.log(JSON.stringify(output))}}/>
+  {/each}
+</MapContainer>
+{/if}
