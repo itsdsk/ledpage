@@ -70,7 +70,7 @@ io.on('connection', function (socket) {
   socket.on('updateconfig', function (msg) {
     media.updateConfig(msg);
   });
-  // upload config
+  // DEPRECATED upload config
   socket.on('uploadconfig', function (msg) {
     media.uploadConfig(msg, function () {
       media.loadOutput(function (elements) {
@@ -78,6 +78,18 @@ io.on('connection', function (socket) {
       });
     });
   });
+  // upload config file
+  socket.on('updateconfigfile', function (msg) {
+    // update in memory
+    media.uploadConfig(msg, function () {
+      // save to disk
+      media.saveConfig();
+      // send config back to client
+      media.loadConfiguration(function (elements) {
+        io.emit('configuration', elements);
+      });
+    });
+  })
   // save config file
   socket.on('saveconfig', function () {
     media.saveConfig();
