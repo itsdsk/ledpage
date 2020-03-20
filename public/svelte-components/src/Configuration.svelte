@@ -41,10 +41,15 @@
 {/each}
 
 {#if config}
-<h1>{JSON.stringify(activeChain)}</h1>
-<MapContainer>
-  {#each config.outputs as output}
-    <MapChain fillColour={activeChain === output ? 'white' : 'black'} {output} on:click={() => { activeChain = output; console.log(JSON.stringify(output))}}/>
-  {/each}
-</MapContainer>
+  <h1>Config ({config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {config.outputs.length} chains)</h1>
+  {#if activeChain}
+    <h2>Chain {activeChain.index}: Type: {activeChain.properties.type} LEDs: {activeChain.leds.length}</h2>
+  {:else}
+    <h2>No chain selected</h2>
+  {/if}
+  <MapContainer>
+    {#each config.outputs as output}
+      <MapChain fillColour={activeChain === output ? 'white' : 'black'} {output} on:click={() => { activeChain = output; }}/>
+    {/each}
+  </MapContainer>
 {/if}
