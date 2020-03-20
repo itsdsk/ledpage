@@ -129,5 +129,6 @@ EOT"
 # hdmi_mode=87
 # hdmi_cvt=640 480 60 1 0 0 0
 # 640 x 350 @ 85Hz:
+# hdmi_group=2
 # hdmi_mode=1
 # gpu_mem=192
