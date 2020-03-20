@@ -49,6 +49,8 @@
   {/each}
 </select>
 
+<button on:click={() => socket.emit('autoplay', selectedChannel === 'all media' ? null : selectedChannel )}>Autoplay</button>
+
 {#each mediaFeedObjects.filter(m => selectedChannel === 'all media' || m.channels.includes(selectedChannel)) as mediaFeedObject}
   <MediaFeedBlock {...mediaFeedObject} />
 {/each}
