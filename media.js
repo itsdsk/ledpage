@@ -747,6 +747,29 @@ module.exports = {
             }));
             // do not take screenshot
             mediaRequiringScreenshot = null;
+            // update playback status
+            playback.playingFadeIn = {
+                directory: name,
+                startTime: Date.now(),
+                fadeDuration: config.settings.fade,
+                metadata: {
+                    title: `URL: ${name}`
+                }
+            };
+            // update playback status when fade is over
+            clearTimeout(playback.transitioningTimerID);
+            playback.transitioningTimerID = null;
+            playback.transitioningTimerID = setTimeout(function (playingURL) {
+                //
+                playback.playing = {
+                    directory: playingURL,
+                    metadata: {
+                        title: `URL: ${playingURL}`
+                    }
+                };
+                // clear fading in
+                playback.playingFadeIn = false;
+            }, config.settings.fade, name);
         }
         console.log('USER INPUT::playing remote media: ' + name);
     },
