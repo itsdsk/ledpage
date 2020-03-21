@@ -3,21 +3,17 @@ const util = require('util');
 const fs = require('fs');
 const copyFilePromise = util.promisify(fs.copyFile);
 const path = require('path');
-const Dat = require('dat-node');
 var sockets = require('./sockets.js');
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database(':memory:');
-
-var datHttpServer;
 
 db.serialize(function () {
     // create tables for primitive types (media and channel)
     db.run(`CREATE TABLE media (
         directory TEXT PRIMARY KEY, title TEXT, description TEXT,
         image BLOB, blur_amt INT DEFAULT 50, modified TEXT,
-        playcount INT DEFAULT 0,
-        dat_key CHARACTER(64), dat_versions UNSIGNED SMALL INT
+        playcount INT DEFAULT 0
     )`);
     db.run(`CREATE TABLE channels (
         name TEXT PRIMARY KEY
@@ -500,51 +496,23 @@ module.exports = {
         });
     },
     saveVersion: function (msg) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // save version of media to Dat
-        Dat(path.join(mediaDir, msg), function (err, dat) {
-            if (err) throw err;
-            if (dat.writable) {
-                dat.importFiles();
-                dat.joinNetwork();
-                console.log("USER INPUT::Saved revision " + dat.archive.version + " of " + msg + " in dat://" + dat.key.toString('hex'));
-                // get datetime
-                var timestamp = new Date().toISOString();
-                timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
-                // update key+version in database
-                var addDatQuery = "UPDATE media SET dat_key = ?, dat_versions = ?, modified = ? WHERE directory = ?";
-                db.run(addDatQuery, [dat.key.toString('hex'), dat.archive.version, timestamp, msg]);
-                // update dat key and datetime in JSON
-                var metaPath = path.join(mediaDir, msg, 'demo.json');
-                var meta = require(metaPath);
-                meta.demo = Object.assign(meta.demo, {
-                    datKey: dat.key.toString('hex'),
-                    modified: timestamp
-                });
-                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                    if (err) console.log(err);
-                });
-            } else {
-                console.log("USER INPUT ERROR::Could not save version because dat is not writable (must be owner to import files)");
-            }
+        console.log(`warning: not saving version (DAT is deprecated)`);
+        // get datetime
+        var timestamp = new Date().toISOString();
+        timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+        // update in database
+        var updateModifiedQuery = "UPDATE media SET modified = ? WHERE directory = ?";
+        db.run(updateModifiedQuery, [timestamp, msg]);
+        // update datetime in JSON
+        var metaPath = path.join(mediaDir, msg, 'demo.json');
+        var meta = require(metaPath);
+        meta.demo = Object.assign(meta.demo, {
+            modified: timestamp
         });
-        // TEST TO CHECKOUT AND DOWNLOAD OLD VERSION
-        // Dat('/home/testmediaitem/', {
-        //     key: '0c2f952a505a2bffc913a79e0fdc2cccf2654a31ff555dc6248a407036c69cd5'
-        // }, function (err, dat) {
-        //     if(err) throw err;
-        //     dat.joinNetwork();
-        //     dat.archive.on('content', function() {
-        //         dat.archive.checkout(4).download('/', function (err) {
-        //             if(err)console.log("err: " + err);
-        //             dat.archive.readFile('/index.html', {cached: true}, function (err, content) {
-        //                 if(err)console.log("err2: " + err);
-        //                 console.log("content: " + content);
-        //             });
-        //         });
-        //     });
-        // });
+        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+            if (err) console.log(err);
+        });
+        console.log(`USER INPUT::Saved ${msg} at ${timestamp}`);
     },
     deleteConnection: function (msg, callback) {
         // stop autoplay
@@ -593,96 +561,72 @@ module.exports = {
     playLocalMedia: function (dirAndVersion) {
         var filePath = path.join(mediaDir, dirAndVersion.directory);
         if (dirAndVersion.version) {
-            // serve Dat to see old version
-            Dat(filePath, function (err, dat) {
-                if (err) throw err;
-                if (datHttpServer)
-                    datHttpServer.close();
-                datHttpServer = dat.serveHttp({
-                    port: 8731
+            console.log(`warning: cannot play old versions of media (DAT is deprecated)`);
+        }
+        // update playcount in database
+        db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
+            if (err) console.log(`error updating playcount in database: ${err}`);
+            // get playcount and check screenshot
+            db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
+                if (err) console.log(`Error getting media info from db: ${err}`);
+                // get demo.json
+                var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
+                var meta = require(metaPath);
+                // update playcount
+                meta.demo.playcount = +row.playcount;
+                // save demo.json
+                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
                 });
-                if (rendererSocket.connected) {
-                    // send media path to renderer
-                    var rendererURL = 'localhost:8731/?version=' + dirAndVersion.version.toString();
-                    rendererSocket.write(JSON.stringify({
-                        command: 'loadURL',
-                        path: rendererURL
-                    }));
-                    // // send blur amt to backend
-                    // // select media item
-                    // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
-                    // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
-                    //     // send size to app
-                    //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
-                    // });
+                // check if screenshot is missing
+                if (meta.demo.image && meta.demo.image.length > 0) {
+                    // do not take screenshot
+                    mediaRequiringScreenshot = null;
+                } else {
+                    // flag media directory to take screenshot of
+                    mediaRequiringScreenshot = dirAndVersion.directory;
                 }
             });
-        } else {
-            // update playcount in database
-            db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
-                if (err) console.log(`error updating playcount in database: ${err}`);
-                // get playcount and check screenshot
-                db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
-                    if (err) console.log(`Error getting media info from db: ${err}`);
-                    // get demo.json
-                    var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
-                    var meta = require(metaPath);
-                    // update playcount
-                    meta.demo.playcount = +row.playcount;
-                    // save demo.json
-                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                        if (err) console.log(err);
-                    });
-                    // check if screenshot is missing
-                    if (meta.demo.image && meta.demo.image.length > 0) {
-                        // do not take screenshot
-                        mediaRequiringScreenshot = null;
-                    } else {
-                        // flag media directory to take screenshot of
-                        mediaRequiringScreenshot = dirAndVersion.directory;
-                    }
-                });
-            });
-            // send media file path to renderer
-            rendererSocket.write(JSON.stringify({
-                command: 'loadURL',
-                path: ('file://' + filePath + "/index.html")
-            }));
-            // update playback status
-            playback.playingFadeIn = {
-                directory: dirAndVersion.directory,
-                startTime: Date.now(),
-                fadeDuration: config.settings.fade
+        });
+        // send media file path to renderer
+        rendererSocket.write(JSON.stringify({
+            command: 'loadURL',
+            path: ('file://' + filePath + "/index.html")
+        }));
+        // update playback status
+        playback.playingFadeIn = {
+            directory: dirAndVersion.directory,
+            startTime: Date.now(),
+            fadeDuration: config.settings.fade
+        };
+        // add metadata from database to playback status
+        db.get(`SELECT title, image FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
+            if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
+            playback.playingFadeIn.metadata = itemrow;
+        });
+        // update playback status when fade is over
+        clearTimeout(playback.transitioningTimerID);
+        playback.transitioningTimerID = null;
+        playback.transitioningTimerID = setTimeout(function (playingDirectory) {
+            //
+            playback.playing = {
+                directory: playingDirectory
             };
             // add metadata from database to playback status
-            db.get(`SELECT title, image FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
-                if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
-                playback.playingFadeIn.metadata = itemrow;
+            db.get(`SELECT title FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
+                if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
+                playback.playing.metadata = itemrow;
             });
-            // update playback status when fade is over
-            clearTimeout(playback.transitioningTimerID);
-            playback.transitioningTimerID = null;
-            playback.transitioningTimerID = setTimeout(function (playingDirectory) {
-                //
-                playback.playing = {
-                    directory: playingDirectory
-                };
-                // add metadata from database to playback status
-                db.get(`SELECT title FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
-                    if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
-                    playback.playing.metadata = itemrow;
-                });
-                //
-                playback.playingFadeIn = false;
-            }, config.settings.fade, dirAndVersion.directory);
-            // // send blur amt to backend
-            // // select media item
-            // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
-            // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
-            //     // send size to app
-            //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
-            // });
-        }
+            //
+            playback.playingFadeIn = false;
+        }, config.settings.fade, dirAndVersion.directory);
+        // // send blur amt to backend
+        // // select media item
+        // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
+        // db.get(selectQuery, [dirAndVersion.directory], (err, itemrow) => {
+        //     // send size to app
+        //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
+        // });
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
     },
     setBrightness: function (msg) {
@@ -1069,7 +1013,7 @@ function templateChannel(channel_name, sort, create_flag, callback) {
 
 function templateMediaItem(media_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from media table
-    var sql = "SELECT directory, title, description, image, blur_amt, modified, dat_key, dat_versions FROM media WHERE directory = ?";
+    var sql = "SELECT directory, title, description, image, blur_amt, modified FROM media WHERE directory = ?";
     db.get(sql, [media_directory], (err, itemrow) => {
         itemrow.files = new Array();
         // fetch corresponding entries in files table
@@ -1146,22 +1090,7 @@ function parseMediaItemDirectory(directory, meta, callback) {
                 db.run(addConnectQuery, [directory, channelName], callback);
             });
         });
-        // add DAT info to database
-        if (meta.demo.datKey) {
-            // get version number from Dat
-            Dat(itemPath, {
-                key: meta.demo.datKey,
-                sparse: true
-            }, function (err, dat) {
-                if (err) throw err;
-                dat.joinNetwork();
-                // update Dat fields in database
-                var addDatQuery = "UPDATE media SET dat_key = ?, dat_versions = ? WHERE directory = ?";
-                db.run(addDatQuery, [meta.demo.datKey, dat.archive.version, directory]);
-            });
-        }
     });
-
 }
 
 function runCommand(command, callback) {
