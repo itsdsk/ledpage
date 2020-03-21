@@ -210,8 +210,8 @@ module.exports = {
                     if (err) console.log("err: " + err);
                     // check if subpath is a directory
                     if (stats.isDirectory()) {
-                        // check folder is not hidden
-                        if (itemPath.includes('/.') == false) {
+                        // check folder is not hidden (unless media directory is unpopulated)
+                        if (itemPath.includes('/.') == false || files.length == 1) {
                             // load media metadata
                             var meta = require(path.join(itemPath, 'demo.json'));
                             if (meta) {
