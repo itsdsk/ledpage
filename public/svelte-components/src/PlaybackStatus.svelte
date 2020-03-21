@@ -84,6 +84,8 @@
     }
     console.log(`svelte received playback status from server`);
   });
+
+  $: iframeSrc = nowPlaying.directory ? (nowPlaying.directory.startsWith('http') ? nowPlaying.directory : `/media/${nowPlaying.directory}/index.html`) : `/media/.default/index.html`;
 </script>
 
 NOW PLAYING:
@@ -98,7 +100,7 @@ NOW PLAYING:
 {/if}
 
 <iframe
-  src="/media/{nowPlaying.directory || '.default'}/index.html"
+  src={iframeSrc}
   title={nowPlaying.title} />
 
 <button id="reloadCurrentPageButton">Reload</button>
