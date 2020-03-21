@@ -7,7 +7,7 @@
 </script>
 
 <p>
-  {title}
+  {title || 'Nothing...'}
   {#if timeFromStart}
     (
     {#if timeFromStart < 0}
