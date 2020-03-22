@@ -17,6 +17,6 @@
 
 <svelte:window on:resize={resizeSVG} bind:innerHeight={windowHeight} />
 
-<svg viewBox="0 0 {width} {height}" height={windowHeight - 10} bind:this={svg}>
+<svg viewBox="0 0 {width} {height}" height={Math.min(windowHeight - 10, 500)} bind:this={svg}>
   <slot />
 </svg>
