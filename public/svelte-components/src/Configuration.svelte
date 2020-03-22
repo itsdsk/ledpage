@@ -4,6 +4,7 @@
   import MapChain from "./MapChain.svelte";
   let config;
   let activeChain;
+  let showAll;
   socket.on("configuration", function(conf) {
     config = conf;
     // set values from config
@@ -65,25 +66,70 @@
   }
 </script>
 
-{#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
-  <ConfigurationSlider {...item} />
-{/each}
+<p
+  style="text-align:center;"
+  on:click={() => showAll = !showAll}
+>
+  {showAll ? 'Close' : 'Open'}Settings
+</p>
 
-{#if config}
-  <h1>Config ({config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {config.outputs.length} chains)</h1>
-  <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
-  <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}>Select config file</a>
-  {#if fileUploadText.length}
-    <p>{fileUploadText}</p>
+<div id="config-main">
+
+  {#if showAll}
+
+    {#if config}
+      <div id="config-main__map">
+      
+        <MapContainer>
+          {#each config.outputs as output}
+            <MapChain fillColour={activeChain === output ? 'black' : 'white'} {output} on:click={() => { activeChain = output; }}/>
+          {/each}
+        </MapContainer>
+      
+        <p>Output has {config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {config.outputs.length} chains</p>
+      
+        <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
+        <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}>Upload config file</a>
+        {#if fileUploadText.length}
+          <p>{fileUploadText}</p>
+        {/if}
+
+        <p>
+          Chain:
+          {#if activeChain}
+            #{activeChain.index}: Type: {activeChain.properties.type} LEDs: {activeChain.leds.length}
+          {:else}
+            None selected...
+          {/if}
+        </p>
+
+      </div>
+
+    {/if}
+
+    <div>
+      {#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
+        <div>
+          <ConfigurationSlider {...item} />
+        </div>
+      {/each}
+    </div>
   {/if}
-  {#if activeChain}
-    <h2>Chain {activeChain.index}: Type: {activeChain.properties.type} LEDs: {activeChain.leds.length}</h2>
-  {:else}
-    <h2>No chain selected</h2>
-  {/if}
-  <MapContainer>
-    {#each config.outputs as output}
-      <MapChain fillColour={activeChain === output ? 'white' : 'black'} {output} on:click={() => { activeChain = output; }}/>
-    {/each}
-  </MapContainer>
-{/if}
+</div>
+
+<style>
+  #config-main {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    background-color: rgba(0, 0, 0, 0.50);
+    margin: 8px;
+  }
+  #config-main__map {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
