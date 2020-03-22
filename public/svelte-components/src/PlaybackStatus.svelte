@@ -83,24 +83,52 @@
       });
     }
     console.log(`svelte received playback status from server`);
+    //console.log(`svelte received playback status from server:\n${JSON.stringify(playbackState2, null, 2)}`);
   });
 
   $: iframeSrc = nowPlaying.directory ? (nowPlaying.directory.startsWith('http') ? nowPlaying.directory : `/media/${nowPlaying.directory}/index.html`) : `/media/.default/index.html`;
 </script>
 
-NOW PLAYING:
-<PlaybackStatusElement {...nowPlaying} />
+<div class="playback-status">
+  <div>
+    <iframe
+      src={iframeSrc}
+      title={nowPlaying.title} />
+  </div>
 
-{#if fadingPlaying.title}
-  FADING:
-  <PlaybackStatusElement {...fadingPlaying} />
-{:else if nxtPlaying.title}
-  NEXT:
-  <PlaybackStatusElement {...nxtPlaying} />
-{/if}
+  <div>
+  
+    <div>
+      <button id="reloadCurrentPageButton">Reload</button>
+    </div>
 
-<iframe
-  src={iframeSrc}
-  title={nowPlaying.title} />
+    NOW PLAYING:
+    <PlaybackStatusElement {...nowPlaying} />
 
-<button id="reloadCurrentPageButton">Reload</button>
+    {#if fadingPlaying.title}
+      FADING:
+      <PlaybackStatusElement {...fadingPlaying} />
+    {:else if nxtPlaying.title}
+      NEXT:
+      <PlaybackStatusElement {...nxtPlaying} />
+    {/if}
+  </div>
+</div>
+
+<style>
+  iframe {
+    width: 350px;
+    height: 350px;
+  }
+  .playback-status {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 8px;
+  }
+  .playback-status > div {
+    padding: 16px;
+  }
+</style>
