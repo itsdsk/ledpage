@@ -240,21 +240,11 @@ io.on('connection', function (socket) {
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    media.deleteConnection(msg, function (mediaDirectory) {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: mediaDirectory
-      }));
-    });
+    media.deleteConnection(msg);
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    media.createConnection(msg, function (mediaDirectory) {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: mediaDirectory
-      }));
-    });
+    media.createConnection(msg);
   });
   // get logs
   socket.on('getlogs', function () {

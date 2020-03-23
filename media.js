@@ -514,48 +514,50 @@ module.exports = {
         });
         console.log(`USER INPUT::Saved ${msg} at ${timestamp}`);
     },
-    deleteConnection: function (msg, callback) {
+    deleteConnection: function (msg) {
         // stop autoplay
         module.exports.stopAutoplay();
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE media_directory = ? AND channel_name = ?";
-        db.run(sql, msg);
-        // get path and load json
-        var metaPath = path.join(mediaDir, msg[0], 'demo.json');
-        var meta = require(metaPath);
-        // get index of channel in array
-        var index = meta.demo.channels.indexOf(msg[1]);
-        if (index > -1) {
-            // delete if exists
-            meta.demo.channels.splice(index, 1);
-        }
-        // save json to disk
-        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-            if (err) console.log(err);
-            callback(msg[0]);
+        db.run(sql, msg, (err) => {
+            if (err) console.log(`error updating database: ${err}`);
+            // get path and load json
+            var metaPath = path.join(mediaDir, msg[0], 'demo.json');
+            var meta = require(metaPath);
+            // get index of channel in array
+            var index = meta.demo.channels.indexOf(msg[1]);
+            if (index > -1) {
+                // delete if exists
+                meta.demo.channels.splice(index, 1);
+            }
+            // save json to disk
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+            });
         });
     },
-    createConnection: function (msg, callback) {
+    createConnection: function (msg) {
         // stop autoplay
         module.exports.stopAutoplay();
         console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
         var sql = "INSERT INTO connections (media_directory, channel_name) VALUES (?, ?)";
-        db.run(sql, msg);
-        // get path and load json
-        var metaPath = path.join(mediaDir, msg[0], 'demo.json');
-        var meta = require(metaPath);
-        // get index of channel in array
-        var index = meta.demo.channels.indexOf(msg[1]);
-        if (index == -1) {
-            // add if channel isnt connected
-            meta.demo.channels.push(msg[1]);
-        }
-        // save json to disk
-        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-            if (err) console.log(err);
-            callback(msg[0]);
+        db.run(sql, msg, (err) => {
+            if (err) console.log(`error updating database: ${err}`);
+            // get path and load json
+            var metaPath = path.join(mediaDir, msg[0], 'demo.json');
+            var meta = require(metaPath);
+            // get index of channel in array
+            var index = meta.demo.channels.indexOf(msg[1]);
+            if (index == -1) {
+                // add if channel isnt connected
+                meta.demo.channels.push(msg[1]);
+            }
+            // save json to disk
+            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                if (err) console.log(err);
+            });
         });
     },
     playLocalMedia: function (dirAndVersion) {
