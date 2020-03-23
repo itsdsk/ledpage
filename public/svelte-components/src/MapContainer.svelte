@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
 
   let svg;
   let width = "0";
@@ -12,6 +12,7 @@
   }
 
   onMount(resizeSVG);
+  afterUpdate(resizeSVG);
   let windowHeight = 10;
 </script>
 
