@@ -9,10 +9,6 @@
 <p>
   {title || 'Nothing...'}
   {#if timeFromStart}
-    (
-    {#if timeFromStart < 0}
-      {Math.round(Math.abs(timeFromStart) / 1000)}
-    {:else}{Math.round(timeFromStart / 1000)}/{Math.round(fadeDuration / 1000)}{/if}
-    s)
+    ( {Math.round(timeFromStart / 1000)}/{Math.round(fadeDuration / 1000)} s)
   {/if}
 </p>

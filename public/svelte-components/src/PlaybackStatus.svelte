@@ -1,19 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import PlaybackStatusElement from "./PlaybackStatusElement.svelte";
-  import {
-    nowPlaying,
-    fadingPlaying,
-    nxtPlaying,
-    playingFadeInTimeFromStart,
-    playingAutoNextTimeFromStart
-    } from './stores.js';
+  import { livePlaybackStatus } from './stores.js';
 
   onMount(() => {
     //
   });
 
-  $: iframeSrc = $nowPlaying ? ($nowPlaying.directory.startsWith('http') ? $nowPlaying.directory : `/media/${$nowPlaying.directory}/index.html`) : `about:blank`;
+  $: iframeSrc = $livePlaybackStatus.nowPlaying ? ($livePlaybackStatus.nowPlaying.directory.startsWith('http') ? $livePlaybackStatus.nowPlaying.directory : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`) : `about:blank`;
 
 </script>
 
@@ -21,7 +15,7 @@
   <div>
     <iframe
       src={iframeSrc}
-      title={$nowPlaying ? $nowPlaying.title : 'Nothing playing'} />
+      title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
   </div>
 
   <div>
@@ -31,15 +25,13 @@
     </div>
 
     NOW PLAYING:
-    <PlaybackStatusElement {...$nowPlaying} />
+    <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
 
-    {#if $fadingPlaying}
-      FADING:
-      <PlaybackStatusElement {...$fadingPlaying} timeFromStart={$playingFadeInTimeFromStart} />
-    {:else if $nxtPlaying}
-      NEXT:
-      <PlaybackStatusElement {...$nxtPlaying} timeFromStart={$playingAutoNextTimeFromStart} />
+    NEXT:
+    {#if $livePlaybackStatus.nextPlaying}
+      <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
     {/if}
+
   </div>
 </div>
 

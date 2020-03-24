@@ -20,6 +20,7 @@ export const playbackStatus = writable({});
 socket.on("nowplaying", function (playback) {
     // parse status object
     playbackStatus.set(JSON.parse(playback));
+    // console.log(`recieved playback status:\n${JSON.stringify(JSON.parse(playback), null, 2)}`)
 });
 
 export const time = readable(Date.now(), function start(set) {
@@ -32,42 +33,46 @@ export const time = readable(Date.now(), function start(set) {
     };
 });
 
-export const playingFadeInTimeFromStart = derived([time, playbackStatus], ([$time, $playbackStatus], set) => {
+export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackStatus, $time], set) => {
+    //
+    let nowPlaying = false;
+    let nextPlaying = false;
     if ($playbackStatus.playingFadeIn) {
-        set(Math.round($time - $playbackStatus.playingFadeIn.startTime));
+        // get time from start for playing fade in object
+        let fadeInTimeFromStart = $time - $playbackStatus.playingFadeIn.startTime;
+        // check if playingFadeIn has finished fading in
+        if (fadeInTimeFromStart > $playbackStatus.playingFadeIn.fadeDuration) {
+            // set playingFadeIn object as nowPlaying as it has actually finished fading in
+            nowPlaying = $playbackStatus.playingFadeIn;
+            //
+            if ($playbackStatus.playingAutoNext) {
+                let autoNextTimeFromStart = $time - $playbackStatus.playingAutoNext.startTime;
+                nextPlaying = $playbackStatus.playingAutoNext;
+                nextPlaying.timeFromStart = autoNextTimeFromStart;
+            }
+        } else {
+            // set nowPlaying and playing fade in
+            nowPlaying = $playbackStatus.playing;
+            nextPlaying = $playbackStatus.playingFadeIn;
+            nextPlaying.timeFromStart = fadeInTimeFromStart; // add time from start
+        }
     } else {
-        set(null);
+        // set nowPlaying
+        nowPlaying = $playbackStatus.playing;
+        // set nextPlaying
+        if ($playbackStatus.playingAutoNext) {
+            let autoNextTimeFromStart = $time - $playbackStatus.playingAutoNext.startTime;
+            nextPlaying = $playbackStatus.playingAutoNext;
+            nextPlaying.timeFromStart = autoNextTimeFromStart;
+        }
     }
-}, null);
+    // clear time from start
+    if (nowPlaying)
+        delete nowPlaying.timeFromStart;
 
-export const playingAutoNextTimeFromStart = derived([time, playbackStatus], ([$time, $playbackStatus], set) => {
-    if ($playbackStatus.playingAutoNext) {
-        set(Math.round($time - $playbackStatus.playingAutoNext.startTime));
-    } else {
-        set(null);
-    }
-}, null);
-
-export const nowPlaying = derived([playingFadeInTimeFromStart, playbackStatus], ([$playingFadeInTimeFromStart, $playbackStatus], set) => {
-    if ($playbackStatus.playingFadeIn && $playingFadeInTimeFromStart > $playbackStatus.playingFadeIn.fadeDuration) {
-        set($playbackStatus.playingFadeIn);
-    } else {
-        set($playbackStatus.playing);
-    }
-});
-
-export const fadingPlaying = derived([playingAutoNextTimeFromStart, playbackStatus], ([$playingAutoNextTimeFromStart, $playbackStatus], set) => {
-    if ($playingAutoNextTimeFromStart >= 0) {
-        set($playbackStatus.playingAutoNext);
-    } else {
-        set($playbackStatus.playingFadeIn);
-    }
-});
-
-export const nxtPlaying = derived([playingAutoNextTimeFromStart, playbackStatus], ([$playingAutoNextTimeFromStart, $playbackStatus], set) => {
-    if ($playingAutoNextTimeFromStart >= 0) {
-        set(false);
-    } else {
-        set($playbackStatus.playingAutoNext);
-    }
-});
+    // set the final playback status
+    set({
+        'nowPlaying': nowPlaying,
+        'nextPlaying': nextPlaying
+    });
+}, {});
