@@ -6,7 +6,7 @@
 
 <style>
   line {
-    stroke: white;
+    stroke: black;
     stroke-width: 4px;
   }
   /* circle {
