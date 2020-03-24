@@ -18,7 +18,28 @@
     step: 0.0005
   };
 
+  let urlinputelement;
+  function playURL(event) {
+      if (event.keyCode == 13) { // 'Enter'
+        if (event.target.matches(':valid')) { // URL is validated
+          socket.emit('playURL', event.target.value);
+          console.log(`playing URL: ${event.target.value}`);
+        }
+      }
+  }
+
 </script>
+
+<div class="header-main">
+    <input
+    class="url-input"
+    bind:this={urlinputelement}
+    type=url
+    placeholder="Enter URL to display"
+    size="100"
+    on:keyup={playURL}
+    >
+</div>
 
 <div class="preview-container">
 
@@ -59,6 +80,20 @@
 </div>
 
 <style>
+
+    .header-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+
+    .url-input {
+        border: none;
+    }
+
+    /* input:invalid {
+        background-color: red;
+    } */
 
     .preview-container {
         display: flex;
