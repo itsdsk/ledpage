@@ -112,10 +112,10 @@ function setConfig(msg = lastReceivedOutputMsg) {
 
 function changeStyleToView(view) {
     // show/hide containers, argument should be 'feed', 'channel' or 'editor'
-    document.getElementById("indexContainer").style.display = (view == "editor" ? "none" : "block");
-    document.getElementById("diskChannelContainer").style.display = (view == "channel" ? "grid" : "none");
-    document.getElementById("diskFeedContainer").style.display = (view == "feed" ? "grid" : "none");
-    document.getElementById("diskContainer").style.display = (view == "editor" ? "block" : "none");
+    // document.getElementById("indexContainer").style.display = (view == "editor" ? "none" : "block");
+    // document.getElementById("diskChannelContainer").style.display = (view == "channel" ? "grid" : "none");
+    // document.getElementById("diskFeedContainer").style.display = (view == "feed" ? "grid" : "none");
+    // document.getElementById("diskContainer").style.display = (view == "editor" ? "block" : "none");
 }
 
 // event handlers

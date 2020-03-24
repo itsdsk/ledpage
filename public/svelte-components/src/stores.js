@@ -11,6 +11,8 @@ export const config = writable({
     'outputs': []
 });
 
+socket.emit('load');
+
 socket.on("configuration", function (conf) {
     config.set(conf);
 });
