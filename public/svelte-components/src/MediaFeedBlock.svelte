@@ -1,11 +1,11 @@
 <script>
+  import { channelObjects } from './stores.js';
   export let directory;
   export let title;
   export let image;
   export let modified;
   export let channels;
   export let playcount;
-  export let channelObjects;
 
   let channelsOpen = false;
 
@@ -24,7 +24,7 @@
     refresh();
   }
 
-  $: channelsList = channelObjects.reduce((accumulator, currentValue) => {
+  $: channelsList = $channelObjects.reduce((accumulator, currentValue) => {
     if (currentValue.channel_name) {
       accumulator.push({channel_name: currentValue.channel_name, added: channels.includes(currentValue.channel_name)})
     }

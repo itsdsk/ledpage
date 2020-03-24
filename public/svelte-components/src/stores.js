@@ -76,3 +76,28 @@ export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackSta
         'nextPlaying': nextPlaying
     });
 }, {});
+
+export const channelObjects = writable([]);
+
+socket.on("channellist", function (newChannelObjects) {
+    channelObjects.set(newChannelObjects);
+    sortMediaFeed();
+});
+
+export const mediaFeedObjects = writable([]);
+
+socket.on("mediafeed", function (newMediaFeedObjects) {
+    mediaFeedObjects.set(newMediaFeedObjects);
+});
+
+export function sortMediaFeed(selectedSortMode = 'Recently added') {
+    if (selectedSortMode === 'Most viewed') {
+        // sort playcount high to low
+        mediaFeedObjects.update(mf => mf.sort((a, b) => b.playcount - a.playcount));
+    } else if (selectedSortMode === 'Recently added') {
+        // sort date new to old
+        mediaFeedObjects.update(mf => mf.sort((a, b) => Date.parse(b.modified) - Date.parse(a.modified)));
+    } else {
+        console.log(`error in update sorting`);
+    }
+};
