@@ -11,8 +11,8 @@
   {#if timeFromStart}
     (
     {#if timeFromStart < 0}
-      {Math.abs(timeFromStart)}
-    {:else}{timeFromStart}/{fadeDuration}{/if}
+      {Math.round(Math.abs(timeFromStart) / 1000)}
+    {:else}{Math.round(timeFromStart / 1000)}/{Math.round(fadeDuration / 1000)}{/if}
     s)
   {/if}
 </p>
