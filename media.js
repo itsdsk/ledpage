@@ -602,9 +602,9 @@ module.exports = {
             fadeDuration: config.settings.fade
         };
         // add metadata from database to playback status
-        db.get(`SELECT title, image FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
+        db.get(`SELECT title FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
             if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
-            playback.playingFadeIn.metadata = itemrow;
+            playback.playingFadeIn.title = itemrow.title;
         });
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -617,7 +617,7 @@ module.exports = {
             // add metadata from database to playback status
             db.get(`SELECT title FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
                 if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
-                playback.playing.metadata = itemrow;
+                playback.playing.title = itemrow.title;
             });
             //
             playback.playingFadeIn = false;
@@ -753,9 +753,7 @@ module.exports = {
             directory: name,
             startTime: Date.now(),
             fadeDuration: config.settings.fade,
-            metadata: {
-                title: `URL: ${name}`
-            }
+            title: `URL: ${name}`
         };
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -764,9 +762,7 @@ module.exports = {
             //
             playback.playing = {
                 directory: playingURL,
-                metadata: {
-                    title: `URL: ${playingURL}`
-                }
+                title: `URL: ${playingURL}`
             };
             // clear fading in
             playback.playingFadeIn = false;
@@ -1160,11 +1156,11 @@ function autoplayNext() {
             fadeDuration: config.settings.fade
         }
         // get metadata for next media from database
-        var selectQuery = `SELECT title, image FROM media WHERE directory = ?`;
+        var selectQuery = `SELECT title FROM media WHERE directory = ?`;
         db.get(selectQuery, [autoplayList[autoplayPos]], (err, itemrow) => {
             if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
             // store media metadata in playback object
-            playback.playingAutoNext.metadata = itemrow;
+            playback.playingAutoNext.title = itemrow.title;
         });
         // start timer to autoplay next
         playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fade + delayTime);
