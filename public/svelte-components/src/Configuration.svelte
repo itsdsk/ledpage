@@ -6,7 +6,7 @@
 
   let activeChain;
   let showAll = true;
-  
+
   $: brightness = {
     name: "brightness",
     value: $config.settings.brightness || 0.0125,
@@ -56,13 +56,6 @@
     }
   }
 </script>
-
-<p
-  style="text-align:center;"
-  on:click={() => showAll = !showAll}
->
-  {showAll ? 'Close' : 'Open'}Settings
-</p>
 
 <div id="config-main">
 
@@ -115,7 +108,7 @@
     flex-wrap: wrap;
     flex-direction: row;
     align-items: flex-start;
-    background-color: rgba(0, 0, 0, 0.50);
+    background-color: gray;
     margin: 8px;
   }
   #config-main__map {

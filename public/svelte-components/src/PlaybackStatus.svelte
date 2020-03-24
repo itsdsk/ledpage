@@ -28,9 +28,7 @@
     <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
 
     NEXT:
-    {#if $livePlaybackStatus.nextPlaying}
-      <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
-    {/if}
+    <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
 
   </div>
 </div>

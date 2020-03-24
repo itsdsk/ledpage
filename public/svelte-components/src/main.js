@@ -1,13 +1,8 @@
-import PlaybackStatus from './PlaybackStatus.svelte';
+import PageMain from './PageMain.svelte';
 import MediaFeed from './MediaFeed.svelte';
-import Configuration from './Configuration.svelte';
 
-new PlaybackStatus({
-	target: document.querySelector('#playback-status')
-});
-
-new Configuration({
-	target: document.querySelector('#configuration')
+new PageMain({
+	target: document.querySelector('#page-main')
 });
 
 new MediaFeed({
