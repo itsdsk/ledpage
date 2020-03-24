@@ -21,11 +21,18 @@
   let urlinputelement;
   function playURL(event) {
       if (event.keyCode == 13) { // 'Enter'
-        if (event.target.matches(':valid')) { // URL is validated
+        if (event.target.value.length > 0 && event.target.matches(':valid')) { // URL is validated
           socket.emit('playURL', event.target.value);
           console.log(`playing URL: ${event.target.value}`);
         }
       }
+  }
+
+  function downloadURL() {
+    if (urlinputelement.value.length > 0 && urlinputelement.matches(':valid')) { // URL is validated
+        socket.emit('createmediaURL', urlinputelement.value);
+        console.log(`createmediaURL: ${urlinputelement.value}`);
+    }
   }
 
 </script>
@@ -39,6 +46,9 @@
     size="100"
     on:keyup={playURL}
     >
+    <button on:click={downloadURL}>
+        Download
+    </button>
 </div>
 
 <div class="preview-container">

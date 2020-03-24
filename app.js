@@ -136,6 +136,10 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // create media from URL
+  socket.on('createmediaURL', function (msg) {
+    media.createMediaFromURL(msg);
+  });
   // rename media
   socket.on('renamemedia', function (msg) {
     media.renameMedia(msg, function () {

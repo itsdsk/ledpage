@@ -1,6 +1,7 @@
 const electron = require('electron');
 const path = require('path');
 const net = require('net');
+const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -175,6 +176,65 @@ app.on('ready', () => {
             }
             // flip window to display on
             flipWindow = !flipWindow;
+          } else if (msg.command == "saveURL") {
+            // get right browser window
+            var _browserWindow = false;
+            if (mainWindowA.webContents.getURL() == msg.URL) {
+              _browserWindow = mainWindowA;
+            } else if (mainWindowB.webContents.getURL() == msg.URL) {
+              _browserWindow = mainWindowB;
+            } else {
+              console.log(`error saving url for ${msg.URL} (not matching ${mainWindowA.webContents.getURL()} or ${mainWindowB.webContents.getURL()})`);
+            }
+            // if requested URL is open
+            if (_browserWindow) {
+              // make directory
+              var randomName = "item_" + Math.random().toString(36).substring(2, 8);
+              var newDirectory = path.join(msg.mediaDir, randomName);
+              fs.mkdir(newDirectory, function (err) {
+                if (err) console.log(`err: ${err}`)
+                else {
+                  // save page
+                  _browserWindow.webContents.savePage(path.join(newDirectory, 'index.html'), 'HTMLComplete').then(() => {
+                    //console.log(`saved page successfully`);
+                    // save screenshot
+                    _browserWindow.capturePage((image) => {
+                      fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(80), (err) => {
+                        if (err) console.log(`error capturing page: ${err}`)
+                        //console.log(`saved screenshot`);
+                        // get datetime
+                        var timestamp = new Date().toISOString();
+                        timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+                        // build metadata object
+                        var newMetadata = {
+                          "demo": {
+                            "title": _browserWindow.webContents.getTitle(),
+                            "description": msg.URL,
+                            "files": ["index.html"],
+                            "channels": ["firstchannel"],
+                            "playcount": 0,
+                            "image": "thumb.jpg",
+                            "modified": timestamp
+                          }
+                        }
+                        // save metadata
+                        fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(newMetadata, null, 4), function (err) {
+                          if (err) console.log(`error saving metadata: ${err}`);
+                          console.log(`saved page ${msg.URL} to ${newDirectory}`);
+                          // report loaded to client
+                          if (client) client.write(JSON.stringify({
+                            saved: true,
+                            directory: randomName
+                          }));
+                        });
+                      });
+                    })
+                  }).catch(err => {
+                    console.log(`didnt save page successfully: ${err}`);
+                  });
+                }
+              })
+            }
           }
         });
       })

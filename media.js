@@ -73,12 +73,12 @@ rendererSocket.event.on('data', function (data) {
         cleanup();
     } else {
         var rendererMsg = JSON.parse(data.toString());
-        // update currentURL when halfway through transition
-        changePlaybackID = setTimeout(function (URL) {
-            playback.currentURL = URL;
-        }, config.settings.fade / 2, rendererMsg.URL);
         // message backend to switch
         if (rendererMsg.loaded) {
+            // update currentURL when halfway through transition
+            changePlaybackID = setTimeout(function (URL) {
+                playback.currentURL = URL;
+            }, config.settings.fade / 2, rendererMsg.URL);
             // object containing commands for backend
             var backendMsg = {};
             // tell backend where media is playing and how to transition
@@ -95,6 +95,14 @@ rendererSocket.event.on('data', function (data) {
             }
             // send message to backend
             backendSocket.write(JSON.stringify(backendMsg));
+        } else if (rendererMsg.saved) {
+            console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
+            // add new media to db
+            var newMetadata = require(path.join(mediaDir, rendererMsg.directory, 'demo.json'));
+            if (newMetadata) {
+                // add to database
+                parseMediaItemDirectory(rendererMsg.directory, newMetadata);
+            }
         }
     }
 });
@@ -342,6 +350,15 @@ module.exports = {
                 console.log(`error copying files to duplicate media: ${err}`);
             });
         });
+    },
+    createMediaFromURL: function (msg) {
+        console.log(`creating media from URL: ${msg}`);
+        // send media file path to renderer
+        rendererSocket.write(JSON.stringify({
+            command: 'saveURL',
+            URL: msg,
+            mediaDir: mediaDir
+        }));
     },
     renameMedia: function (msg, callback) {
         // stop autoplay
