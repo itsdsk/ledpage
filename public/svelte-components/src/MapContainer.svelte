@@ -4,6 +4,7 @@
   let svg;
   let width = "0";
   let height = "0";
+  let windowWidth = 10;
 
   const resizeSVG = () => {
       let svgBoundingBox = svg.getBBox();
@@ -13,11 +14,10 @@
 
   onMount(resizeSVG);
   afterUpdate(resizeSVG);
-  let windowHeight = 10;
 </script>
 
-<svelte:window on:resize={resizeSVG} bind:innerHeight={windowHeight} />
+<svelte:window on:resize={resizeSVG} bind:innerWidth={windowWidth} />
 
-<svg viewBox="0 0 {width} {height}" height={Math.min(windowHeight - 10, 500)} bind:this={svg}>
+<svg viewBox="0 0 {width} {height}" width={Math.min(windowWidth - 10, 500)} bind:this={svg}>
   <slot />
 </svg>
