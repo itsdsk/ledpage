@@ -5,7 +5,8 @@ const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+let mainWindowA = null;
+let mainWindowB = null;
 
 const {
   app,
@@ -112,6 +113,15 @@ app.on('ready', () => {
     }, 300);
   });
 
+  // log windows
+  mainWindowA.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`Console message (window A): ${message}`);
+  });
+  mainWindowB.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`Console message (window B): ${message}`);
+  });
+
+  //
   process.on('uncaughtException', (err) => {
     console.log(err);
   });
