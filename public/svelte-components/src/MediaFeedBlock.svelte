@@ -36,6 +36,7 @@
   <img src={image} alt="no image available" />
   <p style="text-align:center;">{title}</p>
   <div class="media__feed__block__overlay">
+    <p>{modified}</p>
     <button on:click={handlePlay}>Play</button>
     <button on:click={handleEdit}>Edit</button>
     <button on:click={() => channelsOpen = true}>Channels</button>

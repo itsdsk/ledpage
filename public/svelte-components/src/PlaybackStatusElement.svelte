@@ -6,9 +6,9 @@
   export let timeFromStart = false;
 </script>
 
-<p>
+<span>
   {title || 'Nothing...'}
   {#if timeFromStart}
     ( {Math.round(timeFromStart / 1000)}/{Math.round(fadeDuration / 1000)} s)
   {/if}
-</p>
+</span>

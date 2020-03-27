@@ -60,7 +60,7 @@
     align-items: baseline;
   }
   .media-main {
-    background: lightgray;
+    /* background: lightgray; */
   }
 
   .media__feed {

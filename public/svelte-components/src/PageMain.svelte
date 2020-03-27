@@ -1,5 +1,6 @@
 <script>
   import PlaybackStatus from "./PlaybackStatus.svelte";
+  import PlaybackStatusElement from "./PlaybackStatusElement.svelte";
   import Configuration from "./Configuration.svelte";
   import ConfigurationSlider from "./ConfigurationSlider.svelte";
   import MapContainer from "./MapContainer.svelte";
@@ -35,20 +36,65 @@
     }
   }
 
+  let scrollY;
+
+    let fileUploadText = '';
+  function handleFiles() {
+    // check 1 file was selected
+    if (this.files.length == 1) {
+      // update status string
+      fileUploadText = `${this.files[0].name} (${this.files[0].size} bytes, modified: ${(new Date(this.files[0].lastModified).toLocaleString())})`;
+      // check file type
+      if (this.files[0].type == 'application/json') {
+        // read file and parse JSON
+        var reader = new FileReader();
+        reader.onload = (function () {
+            return function (event) {
+                var jsonconf;
+                try {
+                    jsonconf = JSON.parse(event.target.result);
+                } catch (exception) {
+                    alert('exception caught when parsing json: ' + exception);
+                }
+                // update status string
+                fileUploadText = `Uploaded ${fileUploadText}`;
+                // send uploaded config to server
+                socket.emit('updateconfigfile', jsonconf);
+            };
+        })(this.files[0]);
+        reader.readAsText(this.files[0]);
+      }
+    }
+  }
+
 </script>
 
+<svelte:window bind:scrollY={scrollY}/>
+
 <div class="header-main">
-    <input
-    class="url-input"
-    bind:this={urlinputelement}
-    type=url
-    placeholder="Enter URL to display"
-    size="100"
-    on:keyup={playURL}
-    >
-    <button on:click={downloadURL}>
-        Download
-    </button>
+    <div>
+        <input
+        class="url-input"
+        bind:this={urlinputelement}
+        type=url
+        placeholder="Enter URL to display"
+        on:keyup={playURL}
+        >
+        <button class="url-input--download-btn" on:click={downloadURL}>
+            Download
+        </button>
+    </div>
+    {#if scrollY > 400}
+        <div>
+        NOW PLAYING: <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
+        </div>
+    {/if}
+        <div>
+        NEXT: <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
+        </div>
+        <div on:click={()=>showConfig=!showConfig}>
+            Config
+        </div>
 </div>
 
 <div class="preview-container">
@@ -68,11 +114,19 @@
     </div>
 
     <div class="preview-container--child">
-        <p>Output: {$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {$config.outputs.length} chains</p>
-        <ConfigurationSlider {...brightness} />
-        <div>
-            <input type=checkbox bind:checked={showConfig}>
-        </div>
+        <p>NOW PLAYING</p>
+        <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
+        <p></p>
+        {#if showConfig}
+            <p>Output: {$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {$config.outputs.length} chains</p>
+            <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
+            <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}>Upload config file</a>
+            {#if fileUploadText.length}
+                <p>{fileUploadText}</p>
+            {/if}
+        {:else}
+            <ConfigurationSlider {...brightness} />
+        {/if}
     </div>
 </div>
 
@@ -94,22 +148,60 @@
     .header-main {
         display: flex;
         justify-content: space-between;
-        align-items: baseline;
+        align-items: center;
+        padding: 24px;
+        /* margin: 8px; */
+        /* margin-bottom: 16px; */
+        /* border-bottom: 2px solid grey; */
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 100;
+        /* position: fixed;
+        top: 0;
+        width: 100%;
+        background: white; */
+    }
+
+    .header-main > * {
+        flex: 1 1 0;
+    }
+
+    .header-main > *:first-child {
+        text-align: left;
+    }
+
+    .header-main > * {
+        text-align: center;
+    }
+
+    .header-main > *:last-child {
+        text-align: right;
     }
 
     .url-input {
         border: none;
+        /* width: 100%; */
     }
 
     /* input:invalid {
         background-color: red;
     } */
 
+    .url-input--download-btn {
+        display: none;
+    }
+
+    .url-input:focus ~ .url-input--download-btn {
+        display: inline;
+    }
+
     .preview-container {
         display: flex;
         flex-wrap: wrap;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
+        margin-top: 48px;
     }
 
     .preview-container--child {
