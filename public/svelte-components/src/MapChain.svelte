@@ -5,7 +5,7 @@
 
   let circleDuration = 500;
   let lineDuration = 400;
-  let lineDelay = 100;
+  let lineDelay = 0;//100;
 </script>
 
 <style>

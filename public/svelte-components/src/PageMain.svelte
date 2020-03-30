@@ -33,6 +33,8 @@
     if (urlinputelement.value.length > 0 && urlinputelement.matches(':valid')) { // URL is validated
         socket.emit('createmediaURL', urlinputelement.value);
         console.log(`createmediaURL: ${urlinputelement.value}`);
+    } else {
+        console.log('cannot create media from URL as it is invalid');
     }
   }
 
@@ -192,7 +194,7 @@
         display: none;
     }
 
-    .url-input:focus ~ .url-input--download-btn {
+    .header-main > *:first-child:hover .url-input--download-btn {
         display: inline;
     }
 
