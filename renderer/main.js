@@ -13,6 +13,10 @@ const {
   BrowserWindow
 } = electron;
 
+// enable content to use web bluetooth api
+app.commandLine.appendSwitch('enable-experimental-web-platform-features');
+app.commandLine.appendSwitch('enable-web-bluetooth', true);
+
 // app.disableHardwareAcceleration();
 /*
  we initialize our application display as a callback of the electronJS "ready" event
