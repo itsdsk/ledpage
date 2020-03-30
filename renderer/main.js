@@ -65,6 +65,9 @@ app.on('ready', () => {
         mainWindowA.restore();
       }
       mainWindowA.show();
+      mainWindowA.focus();
+      // fake user gesture to trigger event in page
+      mainWindowA.webContents.executeJavaScript('document.dispatchEvent(new Event("mouseenter"));', true);
       // save page to disk
       if (savePage == true) {
         var saveLocation = '/tmp/index.html'; // TODO: add media path
@@ -94,6 +97,9 @@ app.on('ready', () => {
         mainWindowB.restore();
       }
       mainWindowB.show();
+      mainWindowB.focus();
+      // fake user gesture to trigger event in page
+      mainWindowB.webContents.executeJavaScript('document.dispatchEvent(new Event("mouseenter"));', true);
       // save page to disk
       if (savePage == true) {
         var saveLocation = '/tmp/index.html'; // TODO: add media path
