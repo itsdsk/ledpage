@@ -240,9 +240,11 @@ app.on('ready', () => {
                   _browserWindow.webContents.savePage(path.join(newDirectory, 'index.html'), 'HTMLComplete').then(() => {
                     //console.log(`saved page successfully`);
                     // save screenshot
-                    _browserWindow.capturePage((image) => {
+                    _browserWindow.capturePage().then(image => {
+                      //console.log(`captured page screenshot`);
+                      if (!image) console.log(`error capturing page: image is null`);
                       fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(80), (err) => {
-                        if (err) console.log(`error capturing page: ${err}`)
+                        if (err) console.log(`error capturing page: ${err}`);
                         //console.log(`saved screenshot`);
                         // get datetime
                         var timestamp = new Date().toISOString();
@@ -270,12 +272,14 @@ app.on('ready', () => {
                           }));
                         });
                       });
-                    })
+                    }).catch(err => {
+                      console.log(`error capturing page screenshot: ${err}`);
+                    });
                   }).catch(err => {
                     console.log(`didnt save page successfully: ${err}`);
                   });
                 }
-              })
+              });
             }
           }
         });
