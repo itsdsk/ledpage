@@ -117,12 +117,34 @@ app.on('ready', () => {
     }, 300);
   });
 
+  // bluetooth device request handler
+  mainWindowA.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
+    event.preventDefault();
+    console.log(`winA bluetooth request device list: ${JSON.stringify(deviceList)}`);
+    let result = deviceList[0]; // return first device in list
+    if (!result) {
+      callback('');
+    } else {
+      callback(result.deviceId);
+    }
+  });
+  mainWindowB.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
+    event.preventDefault();
+    console.log(`winB bluetooth request device list: ${JSON.stringify(deviceList)}`);
+    let result = deviceList[0]; // return first device in list
+    if (!result) {
+      callback('');
+    } else {
+      callback(result.deviceId);
+    }
+  });
+
   // log windows
   mainWindowA.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`Console message (window A): ${message}`);
+    console.log(`winA console: ${message}`);
   });
   mainWindowB.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`Console message (window B): ${message}`);
+    console.log(`winB console: ${message}`);
   });
 
   //
