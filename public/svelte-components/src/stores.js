@@ -116,6 +116,12 @@ socket.on("updatemediaitem", function (updatedMediaFeedObject) {
     }));
 });
 
+// delete media from client
+socket.on("unloadmediaitem", function (mediaDirToDelete) {
+    mediaFeedObjects.update(mf => mf.filter(item => item.directory !== mediaDirToDelete));
+    console.log(`deleting media ${mediaDirToDelete} in store`);
+});
+
 export function sortMediaFeed(selectedSortMode = 'Recently added') {
     if (selectedSortMode === 'Most viewed') {
         // sort playcount high to low

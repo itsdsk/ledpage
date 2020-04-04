@@ -40,6 +40,7 @@
     <button on:click={handlePlay}>Play</button>
     <button on:click={handleEdit}>Edit</button>
     <button on:click={() => channelsOpen = true}>Channels</button>
+    <button on:click={() =>socket.emit('deletemedia', directory)}>TODO: move me // Delete</button>
   </div>
   {#if channelsOpen}
     <div class="media__feed__block__overlay--playlists">

@@ -152,6 +152,13 @@ io.on('connection', function (socket) {
       }));
     });
   });
+  // delete media
+  socket.on('deletemedia', function (msg) {
+    media.deleteMedia(msg, function () {
+      // update client
+      io.emit('unloadmediaitem', msg);
+    });
+  });
   // create file
   socket.on('createfile', function (msg) {
     media.createFile(msg, function () {

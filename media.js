@@ -388,6 +388,26 @@ module.exports = {
             });
         });
     },
+    deleteMedia: function(msg, callback) {
+        // get demo.json TODO: check msg length?
+        var metaPath = path.join(mediaDir, msg, 'demo.json');
+        var meta = require(metaPath);
+        // stop autoplay
+        module.exports.stopAutoplay();
+        console.log("USER INPUT::deleting media " + meta.demo.title + " from " + meta.directory + ":\n");
+        // delete media in database
+        var deleteMediaQuery = "DELETE FROM media WHERE directory = ?";
+        db.run(deleteMediaQuery, [msg], function (err) {
+            if (err) console.log(`error deleting media ${msg.directory}/${msg} from db:`)
+            // delete folder in filesystem // TODO: check path for security????
+            var deleteCmd = `rm -rf ${path.join(mediaDir, msg)}`;
+            console.log(`${deleteCmd}`);
+            runCommand(deleteCmd, function (stdout) {
+                console.log(`stdout:\n${stdout}`)
+                callback();
+            });
+        });
+    },
     listDatabase: function () {
         // log entries
         db.each("SELECT * FROM media", function (err, row) {
