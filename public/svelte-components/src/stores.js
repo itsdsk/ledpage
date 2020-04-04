@@ -11,7 +11,7 @@ export const config = writable({
     'outputs': []
 });
 
-socket.emit('load');
+socket.emit('load'); // request feed from server
 
 socket.on("configuration", function (conf) {
     config.set(conf);
@@ -24,6 +24,12 @@ socket.on("nowplaying", function (playback) {
     playbackStatus.set(JSON.parse(playback));
     // console.log(`recieved playback status:\n${JSON.stringify(JSON.parse(playback), null, 2)}`)
 });
+
+var nowPlayingUpdatePeriod = 5000; // ms to update nowplaying
+setInterval(function () {
+    // request playback status update
+    socket.emit('nowplaying');
+}, nowPlayingUpdatePeriod);
 
 export const time = readable(Date.now(), function start(set) {
     const interval = setInterval(() => {

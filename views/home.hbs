@@ -3,9 +3,12 @@
 <html>
 
 <head>
-    <link rel="stylesheet" type="text/css" href="/style.css">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/script.js"></script>
+    <script>
+        // connect to server and backend
+        var socket = io();
+        var mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+    </script>
     <link href="/svelte-bundle.css" rel="stylesheet">
     <script defer src="/svelte-bundle.js"></script>
 </head>
