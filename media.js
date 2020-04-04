@@ -98,11 +98,17 @@ rendererSocket.event.on('data', function (data) {
             backendSocket.write(JSON.stringify(backendMsg));
         } else if (rendererMsg.saved) {
             console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
-            // add new media to db
+            // parse metadata of new media
             var newMetadata = require(path.join(mediaDir, rendererMsg.directory, 'demo.json'));
             if (newMetadata) {
                 // add to database
-                parseMediaItemDirectory(rendererMsg.directory, newMetadata);
+                parseMediaItemDirectory(rendererMsg.directory, newMetadata, () => {
+                    // retrieve from database
+                    module.exports.loadMediaItem(rendererMsg.directory, element => {
+                        // send media item to client
+                        module.exports.eventEmitter.emit('addmediaitem', element);
+                    });
+                });
             }
         }
     }
@@ -830,6 +836,17 @@ module.exports = {
             }
         });
     },
+    loadMediaItem: function (directory, callback) {
+        // get single media item and list of channels from db
+        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
+        FROM connections INNER JOIN media ON media.directory = connections.media_directory WHERE media.directory = ?`;
+        db.get(mediaQuery, [directory], (err, dbreturn) => {
+            if (err) console.log(`err: ${err}`);
+            // parse list of channels to json array from string
+            dbreturn.channels = JSON.parse(dbreturn.channels);
+            callback(dbreturn);
+        });
+    },
     loadChannelList: function (params, callback) {
         db.all(`SELECT channel_name, count(media_directory) AS count FROM connections GROUP BY channel_name`, (err, info) => {
             if (err) console.log(`err: ${err}`);
@@ -1054,6 +1071,7 @@ function templateMediaItem(media_directory, templateCompiler, callback) {
     // fetch entry requested in [key] arg from media table
     var sql = "SELECT directory, title, description, image, blur_amt, modified FROM media WHERE directory = ?";
     db.get(sql, [media_directory], (err, itemrow) => {
+        if (err) console.log(`error templating media item: ${err}`);
         itemrow.files = new Array();
         // fetch corresponding entries in files table
         db.all("SELECT rowid AS id, media_directory, filename, data FROM files WHERE media_directory = ?", [media_directory], function (err, filerows) {
