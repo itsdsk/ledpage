@@ -104,6 +104,18 @@ socket.on("addmediaitem", function (newMediaFeedObject) {
     mediaFeedObjects.update(mf => [newMediaFeedObject, ...mf] );
 });
 
+// update single media item in feed
+socket.on("updatemediaitem", function (updatedMediaFeedObject) {
+    mediaFeedObjects.update(mf => mf.map(item => {
+        // return updated object
+        if (item.directory == updatedMediaFeedObject.directory) {
+            return updatedMediaFeedObject;
+        }
+        // return same object
+        return item;
+    }));
+});
+
 export function sortMediaFeed(selectedSortMode = 'Recently added') {
     if (selectedSortMode === 'Most viewed') {
         // sort playcount high to low
