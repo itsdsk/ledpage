@@ -4,6 +4,7 @@
 #include <device/OutputGPIO.h>
 #include <device/OutputSPI1.h>
 #include <device/OutputUART.h>
+#include <device/OutputPWM.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -89,6 +90,10 @@ public:
         else if (outputType == "UART")
         {
             output = std::shared_ptr<Output>(new OutputUART());
+        }
+        else if (outputType == "PWM")
+        {
+            output = std::shared_ptr<Output>(new OutputPWM());
         }
         else
         {
