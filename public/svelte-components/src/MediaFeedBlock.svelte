@@ -30,13 +30,46 @@
     }
     return accumulator;
     }, []);
+
+  function renameMedia(e) {
+    // check if user pressed ENTER
+    if (e.inputType == "insertParagraph") {
+      e.preventDefault();
+      // remove line breaks from title
+      var newTitle = e.target.innerText.replace(/(\r\n|\n|\r)/gm, '');
+      e.target.innerText = newTitle;
+      // check if title has changed
+      if (newTitle !== title) {
+        // construct msg to send server
+        var renameMsg = {
+          directory: directory,
+          newName: newTitle
+        }
+        console.log(`renaming media ${title} to ${newTitle}`);
+        // send to server
+        socket.emit('renamemedia', renameMsg);
+      } else {
+        console.log(`error changing title of ${newTitle}: no change`)
+      }
+    }
+  }
 </script>
 
 <div class="media__feed__block">
   <img src={image} alt="no image available" />
   <p style="text-align:center;">{title}</p>
   <div class="media__feed__block__overlay">
-    <p>{(new Date(modified)).toUTCString()}</p>
+    <h3 class="title">
+      <div class="title__editable"
+        on:input={renameMedia}
+        contenteditable="true"
+        spellcheck="false"
+        style="text-align:center;"
+      >
+        {title}
+      </div>
+    </h3>
+    <p style="text-align:center;">{(new Date(modified)).toUTCString()}</p>
     <button on:click={handlePlay}>Play</button>
     <button on:click={handleEdit}>Edit</button>
     <button on:click={() => channelsOpen = true}>Channels</button>

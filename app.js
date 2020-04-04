@@ -146,10 +146,10 @@ io.on('connection', function (socket) {
   // rename media
   socket.on('renamemedia', function (msg) {
     media.renameMedia(msg, function () {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: msg.directory
-      }));
+      // load updated media item and send back to client
+      media.loadMediaItem(msg.directory, updatedMediaItem => {
+        io.emit('updatemediaitem', updatedMediaItem);
+      });
     });
   });
   // delete media
