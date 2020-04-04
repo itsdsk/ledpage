@@ -245,6 +245,29 @@ io.on('connection', function (socket) {
     if (msg.length > 0)
       media.createChannel(msg);
   });
+  // create channel and add media to it
+  socket.on('addnewchannel', function (msg) {
+    // msg[0] is media directory and [1] is new channel name
+    if (msg[1].length > 0) {
+      // create channel
+      media.createChannel(msg[1], () => {
+        // add media to channel
+        media.createConnection(msg, () => {
+          // get updated list of channels from db
+          media.loadChannelList({}, function (elements) {
+            // send updated channel list back to client
+            io.emit('channellist', elements);
+            // load updated media item and send back to client
+            media.loadMediaItem(msg[0], updatedMediaItem => {
+              io.emit('updatemediaitem', updatedMediaItem);
+            });
+          });  
+        });
+      });
+    } else {
+      console.log(`error adding new channel: name too short`);
+    }
+  });
   // delete connection
   socket.on('deleteconnection', function (msg) {
     media.deleteConnection(msg);

@@ -43,6 +43,13 @@
   </div>
   {#if channelsOpen}
     <div class="media__feed__block__overlay--playlists">
+      <div>
+        <input
+          type=text
+          placeholder="New channel name"
+          on:change={e => socket.emit('addnewchannel', [directory, e.target.value])}
+        >
+      </div>
       {#each channelsList as channelObject}
         <div>
           <input

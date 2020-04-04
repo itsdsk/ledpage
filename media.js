@@ -409,12 +409,12 @@ module.exports = {
             console.log("LED: " + JSON.stringify(row));
         });
     },
-    createChannel: function (msg) {
+    createChannel: function (msg, callback) {
         // stop autoplay
         module.exports.stopAutoplay();
         console.log("USER INPUT::creating channel: " + msg);
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
-        db.run(createQuery, [msg]);
+        db.run(createQuery, [msg], callback);
     },
     createFile: function (msg, callback) {
         // stop autoplay
@@ -563,7 +563,7 @@ module.exports = {
             });
         });
     },
-    createConnection: function (msg) {
+    createConnection: function (msg, callback) {
         // stop autoplay
         module.exports.stopAutoplay();
         console.log("USER INPUT::creating connection: " + msg);
@@ -583,6 +583,7 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
+                if (callback) callback();
             });
         });
     },
