@@ -27,7 +27,10 @@ io.on('connection', function (socket) {
       //   io.emit('load', elements);
       // });
       media.loadMediaFeed({}, function (elements) {
-        io.emit('mediafeed', elements)
+        // send media items one at a time
+        elements.forEach(element => {
+          io.emit('addmediaitem', element);
+        });
       });
       media.loadChannelList({}, function (elements) {
         io.emit('channellist', elements);
@@ -264,4 +267,11 @@ io.on('connection', function (socket) {
   socket.on('systempower', function (msg) {
     media.systemPower(msg);
   });
+});
+
+// events from media.js
+
+// send media item to clients
+media.eventEmitter.on('addmediaitem', function (mediaItem) {
+  io.emit('addmediaitem', mediaItem);
 });

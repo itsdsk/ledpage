@@ -3,6 +3,7 @@ const util = require('util');
 const fs = require('fs');
 const copyFilePromise = util.promisify(fs.copyFile);
 const path = require('path');
+const EventEmitter = require('events');
 var sockets = require('./sockets.js');
 
 const sqlite3 = require('sqlite3').verbose();
@@ -204,6 +205,8 @@ fs.readFile(path.join(__dirname, "templates", "disk_editor.hbs"), function (err,
 var mediaDir = path.join(__dirname, 'public', 'media');
 var config; // device config
 module.exports = {
+    // event emitter
+    eventEmitter: new EventEmitter(),
     // build local database in memory
     generateDb: function () {
         // read media directory

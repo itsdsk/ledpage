@@ -94,8 +94,14 @@ socket.on("channellist", function (newChannelObjects) {
 
 export const mediaFeedObjects = writable([]);
 
+// load complete array of media items
 socket.on("mediafeed", function (newMediaFeedObjects) {
     mediaFeedObjects.set(newMediaFeedObjects);
+});
+
+// add individual media items
+socket.on("addmediaitem", function (newMediaFeedObject) {
+    mediaFeedObjects.update(mf => [newMediaFeedObject, ...mf] );
 });
 
 export function sortMediaFeed(selectedSortMode = 'Recently added') {
