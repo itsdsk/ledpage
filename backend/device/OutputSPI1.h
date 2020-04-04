@@ -97,7 +97,7 @@ public:
         }
         // send to LEDs
         bcm2835_aux_spi_writenb(_ledBuffer.data(), spiFrameLength);
-        bcm2835_delay(5);
+        bcm2835_delay(1);
         return 0;
     }
     virtual ~OutputSPI1()
