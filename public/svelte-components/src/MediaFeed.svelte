@@ -16,6 +16,8 @@
 
   <div class="media media__header">
 
+    <button on:click={() => socket.emit('autoplay', selectedChannel === 'all media' ? null : selectedChannel )}>Play</button>
+
     <select bind:value={selectedChannel}>
       {#each $channelObjects as channelObject}
         <option value={channelObject.channel_name || 'all media'}>
@@ -31,8 +33,6 @@
         </option>
       {/each}
     </select>
-
-    <button on:click={() => socket.emit('autoplay', selectedChannel === 'all media' ? null : selectedChannel )}>Autoplay</button>
 
   </div>
 
