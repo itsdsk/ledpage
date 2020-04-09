@@ -113,14 +113,14 @@
             Download
         </button>
     </div>
-    {#if scrollY > 400}
+    {#if scrollY > 400 || showConfig}
         <div>
         NOW PLAYING: <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
         </div>
-    {/if}
         <div>
         NEXT: <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
         </div>
+    {/if}
         <div on:click={()=>showConfig=!showConfig}>
             Config
         </div>
@@ -143,9 +143,6 @@
     </div>
 
     <div class="preview-container--child">
-        <p>NOW PLAYING</p>
-        <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
-        <p></p>
         {#if showConfig}
             <div>
                 <h4 class="preview-container--label">CONFIGURATION</h4>
@@ -163,9 +160,28 @@
                 <p>{fileUploadText}</p>
             {/if}
         {:else}
+        <div>
+            <h4 class="preview-container--label">
+                NOW PLAYING
+            </h4>
+            <p class="now-playing--title">
+                {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : "Nothing"}
+            </p>
             <progress value={$nextPlayingProgress}></progress>
+        </div>
+        <div>
+            <div class="preview-container--next-playing">
+                <img src={nextPlayingImg} alt="" class="next-thumbnail" />
+                <div>
+                    <h4 class="preview-container--label">NEXT</h4>
+                    <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
                     <progress value={$nextPlayingProgress}></progress>
+                </div>
+            </div>
+        </div>
+        <div>
             <ConfigurationSlider {...brightness} />
+        </div>
         {/if}
     </div>
 </div>
@@ -219,9 +235,15 @@
         text-align: right;
     }
 
+    .header-main > *:first-child {
+        display: flex;
+    }
+
     .url-input {
         border: none;
-        /* width: 100%; */
+        flex-grow: 2;
+        /* display: inline-block;
+        max-width: 100%; */
     }
 
     /* input:invalid {
@@ -239,17 +261,21 @@
     .preview-container {
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: stretch;
         justify-content: center;
         margin-top: 48px;
     }
 
     .preview-container--child {
         flex-basis: 360px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 16px;
     }
 
-    .preview-container--child:first-child {
-        height: 400px;
+    .preview-container--child:last-of-type > * {
+        margin: 16px;
     }
 
     iframe {
@@ -257,11 +283,46 @@
         height: 350px;
     }
 
+    .preview-container--next-playing {
+        display: flex;
+        align-items: center;
+    }
+
+    .now-playing--title {
+        font-size: 1.75em;
+        margin-top: 4px;
+        margin-bottom: 0;
+    }
+
     progress {
         display: block;
         width: 100%;
         height: 4px;
         margin-top: 8px;
+    }
+
+    .preview-container--next-playing > *:first-child {
+        /* vertical-align: middle; */
+        padding-right: 8px;
+    }
+
+    .preview-container--next-playing > *:nth-child(2) {
+        /* vertical-align: middle; */
+        flex-grow: 2;
+    }
+    .preview-container--label {
+        margin-top: 0;
+        margin-bottom: 4px;
+    }
+
+    .preview-container--outputs-list > p {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    img.next-thumbnail {
+        max-width: 64px;
+        display: inline;
     }
 
 </style>
