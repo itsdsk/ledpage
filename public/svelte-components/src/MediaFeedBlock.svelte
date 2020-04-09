@@ -12,17 +12,6 @@
   function handlePlay(event) {
     socket.emit("play", { directory: directory });
   }
-  function handleEdit(event) {
-    window.history.pushState(
-      {
-        page: "editor",
-        disk: directory
-      },
-      directory,
-      "?page=editor&disk=" + directory
-    );
-    refresh();
-  }
 
   $: channelsList = $channelObjects.reduce((accumulator, currentValue) => {
     if (currentValue.channel_name) {
@@ -59,6 +48,22 @@
   <img src={image} alt="no image available" />
   <p style="text-align:center;">{title}</p>
   <div class="media__feed__block__overlay">
+    <div class="title">
+      <div class="title__editable"
+        on:input={renameMedia}
+        contenteditable="true"
+        spellcheck="false"
+        style="text-align:center;"
+      >
+        {title}
+      </div>
+    </div>
+    <p style="text-align:center;">{(new Date(modified)).toUTCString()}</p>
+    <button on:click={handlePlay}>Play</button>
+    <button on:click={() => channelsOpen = true}>Info</button>
+  </div>
+  {#if channelsOpen}
+    <div class="media__feed__block__overlay--playlists">
     <h3 class="title">
       <div class="title__editable"
         on:input={renameMedia}
@@ -70,13 +75,6 @@
       </div>
     </h3>
     <p style="text-align:center;">{(new Date(modified)).toUTCString()}</p>
-    <button on:click={handlePlay}>Play</button>
-    <button on:click={handleEdit}>Edit</button>
-    <button on:click={() => channelsOpen = true}>Channels</button>
-    <button on:click={() =>socket.emit('deletemedia', directory)}>TODO: move me // Delete</button>
-  </div>
-  {#if channelsOpen}
-    <div class="media__feed__block__overlay--playlists">
       <div>
         <input
           type=text
@@ -93,6 +91,7 @@
           > {channelObject.channel_name}
         </div>
       {/each}
+      <button disabled on:click={() =>socket.emit('deletemedia', directory)}>Delete</button>
       <button on:click={() => channelsOpen = false}>Close</button>
     </div>
   {/if}
