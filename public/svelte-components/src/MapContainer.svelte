@@ -19,5 +19,6 @@
 <svelte:window on:resize={resizeSVG} bind:innerWidth={windowWidth} />
 
 <svg viewBox="0 0 {width} {height}" width={Math.min(windowWidth - 10, 360)} bind:this={svg}>
+  <rect width="100%" height="100%" fill="rgb(222,222,222)"/>
   <slot />
 </svg>
