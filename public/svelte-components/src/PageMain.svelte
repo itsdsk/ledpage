@@ -69,6 +69,24 @@
     }
   }
 
+  let nextPlayingImg = null;
+
+  $: updateNextPlayingImg($livePlaybackStatus);
+
+  function updateNextPlayingImg() {
+    if ($livePlaybackStatus.nextPlaying) {
+        // update image...
+        // get next playing's media feed index
+        var feedIndex = $mediaFeedObjects.findIndex(mediaItem => mediaItem.directory === $livePlaybackStatus.nextPlaying.directory);
+        // check next playing was found
+        if (feedIndex == -1) {
+            nextPlayingImg = null;
+        } else {
+            nextPlayingImg = $mediaFeedObjects[feedIndex].image;
+        }
+    } else {
+        nextPlayingImg = null;
+    }
 </script>
 
 <svelte:window bind:scrollY={scrollY}/>
