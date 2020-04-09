@@ -7,6 +7,7 @@
   import MapChain from "./MapChain.svelte";
   import MediaFeed from './MediaFeed.svelte';
   import { config, livePlaybackStatus, mediaFeedObjects } from './stores.js';
+  import { tweened } from 'svelte/motion';
 
   let showConfig = false;
   $: iframeSrc = $livePlaybackStatus.nowPlaying ? ($livePlaybackStatus.nowPlaying.directory.startsWith('http') ? $livePlaybackStatus.nowPlaying.directory : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`) : `about:blank`;
@@ -75,6 +76,8 @@
 
   function updateNextPlayingImg() {
     if ($livePlaybackStatus.nextPlaying) {
+        // update progress bar
+        nextPlayingProgress.set($livePlaybackStatus.nextPlaying.timeFromStart/$livePlaybackStatus.nextPlaying.fadeDuration);
         // update image...
         // get next playing's media feed index
         var feedIndex = $mediaFeedObjects.findIndex(mediaItem => mediaItem.directory === $livePlaybackStatus.nextPlaying.directory);
@@ -87,6 +90,12 @@
     } else {
         nextPlayingImg = null;
     }
+  }
+
+	const nextPlayingProgress = tweened(0, {
+		duration: 1000
+	});
+
 </script>
 
 <svelte:window bind:scrollY={scrollY}/>
@@ -154,6 +163,8 @@
                 <p>{fileUploadText}</p>
             {/if}
         {:else}
+            <progress value={$nextPlayingProgress}></progress>
+                    <progress value={$nextPlayingProgress}></progress>
             <ConfigurationSlider {...brightness} />
         {/if}
     </div>
@@ -244,6 +255,13 @@
     iframe {
         width: 350px;
         height: 350px;
+    }
+
+    progress {
+        display: block;
+        width: 100%;
+        height: 4px;
+        margin-top: 8px;
     }
 
 </style>
