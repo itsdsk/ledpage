@@ -6,7 +6,7 @@
   import MapContainer from "./MapContainer.svelte";
   import MapChain from "./MapChain.svelte";
   import MediaFeed from './MediaFeed.svelte';
-  import { config, livePlaybackStatus } from './stores.js';
+  import { config, livePlaybackStatus, mediaFeedObjects } from './stores.js';
 
   let showConfig = false;
   $: iframeSrc = $livePlaybackStatus.nowPlaying ? ($livePlaybackStatus.nowPlaying.directory.startsWith('http') ? $livePlaybackStatus.nowPlaying.directory : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`) : `about:blank`;
@@ -120,7 +120,16 @@
         <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
         <p></p>
         {#if showConfig}
-            <p>Output: {$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)} LEDs in {$config.outputs.length} chains</p>
+            <div>
+                <h4 class="preview-container--label">CONFIGURATION</h4>
+                <p class="now-playing--title"><var>{$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)}</var> LEDs</p>
+            </div>
+            <div class="preview-container--outputs-list">
+                <h4 class="preview-container--label">OUTPUTS</h4>
+                {#each $config.outputs as output, i}
+                    <p><strong>{i}</strong> <var>{output.properties.type}</var>, <var>{output.properties.colorOrder}</var></p>
+                {/each}
+            </div>
             <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
             <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}>Upload config file</a>
             {#if fileUploadText.length}
