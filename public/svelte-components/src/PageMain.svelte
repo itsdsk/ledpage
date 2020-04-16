@@ -149,17 +149,30 @@
     <div class="preview-container--child">
         {#if showConfig}
             <div>
-                <h4 class="preview-container--label">CONFIGURATION</h4>
+                <h4 class="preview-container--label">OUTPUT</h4>
                 <p class="now-playing--title"><var>{$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)}</var> LEDs</p>
             </div>
             <div class="preview-container--outputs-list">
-                <h4 class="preview-container--label">OUTPUTS</h4>
-                {#each $config.outputs as output, i}
-                    <p><strong>{i}</strong> <var>{output.properties.type}</var>, <var>{output.properties.colorOrder}</var></p>
-                {/each}
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Count</th>
+                        <th>Color Order</th>
+                    </tr>
+                    {#each $config.outputs as output, i}
+                        <tr>
+                            <td>{output.properties.type}</td>
+                            <td>{output.leds.length}</td>
+                            <td>{output.properties.colorOrder}</td>
+                        </tr>
+                    {/each}
+                </table>
             </div>
             <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
-            <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}>Upload config file</a>
+            <div>
+                <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}><button>Upload config file</button></a>
+                <button on:click={() => socket.emit('saveconfig')}>Save</button>
+            </div>
             {#if fileUploadText.length}
                 <p>{fileUploadText}</p>
             {/if}
@@ -338,4 +351,18 @@
         display: inline;
     }
 
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 2px solid #ffffff;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:not(:first-child) {
+         background-color: #dddddd;
+    }
 </style>
