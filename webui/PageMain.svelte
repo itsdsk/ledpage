@@ -70,6 +70,18 @@
     }
   }
 
+//   function sendScreenshot() {
+//     console.log('sending screenshot request cmd');
+//     // test to save screenshot on click
+//     if (mainSocket.readyState != 1) {
+//         mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+//         console.log("main socket not connected");
+//     }
+//     mainSocket.send(JSON.stringify({
+//         "command": "screenshot"
+//     }));
+//   }
+
   let nextPlayingImg = null;
 
   $: updateNextPlayingImg($livePlaybackStatus);
@@ -113,9 +125,15 @@
         placeholder="Enter URL to display"
         on:keyup={playURL}
         >
+        <!-- <button class="url-input--download-btn" on:click={() => console.log('pressed play btn')}>
+            TODO** Play
+        </button> -->
         <button class="url-input--download-btn" on:click={downloadURL}>
             Download
         </button>
+        <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
+            Screenshot
+        </button> -->
     </div>
     {#if scrollY > 400 || showConfig}
         <div>
@@ -128,6 +146,9 @@
         <div on:click={()=>showConfig=!showConfig}>
             Config
         </div>
+        <!-- <button on:click={sendScreenshot}>
+            Screenshot
+        </button> -->
 </div>
 
 <div class="preview-container">
@@ -203,6 +224,7 @@
     </div>
 </div>
 
+<!-- <div style="padding: 150px;"> -->
 <div>
 
   {#if showConfig}

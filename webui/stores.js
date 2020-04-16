@@ -31,6 +31,17 @@ setInterval(function () {
     socket.emit('nowplaying');
 }, nowPlayingUpdatePeriod);
 
+// var screenshotUpdatePeriod = 3000; // ms to update nowplaying
+// function screenshotTimeout() {
+//     setTimeout(function () {
+//         // request screenshot
+//         socket.emit('screenshot');
+//         // recall parent to create recursive loop
+//         screenshotTimeout();
+//     }, screenshotUpdatePeriod);
+// }
+// screenshotTimeout()
+
 export const time = readable(Date.now(), function start(set) {
     const interval = setInterval(() => {
         set(Date.now());
@@ -88,6 +99,7 @@ export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackSta
 export const channelObjects = writable([]);
 
 socket.on("channellist", function (newChannelObjects) {
+    // console.log(`got channel list: ${JSON.stringify(newChannelObjects)}`)
     channelObjects.set(newChannelObjects);
     sortMediaFeed();
 });
