@@ -76,8 +76,9 @@
 
   function updateNextPlayingImg() {
     if ($livePlaybackStatus.nextPlaying) {
-        // update progress bar
-        nextPlayingProgress.set($livePlaybackStatus.nextPlaying.timeFromStart/$livePlaybackStatus.nextPlaying.fadeDuration);
+        // update progress bars
+        fadingProgress.set($livePlaybackStatus.nextPlaying.timeFromStart/$livePlaybackStatus.nextPlaying.fadeDuration);
+        nextPlayingProgress.set(-$livePlaybackStatus.nextPlaying.timeFromStart/$config.settings.autoplayDuration.max);
         // update image...
         // get next playing's media feed index
         var feedIndex = $mediaFeedObjects.findIndex(mediaItem => mediaItem.directory === $livePlaybackStatus.nextPlaying.directory);
@@ -92,6 +93,9 @@
     }
   }
 
+	const fadingProgress = tweened(0, {
+		duration: 1000
+	});
 	const nextPlayingProgress = tweened(0, {
 		duration: 1000
 	});
@@ -162,12 +166,12 @@
         {:else}
         <div>
             <h4 class="preview-container--label">
-                NOW PLAYING
+                {$fadingProgress > 0.0 && $fadingProgress < 1.0 ? 'FADING' : 'NOW PLAYING'}
             </h4>
             <p class="now-playing--title">
                 {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : "Nothing"}
             </p>
-            <progress value={$nextPlayingProgress}></progress>
+            <progress value={$fadingProgress}></progress>
         </div>
         <div>
             <div class="preview-container--next-playing">
