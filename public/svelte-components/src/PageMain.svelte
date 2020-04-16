@@ -263,15 +263,24 @@
         flex-wrap: wrap;
         align-items: stretch;
         justify-content: center;
-        margin-top: 48px;
+        margin: 10em 0em;
     }
 
     .preview-container--child {
         flex-basis: 360px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        /* justify-content: space-between; */
+        /* justify-content: center; */
         padding: 16px;
+    }
+
+    .preview-container--child:first-of-type {
+        justify-content: center;
+    }
+
+    .preview-container--child:last-of-type {
+        justify-content: space-between;
     }
 
     .preview-container--child:last-of-type > * {

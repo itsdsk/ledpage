@@ -28,7 +28,7 @@
 <div id="config-main">
 
   {#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
-    <div>
+    <div class="config--control">
       <ConfigurationSlider {...item} />
     </div>
   {/each}
@@ -45,5 +45,8 @@
   }
   #config-main > * {
     text-align: center;
+  }
+  .config--control {
+    padding: 2em;
   }
 </style>
