@@ -1,4 +1,3 @@
-const Handlebars = require('handlebars');
 const util = require('util');
 const fs = require('fs');
 const copyFilePromise = util.promisify(fs.copyFile);
@@ -168,45 +167,6 @@ function saveScreenshot(side) {
         });
     }
 }
-
-// add basic iteration/for-loop helper
-Handlebars.registerHelper('iterate', function (n, block) {
-    var accum = '';
-    for (var i = n; i > 0; --i)
-        accum += block.fn(i);
-    return accum;
-});
-// compile media
-var feedMediaItemCompiler;
-fs.readFile(path.join(__dirname, "templates", "disk.hbs"), function (err, data) {
-    if (err) throw err;
-    feedMediaItemCompiler = Handlebars.compile(data.toString());
-});
-var channelCompiler;
-fs.readFile(path.join(__dirname, "templates", "channel.hbs"), function (err, data) {
-    if (err) throw err;
-    channelCompiler = Handlebars.compile(data.toString());
-});
-var channelBlockCompiler;
-fs.readFile(path.join(__dirname, "templates", "channel_block.hbs"), function (err, data) {
-    if (err) throw err;
-    channelBlockCompiler = Handlebars.compile(data.toString());
-});
-var outputGraphicCompiler;
-fs.readFile(path.join(__dirname, "templates", "output_graphic.hbs"), function (err, data) {
-    if (err) throw err;
-    outputGraphicCompiler = Handlebars.compile(data.toString());
-});
-var outputFormCompiler;
-fs.readFile(path.join(__dirname, "templates", "output_form.hbs"), function (err, data) {
-    if (err) throw err;
-    outputFormCompiler = Handlebars.compile(data.toString());
-});
-var mediaEditorCompiler;
-fs.readFile(path.join(__dirname, "templates", "disk_editor.hbs"), function (err, data) {
-    if (err) throw err;
-    mediaEditorCompiler = Handlebars.compile(data.toString());
-});
 
 var mediaDir = path.join(__dirname, 'public', 'media');
 var config; // device config
@@ -816,32 +776,6 @@ module.exports = {
         }, config.settings.fade, name);
         console.log('USER INPUT::playing remote media: ' + name);
     },
-    loadFeed: function (callback) {
-        // get list of distinct media items in connections
-        var selectQuery = "SELECT * FROM connections GROUP BY media_directory";
-        db.all(selectQuery, function (err, rows) {
-            // group into channels
-            var grouped = {};
-            for (var i = 0; i < rows.length; i++) {
-                if (grouped[rows[i].channel_name] == undefined) {
-                    grouped[rows[i].channel_name] = [];
-                }
-                grouped[rows[i].channel_name].push(rows[i]);
-            }
-            // for each channel
-            for (var key in grouped) {
-                // skip loop of property is from prototype
-                if (!grouped.hasOwnProperty(key)) continue;
-                // 
-                var obj = grouped[key];
-                let media_directories = obj.map(a => a.media_directory);
-                serveChannelAndItems(key, media_directories, function (element) {
-                    console.log("USER INPUT::loading feed");
-                    callback(element);
-                });
-            }
-        });
-    },
     loadMediaFeed: function (params, callback) {
         // get media items from db with list of channels
         var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
@@ -878,122 +812,36 @@ module.exports = {
             });
         })
     },
-    loadAll: function (params, callback) {
-        // count number of media items
-        db.get(`SELECT count(*) AS count FROM media`, (err, info) => {
-            console.log(`USER INPUT::loading all`);
-            // get list of media sorted by date modified
-            var selectQuery = `SELECT directory FROM media `;
-            // order
-            switch (params.sort) {
-                case 'new':
-                    info.new = true;
-                    selectQuery += `ORDER BY modified ASC`;
-                    break;
-                case 'top':
-                    info.top = true;
-                    selectQuery += `ORDER BY playcount ASC`;
-                    break;
-                default:
-                    info.new = true;
-                    selectQuery += `ORDER BY modified ASC`;
-            }
-            // get template
-            var element = channelCompiler(info);
-            // get sorted media from database
-            db.all(selectQuery, (err, rows) => {
-                // get array of directories from result
-                var directories = Array.from(rows, x => x.directory);
-                // get channel names and size
-                db.all("SELECT connections.channel_name, count(media.directory) AS count FROM connections INNER JOIN media " +
-                    "ON media.directory = connections.media_directory " +
-                    "GROUP BY connections.channel_name ORDER BY count(media.directory) ASC",
-                    function (err, chan_rows) {
-                        // generate HTML for channels
-                        serveChannelBlockArray(chan_rows, function (channelElements) {
-                            element += channelElements;
-                            // generate HTML for media and return all
-                            serveMediaArray(directories, function (mediaElements) {
-                                callback(element + mediaElements);
-                            });
-                        });
-                    });
-            });
-        });
-    },
-    loadEditor: function (directory, callback) {
-        templateMediaItem(directory, mediaEditorCompiler, function (elements) {
-            console.log("USER INPUT::loading editor: " + directory);
-            callback(elements);
-        });
-    },
-    loadChannel: function (params, callback) {
-        var channel_name = params.name;
-        var elements = "";
-        // get channel element at start
-        templateChannel(channel_name, params.sort, true, function (channel_element) {
-            elements = channel_element;
-            // get all media in specified channel
-            var selectQuery = "SELECT media.directory FROM media INNER JOIN connections " +
-                "ON media.directory = connections.media_directory " +
-                "AND connections.channel_name = ? ";
-            switch (params.sort) {
-                case 'new':
-                    selectQuery += `ORDER BY modified ASC`;
-                    break;
-                case 'top':
-                    selectQuery += `ORDER BY playcount ASC`;
-                    break;
-                default:
-                    selectQuery += `ORDER BY modified ASC`;
-            }
-            db.all(selectQuery, [channel_name], function (err, rows) {
-                // get media PKs as array of strings
-                let media_directories = rows.map(a => a.directory);
-                // 
-                serveMediaArray(media_directories, function (media_elements) {
-                    elements += media_elements;
-                    console.log("USER INPUT::loading feed for channel: " + channel_name);
-                    callback(elements);
-                });
-            });
-        });
-    },
     loadConfiguration: function (callback) {
         callback(config);
     },
-    loadOutput: function (callback) {
-        var element = outputFormCompiler(config) + outputGraphicCompiler(config);
-        console.log("USER INPUT::loading output");
-        callback(element);
-    },
-    updateConfig: function (msg) {
-        console.log("USER INPUT::updating output configuration");
-        // update window
-        if (msg.window) {
-            config.window = Object.assign(config.window, msg.window);
-        }
-        // update output
-        if (msg.outputs) {
-            // find correct output
-            msg.outputs.forEach(function (msgoutput) {
-                var output = config.outputs.find(x => x.index === msgoutput.index);
-                // update output properties
-                if (msgoutput.properties) {
-                    output.properties = Object.assign(output.properties, msgoutput.properties);
-                }
-                // update output leds
-                if (msgoutput.leds) {
-                    // find correct led
-                    msgoutput.leds.forEach(function (msgled) {
-                        var led = output.leds.find(x => x.index === msgled.index);
-                        // update led properties
-                        led = Object.assign(led, msgled);
-                    });
-                }
-            });
-        }
-    },
+    // updateConfig: function (msg) {
+    //     console.log("USER INPUT::updating output configuration");
+    //     // update window
+    //     if (msg.window) {
+    //         config.window = Object.assign(config.window, msg.window);
+    //     }
+    //     // update output
+    //     if (msg.outputs) {
+    //         // find correct output
+    //         msg.outputs.forEach(function (msgoutput) {
+    //             var output = config.outputs.find(x => x.index === msgoutput.index);
+    //             // update output properties
+    //             if (msgoutput.properties) {
+    //                 output.properties = Object.assign(output.properties, msgoutput.properties);
+    //             }
+    //             // update output leds
+    //             if (msgoutput.leds) {
+    //                 // find correct led
+    //                 msgoutput.leds.forEach(function (msgled) {
+    //                     var led = output.leds.find(x => x.index === msgled.index);
+    //                     // update led properties
+    //                     led = Object.assign(led, msgled);
+    //                 });
+    //             }
+    //         });
+    //     }
+    // },
     uploadConfig: function (msg, callback) {
         console.log("USER INPUT::uploading output configuration");
         config = msg;
@@ -1028,102 +876,6 @@ module.exports = {
             runCommand('reboot');
     }
 };
-
-function serveChannelAndItems(channel_name, media_directories, callback) {
-    var element = "";
-    templateChannel(channel_name, 'new', false, function (channel_element) {
-        element += channel_element;
-        serveMediaArray(media_directories, function (media_elements) {
-            element += media_elements;
-            callback(element);
-        });
-    });
-}
-
-function serveMediaArray(titles, callback) {
-    var object = "";
-
-    function repeat(title) {
-        templateMediaItem(title, feedMediaItemCompiler, function (element) {
-            object += element;
-            if (titles.length) {
-                repeat(titles.pop());
-            } else {
-                callback(object);
-            }
-        });
-    }
-    repeat(titles.pop());
-}
-
-function serveChannelBlockArray(channels, callback) {
-    var object = "";
-
-    function repeat(channel) {
-        templateChannelBlock(channel, function (element) {
-            object += element;
-            if (channels.length) {
-                repeat(channels.pop());
-            } else {
-                callback(object);
-            }
-        });
-    }
-    repeat(channels.pop());
-}
-
-function templateChannelBlock(data, callback) {
-    var element = channelBlockCompiler(data);
-    callback(element);
-}
-
-function templateChannel(channel_name, sort, create_flag, callback) {
-    // count number of items in channel
-    var countQuery = "SELECT channel_name, count(*) AS count FROM connections WHERE channel_name = ?";
-    db.get(countQuery, [channel_name], (err, count) => {
-        count.create = create_flag;
-        count[sort] = true;
-        var element = channelCompiler(count);
-        callback(element);
-    });
-}
-
-function templateMediaItem(media_directory, templateCompiler, callback) {
-    // fetch entry requested in [key] arg from media table
-    var sql = "SELECT directory, title, description, image, blur_amt, modified FROM media WHERE directory = ?";
-    db.get(sql, [media_directory], (err, itemrow) => {
-        if (err) console.log(`error templating media item: ${err}`);
-        itemrow.files = new Array();
-        // fetch corresponding entries in files table
-        db.all("SELECT rowid AS id, media_directory, filename, data FROM files WHERE media_directory = ?", [media_directory], function (err, filerows) {
-            filerows.forEach(function (filerow) {
-                // add each file to object
-                itemrow.files.push(filerow);
-            });
-            // add arrays to hold channels
-            itemrow.connectedChannels = new Array();
-            itemrow.unconnectedChannels = new Array();
-            // get channels
-            var getChannelsQuery = "SELECT channels.name, connections.media_directory FROM channels LEFT JOIN connections " +
-                "ON channels.name = connections.channel_name " +
-                "AND connections.media_directory = ?";
-            db.all(getChannelsQuery, [media_directory], function (err, chanrows) {
-                // loop through channels
-                chanrows.forEach(function (chanrow) {
-                    // check if channel is connected
-                    if (chanrow.media_directory) {
-                        itemrow.connectedChannels.push(chanrow);
-                    } else {
-                        itemrow.unconnectedChannels.push(chanrow);
-                    }
-                });
-                // compile media object into HTML and send to client websocket
-                var element = templateCompiler(itemrow);
-                callback(element);
-            });
-        });
-    });
-}
 
 function parseMediaItemDirectory(directory, meta, callback) {
     // add metadata to media table in database

@@ -23,9 +23,6 @@ io.on('connection', function (socket) {
   // request feed
   socket.on('load', function (params) {
     if (true) {
-      // media.loadAll(params, function (elements) {
-      //   io.emit('load', elements);
-      // });
       media.loadMediaFeed({}, function (elements) {
         // send media items one at a time
         elements.forEach(element => {
@@ -38,35 +35,12 @@ io.on('connection', function (socket) {
       media.loadConfiguration(function (elements) {
         io.emit('configuration', elements);
       });
-    } else {
-      media.loadFeed(function (elements) {
-        io.emit('load', elements);
-      });
     }
-  });
-  // request editor
-  socket.on('loadeditor', function (msg) {
-    media.loadEditor(msg, function (elements) {
-      io.emit('loadeditor', elements);
-    });
-  });
-  // request channel
-  socket.on('loadchannel', function (msg) {
-    media.loadChannel(msg, function (elements) {
-      io.emit('loadchannel', elements);
-    });
-  });
-  // request output graphic
-  socket.on('loadoutput', function () {
-    media.loadOutput(function (elements) {
-      io.emit('loadoutput', elements);
-    });
   });
   // get now playing
   socket.on('nowplaying', function () {
     media.nowPlaying(function (playbackStatus) {
       io.emit('nowplaying', (playbackStatus));
-      // io.emit('nowplaying2', (playbackStatus));
     });
   });
   // update config

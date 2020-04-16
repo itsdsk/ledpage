@@ -6,7 +6,6 @@
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^7.0.0",
     "express": "^4.16.4",
-    "handlebars": "^4.1.2",
     "rollup": "^1.32.0",
     "rollup-plugin-livereload": "^1.0.0",
     "rollup-plugin-svelte": "^5.0.3",
@@ -17,7 +16,6 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "postinstall": "node generate_pages.js",
     "start": "node app.js -n",
     "build": "rollup -c",
     "dev": "rollup -c -w"
