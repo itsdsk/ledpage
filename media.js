@@ -219,107 +219,6 @@ module.exports = {
             playingAutoNext: playback.playingAutoNext
         }));
     },
-    reloadPage: function () {
-        if (playback.currentURL) {
-            if (playback.currentURL.includes('file:///')) {
-                // get directory name
-                var splitURL = playback.currentURL.split('/');
-                var directoryname = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
-                // send message to play local media
-                module.exports.playLocalMedia({
-                    directory: directoryname
-                });
-            } else {
-                // send full URL to play remote media
-                module.exports.playRemoteMedia(playback.currentURL);
-            }
-            mediaRequiringScreenshot = null;
-        }
-    },
-    createMedia: function (channelName, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // path of new media
-        var randomName = "item_" + Math.random().toString(36).substring(2, 8);
-        var newDirectory = path.join(mediaDir, randomName);
-        console.log("USER INPUT::creating media: " + newDirectory);
-        // make directory
-        fs.mkdir(newDirectory, function (err) {
-            if (err) console.log(err)
-            else {
-                var pathToDefault = path.join(mediaDir, '.default');
-                // get default metadata
-                var meta = require(path.join(pathToDefault, 'demo.json'));
-                // add channel if unique
-                if (meta.demo.channels.indexOf(channelName) === -1)
-                    meta.demo.channels.push(channelName);
-                // save metadata to disk
-                fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(meta, null, 4), function (err) {
-                    if (err) console.log(err);
-                    // copy default files
-                    fs.copyFile(path.join(pathToDefault, 'index.html'), path.join(newDirectory, 'index.html'), (err) => {
-                        if (err) console.log(err);
-                        fs.copyFile(path.join(pathToDefault, 'style.css'), path.join(newDirectory, 'style.css'), (err) => {
-                            if (err) console.log(err);
-                            fs.copyFile(path.join(pathToDefault, 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
-                                if (err) console.log(err);
-                                fs.copyFile(path.join(pathToDefault, 'thumb.jpg'), path.join(newDirectory, 'thumb.jpg'), (err) => {
-                                    if (err) console.log(err);
-                                    // add to database
-                                    parseMediaItemDirectory(randomName, meta, callback(randomName));
-                                });
-                            });
-                        });
-                    });
-                });
-            }
-        });
-    },
-    duplicateMedia: function (sourceDir, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // get path of media to duplicate
-        var pathToOriginal = path.join(mediaDir, sourceDir);
-        // get source metadata
-        var originalMeta = require(path.join(pathToOriginal, 'demo.json'));
-        // make directory for new media
-        var destName = `${originalMeta.demo.title}_copy_${Math.random().toString(36).substring(2, 8)}`;
-        var destDir = path.join(mediaDir, destName);
-        console.log("USER INPUT::duplicating media: " + destName);
-        fs.mkdir(destDir, function (err) {
-            if (err) console.log(`error creating directory for duplicated media: ${err}`);
-            // get datetime
-            var timestamp = new Date().toISOString();
-            timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
-            // create metadata object for new media
-            var destMeta = {
-                "demo": {
-                    "title": `${originalMeta.demo.title} copy`,
-                    "description": `original description: ${originalMeta.demo.description}`,
-                    "files": originalMeta.demo.files,
-                    "channels": originalMeta.demo.channels,
-                    "playcount": 0,
-                    "modified": timestamp
-                }
-            };
-            // copy files (function credit: https://stackoverflow.com/a/54818489)
-            function copyFiles(srcDir, dstDir, files) {
-                return Promise.all(files.map(f => {
-                    return copyFilePromise(path.join(srcDir, f), path.join(dstDir, f));
-                }));
-            }
-            copyFiles(pathToOriginal, destDir, destMeta.demo.files).then(() => {
-                // save metadata
-                fs.writeFile(path.join(destDir, 'demo.json'), JSON.stringify(destMeta, null, 4), function (err) {
-                    if (err) console.log(`error saving metadata for duplicated media: ${err}`);
-                    // add to database
-                    parseMediaItemDirectory(destName, destMeta, callback(destName));
-                });
-            }).catch(err => {
-                console.log(`error copying files to duplicate media: ${err}`);
-            });
-        });
-    },
     createMediaFromURL: function (msg) {
         console.log(`creating media from URL: ${msg}`);
         // send media file path to renderer
@@ -368,157 +267,12 @@ module.exports = {
             });
         });
     },
-    listDatabase: function () {
-        // log entries
-        db.each("SELECT * FROM media", function (err, row) {
-            console.log("MEDIA: " + row.directory + " " + row.title + " " + row.description);
-        });
-        db.each("SELECT rowid AS id, media_directory, filename FROM files", function (err, row) {
-            console.log("FILE: " + row.media_directory + " " + row.filename + " " + row.id);
-        });
-        db.each("SELECT * FROM channels", function (err, row) {
-            console.log("CHANNEL: " + row.name);
-        });
-        db.each("SELECT * FROM connections", function (err, row) {
-            console.log("CONNECTION: " + row.media_directory + " " + row.channel_name);
-        });
-        db.each("SELECT * FROM outputs", function (err, row) {
-            console.log("OUTPUT: " + JSON.stringify(row));
-        });
-        db.each("SELECT * FROM leds", function (err, row) {
-            console.log("LED: " + JSON.stringify(row));
-        });
-    },
     createChannel: function (msg, callback) {
         // stop autoplay
         module.exports.stopAutoplay();
         console.log("USER INPUT::creating channel: " + msg);
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
         db.run(createQuery, [msg], callback);
-    },
-    createFile: function (msg, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        //
-        var filepath = path.join(mediaDir, msg, 'new_file.txt');
-        console.log("USER INPUT::creating file " + filepath);
-        // create file on disk
-        fs.writeFile(filepath, "", function (err) {
-            if (err) console.log(err);
-            // add file to JSON
-            var metaPath = path.join(mediaDir, msg, 'demo.json');
-            var meta = require(metaPath);
-            meta.demo.files.push('new_file.txt');
-            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                if (err) console.log(err);
-                // add file to database
-                var addFileQuery = "INSERT INTO files (media_directory, filename, data) VALUES (?, ?, ?)";
-                db.run(addFileQuery, [msg, 'new_file.txt', ""], function () {
-                    callback();
-                });
-            });
-        });
-    },
-    renameFile: function (msg, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // get path of file on disk
-        var oldPath = path.join(mediaDir, msg.directory, msg.oldName);
-        var newPath = path.join(mediaDir, msg.directory, msg.newName);
-        console.log("USER INPUT::renaming file " + msg.oldName + " - " + newPath);
-        // rename file on disk
-        fs.rename(oldPath, newPath, function (err) {
-            if (err) console.log(err);
-            // update JSON
-            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
-            var meta = require(metaPath);
-            var index = meta.demo.files.indexOf(msg.oldName); // get index of channel in array
-            if (index > -1) {
-                // delete if exists
-                meta.demo.files[index] = msg.newName;
-            }
-            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                if (err) console.log(err);
-                // update name in database
-                var updateQuery = "UPDATE files SET filename = ? WHERE rowid = ?";
-                db.run(updateQuery, [msg.newName, msg.fileID], function () {
-                    callback();
-                });
-            });
-        });
-    },
-    updateFile: function (msg) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // update file in database
-        var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";
-        db.run(updateQuery, [msg.text, msg.fileID]);
-        // get path of file on disk
-        var filepath = path.join(mediaDir, msg.directory, msg.filename);
-        console.log("USER INPUT::updating file " + filepath);
-        // update file on disk
-        fs.writeFile(filepath, msg.text, function (err) {
-            if (err) console.log(err);
-            // refresh display
-            module.exports.playLocalMedia({
-                directory: msg.directory
-            });
-        });
-    },
-    removeFile: function (msg, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
-        // remove file in database
-        var removeQuery = "DELETE FROM files WHERE rowid = ?";
-        db.run(removeQuery, [msg.fileID]);
-        // get path of file on disk
-        var filepath = path.join(mediaDir, msg.directory, msg.filename);
-        console.log("USER INPUT::removing file " + filepath);
-        // remove file on disk
-        fs.unlink(filepath, function (err) {
-            if (err) console.log(err);
-            // update demo.json
-            var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
-            var meta = require(metaPath);
-            var index = meta.demo.files.indexOf(msg.filename); // get index of channel in array
-            if (index > -1) {
-                // delete if exists
-                meta.demo.files.splice(index, 1);
-            }
-            // save json to disk
-            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                if (err) console.log(err);
-                if (rendererSocket.connected) {
-                    // send file path to renderer to refresh display
-                    var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
-                    rendererSocket.write(JSON.stringify({
-                        command: 'loadURL',
-                        path: updatedDir
-                    }));
-                    console.log('refreshing ' + updatedDir);
-                }
-                callback();
-            });
-        });
-    },
-    saveVersion: function (msg) {
-        console.log(`warning: not saving version (DAT is deprecated)`);
-        // get datetime
-        var timestamp = new Date().toISOString();
-        timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
-        // update in database
-        var updateModifiedQuery = "UPDATE media SET modified = ? WHERE directory = ?";
-        db.run(updateModifiedQuery, [timestamp, msg]);
-        // update datetime in JSON
-        var metaPath = path.join(mediaDir, msg, 'demo.json');
-        var meta = require(metaPath);
-        meta.demo = Object.assign(meta.demo, {
-            modified: timestamp
-        });
-        fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-            if (err) console.log(err);
-        });
-        console.log(`USER INPUT::Saved ${msg} at ${timestamp}`);
     },
     deleteConnection: function (msg) {
         // stop autoplay
@@ -815,33 +569,6 @@ module.exports = {
     loadConfiguration: function (callback) {
         callback(config);
     },
-    // updateConfig: function (msg) {
-    //     console.log("USER INPUT::updating output configuration");
-    //     // update window
-    //     if (msg.window) {
-    //         config.window = Object.assign(config.window, msg.window);
-    //     }
-    //     // update output
-    //     if (msg.outputs) {
-    //         // find correct output
-    //         msg.outputs.forEach(function (msgoutput) {
-    //             var output = config.outputs.find(x => x.index === msgoutput.index);
-    //             // update output properties
-    //             if (msgoutput.properties) {
-    //                 output.properties = Object.assign(output.properties, msgoutput.properties);
-    //             }
-    //             // update output leds
-    //             if (msgoutput.leds) {
-    //                 // find correct led
-    //                 msgoutput.leds.forEach(function (msgled) {
-    //                     var led = output.leds.find(x => x.index === msgled.index);
-    //                     // update led properties
-    //                     led = Object.assign(led, msgled);
-    //                 });
-    //             }
-    //         });
-    //     }
-    // },
     uploadConfig: function (msg, callback) {
         console.log("USER INPUT::uploading output configuration");
         config = msg;
@@ -980,3 +707,258 @@ function autoplayNext() {
         console.log(`error autoplaying - list is empty`);
     }
 }
+
+    // updateConfig: function (msg) {
+    //     console.log("USER INPUT::updating output configuration");
+    //     // update window
+    //     if (msg.window) {
+    //         config.window = Object.assign(config.window, msg.window);
+    //     }
+    //     // update output
+    //     if (msg.outputs) {
+    //         // find correct output
+    //         msg.outputs.forEach(function (msgoutput) {
+    //             var output = config.outputs.find(x => x.index === msgoutput.index);
+    //             // update output properties
+    //             if (msgoutput.properties) {
+    //                 output.properties = Object.assign(output.properties, msgoutput.properties);
+    //             }
+    //             // update output leds
+    //             if (msgoutput.leds) {
+    //                 // find correct led
+    //                 msgoutput.leds.forEach(function (msgled) {
+    //                     var led = output.leds.find(x => x.index === msgled.index);
+    //                     // update led properties
+    //                     led = Object.assign(led, msgled);
+    //                 });
+    //             }
+    //         });
+    //     }
+    // },
+
+    // reloadPage: function () {
+    //     if (playback.currentURL) {
+    //         if (playback.currentURL.includes('file:///')) {
+    //             // get directory name
+    //             var splitURL = playback.currentURL.split('/');
+    //             var directoryname = splitURL[splitURL.length - (splitURL[splitURL.length - 1].includes('.') ? 2 : 1)];
+    //             // send message to play local media
+    //             module.exports.playLocalMedia({
+    //                 directory: directoryname
+    //             });
+    //         } else {
+    //             // send full URL to play remote media
+    //             module.exports.playRemoteMedia(playback.currentURL);
+    //         }
+    //         mediaRequiringScreenshot = null;
+    //     }
+    // },
+    // createMedia: function (channelName, callback) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     // path of new media
+    //     var randomName = "item_" + Math.random().toString(36).substring(2, 8);
+    //     var newDirectory = path.join(mediaDir, randomName);
+    //     console.log("USER INPUT::creating media: " + newDirectory);
+    //     // make directory
+    //     fs.mkdir(newDirectory, function (err) {
+    //         if (err) console.log(err)
+    //         else {
+    //             var pathToDefault = path.join(mediaDir, '.default');
+    //             // get default metadata
+    //             var meta = require(path.join(pathToDefault, 'demo.json'));
+    //             // add channel if unique
+    //             if (meta.demo.channels.indexOf(channelName) === -1)
+    //                 meta.demo.channels.push(channelName);
+    //             // save metadata to disk
+    //             fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(meta, null, 4), function (err) {
+    //                 if (err) console.log(err);
+    //                 // copy default files
+    //                 fs.copyFile(path.join(pathToDefault, 'index.html'), path.join(newDirectory, 'index.html'), (err) => {
+    //                     if (err) console.log(err);
+    //                     fs.copyFile(path.join(pathToDefault, 'style.css'), path.join(newDirectory, 'style.css'), (err) => {
+    //                         if (err) console.log(err);
+    //                         fs.copyFile(path.join(pathToDefault, 'sketch.js'), path.join(newDirectory, 'sketch.js'), (err) => {
+    //                             if (err) console.log(err);
+    //                             fs.copyFile(path.join(pathToDefault, 'thumb.jpg'), path.join(newDirectory, 'thumb.jpg'), (err) => {
+    //                                 if (err) console.log(err);
+    //                                 // add to database
+    //                                 parseMediaItemDirectory(randomName, meta, callback(randomName));
+    //                             });
+    //                         });
+    //                     });
+    //                 });
+    //             });
+    //         }
+    //     });
+    // },
+    // duplicateMedia: function (sourceDir, callback) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     // get path of media to duplicate
+    //     var pathToOriginal = path.join(mediaDir, sourceDir);
+    //     // get source metadata
+    //     var originalMeta = require(path.join(pathToOriginal, 'demo.json'));
+    //     // make directory for new media
+    //     var destName = `${originalMeta.demo.title}_copy_${Math.random().toString(36).substring(2, 8)}`;
+    //     var destDir = path.join(mediaDir, destName);
+    //     console.log("USER INPUT::duplicating media: " + destName);
+    //     fs.mkdir(destDir, function (err) {
+    //         if (err) console.log(`error creating directory for duplicated media: ${err}`);
+    //         // get datetime
+    //         var timestamp = new Date().toISOString();
+    //         timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+    //         // create metadata object for new media
+    //         var destMeta = {
+    //             "demo": {
+    //                 "title": `${originalMeta.demo.title} copy`,
+    //                 "description": `original description: ${originalMeta.demo.description}`,
+    //                 "files": originalMeta.demo.files,
+    //                 "channels": originalMeta.demo.channels,
+    //                 "playcount": 0,
+    //                 "modified": timestamp
+    //             }
+    //         };
+    //         // copy files (function credit: https://stackoverflow.com/a/54818489)
+    //         function copyFiles(srcDir, dstDir, files) {
+    //             return Promise.all(files.map(f => {
+    //                 return copyFilePromise(path.join(srcDir, f), path.join(dstDir, f));
+    //             }));
+    //         }
+    //         copyFiles(pathToOriginal, destDir, destMeta.demo.files).then(() => {
+    //             // save metadata
+    //             fs.writeFile(path.join(destDir, 'demo.json'), JSON.stringify(destMeta, null, 4), function (err) {
+    //                 if (err) console.log(`error saving metadata for duplicated media: ${err}`);
+    //                 // add to database
+    //                 parseMediaItemDirectory(destName, destMeta, callback(destName));
+    //             });
+    //         }).catch(err => {
+    //             console.log(`error copying files to duplicate media: ${err}`);
+    //         });
+    //     });
+    // },
+
+    // createFile: function (msg, callback) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     //
+    //     var filepath = path.join(mediaDir, msg, 'new_file.txt');
+    //     console.log("USER INPUT::creating file " + filepath);
+    //     // create file on disk
+    //     fs.writeFile(filepath, "", function (err) {
+    //         if (err) console.log(err);
+    //         // add file to JSON
+    //         var metaPath = path.join(mediaDir, msg, 'demo.json');
+    //         var meta = require(metaPath);
+    //         meta.demo.files.push('new_file.txt');
+    //         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+    //             if (err) console.log(err);
+    //             // add file to database
+    //             var addFileQuery = "INSERT INTO files (media_directory, filename, data) VALUES (?, ?, ?)";
+    //             db.run(addFileQuery, [msg, 'new_file.txt', ""], function () {
+    //                 callback();
+    //             });
+    //         });
+    //     });
+    // },
+    // renameFile: function (msg, callback) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     // get path of file on disk
+    //     var oldPath = path.join(mediaDir, msg.directory, msg.oldName);
+    //     var newPath = path.join(mediaDir, msg.directory, msg.newName);
+    //     console.log("USER INPUT::renaming file " + msg.oldName + " - " + newPath);
+    //     // rename file on disk
+    //     fs.rename(oldPath, newPath, function (err) {
+    //         if (err) console.log(err);
+    //         // update JSON
+    //         var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+    //         var meta = require(metaPath);
+    //         var index = meta.demo.files.indexOf(msg.oldName); // get index of channel in array
+    //         if (index > -1) {
+    //             // delete if exists
+    //             meta.demo.files[index] = msg.newName;
+    //         }
+    //         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+    //             if (err) console.log(err);
+    //             // update name in database
+    //             var updateQuery = "UPDATE files SET filename = ? WHERE rowid = ?";
+    //             db.run(updateQuery, [msg.newName, msg.fileID], function () {
+    //                 callback();
+    //             });
+    //         });
+    //     });
+    // },
+    // updateFile: function (msg) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     // update file in database
+    //     var updateQuery = "UPDATE files SET data = ? WHERE rowid = ?";
+    //     db.run(updateQuery, [msg.text, msg.fileID]);
+    //     // get path of file on disk
+    //     var filepath = path.join(mediaDir, msg.directory, msg.filename);
+    //     console.log("USER INPUT::updating file " + filepath);
+    //     // update file on disk
+    //     fs.writeFile(filepath, msg.text, function (err) {
+    //         if (err) console.log(err);
+    //         // refresh display
+    //         module.exports.playLocalMedia({
+    //             directory: msg.directory
+    //         });
+    //     });
+    // },
+    // removeFile: function (msg, callback) {
+    //     // stop autoplay
+    //     module.exports.stopAutoplay();
+    //     // remove file in database
+    //     var removeQuery = "DELETE FROM files WHERE rowid = ?";
+    //     db.run(removeQuery, [msg.fileID]);
+    //     // get path of file on disk
+    //     var filepath = path.join(mediaDir, msg.directory, msg.filename);
+    //     console.log("USER INPUT::removing file " + filepath);
+    //     // remove file on disk
+    //     fs.unlink(filepath, function (err) {
+    //         if (err) console.log(err);
+    //         // update demo.json
+    //         var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
+    //         var meta = require(metaPath);
+    //         var index = meta.demo.files.indexOf(msg.filename); // get index of channel in array
+    //         if (index > -1) {
+    //             // delete if exists
+    //             meta.demo.files.splice(index, 1);
+    //         }
+    //         // save json to disk
+    //         fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+    //             if (err) console.log(err);
+    //             if (rendererSocket.connected) {
+    //                 // send file path to renderer to refresh display
+    //                 var updatedDir = 'file://' + path.join(mediaDir, msg.directory);
+    //                 rendererSocket.write(JSON.stringify({
+    //                     command: 'loadURL',
+    //                     path: updatedDir
+    //                 }));
+    //                 console.log('refreshing ' + updatedDir);
+    //             }
+    //             callback();
+    //         });
+    //     });
+    // },
+    // saveVersion: function (msg) {
+    //     console.log(`warning: not saving version (DAT is deprecated)`);
+    //     // get datetime
+    //     var timestamp = new Date().toISOString();
+    //     timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+    //     // update in database
+    //     var updateModifiedQuery = "UPDATE media SET modified = ? WHERE directory = ?";
+    //     db.run(updateModifiedQuery, [timestamp, msg]);
+    //     // update datetime in JSON
+    //     var metaPath = path.join(mediaDir, msg, 'demo.json');
+    //     var meta = require(metaPath);
+    //     meta.demo = Object.assign(meta.demo, {
+    //         modified: timestamp
+    //     });
+    //     fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+    //         if (err) console.log(err);
+    //     });
+    //     console.log(`USER INPUT::Saved ${msg} at ${timestamp}`);
+    // },

@@ -43,18 +43,6 @@ io.on('connection', function (socket) {
       io.emit('nowplaying', (playbackStatus));
     });
   });
-  // update config
-  socket.on('updateconfig', function (msg) {
-    media.updateConfig(msg);
-  });
-  // DEPRECATED upload config
-  socket.on('uploadconfig', function (msg) {
-    media.uploadConfig(msg, function () {
-      media.loadOutput(function (elements) {
-        io.emit('loadoutput', elements);
-      });
-    });
-  });
   // upload config file
   socket.on('updateconfigfile', function (msg) {
     // update in memory
@@ -80,9 +68,6 @@ io.on('connection', function (socket) {
     media.stopAutoplay();
     media.playRemoteMedia(msg);
   });
-  socket.on('reloadpage', function () {
-    media.reloadPage();
-  });
   // autoplay
   socket.on('autoplay', function (msg) {
     media.startAutoplay(msg);
@@ -94,24 +79,6 @@ io.on('connection', function (socket) {
   // set crossfade time
   socket.on('setcrossfadetime', function (msg) {
     media.setCrossfadeTime(msg);
-  });
-  // create media
-  socket.on('createmedia', function (msg) {
-    media.createMedia(msg, function (mediaDirectory) {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: mediaDirectory
-      }));
-    });
-  });
-  // create media as copy
-  socket.on('duplicatemedia', function (msg) {
-    media.duplicateMedia(msg, function (mediaDirectory) {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: mediaDirectory
-      }));
-    });
   });
   // create media from URL
   socket.on('createmediaURL', function (msg) {
@@ -131,37 +98,6 @@ io.on('connection', function (socket) {
     media.deleteMedia(msg, function () {
       // update client
       io.emit('unloadmediaitem', msg);
-    });
-  });
-  // create file
-  socket.on('createfile', function (msg) {
-    media.createFile(msg, function () {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: msg
-      }));
-    });
-  });
-  // rename file
-  socket.on('renamefile', function (msg) {
-    media.renameFile(msg, function () {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: msg.directory
-      }));
-    });
-  });
-  // update file
-  socket.on('updatefile', function (msg) {
-    media.updateFile(msg);
-  });
-  // remove file
-  socket.on('removefile', function (msg) {
-    media.removeFile(msg, function () {
-      io.emit('changedmedia', JSON.stringify({
-        page: 'editor',
-        disk: msg.directory
-      }));
     });
   });
   // general config update handler
@@ -196,35 +132,6 @@ io.on('connection', function (socket) {
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }
-  });
-  // set brightness
-  socket.on('setbrightness', function (msg) {
-    // update media
-    media.setBrightness(msg);
-  });
-  // set blur
-  socket.on('setblur', function (msg) {
-    // update media
-    media.setBlur(msg);
-  });
-  // set desaturation
-  socket.on('setdesaturation', function (msg) {
-    // update media
-    media.setDesaturation(msg);
-  });
-  // set gamma
-  socket.on('setgamma', function (msg) {
-    // update media
-    media.setGamma(msg);
-  });
-  // save version (DAT)
-  socket.on('saveversion', function (msg) {
-    media.saveVersion(msg);
-  });
-  // create channel
-  socket.on('createchannel', function (msg) {
-    if (msg.length > 0)
-      media.createChannel(msg);
   });
   // create channel and add media to it
   socket.on('addnewchannel', function (msg) {
