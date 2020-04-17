@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import PlaybackStatusElement from "./PlaybackStatusElement.svelte";
-  import { livePlaybackStatus } from './stores.js';
+  import { livePlaybackStatus } from './client_data.js';
 
   onMount(() => {
     //

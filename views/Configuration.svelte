@@ -1,8 +1,8 @@
 <script>
-  import ConfigurationSlider from "./ConfigurationSlider.svelte";
+  import ConfigurationSlider from "./ConfigurationInput.svelte";
   import MapContainer from "./MapContainer.svelte";
   import MapChain from "./MapChain.svelte";
-  import { config } from './stores.js';
+  import { config } from './client_data.js';
 
   $: brightness = {
     name: "brightness",

@@ -2,11 +2,11 @@
   import PlaybackStatus from "./PlaybackStatus.svelte";
   import PlaybackStatusElement from "./PlaybackStatusElement.svelte";
   import Configuration from "./Configuration.svelte";
-  import ConfigurationSlider from "./ConfigurationSlider.svelte";
+  import ConfigurationSlider from "./ConfigurationInput.svelte";
   import MapContainer from "./MapContainer.svelte";
   import MapChain from "./MapChain.svelte";
   import MediaFeed from './MediaFeed.svelte';
-  import { config, livePlaybackStatus, mediaFeedObjects } from './stores.js';
+  import { config, livePlaybackStatus, mediaFeedObjects } from './client_data.js';
   import { tweened } from 'svelte/motion';
 
   let showConfig = false;
@@ -118,6 +118,9 @@
 
 <div class="header-main">
     <div>
+        <label class="" on:click={() => console.log('pressed play btn')}>
+            Play/
+        </label>
         <input
         class="url-input"
         bind:this={urlinputelement}
@@ -125,12 +128,12 @@
         placeholder="Enter URL to display"
         on:keyup={playURL}
         >
-        <!-- <button class="url-input--download-btn" on:click={() => console.log('pressed play btn')}>
-            TODO** Play
-        </button> -->
-        <button class="url-input--download-btn" on:click={downloadURL}>
+        <span class="url-input--download-btn" on:click={downloadURL}>
             Download
-        </button>
+        </span>
+        <!-- <button class="url-input--download-btn" on:click={downloadURL}>
+            Download
+        </button> -->
         <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
             Screenshot
         </button> -->
@@ -263,7 +266,7 @@
     }
 
     .header-main > *:first-child {
-        text-align: left;
+        /* text-align: left; */
     }
 
     .header-main > * {
@@ -271,7 +274,7 @@
     }
 
     .header-main > *:last-child {
-        text-align: right;
+        /* text-align: right; */
     }
 
     .header-main > *:first-child {

@@ -7,7 +7,7 @@ import { terser } from 'rollup-plugin-terser';
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-	input: 'webui/main.js',
+	input: 'views/compile.js',
 	output: {
 		sourcemap: true,
 		format: 'iife',

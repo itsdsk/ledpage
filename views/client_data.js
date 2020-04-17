@@ -25,12 +25,6 @@ socket.on("nowplaying", function (playback) {
     // console.log(`recieved playback status:\n${JSON.stringify(JSON.parse(playback), null, 2)}`)
 });
 
-var nowPlayingUpdatePeriod = 5000; // ms to update nowplaying
-setInterval(function () {
-    // request playback status update
-    socket.emit('nowplaying');
-}, nowPlayingUpdatePeriod);
-
 // var screenshotUpdatePeriod = 3000; // ms to update nowplaying
 // function screenshotTimeout() {
 //     setTimeout(function () {

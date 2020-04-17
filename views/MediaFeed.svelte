@@ -1,7 +1,7 @@
 <script>
   import MediaFeedBlock from "./MediaFeedBlock.svelte";
   import { slide } from 'svelte/transition';
-  import { mediaFeedObjects, channelObjects, sortMediaFeed } from './stores.js'
+  import { mediaFeedObjects, channelObjects, sortMediaFeed } from './client_data.js'
 
   let selectedChannel = 'all media';
   let sortModes = [

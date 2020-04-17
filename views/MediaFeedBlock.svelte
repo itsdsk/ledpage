@@ -1,5 +1,5 @@
 <script>
-  import { channelObjects } from './stores.js';
+  import { channelObjects } from './client_data.js';
   export let directory;
   export let title;
   export let image;
