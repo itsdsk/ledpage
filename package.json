@@ -16,6 +16,7 @@
   },
   "scripts": {
     "lint": "eslint .",
+    "postinstall": "npm run build",
     "start": "node app.js -n",
     "build": "rollup -c",
     "dev": "rollup -c -w"
