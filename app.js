@@ -18,6 +18,19 @@ setTimeout(media.startAutoplay, 5000);
 // serve static files
 app.use(express.static('public'));
 
+// update playback status to clients
+var updatePeriod = 5000; // ms
+function updateNowPlaying() {
+  setTimeout(function () {
+    media.nowPlaying(function (playbackStatus) {
+      io.sockets.emit('nowplaying', (playbackStatus));
+    });
+    // recall to loop
+    updateNowPlaying();
+  }, updatePeriod);
+}
+updateNowPlaying();
+
 // client websocket routes
 io.on('connection', function (socket) {
   // request feed
@@ -35,13 +48,10 @@ io.on('connection', function (socket) {
       media.loadConfiguration(function (elements) {
         socket.emit('configuration', elements);
       });
+      media.nowPlaying(function (playbackStatus) {
+        socket.emit('nowplaying', (playbackStatus));
+      });
     }
-  });
-  // get now playing
-  socket.on('nowplaying', function () {
-    media.nowPlaying(function (playbackStatus) {
-      io.emit('nowplaying', (playbackStatus));
-    });
   });
   // upload config file
   socket.on('updateconfigfile', function (msg) {
