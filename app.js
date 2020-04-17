@@ -26,14 +26,14 @@ io.on('connection', function (socket) {
       media.loadMediaFeed({}, function (elements) {
         // send media items one at a time
         elements.forEach(element => {
-          io.emit('addmediaitem', element);
+          socket.emit('addmediaitem', element);
         });
       });
       media.loadChannelList({}, function (elements) {
-        io.emit('channellist', elements);
+        socket.emit('channellist', elements);
       });
       media.loadConfiguration(function (elements) {
-        io.emit('configuration', elements);
+        socket.emit('configuration', elements);
       });
     }
   });
