@@ -127,6 +127,12 @@
           {title}
         </div>
       </h3>
+      <div>
+        <a
+          href={directory.startsWith('http') ? directory : `/media/${directory}/index.html`}>
+          Source
+        </a>
+      </div>
       <p style="text-align:center;">{new Date(modified).toUTCString()}</p>
       <div>
         <input
