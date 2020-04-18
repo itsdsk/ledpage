@@ -149,7 +149,10 @@
           {channelObject.channel_name}
         </div>
       {/each}
-      <button disabled on:click={() => socket.emit('deletemedia', directory)}>
+      <button
+        on:click={() => {
+          if (window.confirm(`Delete '${title}'?`)) socket.emit('deletemedia', directory);
+        }}>
         Delete
       </button>
       <button on:click={() => (channelsOpen = false)}>Close</button>
