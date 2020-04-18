@@ -21,13 +21,13 @@
   };
 
   let urlinputelement;
-  function playURL(event) {
-      if (event.keyCode == 13) { // 'Enter'
-        if (event.target.value.length > 0 && event.target.matches(':valid')) { // URL is validated
-          socket.emit('playURL', event.target.value);
-          console.log(`playing URL: ${event.target.value}`);
-        }
-      }
+  let urlInputValid = false;
+
+  function playURL() {
+    if (urlinputelement.value.length > 0 && urlinputelement.matches(':valid')) { // URL is validated
+      socket.emit('playURL', urlinputelement.value);
+      console.log(`playing URL: ${urlinputelement.value}`);
+    }
   }
 
   function downloadURL() {
@@ -119,23 +119,22 @@
 <svelte:window bind:scrollY={scrollY}/>
 
 <div class="header-main">
-    <div>
-        <label class="" on:click={() => console.log('pressed play btn')}>
-            Play/
-        </label>
+    <div class="url-input--container">
         <input
         class="url-input"
         bind:this={urlinputelement}
         type=url
         placeholder="Enter URL to display"
-        on:keyup={playURL}
+        required
+        on:keyup="{e => {if (e.keyCode == 13 /* Enter */) playURL()}}"
+        on:input={() => urlInputValid = urlinputelement.matches(':valid')}
         >
-        <span class="url-input--download-btn" on:click={downloadURL}>
+        <button class="url-input--btn" disabled={!urlInputValid} on:click={playURL}>
+            Play
+        </button>
+        <button class="url-input--btn" disabled={!urlInputValid} on:click={downloadURL}>
             Download
-        </span>
-        <!-- <button class="url-input--download-btn" on:click={downloadURL}>
-            Download
-        </button> -->
+        </button>
         <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
             Screenshot
         </button> -->
@@ -276,7 +275,7 @@
     }
 
     .header-main > *:last-child {
-        /* text-align: right; */
+        text-align: right;
     }
 
     .header-main > *:first-child {
@@ -285,21 +284,14 @@
 
     .url-input {
         border: none;
+        border-bottom: 1px solid;
         flex-grow: 2;
         /* display: inline-block;
         max-width: 100%; */
     }
 
-    /* input:invalid {
-        background-color: red;
-    } */
-
-    .url-input--download-btn {
-        display: none;
-    }
-
-    .header-main > *:first-child:hover .url-input--download-btn {
-        display: inline;
+    .url-input--btn {
+        margin-left: 0.75em;
     }
 
     .preview-container {
