@@ -2,20 +2,20 @@
   import { draw, blur } from "svelte/transition";
   export let output;
   export let fillColour = "#333";
+  export let visibility = "hidden";
 
   let circleDuration = 500;
-  let lineDuration = 400;
-  let lineDelay = 0;//100;
 </script>
 
 <style>
   line {
     stroke: black;
-    stroke-width: 4px;
+    stroke-width: 2px;
   }
-  /* circle {
-    fill: black;
-  } */
+  circle {
+    stroke: black;
+    stroke-width: 2px;
+  }
   circle:hover {
     fill: dimgray;
   }
@@ -27,12 +27,12 @@
       in:blur={{ duration: circleDuration }}
       cx={led.x}
       cy={led.y}
-      r={10}
-      fill={fillColour}
+      r={6}
+      fill={visibility === "hidden" ? "#dddddd" : "black"}
       on:click />
     {#if i < output.leds.length - 1}
       <line
-        in:draw={{ delay: i * lineDelay, duration: lineDuration }}
+        visibility={visibility}
         x1={led.x}
         y1={led.y}
         x2={output.leds[i + 1].x}

@@ -110,7 +110,9 @@
 	});
 	const nextPlayingProgress = tweened(0, {
 		duration: 1000
-	});
+    });
+    
+  let activeOutputChain = null;
 
 </script>
 
@@ -159,8 +161,8 @@
     <div class="preview-container--child">
         {#if showConfig}
             <MapContainer>
-                {#each $config.outputs as output}
-                    <MapChain {output} />
+                {#each $config.outputs as output, i}
+                    <MapChain {output} visibility={activeOutputChain == i ? "visible" : "hidden"} on:click={() => activeOutputChain = i} />
                 {/each}
             </MapContainer>
         {:else}
@@ -184,7 +186,7 @@
                         <th>Color Order</th>
                     </tr>
                     {#each $config.outputs as output, i}
-                        <tr>
+                        <tr class:activeOutputChain="{activeOutputChain === i}" on:click="{() => activeOutputChain = (activeOutputChain === i ? null : i)}">
                             <td>{output.properties.type}</td>
                             <td>{output.leds.length}</td>
                             <td>{output.properties.colorOrder}</td>
@@ -387,7 +389,12 @@
         padding: 8px;
     }
 
-    tr:not(:first-child) {
+    tr:not(:first-child):not(.activeOutputChain) {
          background-color: #dddddd;
+    }
+
+    .activeOutputChain {
+        font-style: italic;
+        background-color: #bcbcbc;
     }
 </style>
