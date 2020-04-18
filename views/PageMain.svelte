@@ -234,6 +234,20 @@
     margin-bottom: 0;
   }
 
+  .now-playing--link {
+    margin-top: 4px;
+    font-size: 0.75em;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 360px;
+    text-overflow: ellipsis;
+  }
+
+  .now-playing--link:not(:hover) > a {
+    color: black;
+    text-decoration: none;
+  }
+
   progress {
     display: block;
     width: 100%;
@@ -408,6 +422,11 @@
         <p class="now-playing--title">
           {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing'}
         </p>
+        <div class="now-playing--link">
+          <a href={iframeSrc}>
+            {iframeSrc}
+          </a>
+        </div>
         <progress value={$fadingProgress} />
       </div>
       <div>
