@@ -340,7 +340,7 @@
       <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
     </div>
   {/if}
-  <div on:click={() => (showConfig = !showConfig)}>Config</div>
+  <div on:click={() => (showConfig = !showConfig)}>{showConfig ? "Back" : "Settings"}</div>
   <!-- <button on:click={sendScreenshot}>
             Screenshot
         </button> -->
