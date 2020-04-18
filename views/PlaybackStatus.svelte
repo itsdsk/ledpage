@@ -1,37 +1,18 @@
 <script>
   import { onMount } from "svelte";
   import PlaybackStatusElement from "./PlaybackStatusElement.svelte";
-  import { livePlaybackStatus } from './client_data.js';
+  import { livePlaybackStatus } from "./client_data.js";
 
   onMount(() => {
     //
   });
 
-  $: iframeSrc = $livePlaybackStatus.nowPlaying ? ($livePlaybackStatus.nowPlaying.directory.startsWith('http') ? $livePlaybackStatus.nowPlaying.directory : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`) : `about:blank`;
-
+  $: iframeSrc = $livePlaybackStatus.nowPlaying
+    ? $livePlaybackStatus.nowPlaying.directory.startsWith("http")
+      ? $livePlaybackStatus.nowPlaying.directory
+      : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`
+    : `about:blank`;
 </script>
-
-<div class="playback-status">
-  <div>
-    <iframe
-      src={iframeSrc}
-      title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
-  </div>
-
-  <div>
-  
-    <div>
-      <button id="reloadCurrentPageButton">Reload</button>
-    </div>
-
-    NOW PLAYING:
-    <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
-
-    NEXT:
-    <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
-
-  </div>
-</div>
 
 <style>
   iframe {
@@ -50,3 +31,23 @@
     padding: 16px;
   }
 </style>
+
+<div class="playback-status">
+  <div>
+    <iframe
+      src={iframeSrc}
+      title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
+  </div>
+
+  <div>
+
+    <div>
+      <button id="reloadCurrentPageButton">Reload</button>
+    </div>
+    NOW PLAYING:
+    <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
+    NEXT:
+    <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
+
+  </div>
+</div>

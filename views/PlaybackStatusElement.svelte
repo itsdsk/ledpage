@@ -6,6 +6,4 @@
   export let timeFromStart = false;
 </script>
 
-<span>
-  {title || 'Nothing...'}
-</span>
+<span>{title || 'Nothing...'}</span>

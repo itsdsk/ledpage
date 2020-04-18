@@ -107,7 +107,7 @@ socket.on("mediafeed", function (newMediaFeedObjects) {
 
 // add individual media items
 socket.on("addmediaitem", function (newMediaFeedObject) {
-    mediaFeedObjects.update(mf => [newMediaFeedObject, ...mf] );
+    mediaFeedObjects.update(mf => [newMediaFeedObject, ...mf]);
 });
 
 // update single media item in feed

@@ -8,7 +8,7 @@
   let readonly = true;
   let changed = false;
 
-  function handleChange (event) {
+  function handleChange(event) {
     var data = {
       name: name,
       value: value
@@ -18,9 +18,9 @@
     changed = true;
   }
 
-  function handleBtnClick (event) {
+  function handleBtnClick(event) {
     // get value mapped from 0.0 to 1.0
-    var val = parseInt(event.target.innerHTML)/100;
+    var val = parseInt(event.target.innerHTML) / 100;
     // map from min to max
     val = val * Math.abs(max - min);
     val = min + val;
@@ -33,19 +33,6 @@
     handleChange();
   }
 </script>
-
-<div>
-  <label for={name}>
-    {name.toUpperCase()}:
-  </label>
-  <div class="config-input-save">
-    <input id={name} type="number" bind:value {min} {max} {step} {readonly} on:click|once="{() => readonly = false}" on:change={handleChange} />
-    <button disabled={readonly} on:click={handleBtnClick}>0</button>
-    <button disabled={readonly} on:click={handleBtnClick}>33</button>
-    <button disabled={readonly} on:click={handleBtnClick}>66</button>
-    <button disabled={readonly} on:click={handleBtnClick}>100</button>
-  </div>
-</div>
 
 <style>
   label {
@@ -78,3 +65,23 @@
     width: 4.5em;
   }
 </style>
+
+<div>
+  <label for={name}>{name.toUpperCase()}:</label>
+  <div class="config-input-save">
+    <input
+      id={name}
+      type="number"
+      bind:value
+      {min}
+      {max}
+      {step}
+      {readonly}
+      on:click|once={() => (readonly = false)}
+      on:change={handleChange} />
+    <button disabled={readonly} on:click={handleBtnClick}>0</button>
+    <button disabled={readonly} on:click={handleBtnClick}>33</button>
+    <button disabled={readonly} on:click={handleBtnClick}>66</button>
+    <button disabled={readonly} on:click={handleBtnClick}>100</button>
+  </div>
+</div>

@@ -28,11 +28,11 @@
       cx={led.x}
       cy={led.y}
       r={6}
-      fill={visibility === "hidden" ? "#dddddd" : "black"}
+      fill={visibility === 'hidden' ? '#dddddd' : 'black'}
       on:click />
     {#if i < output.leds.length - 1}
       <line
-        visibility={visibility}
+        {visibility}
         x1={led.x}
         y1={led.y}
         x2={output.leds[i + 1].x}

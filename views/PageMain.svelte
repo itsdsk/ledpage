@@ -5,12 +5,20 @@
   import ConfigurationSlider from "./ConfigurationInput.svelte";
   import MapContainer from "./MapContainer.svelte";
   import MapChain from "./MapChain.svelte";
-  import MediaFeed from './MediaFeed.svelte';
-  import { config, livePlaybackStatus, mediaFeedObjects } from './client_data.js';
-  import { tweened } from 'svelte/motion';
+  import MediaFeed from "./MediaFeed.svelte";
+  import {
+    config,
+    livePlaybackStatus,
+    mediaFeedObjects
+  } from "./client_data.js";
+  import { tweened } from "svelte/motion";
 
   let showConfig = false;
-  $: iframeSrc = $livePlaybackStatus.nowPlaying ? ($livePlaybackStatus.nowPlaying.directory.startsWith('http') ? $livePlaybackStatus.nowPlaying.directory : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`) : `about:blank`;
+  $: iframeSrc = $livePlaybackStatus.nowPlaying
+    ? $livePlaybackStatus.nowPlaying.directory.startsWith("http")
+      ? $livePlaybackStatus.nowPlaying.directory
+      : `/media/${$livePlaybackStatus.nowPlaying.directory}/index.html`
+    : `about:blank`;
 
   $: brightness = {
     name: "brightness",
@@ -24,63 +32,69 @@
   let urlInputValid = false;
 
   function playURL() {
-    if (urlinputelement.value.length > 0 && urlinputelement.matches(':valid')) { // URL is validated
-      socket.emit('playURL', urlinputelement.value);
+    if (urlinputelement.value.length > 0 && urlinputelement.matches(":valid")) {
+      // URL is validated
+      socket.emit("playURL", urlinputelement.value);
       console.log(`playing URL: ${urlinputelement.value}`);
     }
   }
 
   function downloadURL() {
-    if (urlinputelement.value.length > 0 && urlinputelement.matches(':valid')) { // URL is validated
-        socket.emit('createmediaURL', urlinputelement.value);
-        console.log(`createmediaURL: ${urlinputelement.value}`);
+    if (urlinputelement.value.length > 0 && urlinputelement.matches(":valid")) {
+      // URL is validated
+      socket.emit("createmediaURL", urlinputelement.value);
+      console.log(`createmediaURL: ${urlinputelement.value}`);
     } else {
-        console.log('cannot create media from URL as it is invalid');
+      console.log("cannot create media from URL as it is invalid");
     }
   }
 
   let scrollY;
 
-    let fileUploadText = '';
+  let fileUploadText = "";
   function handleFiles() {
     // check 1 file was selected
     if (this.files.length == 1) {
       // update status string
-      fileUploadText = `${this.files[0].name} (${this.files[0].size} bytes, modified: ${(new Date(this.files[0].lastModified).toLocaleString())})`;
+      fileUploadText = `${this.files[0].name} (${
+        this.files[0].size
+      } bytes, modified: ${new Date(
+        this.files[0].lastModified
+      ).toLocaleString()})`;
       // check file type
-      if (this.files[0].type == 'application/json') {
+      if (this.files[0].type == "application/json") {
         // read file and parse JSON
         var reader = new FileReader();
-        reader.onload = (function () {
-            return function (event) {
-                var jsonconf;
-                try {
-                    jsonconf = JSON.parse(event.target.result);
-                } catch (exception) {
-                    alert('exception caught when parsing json: ' + exception);
-                }
-                // update status string
-                fileUploadText = `Uploaded ${fileUploadText}`;
-                // send uploaded config to server
-                socket.emit('updateconfigfile', jsonconf);
-            };
+        reader.onload = (function() {
+          return function(event) {
+            var jsonconf;
+            try {
+              jsonconf = JSON.parse(event.target.result);
+            } catch (exception) {
+              alert("exception caught when parsing json: " + exception);
+            }
+            // update status string
+            fileUploadText = `Uploaded ${fileUploadText}`;
+            // send uploaded config to server
+            socket.emit("updateconfigfile", jsonconf);
+          };
         })(this.files[0]);
         reader.readAsText(this.files[0]);
       }
     }
   }
 
-//   function sendScreenshot() {
-//     console.log('sending screenshot request cmd');
-//     // test to save screenshot on click
-//     if (mainSocket.readyState != 1) {
-//         mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
-//         console.log("main socket not connected");
-//     }
-//     mainSocket.send(JSON.stringify({
-//         "command": "screenshot"
-//     }));
-//   }
+  //   function sendScreenshot() {
+  //     console.log('sending screenshot request cmd');
+  //     // test to save screenshot on click
+  //     if (mainSocket.readyState != 1) {
+  //         mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
+  //         console.log("main socket not connected");
+  //     }
+  //     mainSocket.send(JSON.stringify({
+  //         "command": "screenshot"
+  //     }));
+  //   }
 
   let nextPlayingImg = null;
 
@@ -88,144 +102,329 @@
 
   function updateNextPlayingImg() {
     if ($livePlaybackStatus.nextPlaying) {
-        // update progress bars
-        fadingProgress.set($livePlaybackStatus.nextPlaying.timeFromStart/$livePlaybackStatus.nextPlaying.fadeDuration);
-        nextPlayingProgress.set(-$livePlaybackStatus.nextPlaying.timeFromStart/$config.settings.autoplayDuration.max);
-        // update image...
-        // get next playing's media feed index
-        var feedIndex = $mediaFeedObjects.findIndex(mediaItem => mediaItem.directory === $livePlaybackStatus.nextPlaying.directory);
-        // check next playing was found
-        if (feedIndex == -1) {
-            nextPlayingImg = null;
-        } else {
-            nextPlayingImg = $mediaFeedObjects[feedIndex].image;
-        }
-    } else {
+      // update progress bars
+      fadingProgress.set(
+        $livePlaybackStatus.nextPlaying.timeFromStart /
+          $livePlaybackStatus.nextPlaying.fadeDuration
+      );
+      nextPlayingProgress.set(
+        -$livePlaybackStatus.nextPlaying.timeFromStart /
+          $config.settings.autoplayDuration.max
+      );
+      // update image...
+      // get next playing's media feed index
+      var feedIndex = $mediaFeedObjects.findIndex(
+        mediaItem =>
+          mediaItem.directory === $livePlaybackStatus.nextPlaying.directory
+      );
+      // check next playing was found
+      if (feedIndex == -1) {
         nextPlayingImg = null;
+      } else {
+        nextPlayingImg = $mediaFeedObjects[feedIndex].image;
+      }
+    } else {
+      nextPlayingImg = null;
     }
   }
 
-	const fadingProgress = tweened(0, {
-		duration: 1000
-	});
-	const nextPlayingProgress = tweened(0, {
-		duration: 1000
-    });
-    
-  let activeOutputChain = null;
+  const fadingProgress = tweened(0, {
+    duration: 1000
+  });
+  const nextPlayingProgress = tweened(0, {
+    duration: 1000
+  });
 
+  let activeOutputChain = null;
 </script>
 
-<svelte:window bind:scrollY={scrollY}/>
+<style>
+  .header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    /* margin: 8px; */
+    /* margin-bottom: 16px; */
+    /* border-bottom: 2px solid grey; */
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 100;
+    /* position: fixed;
+        top: 0;
+        width: 100%;
+        background: white; */
+  }
+
+  .header-main > * {
+    flex: 1 1 0;
+  }
+
+  .header-main > *:first-child {
+    /* text-align: left; */
+  }
+
+  .header-main > * {
+    text-align: center;
+  }
+
+  .header-main > *:last-child {
+    text-align: right;
+  }
+
+  .header-main > *:first-child {
+    display: flex;
+  }
+
+  .url-input {
+    border: none;
+    border-bottom: 1px solid;
+    flex-grow: 2;
+    /* display: inline-block;
+        max-width: 100%; */
+  }
+
+  .url-input--btn {
+    margin-left: 0.75em;
+  }
+
+  .preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    margin: 10em 0em;
+  }
+
+  .preview-container--child {
+    flex-basis: 360px;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
+    /* justify-content: center; */
+    padding: 16px;
+  }
+
+  .preview-container--child:first-of-type {
+    justify-content: center;
+  }
+
+  .preview-container--child:last-of-type {
+    justify-content: space-between;
+  }
+
+  .preview-container--child:last-of-type > * {
+    margin: 16px;
+  }
+
+  iframe {
+    width: 350px;
+    height: 350px;
+  }
+
+  .preview-container--next-playing {
+    display: flex;
+    align-items: center;
+  }
+
+  .now-playing--title {
+    font-size: 1.75em;
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
+
+  progress {
+    display: block;
+    width: 100%;
+    height: 4px;
+    margin-top: 8px;
+  }
+
+  .preview-container--next-playing > *:first-child {
+    /* vertical-align: middle; */
+    padding-right: 8px;
+  }
+
+  .preview-container--next-playing > *:nth-child(2) {
+    /* vertical-align: middle; */
+    flex-grow: 2;
+  }
+  .preview-container--label {
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+
+  .preview-container--outputs-list > p {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  img.next-thumbnail {
+    max-width: 64px;
+    display: inline;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td,
+  th {
+    border: 2px solid #ffffff;
+    text-align: left;
+    padding: 8px;
+  }
+
+  tr:not(:first-child):not(.activeOutputChain) {
+    background-color: #dddddd;
+  }
+
+  .activeOutputChain {
+    font-style: italic;
+    background-color: #bcbcbc;
+  }
+</style>
+
+<svelte:window bind:scrollY />
 
 <div class="header-main">
-    <div class="url-input--container">
-        <input
-        class="url-input"
-        bind:this={urlinputelement}
-        type=url
-        placeholder="Enter URL to display"
-        required
-        on:keyup="{e => {if (e.keyCode == 13 /* Enter */) playURL()}}"
-        on:input={() => urlInputValid = urlinputelement.matches(':valid')}
-        >
-        <button class="url-input--btn" disabled={!urlInputValid} on:click={playURL}>
-            Play
-        </button>
-        <button class="url-input--btn" disabled={!urlInputValid} on:click={downloadURL}>
-            Download
-        </button>
-        <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
+  <div class="url-input--container">
+    <input
+      class="url-input"
+      bind:this={urlinputelement}
+      type="url"
+      placeholder="Enter URL to display"
+      required
+      on:keyup={e => {
+        if (e.keyCode == 13) playURL();
+      }}
+      on:input={() => {
+        urlInputValid = urlinputelement.matches(':valid');
+      }} />
+    <button class="url-input--btn" disabled={!urlInputValid} on:click={playURL}>
+      Play
+    </button>
+    <button
+      class="url-input--btn"
+      disabled={!urlInputValid}
+      on:click={downloadURL}>
+      Download
+    </button>
+    <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
             Screenshot
         </button> -->
+  </div>
+  {#if scrollY > 400 || showConfig}
+    <div>
+      NOW PLAYING:
+      <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
     </div>
-    {#if scrollY > 400 || showConfig}
-        <div>
-        NOW PLAYING: <PlaybackStatusElement {...$livePlaybackStatus.nowPlaying} />
-        </div>
-        <div>
-        NEXT: <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
-        </div>
-    {/if}
-        <div on:click={()=>showConfig=!showConfig}>
-            Config
-        </div>
-        <!-- <button on:click={sendScreenshot}>
+    <div>
+      NEXT:
+      <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
+    </div>
+  {/if}
+  <div on:click={() => (showConfig = !showConfig)}>Config</div>
+  <!-- <button on:click={sendScreenshot}>
             Screenshot
         </button> -->
 </div>
 
 <div class="preview-container">
 
-    <div class="preview-container--child">
-        {#if showConfig}
-            <MapContainer>
-                {#each $config.outputs as output, i}
-                    <MapChain {output} visibility={activeOutputChain == i ? "visible" : "hidden"} on:click={() => activeOutputChain = i} />
-                {/each}
-            </MapContainer>
-        {:else}
-            <iframe
-            src={iframeSrc}
-            title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
-        {/if}
-    </div>
+  <div class="preview-container--child">
+    {#if showConfig}
+      <MapContainer>
+        {#each $config.outputs as output, i}
+          <MapChain
+            {output}
+            visibility={activeOutputChain == i ? 'visible' : 'hidden'}
+            on:click={() => (activeOutputChain = i)} />
+        {/each}
+      </MapContainer>
+    {:else}
+      <iframe
+        src={iframeSrc}
+        title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
+    {/if}
+  </div>
 
-    <div class="preview-container--child">
-        {#if showConfig}
-            <div>
-                <h4 class="preview-container--label">OUTPUT</h4>
-                <p class="now-playing--title"><var>{$config.outputs.reduce((accumulator, currentValue) => {return accumulator + currentValue.leds.length}, 0)}</var> LEDs</p>
-            </div>
-            <div class="preview-container--outputs-list">
-                <table>
-                    <tr>
-                        <th>Type</th>
-                        <th>Count</th>
-                        <th>Color Order</th>
-                    </tr>
-                    {#each $config.outputs as output, i}
-                        <tr class:activeOutputChain="{activeOutputChain === i}" on:click="{() => activeOutputChain = (activeOutputChain === i ? null : i)}">
-                            <td>{output.properties.type}</td>
-                            <td>{output.leds.length}</td>
-                            <td>{output.properties.colorOrder}</td>
-                        </tr>
-                    {/each}
-                </table>
-            </div>
-            <input type="file" accept="application/json" style="display:none" on:change={handleFiles}>
-            <div>
-                <a href="#" on:click|preventDefault|stopPropagation={() => document.querySelector("input[type='file']").click()}><button>Upload config file</button></a>
-                <button on:click={() => socket.emit('saveconfig')}>Save</button>
-            </div>
-            {#if fileUploadText.length}
-                <p>{fileUploadText}</p>
-            {/if}
-        {:else}
-        <div>
-            <h4 class="preview-container--label">
-                {$fadingProgress > 0.0 && $fadingProgress < 1.0 ? 'FADING' : 'NOW PLAYING'}
-            </h4>
-            <p class="now-playing--title">
-                {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : "Nothing"}
-            </p>
-            <progress value={$fadingProgress}></progress>
+  <div class="preview-container--child">
+    {#if showConfig}
+      <div>
+        <h4 class="preview-container--label">OUTPUT</h4>
+        <p class="now-playing--title">
+          <var>
+            {$config.outputs.reduce((accumulator, currentValue) => {
+              return accumulator + currentValue.leds.length;
+            }, 0)}
+          </var>
+          LEDs
+        </p>
+      </div>
+      <div class="preview-container--outputs-list">
+        <table>
+          <tr>
+            <th>Type</th>
+            <th>Count</th>
+            <th>Color Order</th>
+          </tr>
+          {#each $config.outputs as output, i}
+            <tr
+              class:activeOutputChain={activeOutputChain === i}
+              on:click={() => (activeOutputChain = activeOutputChain === i ? null : i)}>
+              <td>{output.properties.type}</td>
+              <td>{output.leds.length}</td>
+              <td>{output.properties.colorOrder}</td>
+            </tr>
+          {/each}
+        </table>
+      </div>
+      <input
+        type="file"
+        accept="application/json"
+        style="display:none"
+        on:change={handleFiles} />
+      <div>
+        <a
+          href="#"
+          on:click|preventDefault|stopPropagation={() => document
+              .querySelector("input[type='file']")
+              .click()}>
+          <button>Upload config file</button>
+        </a>
+        <button on:click={() => socket.emit('saveconfig')}>Save</button>
+      </div>
+      {#if fileUploadText.length}
+        <p>{fileUploadText}</p>
+      {/if}
+    {:else}
+      <div>
+        <h4 class="preview-container--label">
+          {$fadingProgress > 0.0 && $fadingProgress < 1.0 ? 'FADING' : 'NOW PLAYING'}
+        </h4>
+        <p class="now-playing--title">
+          {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing'}
+        </p>
+        <progress value={$fadingProgress} />
+      </div>
+      <div>
+        <div class="preview-container--next-playing">
+          <img src={nextPlayingImg} alt="" class="next-thumbnail" />
+          <div>
+            <h4 class="preview-container--label">NEXT</h4>
+            <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
+            <progress value={$nextPlayingProgress} />
+          </div>
         </div>
-        <div>
-            <div class="preview-container--next-playing">
-                <img src={nextPlayingImg} alt="" class="next-thumbnail" />
-                <div>
-                    <h4 class="preview-container--label">NEXT</h4>
-                    <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
-                    <progress value={$nextPlayingProgress}></progress>
-                </div>
-            </div>
-        </div>
-        <div>
-            <ConfigurationSlider {...brightness} />
-        </div>
-        {/if}
-    </div>
+      </div>
+      <div>
+        <ConfigurationSlider {...brightness} />
+      </div>
+    {/if}
+  </div>
 </div>
 
 <!-- <div style="padding: 150px;"> -->
@@ -233,160 +432,11 @@
 
   {#if showConfig}
     <div>
-        <Configuration />
+      <Configuration />
     </div>
   {:else}
     <div>
-        <MediaFeed />
+      <MediaFeed />
     </div>
   {/if}
 </div>
-
-<style>
-
-    .header-main {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 24px;
-        /* margin: 8px; */
-        /* margin-bottom: 16px; */
-        /* border-bottom: 2px solid grey; */
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 100;
-        /* position: fixed;
-        top: 0;
-        width: 100%;
-        background: white; */
-    }
-
-    .header-main > * {
-        flex: 1 1 0;
-    }
-
-    .header-main > *:first-child {
-        /* text-align: left; */
-    }
-
-    .header-main > * {
-        text-align: center;
-    }
-
-    .header-main > *:last-child {
-        text-align: right;
-    }
-
-    .header-main > *:first-child {
-        display: flex;
-    }
-
-    .url-input {
-        border: none;
-        border-bottom: 1px solid;
-        flex-grow: 2;
-        /* display: inline-block;
-        max-width: 100%; */
-    }
-
-    .url-input--btn {
-        margin-left: 0.75em;
-    }
-
-    .preview-container {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: stretch;
-        justify-content: center;
-        margin: 10em 0em;
-    }
-
-    .preview-container--child {
-        flex-basis: 360px;
-        display: flex;
-        flex-direction: column;
-        /* justify-content: space-between; */
-        /* justify-content: center; */
-        padding: 16px;
-    }
-
-    .preview-container--child:first-of-type {
-        justify-content: center;
-    }
-
-    .preview-container--child:last-of-type {
-        justify-content: space-between;
-    }
-
-    .preview-container--child:last-of-type > * {
-        margin: 16px;
-    }
-
-    iframe {
-        width: 350px;
-        height: 350px;
-    }
-
-    .preview-container--next-playing {
-        display: flex;
-        align-items: center;
-    }
-
-    .now-playing--title {
-        font-size: 1.75em;
-        margin-top: 4px;
-        margin-bottom: 0;
-    }
-
-    progress {
-        display: block;
-        width: 100%;
-        height: 4px;
-        margin-top: 8px;
-    }
-
-    .preview-container--next-playing > *:first-child {
-        /* vertical-align: middle; */
-        padding-right: 8px;
-    }
-
-    .preview-container--next-playing > *:nth-child(2) {
-        /* vertical-align: middle; */
-        flex-grow: 2;
-    }
-    .preview-container--label {
-        margin-top: 0;
-        margin-bottom: 4px;
-    }
-
-    .preview-container--outputs-list > p {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-
-    img.next-thumbnail {
-        max-width: 64px;
-        display: inline;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    td, th {
-        border: 2px solid #ffffff;
-        text-align: left;
-        padding: 8px;
-    }
-
-    tr:not(:first-child):not(.activeOutputChain) {
-         background-color: #dddddd;
-    }
-
-    .activeOutputChain {
-        font-style: italic;
-        background-color: #bcbcbc;
-    }
-</style>
