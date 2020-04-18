@@ -60,7 +60,7 @@
     left: 0px;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.25);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -95,23 +95,24 @@
     margin: auto;
     width: 100%;
   }
+  .sub-title:after {
+    content: attr(data-title);
+    color: rgba(0, 0, 0, 0.75);
+  }
+  .media__feed__block:hover .sub-title:after {
+    content: attr(data-date);
+    color: black;
+  }
 </style>
 
 <div class="media__feed__block">
   <img src={image} alt="no image available" />
-  <p style="text-align:center;">{title}</p>
+  <p
+    class="sub-title"
+    style="text-align:center;"
+    data-title={title}
+    data-date={new Date(modified).toUTCString()} />
   <div class="media__feed__block__overlay">
-    <div class="title">
-      <div
-        class="title__editable"
-        on:input={renameMedia}
-        contenteditable="true"
-        spellcheck="false"
-        style="text-align:center;">
-        {title}
-      </div>
-    </div>
-    <p style="text-align:center;">{new Date(modified).toUTCString()}</p>
     <button on:click={handlePlay}>Play</button>
     <button on:click={() => (channelsOpen = true)}>Info</button>
   </div>
@@ -133,7 +134,6 @@
           Source
         </a>
       </div>
-      <p style="text-align:center;">{new Date(modified).toUTCString()}</p>
       <div>
         <input
           type="text"
