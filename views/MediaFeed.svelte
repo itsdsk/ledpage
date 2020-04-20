@@ -14,7 +14,7 @@
 
 <style>
   .media {
-    margin: 8px;
+    margin: 32px;
   }
 
   .media__header {
@@ -24,6 +24,8 @@
     align-items: baseline;
   }
   .media-main {
+    max-width: 1200px;
+    margin: auto;
     /* background: lightgray; */
   }
 

@@ -194,7 +194,7 @@
     flex-wrap: wrap;
     align-items: stretch;
     justify-content: center;
-    margin: 10em 0em;
+    margin: 2em 0em;
   }
 
   .preview-container--child {

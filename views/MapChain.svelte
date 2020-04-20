@@ -17,7 +17,15 @@
     stroke-width: 2px;
   }
   circle:hover {
-    fill: dimgray;
+    r: 12px;
+    fill: black;
+  }
+  g:hover > circle:not(:hover) {
+    r: 8px;
+    fill: black;
+  }
+  g:hover > line {
+    /* visibility: visible; */
   }
 </style>
 
@@ -27,7 +35,7 @@
       in:blur={{ duration: circleDuration }}
       cx={led.x}
       cy={led.y}
-      r={6}
+      r={visibility === "hidden" ? 6 : 8}
       fill={visibility === 'hidden' ? '#dddddd' : 'black'}
       on:click />
     {#if i < output.leds.length - 1}
