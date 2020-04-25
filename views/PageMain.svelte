@@ -106,17 +106,22 @@
 
   $: updateNextPlayingImg($livePlaybackStatus);
 
+  $: progressStatus = $livePlaybackStatus.nextPlaying
+    ? $livePlaybackStatus.nextPlaying.timeFromStart < 0
+      ? "waiting"
+      : "fading"
+    : "static";
+
   function updateNextPlayingImg() {
     if ($livePlaybackStatus.nextPlaying) {
-      // update progress bars
-      fadingProgress.set(
-        $livePlaybackStatus.nextPlaying.timeFromStart /
-          $livePlaybackStatus.nextPlaying.fadeDuration
-      );
-      nextPlayingProgress.set(
-        -$livePlaybackStatus.nextPlaying.timeFromStart /
-          $config.settings.autoplayDuration.max
-      );
+      // update progress bar TODO use progressStatus in progressval
+      var progressVal =
+        $livePlaybackStatus.nextPlaying.timeFromStart < 0
+          ? -$livePlaybackStatus.nextPlaying.timeFromStart /
+            $config.settings.autoplayDuration.max
+          : $livePlaybackStatus.nextPlaying.timeFromStart /
+            $livePlaybackStatus.nextPlaying.fadeDuration;
+      playbackProgress.set(progressVal);
       // update image...
       // get next playing's media feed index
       var feedIndex = $mediaFeedObjects.findIndex(
@@ -131,13 +136,12 @@
       }
     } else {
       nextPlayingImg = null;
+      // set progress bar to default value
+      playbackProgress.set(1.0);
     }
   }
 
-  const fadingProgress = tweened(0, {
-    duration: 1000
-  });
-  const nextPlayingProgress = tweened(0, {
+  const playbackProgress = tweened(0, {
     duration: 1000
   });
 
@@ -318,6 +322,20 @@
     width: 100%;
     height: 4px;
     margin-top: 8px;
+    background-color: #eee;
+  }
+
+  progress.fading {
+    /* background-color: #a00;
+    opacity: 50%; */
+  }
+  progress.waiting {
+    /* background-color: #0a0; */
+    opacity: 10%;
+  }
+  progress.static {
+    /* background-color: #00a; */
+    opacity: 10%;
   }
 
   .preview-container--next-playing > *:first-child {
@@ -506,18 +524,20 @@
     {:else}
       <div>
         <h4 class="preview-container--label">
-          {$fadingProgress > 0.0 && $fadingProgress < 1.0 ? 'FADING' : 'NOW PLAYING'}
+          {$livePlaybackStatus.nextPlaying && $livePlaybackStatus.nextPlaying.timeFromStart > 0.0 && $livePlaybackStatus.nextPlaying.timeFromStart < $livePlaybackStatus.nextPlaying.fadeDuration ? 'FADING' : 'NOW PLAYING'}
         </h4>
         <p class="now-playing--title">
-          {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing'}
+          {#if $livePlaybackStatus.nowPlaying}
+            {#if $livePlaybackStatus.nowPlaying.title === '<Live URL>'}
+              Live URL
               <button on:click={downloadURL}>Download</button>
+            {:else}{$livePlaybackStatus.nowPlaying.title}{/if}
+          {:else}Nothing{/if}
         </p>
         <div class="now-playing--link">
-          <a href={iframeSrc}>
-            {iframeSrc}
-          </a>
+          <a href={iframeSrc}>{iframeSrc}</a>
         </div>
-        <progress value={$fadingProgress} />
+        <progress class={progressStatus} value={$playbackProgress} />
       </div>
       <div>
         <div class="preview-container--next-playing">
@@ -525,7 +545,6 @@
           <div>
             <h4 class="preview-container--label">NEXT</h4>
             <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
-            <progress value={$nextPlayingProgress} />
           </div>
         </div>
       </div>

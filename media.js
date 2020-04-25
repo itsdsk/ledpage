@@ -514,7 +514,7 @@ module.exports = {
             directory: name,
             startTime: Date.now(),
             fadeDuration: config.settings.fade,
-            title: `URL: ${name}`
+            title: `<Live URL>`
         };
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -523,7 +523,7 @@ module.exports = {
             //
             playback.playing = {
                 directory: playingURL,
-                title: `URL: ${playingURL}`
+                title: `<Live URL>`
             };
             // clear fading in
             playback.playingFadeIn = false;
