@@ -84,17 +84,23 @@
     }
   }
 
-  //   function sendScreenshot() {
-  //     console.log('sending screenshot request cmd');
-  //     // test to save screenshot on click
-  //     if (mainSocket.readyState != 1) {
-  //         mainSocket = new WebSocket('ws://' + (window.location.hostname ? window.location.hostname : "localhost") + ':9002');
-  //         console.log("main socket not connected");
-  //     }
-  //     mainSocket.send(JSON.stringify({
-  //         "command": "screenshot"
-  //     }));
-  //   }
+  function sendScreenshot() {
+    console.log("sending screenshot request cmd");
+    // test to save screenshot on click
+    if (mainSocket.readyState != 1) {
+      mainSocket = new WebSocket(
+        "ws://" +
+          (window.location.hostname ? window.location.hostname : "localhost") +
+          ":9002"
+      );
+      console.log("main socket not connected");
+    }
+    mainSocket.send(
+      JSON.stringify({
+        command: "screenshot"
+      })
+    );
+  }
 
   let nextPlayingImg = null;
 
@@ -299,6 +305,21 @@
     font-style: italic;
     background-color: #bcbcbc;
   }
+
+  .preview-container--btn-div {
+    margin: 1em 0;
+  }
+
+  .preview-container--btn-div > button {
+    padding: 0;
+  }
+
+  .preview-container--btn-div > b {
+    display: block;
+    font-size: 1em;
+    text-transform: uppercase;
+    padding: 0.3em 0;
+  }
 </style>
 
 <svelte:window bind:scrollY />
@@ -320,15 +341,6 @@
     <button class="url-input--btn" disabled={!urlInputValid} on:click={playURL}>
       Play
     </button>
-    <button
-      class="url-input--btn"
-      disabled={!urlInputValid}
-      on:click={downloadURL}>
-      Download
-    </button>
-    <!-- <button class="url-input--download-btn" on:click={sendScreenshot}>
-            Screenshot
-        </button> -->
   </div>
   {#if scrollY > 400 || showConfig}
     <div>
@@ -340,10 +352,9 @@
       <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
     </div>
   {/if}
-  <div on:click={() => (showConfig = !showConfig)}>{showConfig ? "Back" : "Settings"}</div>
-  <!-- <button on:click={sendScreenshot}>
-            Screenshot
-        </button> -->
+  <div on:click={() => (showConfig = !showConfig)}>
+    {showConfig ? 'Back' : 'Settings'}
+  </div>
 </div>
 
 <div class="preview-container">
@@ -421,6 +432,7 @@
         </h4>
         <p class="now-playing--title">
           {$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing'}
+              <button on:click={downloadURL}>Download</button>
         </p>
         <div class="now-playing--link">
           <a href={iframeSrc}>
@@ -441,6 +453,14 @@
       </div>
       <div>
         <ConfigurationSlider {...brightness} />
+        <div class="preview-container--btn-div">
+          <b>Display:</b>
+          <button disabled>Refresh</button>
+          <button on:click={sendScreenshot}>Screenshot</button>
+          <button on:click={() => socket.emit('fakemouseinput')}>
+            Mouse click
+          </button>
+        </div>
       </div>
     {/if}
   </div>
