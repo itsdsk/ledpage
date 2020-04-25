@@ -163,6 +163,44 @@
       //
     }
   }
+
+  function transformOutputNodes(mode = "rotate") {
+    switch (mode) {
+      case "rotate":
+        // 90deg CW
+        // TODO: actual rotate rather than swap X and Y
+        var newConfig = $config;
+        for (var i = 0; i < newConfig.outputs.length; i++) {
+          for (var k = 0; k < newConfig.outputs[i].leds.length; k++) {
+            var newX =
+              (newConfig.outputs[i].leds[k].y / newConfig.window.height) *
+              newConfig.window.width;
+            var newY =
+              (newConfig.outputs[i].leds[k].x / newConfig.window.width) *
+              newConfig.window.height;
+            newConfig.outputs[i].leds[k].x = Math.round(newX);
+            newConfig.outputs[i].leds[k].y = Math.round(newY);
+          }
+        }
+        // set locally
+        $config = newConfig;
+        break;
+      case "flip":
+        // horizontal flip
+        var newConfig = $config;
+        for (var i = 0; i < newConfig.outputs.length; i++) {
+          for (var k = 0; k < newConfig.outputs[i].leds.length; k++) {
+            newConfig.outputs[i].leds[k].x =
+              newConfig.window.width - newConfig.outputs[i].leds[k].x;
+          }
+        }
+        // set locally
+        $config = newConfig;
+        break;
+      default:
+      //
+    }
+  }
 </script>
 
 <style>
@@ -428,11 +466,14 @@
           {/each}
         </table>
         <div class="preview-container--btn-div">
-      <input
-        type="file"
-        accept="application/json"
-        style="display:none"
-        on:change={handleFiles} />
+          <b>MAP:</b>
+          <button on:click={() => transformOutputNodes('rotate')}>
+            Rotate 90° CW
+          </button>
+          <button on:click={() => transformOutputNodes('flip')}>
+            Flip horizontal
+          </button>
+          <br />
           <b>System:</b>
           <button on:click={() => socket.emit('getlogs')}>Get logs</button>
           <!-- todo: handle response e.g. by printing to console -->
