@@ -142,6 +142,27 @@
   });
 
   let activeOutputChain = null;
+
+  function handleRestartBtn(e) {
+    //
+    let actionStr = prompt(`Restart system/renderer/backend/ui:`).toLowerCase();
+    switch (actionStr) {
+      case "system":
+        socket.emit("systempower", "reboot");
+        break;
+      case "renderer":
+        socket.emit("restartservice", "disk-renderer-daemon");
+        break;
+      case "backend":
+        socket.emit("restartservice", "disk-backend-daemon");
+        break;
+      case "ui":
+        socket.emit("restartservice", "disk-ui-daemon");
+        break;
+      default:
+      //
+    }
+  }
 </script>
 
 <style>
@@ -406,25 +427,41 @@
             </tr>
           {/each}
         </table>
-      </div>
+        <div class="preview-container--btn-div">
       <input
         type="file"
         accept="application/json"
         style="display:none"
         on:change={handleFiles} />
-      <div>
-        <a
-          href="#"
-          on:click|preventDefault|stopPropagation={() => document
-              .querySelector("input[type='file']")
-              .click()}>
-          <button>Upload config file</button>
-        </a>
-        <button on:click={() => socket.emit('saveconfig')}>Save</button>
+          <b>System:</b>
+          <button on:click={() => socket.emit('getlogs')}>Get logs</button>
+          <!-- todo: handle response e.g. by printing to console -->
+          <button on:click={handleRestartBtn}>Restart</button>
+          <button
+            on:click={() => {
+              if (window.confirm(`Shutdown system?`)) socket.emit('systempower', 'shutdown');
+            }}>
+            Shutdown
+          </button>
+          <input
+            type="file"
+            accept="application/json"
+            style="display:none"
+            on:change={handleFiles} />
+          <br />
+          <b>Config:</b>
+          <button
+            on:click|preventDefault|stopPropagation={() => document
+                .querySelector("input[type='file']")
+                .click()}>
+            Upload
+          </button>
+          <button on:click={() => socket.emit('saveconfig')}>Save</button>
+        </div>
+        {#if fileUploadText.length}
+          <p>{fileUploadText}</p>
+        {/if}
       </div>
-      {#if fileUploadText.length}
-        <p>{fileUploadText}</p>
-      {/if}
     {:else}
       <div>
         <h4 class="preview-container--label">
