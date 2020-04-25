@@ -174,6 +174,10 @@ io.on('connection', function (socket) {
   socket.on('createconnection', function (msg) {
     media.createConnection(msg);
   });
+  // renderer user gesture input
+  socket.on('fakemouseinput', function () {
+    media.fakeMouseInput();
+  });
   // get logs
   socket.on('getlogs', function () {
     media.getLogs(function (logs) {

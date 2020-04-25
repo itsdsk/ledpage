@@ -581,6 +581,12 @@ module.exports = {
             if (err) console.log(err);
         });
     },
+    fakeMouseInput: function () {
+        console.log("USER INPUT::send renderer gesture input");
+        rendererSocket.write(JSON.stringify({
+            command: 'fakeInput'
+        }));
+    },
     getLogs: function (callback) {
         console.log("USER INPUT::getting service logs");
         runCommand('journalctl -u disk-backend-daemon.service -b --no-pager --lines=128', function (backendLogs) {

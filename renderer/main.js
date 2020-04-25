@@ -66,8 +66,6 @@ app.on('ready', () => {
       }
       mainWindowA.show();
       mainWindowA.focus();
-      // fake user gesture to trigger event in page
-      mainWindowA.webContents.executeJavaScript('document.dispatchEvent(new Event("mouseenter"));', true);
       // save page to disk
       if (savePage == true) {
         var saveLocation = '/tmp/index.html'; // TODO: add media path
@@ -98,8 +96,6 @@ app.on('ready', () => {
       }
       mainWindowB.show();
       mainWindowB.focus();
-      // fake user gesture to trigger event in page
-      mainWindowB.webContents.executeJavaScript('document.dispatchEvent(new Event("mouseenter"));', true);
       // save page to disk
       if (savePage == true) {
         var saveLocation = '/tmp/index.html'; // TODO: add media path
@@ -218,6 +214,14 @@ app.on('ready', () => {
             }
             // flip window to display on
             flipWindow = !flipWindow;
+          } else if (msg.command == "fakeInput") {
+            // send fake user gesture to trigger event in page
+            console.log(`sending mouse click event to window ${flipWindow ? 'B' : 'A'}`);
+            if (flipWindow) {
+              mainWindowB.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+            } else {
+              mainWindowA.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+            }
           } else if (msg.command == "saveURL") {
             // get right browser window
             var _browserWindow = false;
