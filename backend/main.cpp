@@ -404,6 +404,9 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
             string key1 = element1.key();
             if (key1 == "outputs")
             {
+                // DEPRECATED
+
+                /*
                 // received an entry for "outputs", go through items in this array
                 for (auto &element2 : (element1.value()).items())
                 {
@@ -434,6 +437,7 @@ void on_message(server *s, websocketpp::connection_hdl hdl, message_ptr msg)
                         cout << "could not get index" << endl;
                     }
                 }
+                */
             }
             else if (key1 == "command")
             {

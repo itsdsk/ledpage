@@ -724,7 +724,7 @@ function autoplayNext() {
     //     if (msg.outputs) {
     //         // find correct output
     //         msg.outputs.forEach(function (msgoutput) {
-    //             var output = config.outputs.find(x => x.index === msgoutput.index);
+    //             var output = config.outputs.find(x => x.index === msgoutput.index); // DEPRECATED led.index property
     //             // update output properties
     //             if (msgoutput.properties) {
     //                 output.properties = Object.assign(output.properties, msgoutput.properties);
@@ -733,7 +733,7 @@ function autoplayNext() {
     //             if (msgoutput.leds) {
     //                 // find correct led
     //                 msgoutput.leds.forEach(function (msgled) {
-    //                     var led = output.leds.find(x => x.index === msgled.index);
+    //                     var led = output.leds.find(x => x.index === msgled.index); // DEPRECATED led.index property
     //                     // update led properties
     //                     led = Object.assign(led, msgled);
     //                 });
