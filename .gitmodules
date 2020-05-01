@@ -10,3 +10,6 @@
 [submodule "backend/thirdparty/websocketpp"]
 	path = backend/thirdparty/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "backend/thirdparty/pigpio"]
+	path = backend/thirdparty/pigpio
+	url = https://github.com/joan2937/pigpio.git
