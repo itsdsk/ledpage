@@ -27,10 +27,14 @@ target_link_libraries(serial rt)
 # Find the BCM-package (VC control)
 find_package(BCM REQUIRED)
 
+# find pigpio
+find_package(pigpio REQUIRED)
+include_directories(${pigpio_INCLUDE_DIRS})
+
 set(main_SOURCES
     main.cpp
 )
 
 add_executable( ${PROJECT_NAME} ${main_SOURCES})
 
-target_link_libraries(main ${BCM_LIBRARIES} serial ${Boost_LIBRARIES} bcm2835)
+target_link_libraries(main ${BCM_LIBRARIES} serial ${Boost_LIBRARIES} bcm2835 ${pigpio_LIBRARY})
