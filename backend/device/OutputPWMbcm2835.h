@@ -12,12 +12,12 @@
 // and it is controlled by PWM channel 0
 #define PWM_CHANNEL 0
 // This controls the max range of the PWM signal
-#define RANGE 1024
+#define RANGE 765 // 255 * 3
 
-class OutputPWM : public Output
+class OutputPWMbcm2835 : public Output
 {
 public:
-    OutputPWM()
+    OutputPWMbcm2835()
     {
         //
         if (!bcm2835_init())
@@ -36,15 +36,15 @@ public:
         // With a divider of 16 and a RANGE of 1024, in MARKSPACE mode,
         // the pulse repetition frequency will be
         // 1.2MHz/1024 = 1171.875Hz, suitable for driving a DC motor with PWM
-        bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_16);
         bcm2835_pwm_set_mode(PWM_CHANNEL, 1, 1);
         bcm2835_pwm_set_range(PWM_CHANNEL, RANGE);
+        bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_128);
         std::cout << "Opened PWM" << std::endl;
     };
     int write(const std::vector<ColorRgb> &ledValues)
     {
-        // get colour // TODO: as value between 1/RANGE and (RANGE-1)/RANGE
-        int data = 0;
+        // get colour (max speed is RANGE = 255 * 3)
+        uint32_t data = 0;
         data += ledValues[0].red;
         data += ledValues[0].green;
         data += ledValues[0].blue;
@@ -53,7 +53,7 @@ public:
         bcm2835_delay(1);
         return 0;
     }
-    virtual ~OutputPWM()
+    virtual ~OutputPWMbcm2835()
     {
         // close
         bcm2835_close();

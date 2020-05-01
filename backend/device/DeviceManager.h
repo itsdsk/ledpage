@@ -4,7 +4,7 @@
 #include <device/OutputGPIO.h>
 #include <device/OutputSPI1.h>
 #include <device/OutputUART.h>
-#include <device/OutputPWM.h>
+#include <device/OutputPWMbcm2835.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -91,9 +91,9 @@ public:
         {
             output = std::shared_ptr<Output>(new OutputUART());
         }
-        else if (outputType == "PWM")
+        else if (outputType == "PWM_bcm2835" || outputType == "PWM")
         {
-            output = std::shared_ptr<Output>(new OutputPWM());
+            output = std::shared_ptr<Output>(new OutputPWMbcm2835());
         }
         else
         {
