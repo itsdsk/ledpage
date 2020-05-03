@@ -16,9 +16,9 @@
     },
     "outputs": [
         {
+            "type": "WS2812",
             "properties": {
                 "port": "/dev/ttyACM0",
-                "type": "WS2812",
                 "colorOrder": "rgb",
                 "rate": 460800
             },
@@ -46,9 +46,9 @@
             ]
         },
         {
+            "type": "WS2812",
             "properties": {
                 "port": "/dev/ttyACM1",
-                "type": "WS2812",
                 "colorOrder": "rgb",
                 "rate": 460800
             },

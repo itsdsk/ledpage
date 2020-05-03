@@ -59,10 +59,13 @@ class DeviceManager
 public:
     DeviceManager(const json &config, unsigned &outputIndex, unsigned &_screenX, unsigned &screenY)
     {
+        // set widths of screen
         screenX = _screenX;
         screenHalfX = unsigned(screenX / 2.0f);
-        //
-        cout << "Output type: " << config["outputs"][outputIndex]["properties"]["type"] << ", port: " << config["outputs"][outputIndex]["properties"]["port"] << ", leds: " << config["outputs"][outputIndex]["leds"].size() << endl;
+        // log output info
+        cout << "Output " << outputIndex << ": " << config["outputs"][outputIndex]["type"] << ", LEDs: " << config["outputs"][outputIndex]["leds"].size() << endl;
+        cout << config["outputs"][outputIndex]["properties"].dump(2) << endl; // pretty print properties
+        // get width and height from config
         unsigned configW = config["window"]["width"];
         unsigned configH = config["window"]["height"];
         // add leds
@@ -71,10 +74,9 @@ public:
             ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
         }
         // get output properties
-        const string deviceName = config["outputs"][outputIndex]["properties"]["port"];
+        const string outputType = config["outputs"][outputIndex]["type"];
         nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
         const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
-        const string outputType = config["outputs"][outputIndex]["properties"]["type"];
         // create output object
         if (outputType == "WS2812")
         {

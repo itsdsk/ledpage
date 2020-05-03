@@ -477,7 +477,7 @@
             <tr
               class:activeOutputChain={activeOutputChain === i}
               on:click={() => (activeOutputChain = activeOutputChain === i ? null : i)}>
-              <td>{output.properties.type}</td>
+              <td>{output.type}</td>
               <td>{output.leds.length}</td>
               <td>{output.properties.colorOrder}</td>
             </tr>
