@@ -5,11 +5,13 @@
 #include <unistd.h>  //Used for UART
 #include <fcntl.h>   //Used for UART
 #include <termios.h> //Used for UART
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class OutputUART : public Output
 {
 public:
-    OutputUART()
+    OutputUART(const json &properties)
     {
         // reference: https://raspberry-projects.com/pi/programming-in-c/uart-serial-port/using-the-uart
         

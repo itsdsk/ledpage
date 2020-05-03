@@ -4,6 +4,8 @@
 #include <bcm2835.h>
 #include <stdio.h>
 #include <math.h>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 // PWM output on RPi Plug P1 pin 12 (which is GPIO pin 18)
 // in alt fun 5.
@@ -17,7 +19,7 @@
 class OutputPWMbcm2835 : public Output
 {
 public:
-    OutputPWMbcm2835()
+    OutputPWMbcm2835(const json &properties)
     {
         //
         if (!bcm2835_init())

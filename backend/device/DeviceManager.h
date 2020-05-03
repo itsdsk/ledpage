@@ -82,23 +82,23 @@ public:
         }
         else if (outputType == "GPIO")
         {
-            output = std::shared_ptr<Output>(new OutputGPIO());
+            output = std::shared_ptr<Output>(new OutputGPIO(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "SPI1")
         {
-            output = std::shared_ptr<Output>(new OutputSPI1());
+            output = std::shared_ptr<Output>(new OutputSPI1(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "UART")
         {
-            output = std::shared_ptr<Output>(new OutputUART());
+            output = std::shared_ptr<Output>(new OutputUART(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "PWM_bcm2835" || outputType == "PWM")
         {
-            output = std::shared_ptr<Output>(new OutputPWMbcm2835());
+            output = std::shared_ptr<Output>(new OutputPWMbcm2835(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "PWM_pigpio")
         {
-            output = std::shared_ptr<Output>(new OutputPWMpigpio());
+            output = std::shared_ptr<Output>(new OutputPWMpigpio(config["outputs"][outputIndex]["properties"]));
         }
         else
         {

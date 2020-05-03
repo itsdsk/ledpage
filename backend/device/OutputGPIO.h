@@ -4,11 +4,13 @@
 #include <bcm2835.h>
 #include <stdio.h>
 #include <math.h>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class OutputGPIO : public Output
 {
 public:
-    OutputGPIO()
+    OutputGPIO(const json &properties)
     {
         //
         //Initiate the SPI Data Frame

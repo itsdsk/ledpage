@@ -4,11 +4,13 @@
 #include <stdio.h>
 #include <math.h>
 #include <pigpio.h>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class OutputPWMpigpio : public Output
 {
 public:
-    OutputPWMpigpio()
+    OutputPWMpigpio(const json &properties)
     {
         //
         if (gpioInitialise() < 0)
