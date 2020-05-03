@@ -172,17 +172,19 @@
     switch (mode) {
       case "rotate":
         // 90deg CW
-        // TODO: actual rotate rather than swap X and Y
         var newConfig = $config;
         for (var i = 0; i < newConfig.outputs.length; i++) {
           for (var k = 0; k < newConfig.outputs[i].leds.length; k++) {
+            // remap Y value from 0-height to 0-width
             var newX =
               (newConfig.outputs[i].leds[k].y / newConfig.window.height) *
               newConfig.window.width;
+            // remap X value from 0-width to 0-height
             var newY =
               (newConfig.outputs[i].leds[k].x / newConfig.window.width) *
               newConfig.window.height;
-            newConfig.outputs[i].leds[k].x = Math.round(newX);
+            // rotate 90deg CW: replace (x, y) with (-y, x)
+            newConfig.outputs[i].leds[k].x = newConfig.window.width - Math.round(newX);
             newConfig.outputs[i].leds[k].y = Math.round(newY);
           }
         }
