@@ -382,7 +382,13 @@ module.exports = {
             });
             //
             playback.playingFadeIn = false;
+            // send playbackstatus changed update to client
+            module.exports.eventEmitter.emit('playbackstatus');
         }, config.settings.fade, dirAndVersion.directory);
+
+        // send playbackstatus changed update to client
+        module.exports.eventEmitter.emit('playbackstatus');
+        
         // // send blur amt to backend
         // // select media item
         // var selectQuery = "SELECT blur_amt FROM media WHERE directory = ?";
@@ -527,7 +533,11 @@ module.exports = {
             };
             // clear fading in
             playback.playingFadeIn = false;
+            // send playbackstatus changed update to client
+            module.exports.eventEmitter.emit('playbackstatus');
         }, config.settings.fade, name);
+        // send playbackstatus changed update to client
+        module.exports.eventEmitter.emit('playbackstatus');
         console.log('USER INPUT::playing remote media: ' + name);
     },
     loadMediaFeed: function (params, callback) {
@@ -705,6 +715,8 @@ function autoplayNext() {
             if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
             // store media metadata in playback object
             playback.playingAutoNext.title = itemrow.title;
+            // send playbackstatus changed update to client
+            module.exports.eventEmitter.emit('playbackstatus');
         });
         // start timer to autoplay next
         playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fade + delayTime);

@@ -18,19 +18,6 @@ setTimeout(media.startAutoplay, 5000);
 // serve static files
 app.use(express.static('public'));
 
-// update playback status to clients
-var updatePeriod = 5000; // ms
-function updateNowPlaying() {
-  setTimeout(function () {
-    media.nowPlaying(function (playbackStatus) {
-      io.sockets.emit('nowplaying', (playbackStatus));
-    });
-    // recall to loop
-    updateNowPlaying();
-  }, updatePeriod);
-}
-updateNowPlaying();
-
 // client websocket routes
 io.on('connection', function (socket) {
   // request feed
@@ -199,4 +186,13 @@ io.on('connection', function (socket) {
 // send media item to clients
 media.eventEmitter.on('addmediaitem', function (mediaItem) {
   io.emit('addmediaitem', mediaItem);
+});
+
+// send playbackstatus changed update to client
+media.eventEmitter.on('playbackstatus', function () {
+  setTimeout(() => {
+    media.nowPlaying(function (playbackStatus) {
+      io.sockets.emit('nowplaying', playbackStatus);
+    });
+  }, 250); // 250ms delay to wait for playbackstatus to be updated
 });
