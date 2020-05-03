@@ -2,13 +2,34 @@
 
 #include <device/Output.h>
 #include <serial/serial.h>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class OutputSerial : public Output
 {
   public:
-    OutputSerial(const std::string &name, const unsigned baudRate)
-        : _deviceName(name), _baudRate(baudRate), _rs232Port()
+    OutputSerial(const json &properties)
+        : _rs232Port()
     {
+        // check properties object contains serial port and baud rate values, and set defaults if not
+        if (properties.contains("port"))
+        {
+            _deviceName = properties["port"];
+        }
+        else
+        {
+            _deviceName = "/dev/ttyACM0";
+            std::cout << "no serial port specified in properties, using default: " << _deviceName << std::endl;
+        }
+        if (properties.contains("rate"))
+        {
+            _baudRate = properties["rate"].get<int>();
+        }
+        else
+        {
+            _baudRate = 460800;
+            std::cout << "no serial baud rate specified in properties, using default: " << _baudRate << std::endl;
+        }
         open();
     };
     int open()
@@ -90,8 +111,8 @@ class OutputSerial : public Output
             _rs232Port.close();
         }
     };
-    const std::string _deviceName;
-    const int _baudRate;
+    std::string _deviceName = "/dev/ttyACM0";
+    int _baudRate = 460800;
     serial::Serial _rs232Port;
     std::vector<uint8_t> _ledBuffer;
 };

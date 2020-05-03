@@ -4,12 +4,14 @@
 #include <grabber/ColorRgb.h>
 #include <device/Output.h>
 #include <device/OutputSerial.h>
+#include <thirdparty/json/single_include/nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class OutputSerialDefault : public OutputSerial
 {
   public:
     //
-    OutputSerialDefault(const std::string &name, const unsigned baudRate) : OutputSerial(name, baudRate) {}
+    OutputSerialDefault(const json &properties) : OutputSerial(properties) {}
     int write(const std::vector<ColorRgb> &ledValues)
     {
         if (_ledBuffer.size() == 0)

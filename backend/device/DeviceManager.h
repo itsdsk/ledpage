@@ -75,12 +75,10 @@ public:
         }
         // get output properties
         const string outputType = config["outputs"][outputIndex]["type"];
-        nameTEMP = config["outputs"][outputIndex]["properties"]["port"];
-        const unsigned baudRate = config["outputs"][outputIndex]["properties"]["rate"];
         // create output object
         if (outputType == "WS2812")
         {
-            output = std::shared_ptr<Output>(new OutputSerialDefault(deviceName, baudRate));
+            output = std::shared_ptr<Output>(new OutputSerialDefault(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "GPIO")
         {
@@ -223,7 +221,6 @@ public:
     }
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
-    string nameTEMP;
     unsigned screenX;
     unsigned screenHalfX;
 
