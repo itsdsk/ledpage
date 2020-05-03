@@ -21,6 +21,16 @@ class OutputPWMbcm2835 : public Output
 public:
     OutputPWMbcm2835(const json &properties)
     {
+        // check properties object contains PWM properties, and set defaults if not
+        if (properties.contains("clockDivider"))
+        {
+            _clockDivider = properties["clockDivider"].get<unsigned>();
+        }
+        else
+        {
+            _clockDivider = 128;
+            std::cout << "no clock divider specified in properties, using default: " << _clockDivider << std::endl;
+        }
         //
         if (!bcm2835_init())
         {
@@ -40,7 +50,7 @@ public:
         // 1.2MHz/1024 = 1171.875Hz, suitable for driving a DC motor with PWM
         bcm2835_pwm_set_mode(PWM_CHANNEL, 1, 1);
         bcm2835_pwm_set_range(PWM_CHANNEL, RANGE);
-        bcm2835_pwm_set_clock(BCM2835_PWM_CLOCK_DIVIDER_128);
+        bcm2835_pwm_set_clock(_clockDivider);
         std::cout << "Opened PWM" << std::endl;
     };
     int write(const std::vector<ColorRgb> &ledValues)
@@ -61,4 +71,5 @@ public:
         bcm2835_close();
         std::cout << "Closed PWM" << std::endl;
     };
+    unsigned _clockDivider = 128; // PWM clock divider, https://www.airspayce.com/mikem/bcm2835/group__pwm.html#ga4487f4e26e57ea3697a57cf52b8de35b
 };

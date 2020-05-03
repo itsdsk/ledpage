@@ -12,7 +12,16 @@ class OutputSPI1 : public Output
 public:
     OutputSPI1(const json &properties)
     {
-        //
+        // check properties object contains SPI properties, and set defaults if not
+        if (properties.contains("clockDivider"))
+        {
+            _clockDivider = properties["clockDivider"].get<unsigned>();
+        }
+        else
+        {
+            _clockDivider = 64;
+            std::cout << "no clock divider specified in properties, using default: " << _clockDivider << std::endl;
+        }
         //Initiate the SPI Data Frame
         if (!bcm2835_init())
         {
@@ -34,7 +43,7 @@ public:
         {
             std::cout << "aux spi begin bcm2835" << std::endl;
         }
-        bcm2835_aux_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); // The default
+        bcm2835_aux_spi_setClockDivider(_clockDivider); // The default
                                                                    /*
 
 		BCM2835_SPI_CLOCK_DIVIDER_65536 	65536 = 262.144us = 3.814697260kHz
@@ -110,7 +119,7 @@ public:
         std::cout << "Closed SPI1" << std::endl;
     };
     std::vector<char> _ledBuffer;
-
+    unsigned _clockDivider = 64; // SPI clock divider, https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e
     // setup data block for LEDs
     static const uint8_t bytesPerLED = 4;
     static const int16_t endFrameLength = 15;   //round( (numOfLEDs/2)/8 );

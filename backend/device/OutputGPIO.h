@@ -12,7 +12,16 @@ class OutputGPIO : public Output
 public:
     OutputGPIO(const json &properties)
     {
-        //
+        // check properties object contains SPI properties, and set defaults if not
+        if (properties.contains("clockDivider"))
+        {
+            _clockDivider = properties["clockDivider"].get<unsigned>();
+        }
+        else
+        {
+            _clockDivider = 64;
+            std::cout << "no clock divider specified in properties, using default: " << _clockDivider << std::endl;
+        }
         //Initiate the SPI Data Frame
         if (!bcm2835_init())
         {
@@ -43,7 +52,7 @@ public:
 	BCM2835_SPI_MODE2 		CPOL = 1, CPHA = 0
 	BCM2835_SPI_MODE3 		CPOL = 1, CPHA = 1	
 	*/
-        bcm2835_spi_setClockDivider(BCM2835_SPI_CLOCK_DIVIDER_64); // The default
+        bcm2835_spi_setClockDivider(_clockDivider); // The default
                                                                    /*
 
 		BCM2835_SPI_CLOCK_DIVIDER_65536 	65536 = 262.144us = 3.814697260kHz
@@ -122,7 +131,7 @@ public:
         std::cout << "Closed GPIO" << std::endl;
     };
     std::vector<char> _ledBuffer;
-
+    unsigned _clockDivider = 64; // SPI clock divider, https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e
     // setup data block for LEDs
     static const uint8_t bytesPerLED = 4;
     static const int16_t endFrameLength = 15;   //round( (numOfLEDs/2)/8 );

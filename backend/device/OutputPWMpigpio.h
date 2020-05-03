@@ -12,6 +12,25 @@ class OutputPWMpigpio : public Output
 public:
     OutputPWMpigpio(const json &properties)
     {
+        // check properties object contains PWM properties, and set defaults if not
+        if (properties.contains("pin"))
+        {
+            _pinNumber = properties["pin"].get<unsigned>();
+        }
+        else
+        {
+            _pinNumber = 18;
+            std::cout << "no gpio pin specified in properties, using default: " << _pinNumber << std::endl;
+        }
+        if (properties.contains("frequency"))
+        {
+            _frequency = properties["frequency"].get<unsigned>();
+        }
+        else
+        {
+            _frequency = 500;
+            std::cout << "no pwm frequency specified in properties, using default: " << _frequency << std::endl;
+        }
         //
         if (gpioInitialise() < 0)
         {
@@ -21,11 +40,11 @@ public:
         else
         {
             std::cout << "initialised pigpio" << std::endl;
-            if (gpioSetMode(18, PI_OUTPUT) != 0) {
+            if (gpioSetMode(_pinNumber, PI_OUTPUT) != 0) {
                 std::cout << "error in gpio set mode" << std::endl;
             }
-            std::cout << "PWM frequency: " << gpioSetPWMfrequency(18, 250) << "Hz" << std::endl;
-            gpioSetPWMrange(18, 765); // range = 255 * 3
+            std::cout << "PWM frequency: " << gpioSetPWMfrequency(_pinNumber, _frequency) << "Hz" << std::endl;
+            gpioSetPWMrange(_pinNumber, 765); // range = 255 * 3
         }
         std::cout << "Opened PWM" << std::endl;
     };
@@ -37,7 +56,7 @@ public:
         data += ledValues[0].green;
         data += ledValues[0].blue;
         // send to PWM
-        if(gpioPWM(18, data) != 0) {
+        if(gpioPWM(_pinNumber, data) != 0) {
             std::cout << "pwm error" << std::endl;
         }
         return 0;
@@ -48,4 +67,6 @@ public:
         gpioTerminate();
         std::cout << "Closed PWM" << std::endl;
     };
+    unsigned _pinNumber = 18; // 0-31, a Broadcom numbered GPIO
+    unsigned _frequency = 500; // frequency in Hz for gpio
 };
