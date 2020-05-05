@@ -193,10 +193,10 @@ public:
         if (!error)
         {
             new_session->start();
+            std::cout << "client connected to UNIX socket" << std::endl;
         }
 
         currentSession = session_ptr(new_session);
-        std::cout << "client connected to UNIX socket" << std::endl;
 
         new_session.reset(new session(io_service_));
         acceptor_.async_accept(new_session->socket(),
