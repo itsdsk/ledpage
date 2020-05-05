@@ -1,15 +1,15 @@
 [submodule "backend/thirdparty/json"]
-	path = backend/thirdparty/json
+	path = cpp/thirdparty/json
 	url = https://github.com/nlohmann/json.git
 [submodule "backend/thirdparty/serial"]
-	path = backend/thirdparty/serial
+	path = cpp/thirdparty/serial
 	url = https://github.com/wjwwood/serial.git
 [submodule "backend/thirdparty/cxxopts"]
-	path = backend/thirdparty/cxxopts
+	path = cpp/thirdparty/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
 [submodule "backend/thirdparty/websocketpp"]
-	path = backend/thirdparty/websocketpp
+	path = cpp/thirdparty/websocketpp
 	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "backend/thirdparty/pigpio"]
-	path = backend/thirdparty/pigpio
+	path = cpp/thirdparty/pigpio
 	url = https://github.com/joan2937/pigpio.git

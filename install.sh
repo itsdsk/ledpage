@@ -23,7 +23,7 @@ sudo apt install xserver-xorg-core \
 BASEDIR=$(dirname $(readlink -f $0))
 
 # compile backend
-cd ./backend
+cd ./cpp
 chmod +x ./compile.sh
 ./compile.sh
 cd ../
@@ -35,7 +35,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
-ExecStart=$BASEDIR/backend/main -d -c \"$BASEDIR/public/config.json\" -p \"$BASEDIR/public/settings.json\"
+ExecStart=$BASEDIR/cpp/main -d -c \"$BASEDIR/public/config.json\" -p \"$BASEDIR/public/settings.json\"
 Restart=on-failure
 RestartSec=5s
 
