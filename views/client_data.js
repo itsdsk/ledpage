@@ -5,16 +5,21 @@ import {
 } from 'svelte/store';
 
 export const config = writable({
-    'settings': {
-        'autoplayDuration': {}
-    },
     'outputs': []
+});
+
+export const config_settings = writable({
+    'autoplayDuration': {}
 });
 
 socket.emit('load'); // request feed from server
 
 socket.on("configuration", function (conf) {
     config.set(conf);
+});
+
+socket.on("settings", function (sett) {
+    config_settings.set(sett);
 });
 
 export const playbackStatus = writable({});

@@ -35,7 +35,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
-ExecStart=$BASEDIR/backend/main -d -c \"$BASEDIR/public/config.json\"
+ExecStart=$BASEDIR/backend/main -d -c \"$BASEDIR/public/config.json\" -p \"$BASEDIR/public/settings.json\"
 Restart=on-failure
 RestartSec=5s
 

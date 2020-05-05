@@ -8,6 +8,7 @@
   import MediaFeed from "./MediaFeed.svelte";
   import {
     config,
+    config_settings,
     livePlaybackStatus,
     mediaFeedObjects
   } from "./client_data.js";
@@ -22,7 +23,7 @@
 
   $: brightness = {
     name: "brightness",
-    value: $config.settings.brightness || 0.0125,
+    value: $config_settings.brightness || 0.0125,
     min: 0.0,
     max: 1.0,
     step: 0.0005
@@ -118,7 +119,7 @@
       var progressVal =
         $livePlaybackStatus.nextPlaying.timeFromStart < 0
           ? -$livePlaybackStatus.nextPlaying.timeFromStart /
-            $config.settings.autoplayDuration.max
+            $config_settings.autoplayDuration.max
           : $livePlaybackStatus.nextPlaying.timeFromStart /
             $livePlaybackStatus.nextPlaying.fadeDuration;
       playbackProgress.set(progressVal);

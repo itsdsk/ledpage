@@ -35,6 +35,9 @@ io.on('connection', function (socket) {
       media.loadConfiguration(function (elements) {
         socket.emit('configuration', elements);
       });
+      media.loadSettings(function (elements) {
+        socket.emit('settings', elements);
+      });
       media.nowPlaying(function (playbackStatus) {
         socket.emit('nowplaying', (playbackStatus));
       });

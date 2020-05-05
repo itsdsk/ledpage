@@ -251,7 +251,11 @@ int main(int argc, char *argv[])
 
     // command line options
     cxxopts::Options options("Disk", "Display Web Media on LEDs from Raspberry Pi");
-    options.add_options()("s,screenshot", "Save screenshot as .PPM")("d,display", "Display screenshot on device")("c,config", "Config file path", cxxopts::value<std::string>()->default_value("/home/pi/disk/renderer/config.json"));
+    options.add_options()
+        ("s,screenshot", "Save screenshot as .PPM")
+        ("d,display", "Display screenshot on device")
+        ("c,config", "Config file path", cxxopts::value<std::string>()->default_value("/home/pi/disk/config.json"))
+        ("p,settings", "Settings file path", cxxopts::value<std::string>()->default_value("/home/pi/disk/settings.json"));
     auto result = options.parse(argc, argv);
 
     // read config file
@@ -260,6 +264,12 @@ int main(int argc, char *argv[])
     std::ifstream confFile(confFilePath);
     json config;
     confFile >> config;
+    // read settings file
+    std::string settingsFilePath = result["p"].as<std::string>();
+    std::cout << "Settings file path: " << settingsFilePath << std::endl;
+    std::ifstream settingsFile(settingsFilePath);
+    json settings;
+    settingsFile >> settings;
 
     // unix sock server
     const char *sockPath = "/tmp/backend.sock";
@@ -292,11 +302,11 @@ int main(int argc, char *argv[])
     }
 
     // load settings from config file // TODO: check values exist in config
-    brightness = config["settings"]["brightness"];
-    desaturation = config["settings"]["desaturation"];
-    gammaValue = config["settings"]["gamma"];
-    changeSize = config["settings"]["blur"];
-    fadeDuration = config["settings"]["fade"];
+    brightness = settings["brightness"];
+    desaturation = settings["desaturation"];
+    gammaValue = settings["gamma"];
+    changeSize = settings["blur"];
+    fadeDuration = settings["fade"];
 
     // create framegrabber and image object
     _w = config["window"]["width"];

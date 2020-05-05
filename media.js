@@ -78,13 +78,13 @@ rendererSocket.event.on('data', function (data) {
             // update currentURL when halfway through transition
             changePlaybackID = setTimeout(function (URL) {
                 playback.currentURL = URL;
-            }, config.settings.fade / 2, rendererMsg.URL);
+            }, config_settings.fade / 2, rendererMsg.URL);
             // object containing commands for backend
             var backendMsg = {};
             // tell backend where media is playing and how to transition
             backendMsg.window = {
                 half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
-                fade: config.settings.fade
+                fade: config_settings.fade
             }
             // check if screenshot is needed
             if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
@@ -170,6 +170,7 @@ function saveScreenshot(side) {
 
 var mediaDir = path.join(__dirname, 'public', 'media');
 var config; // device config
+var config_settings; // settings
 module.exports = {
     // event emitter
     eventEmitter: new EventEmitter(),
@@ -208,6 +209,21 @@ module.exports = {
                 else {
                     console.log("Copied default config to " + configPath);
                     config = require(configPath);
+                }
+            });
+        }
+        // get settings JSON
+        var settingsPath = path.join(__dirname, 'public', 'settings.json');
+        try {
+            config_settings = require(settingsPath);
+        } catch (ex) {
+            console.log("Error getting settings.json: " + ex);
+            var pathToDefaultSettings = path.join(__dirname, 'public', '.default_settings.json');
+            fs.copyFile(pathToDefaultSettings, settingsPath, (err) => {
+                if (err) console.log(err)
+                else {
+                    console.log("Copied default settings to " + settingsPath);
+                    config_settings = require(settingsPath);
                 }
             });
         }
@@ -360,7 +376,7 @@ module.exports = {
         playback.playingFadeIn = {
             directory: dirAndVersion.directory,
             startTime: Date.now(),
-            fadeDuration: config.settings.fade
+            fadeDuration: config_settings.fade
         };
         // add metadata from database to playback status
         db.get(`SELECT title FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
@@ -384,7 +400,7 @@ module.exports = {
             playback.playingFadeIn = false;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
-        }, config.settings.fade, dirAndVersion.directory);
+        }, config_settings.fade, dirAndVersion.directory);
 
         // send playbackstatus changed update to client
         module.exports.eventEmitter.emit('playbackstatus');
@@ -401,7 +417,7 @@ module.exports = {
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
         // update local config object
-        config.settings.brightness = msg.brightness;
+        config_settings.brightness = msg.brightness;
         // update backend
         backendSocket.write(`{"window":{"brightness":${msg.brightness}}}`);
     },
@@ -409,7 +425,7 @@ module.exports = {
         //
         console.log(`set blur msg: ${JSON.stringify(msg)}`);
         // update local config object
-        config.settings.blur = msg.blur;
+        config_settings.blur = msg.blur;
         // update backend
         backendSocket.write(`{"window":{"blur":${msg.blur}}}`);
         // // update in database
@@ -433,21 +449,21 @@ module.exports = {
     setDesaturation: function (msg) {
         console.log(`set desaturation msg: ${JSON.stringify(msg)}`);
         // update local config object
-        config.settings.desaturation = msg.desaturation;
+        config_settings.desaturation = msg.desaturation;
         // update backend
         backendSocket.write(`{"window":{"desaturation":${msg.desaturation}}}`);
     },
     setGamma: function (msg) {
         console.log(`set gamma msg: ${JSON.stringify(msg)}`);
         // update local config object
-        config.settings.gamma = msg.gamma;
+        config_settings.gamma = msg.gamma;
         // update backend
         backendSocket.write(`{"window":{"gamma":${msg.gamma}}}`);
     },
     setCrossfadeTime: function (msg) {
         console.log(`set crossfade msg: ${JSON.stringify(msg)}`);
         // update local config object
-        config.settings.fade = msg.fade;
+        config_settings.fade = msg.fade;
     },
     stopAutoplay: function () {
         // update playback status
@@ -500,10 +516,10 @@ module.exports = {
         console.log(`USER INPUT::setting autoplay time range: ${JSON.stringify(msg)}`);
         // update local config object
         if (msg.autoplayMinRange) {
-            config.settings.autoplayDuration.min = msg.autoplayMinRange;
+            config_settings.autoplayDuration.min = msg.autoplayMinRange;
         }
         if (msg.autoplayMaxRange) {
-            config.settings.autoplayDuration.max = msg.autoplayMaxRange;
+            config_settings.autoplayDuration.max = msg.autoplayMaxRange;
         }
     },
     playRemoteMedia: function (name) {
@@ -519,7 +535,7 @@ module.exports = {
         playback.playingFadeIn = {
             directory: name,
             startTime: Date.now(),
-            fadeDuration: config.settings.fade,
+            fadeDuration: config_settings.fade,
             title: `<Live URL>`
         };
         // update playback status when fade is over
@@ -535,7 +551,7 @@ module.exports = {
             playback.playingFadeIn = false;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
-        }, config.settings.fade, name);
+        }, config_settings.fade, name);
         // send playbackstatus changed update to client
         module.exports.eventEmitter.emit('playbackstatus');
         console.log('USER INPUT::playing remote media: ' + name);
@@ -579,12 +595,22 @@ module.exports = {
     loadConfiguration: function (callback) {
         callback(config);
     },
+    loadSettings: function (callback) {
+        callback(config_settings);
+    },
     uploadConfig: function (msg, callback) {
         console.log("USER INPUT::uploading output configuration");
         config = msg;
         callback();
     },
     saveConfig: function () {
+        // save settings
+        var settingsPath = path.join(__dirname, 'public', 'settings.json');
+        console.log("USER INPUT::saving settings to " + settingsPath);
+        fs.writeFile(settingsPath, JSON.stringify(config_settings, null, 4), function (err) {
+            if (err) console.log(err);
+        });
+        // save output
         var configPath = path.join(__dirname, 'public', 'config.json');
         console.log("USER INPUT::saving output config to " + configPath);
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
@@ -699,15 +725,15 @@ function autoplayNext() {
             directory: autoplayList[autoplayPos]
         });
         // choose random timespan in min-max range to wait before playing next
-        var delayTime = Math.random() * Math.abs(config.settings.autoplayDuration.max - config.settings.autoplayDuration.min);
-        delayTime += Math.min(config.settings.autoplayDuration.max, config.settings.autoplayDuration.min); // add min of range
+        var delayTime = Math.random() * Math.abs(config_settings.autoplayDuration.max - config_settings.autoplayDuration.min);
+        delayTime += Math.min(config_settings.autoplayDuration.max, config_settings.autoplayDuration.min); // add min of range
         // increment autoplay position
         autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // update playback status
         playback.playingAutoNext = {
             directory: autoplayList[autoplayPos],
-            startTime: Date.now() + config.settings.fade + delayTime,
-            fadeDuration: config.settings.fade
+            startTime: Date.now() + config_settings.fade + delayTime,
+            fadeDuration: config_settings.fade
         }
         // get metadata for next media from database
         var selectQuery = `SELECT title FROM media WHERE directory = ?`;
@@ -719,7 +745,7 @@ function autoplayNext() {
             module.exports.eventEmitter.emit('playbackstatus');
         });
         // start timer to autoplay next
-        playback.autoplayTimerID = setTimeout(autoplayNext, config.settings.fade + delayTime);
+        playback.autoplayTimerID = setTimeout(autoplayNext, config_settings.fade + delayTime);
     } else {
         // error autoplaying
         console.log(`error autoplaying - list is empty`);
