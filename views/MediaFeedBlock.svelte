@@ -6,6 +6,7 @@
   export let modified;
   export let channels;
   export let playcount;
+  export let source;
 
   let channelsOpen = false;
 
@@ -154,9 +155,14 @@
   {#if channelsOpen}
     <div class="media__feed__block__overlay--playlists">
       <div class="overlay--source">
+        View
         <a
           href={directory.startsWith('http') ? directory : `/media/${directory}/index.html`}>
-          {directory.startsWith('http') ? directory : `/media/${directory}/index.html`}
+          saved
+        </a>
+        /
+        <a href={source}>
+          source
         </a>
         <span
           class="overlay--delete"
