@@ -70,6 +70,10 @@ io.on('connection', function (socket) {
   socket.on('autoplay', function (msg) {
     media.startAutoplay(msg);
   });
+  // play next
+  socket.on('playnext', function (msg) {
+    media.playNext();
+  });
   // set autoplay time range
   socket.on('setautoplaytimerange', function (msg) {
     media.setAutoplayTimeRange(msg);

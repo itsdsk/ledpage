@@ -561,6 +561,7 @@
           <div>
             <h4 class="preview-container--label">NEXT</h4>
             <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
+            <button on:click={() => socket.emit('playnext')}>Play</button>
           </div>
         </div>
       </div>

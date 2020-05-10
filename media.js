@@ -631,6 +631,17 @@ module.exports = {
             if (err) console.log(err);
         });
     },
+    playNext: function () {
+        console.log("USER INPUT::playing next");
+        if (playback.autoplayTimerID) {
+            // update playback status
+            playback.playing = playback.playingFadeIn || playback.playingAutoNext;
+            // autoplay early by restarting timeout
+            clearTimeout(playback.autoplayTimerID);
+            playback.autoplayTimerID = setTimeout(autoplayNext, 0);
+        } else
+            console.log(`error skipping to next media: autoplay is off`);
+    },
     fakeMouseInput: function () {
         console.log("USER INPUT::send renderer gesture input");
         rendererSocket.write(JSON.stringify({
