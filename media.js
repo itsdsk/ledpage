@@ -13,7 +13,7 @@ db.serialize(function () {
     db.run(`CREATE TABLE media (
         directory TEXT PRIMARY KEY, title TEXT, description TEXT,
         image BLOB, blur_amt INT DEFAULT 50, modified TEXT,
-        playcount INT DEFAULT 0
+        source TEXT, playcount INT DEFAULT 0
     )`);
     db.run(`CREATE TABLE channels (
         name TEXT PRIMARY KEY
@@ -383,9 +383,10 @@ module.exports = {
             fadeDuration: config_settings.fade
         };
         // add metadata from database to playback status
-        db.get(`SELECT title FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
+        db.get(`SELECT title, source FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
             if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
             playback.playingFadeIn.title = itemrow.title;
+            playback.playingFadeIn.source = itemrow.source;
         });
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -396,9 +397,10 @@ module.exports = {
                 directory: playingDirectory
             };
             // add metadata from database to playback status
-            db.get(`SELECT title FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
+            db.get(`SELECT title, source FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
                 if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
                 playback.playing.title = itemrow.title;
+                playback.playing.source = itemrow.source;
             });
             //
             playback.playingFadeIn = false;
@@ -540,7 +542,8 @@ module.exports = {
             directory: name,
             startTime: Date.now(),
             fadeDuration: config_settings.fade,
-            title: `<Live URL>`
+            title: `<Live URL>`,
+            source: name
         };
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -549,7 +552,8 @@ module.exports = {
             //
             playback.playing = {
                 directory: playingURL,
-                title: `<Live URL>`
+                title: `<Live URL>`,
+                source: playingURL
             };
             // clear fading in
             playback.playingFadeIn = false;
@@ -562,7 +566,7 @@ module.exports = {
     },
     loadMediaFeed: function (params, callback) {
         // get media items from db with list of channels
-        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
+        var mediaQuery = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
         FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
         db.all(mediaQuery, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
@@ -577,7 +581,7 @@ module.exports = {
     },
     loadMediaItem: function (directory, callback) {
         // get single media item and list of channels from db
-        var mediaQuery = `SELECT media.title, media.directory, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
+        var mediaQuery = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
         FROM connections INNER JOIN media ON media.directory = connections.media_directory WHERE media.directory = ?`;
         db.get(mediaQuery, [directory], (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
@@ -656,8 +660,8 @@ module.exports = {
 
 function parseMediaItemDirectory(directory, meta, callback) {
     // add metadata to media table in database
-    var insertQuery = "INSERT INTO media (directory, title, description, modified) VALUES (?, ?, ?, ?)";
-    db.run(insertQuery, [directory, meta.demo.title, meta.demo.description, meta.demo.modified], function () {
+    var insertQuery = "INSERT INTO media (directory, title, source, description, modified) VALUES (?, ?, ?, ?, ?)";
+    db.run(insertQuery, [directory, meta.demo.title, meta.demo.source || 'about:none', meta.demo.description, meta.demo.modified], function () {
         var itemPath = path.join(mediaDir, directory);
         // add image to media database TODO: check if files exist
         if (meta.demo.image && meta.demo.image.length > 0) {
@@ -744,11 +748,12 @@ function autoplayNext() {
             fadeDuration: config_settings.fade
         }
         // get metadata for next media from database
-        var selectQuery = `SELECT title FROM media WHERE directory = ?`;
+        var selectQuery = `SELECT title, source FROM media WHERE directory = ?`;
         db.get(selectQuery, [autoplayList[autoplayPos]], (err, itemrow) => {
             if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
             // store media metadata in playback object
             playback.playingAutoNext.title = itemrow.title;
+            playback.playingAutoNext.source = itemrow.source;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
         });

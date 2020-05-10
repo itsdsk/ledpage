@@ -257,6 +257,7 @@ app.on('ready', () => {
                         var newMetadata = {
                           "demo": {
                             "title": _browserWindow.webContents.getTitle(),
+                            "source": msg.URL,
                             "description": msg.URL,
                             "files": ["index.html"],
                             "channels": ["firstchannel"],
