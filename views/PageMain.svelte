@@ -540,6 +540,9 @@
           {$livePlaybackStatus.nextPlaying && $livePlaybackStatus.nextPlaying.timeFromStart > 0.0 && $livePlaybackStatus.nextPlaying.timeFromStart < $livePlaybackStatus.nextPlaying.fadeDuration ? 'FADING' : 'NOW PLAYING'}
         </h4>
         <p class="now-playing--title">
+          {#if $livePlaybackStatus.channel}
+            [{$livePlaybackStatus.channel}]
+          {/if}
           {#if $livePlaybackStatus.nowPlaying}
             {#if $livePlaybackStatus.nowPlaying.title === '<Live URL>'}
               Live URL

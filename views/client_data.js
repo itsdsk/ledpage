@@ -88,11 +88,18 @@ export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackSta
     if (nowPlaying)
         delete nowPlaying.timeFromStart;
 
-    // set the final playback status
-    set({
+    // create formatted status object
+    var pbStatus = {
         'nowPlaying': nowPlaying,
         'nextPlaying': nextPlaying
-    });
+    };
+
+    // add channel currently autoplaying
+    if ($playbackStatus.channel)
+        pbStatus.channel = $playbackStatus.channel;
+        
+    // set the final playback status
+    set(pbStatus);
 }, {});
 
 export const channelObjects = writable([]);
