@@ -178,7 +178,7 @@ module.exports = {
     generateDb: function () {
         // read media directory
         fs.readdir(mediaDir, function (err, files) {
-            files.forEach(file => {
+            files.forEach( (file, index) => {
                 var itemPath = path.join(mediaDir, file);
                 fs.stat(itemPath, function (err, stats) {
                     if (err) console.log("err: " + err);
@@ -195,6 +195,10 @@ module.exports = {
                         }
                     }
                 });
+                // start autoplay on last item
+                if (index == files.length - 1) {
+                    setTimeout(module.exports.startAutoplay, 500, config_settings.startupPlaylist);
+                }
             });
         });
         // get config JSON
