@@ -233,11 +233,17 @@ module.exports = {
         }
     },
     nowPlaying: function (callback) {
-        callback(JSON.stringify({
+        // reformat key parts of playback status object
+        var _status = {
             playing: playback.playing,
             playingFadeIn: playback.playingFadeIn,
             playingAutoNext: playback.playingAutoNext
-        }));
+        };
+        // add playback channel
+        if (playback.autoplayTimerID)
+            _status.channel = playback.channel || 'allmedia';
+        // return playback status
+        callback(JSON.stringify(_status));
     },
     createMediaFromURL: function (msg) {
         console.log(`creating media from URL: ${msg}`);
@@ -504,7 +510,7 @@ module.exports = {
             // select all media items
             selectMediaItemsQuery = "SELECT directory FROM media";
             // update playback status
-            playback.channel = false;
+            playback.channel = ""; // empty string == all media
         }
         // get list of media to autoplay
         db.all(selectMediaItemsQuery, queryParams, (error, rows) => {
