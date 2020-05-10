@@ -54,6 +54,11 @@ struct LedNode
     }
 };
 
+enum ColorOrder
+{
+    ORDER_RGB, ORDER_RBG, ORDER_GRB, ORDER_BRG, ORDER_GBR, ORDER_BGR
+};
+
 class DeviceManager
 {
 public:
@@ -68,6 +73,30 @@ public:
         // get width and height from config
         unsigned configW = config["window"]["width"];
         unsigned configH = config["window"]["height"];
+        // set color order
+        if (config["outputs"][outputIndex]["properties"].contains("colorOrder"))
+        {
+            std::string _order = config["outputs"][outputIndex]["properties"]["colorOrder"];
+            if (_order == "rgb")
+                colorOrder = ORDER_RGB;
+            else if (_order == "rbg")
+                colorOrder = ORDER_RBG;
+            else if (_order == "grb")
+                colorOrder = ORDER_GRB;
+            else if (_order == "brg")
+                colorOrder = ORDER_BRG;
+            else if (_order == "gbr")
+                colorOrder = ORDER_GBR;
+            else if (_order == "bgr")
+                colorOrder = ORDER_BGR;
+            else {
+                colorOrder = ORDER_RGB;
+                std::cout << "invalid color order ('" << _order << "') specified in properties, using default (RGB)" << std::endl;
+            }
+        } else {
+            colorOrder = ORDER_RGB;
+            std::cout << "no color order specified in properties, using default (RGB)" << std::endl;
+        }
         // add leds
         for (auto &led : config["outputs"][outputIndex]["leds"])
         {
@@ -208,8 +237,39 @@ public:
             avgG = uint8_t(avgG * brightness);
             avgB = uint8_t(avgB * brightness);
 
-            // store colour {R, G, B}
-            ColorRgb col = {avgB, avgG, avgR}; // temp switch RGB -> BGR **TODO: IMPLEMENT COLOR ORDER PROPERLY**
+            // define {R, G, B} as colour object
+            ColorRgb col = {avgR, avgG, avgB};
+
+            // correct colour order
+            switch (colorOrder)
+            {
+            case ORDER_RGB:
+                // leave as is ORDER_RGB, ORDER_RBG, ORDER_GRB, ORDER_BRG, ORDER_GBR, ORDER_BGR
+                break;
+            case ORDER_RBG:
+                std::swap(col.green, col.blue);
+                break;
+            case ORDER_GRB:
+                std::swap(col.red, col.green);
+                break;
+            case ORDER_BRG:
+            {
+                std::swap(col.red, col.blue);
+                std::swap(col.green, col.blue);
+                break;
+            }
+            case ORDER_GBR:
+            {
+                std::swap(col.red, col.green);
+                std::swap(col.green, col.blue);
+                break;
+            }
+            case ORDER_BGR:
+                std::swap(col.red, col.blue);
+                break;
+            }
+
+            // add colour to list
             ledValues.emplace_back(col);
             //cout << col << endl;
         }
@@ -221,6 +281,7 @@ public:
     }
     vector<LedNode> ledNodes;
     std::shared_ptr<Output> output;
+    ColorOrder colorOrder;
     unsigned screenX;
     unsigned screenHalfX;
 
