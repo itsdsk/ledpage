@@ -98,6 +98,10 @@ io.on('connection', function (socket) {
       io.emit('unloadmediaitem', msg);
     });
   });
+  // set startup playlist
+  socket.on('startupplaylist', function (msg) {
+    media.setStartupPlaylist(msg);
+  });
   // general config update handler
   socket.on('config/update', function (msg) {
     // make object in old style of update

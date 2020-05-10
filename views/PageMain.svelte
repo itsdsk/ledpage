@@ -10,7 +10,8 @@
     config,
     config_settings,
     livePlaybackStatus,
-    mediaFeedObjects
+    mediaFeedObjects,
+    channelObjects
   } from "./client_data.js";
   import { tweened } from "svelte/motion";
 
@@ -510,6 +511,15 @@
             accept="application/json"
             style="display:none"
             on:change={handleFiles} />
+          <br />
+          <b>Startup Playlist:</b>
+          <select bind:value={$config_settings.startupPlaylist} on:change={e => socket.emit('startupplaylist', e.target.value)}>
+            {#each $channelObjects as channelObject}
+              <option value={channelObject.channel_name || ''}>
+                {channelObject.channel_name || 'all media'} ({channelObject.count})
+              </option>
+            {/each}
+          </select>
           <br />
           <b>Config:</b>
           <button
