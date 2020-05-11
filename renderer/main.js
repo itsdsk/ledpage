@@ -5,8 +5,8 @@ const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindowA = null;
-let mainWindowB = null;
+let windowA = null;
+let windowB = null;
 
 const {
   app,
@@ -16,6 +16,66 @@ const {
 // enable content to use web bluetooth api
 app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 app.commandLine.appendSwitch('enable-web-bluetooth', true);
+
+class RenderWindow {
+  browserWindow;
+  side;
+  loadMessage;
+  client;
+  constructor(windowOpts, side) {
+    this.side = side;
+    // create browser window
+    this.browserWindow = new BrowserWindow(windowOpts);
+    // move window
+    this.browserWindow.setPosition(side == 'A' ? 0 : windowOpts.width, 0);
+    // log
+    console.log(`${side} size: ${JSON.stringify(this.browserWindow.getContentSize())} position: ${JSON.stringify(this.browserWindow.getPosition())}`);
+    // add handlers
+    this.browserWindow.webContents.on('did-finish-load', this.onLoadFinished.bind(this));
+    this.browserWindow.webContents.on('console-message', this.onConsoleOutput.bind(this));
+    this.browserWindow.webContents.on('select-bluetooth-device', this.onSelectBluetoothDevice.bind(this));
+  }
+  loadURL(msg, client) {
+    this.loadMessage = msg;
+    this.client = client;
+    console.log(`loadurl ${this.side}: ${JSON.stringify(msg)}`)
+    //
+    this.browserWindow.loadURL(this.loadMessage.path);
+  }
+  // behaviour on pageload
+  async onLoadFinished() {
+    setTimeout(() => {
+      // show newly opened window
+      if (this.browserWindow.isMinimized()) {
+        this.browserWindow.restore();
+      }
+      this.browserWindow.show();
+      this.browserWindow.focus();
+      // report loaded to client
+      if (this.client) this.client.write(JSON.stringify({
+        loaded: true,
+        whichWindow: this.side,
+        URL: this.browserWindow.webContents.getURL()
+      }));
+    }, 300);
+  }
+  // bluetooth device request handler
+  onSelectBluetoothDevice(event, deviceList, callback) {
+    event.preventDefault();
+    console.log(`window ${this.side} bluetooth request device list: ${JSON.stringify(deviceList)}`);
+    let result = deviceList[0]; // return first device in list
+    if (!result) {
+      callback('');
+    } else {
+      callback(result.deviceId);
+    }
+  }
+  // log windows
+  onConsoleOutput(event, level, message, line, sourceId) {
+    console.log(`${this.side} console: ${message}`);
+  }
+
+}
 
 // app.disableHardwareAcceleration();
 /*
@@ -49,106 +109,8 @@ app.on('ready', () => {
     },
   };
   // create 2 windows
-  mainWindowA = new BrowserWindow(windowOpts);
-  mainWindowB = new BrowserWindow(windowOpts);
-  // move windows next to each other
-  mainWindowA.setPosition(0, 0);
-  mainWindowB.setPosition((width / 2), 0);
-  // log
-  console.log(`Window positions: ${JSON.stringify(mainWindowA.getPosition())}, ${JSON.stringify(mainWindowB.getPosition())}`);
-  console.log(`Window sizes: ${JSON.stringify(mainWindowA.getContentSize())}, ${JSON.stringify(mainWindowB.getContentSize())}`);
-  // behaviour on pageload
-  mainWindowA.webContents.on('did-finish-load', async () => {
-    setTimeout(() => {
-      // show newly opened window
-      if (mainWindowA.isMinimized()) {
-        mainWindowA.restore();
-      }
-      mainWindowA.show();
-      mainWindowA.focus();
-      // save page to disk
-      if (savePage == true) {
-        var saveLocation = '/tmp/index.html'; // TODO: add media path
-        console.log(`saving page ${saveLocation} (${mainWindowA.webContents.getURL()})`);
-        mainWindowA.webContents.savePage(saveLocation, 'HTMLComplete').then(() => {
-          console.log(`saved page successfully`);
-        }).catch(err => {
-          console.log(`didnt save page successfully: ${err}`);
-        });
-        savePage = false;
-      }
-      // hide previous window
-      //mainWindowB.hide();
-      //mainWindowB.minimize();
-      // report loaded to client
-      if (client) client.write(JSON.stringify({
-        loaded: true,
-        whichWindow: 'A',
-        URL: mainWindowA.webContents.getURL()
-      }));
-    }, 300);
-  });
-  mainWindowB.webContents.on('did-finish-load', async () => {
-    setTimeout(() => {
-      // show newly opened window
-      if (mainWindowB.isMinimized()) {
-        mainWindowB.restore();
-      }
-      mainWindowB.show();
-      mainWindowB.focus();
-      // save page to disk
-      if (savePage == true) {
-        var saveLocation = '/tmp/index.html'; // TODO: add media path
-        console.log(`saving page ${saveLocation} (${mainWindowB.webContents.getURL()})`);
-        mainWindowB.webContents.savePage(saveLocation, 'HTMLComplete').then(() => {
-          console.log(`saved page successfully`);
-        }).catch(err => {
-          console.log(`didnt save page successfully: ${err}`);
-        });
-        savePage = false;
-      }
-      // hide previous window
-      //mainWindowA.hide();
-      //mainWindowA.minimize();
-      // report loaded to client
-      if (client) client.write(JSON.stringify({
-        loaded: true,
-        whichWindow: 'B',
-        URL: mainWindowB.webContents.getURL()
-      }));
-    }, 300);
-  });
-
-  // bluetooth device request handler
-  mainWindowA.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
-    event.preventDefault();
-    console.log(`winA bluetooth request device list: ${JSON.stringify(deviceList)}`);
-    let result = deviceList[0]; // return first device in list
-    if (!result) {
-      callback('');
-    } else {
-      callback(result.deviceId);
-    }
-  });
-  mainWindowB.webContents.on('select-bluetooth-device', (event, deviceList, callback) => {
-    event.preventDefault();
-    console.log(`winB bluetooth request device list: ${JSON.stringify(deviceList)}`);
-    let result = deviceList[0]; // return first device in list
-    if (!result) {
-      callback('');
-    } else {
-      callback(result.deviceId);
-    }
-  });
-
-  // log windows
-  mainWindowA.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`winA console: ${message}`);
-  });
-  mainWindowB.webContents.on('console-message', (event, level, message, line, sourceId) => {
-    console.log(`winB console: ${message}`);
-  });
-
+  windowA = new RenderWindow(windowOpts, 'A');
+  windowB = new RenderWindow(windowOpts, 'B');
   //
   process.on('uncaughtException', (err) => {
     console.log(err);
@@ -156,7 +118,7 @@ app.on('ready', () => {
 
   // initial page load
   var initialURL = `index.html`;
-  mainWindowA.loadFile(initialURL);
+  //mainWindowA.loadFile(initialURL);
 
   // bool state to say which window to load to
   var flipWindow = false;
@@ -208,9 +170,9 @@ app.on('ready', () => {
             savePage = (msg.save ? true : false);
             // display recieved URI
             if (flipWindow) {
-              mainWindowA.loadURL(msg.path);
+              windowA.loadURL(msg, client);
             } else {
-              mainWindowB.loadURL(msg.path);
+              windowB.loadURL(msg, client);
             }
             // flip window to display on
             flipWindow = !flipWindow;
@@ -218,19 +180,27 @@ app.on('ready', () => {
             // send fake user gesture to trigger event in page
             console.log(`sending mouse click event to window ${flipWindow ? 'B' : 'A'}`);
             if (flipWindow) {
-              mainWindowB.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+              // hide previous window
+              windowA.browserWindow.hide();
+              windowA.browserWindow.minimize();
+              // trigger event
+              windowB.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
             } else {
-              mainWindowA.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+              // hide previous window
+              windowB.browserWindow.hide();
+              windowB.browserWindow.minimize();
+              // trigger event
+              windowA.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
             }
-          } else if (msg.command == "saveURL") {
+           } else if (msg.command == "saveURL") {
             // get right browser window
             var _browserWindow = false;
-            if (mainWindowA.webContents.getURL() == msg.URL) {
-              _browserWindow = mainWindowA;
-            } else if (mainWindowB.webContents.getURL() == msg.URL) {
-              _browserWindow = mainWindowB;
+            if (windowA.browserWindow.webContents.getURL() == msg.URL) {
+              _browserWindow = windowA.browserWindow;
+            } else if (windowB.browserWindow.webContents.getURL() == msg.URL) {
+              _browserWindow = windowB.browserWindow;
             } else {
-              console.log(`error saving url for ${msg.URL} (not matching ${mainWindowA.webContents.getURL()} or ${mainWindowB.webContents.getURL()})`);
+              console.log(`error saving url for ${msg.URL} (not matching ${windowA.browserWindow.webContents.getURL()} or ${windowB.browserWindow.webContents.getURL()})`);
             }
             // if requested URL is open
             if (_browserWindow) {
