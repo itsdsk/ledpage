@@ -105,27 +105,27 @@ public:
         // get output properties
         const string outputType = config["outputs"][outputIndex]["type"];
         // create output object
-        if (outputType == "WS2812")
-        {
-            output = std::shared_ptr<Output>(new OutputSerialDefault(config["outputs"][outputIndex]["properties"]));
-        }
-        else if (outputType == "GPIO")
+        if (outputType == "apa102_spi0")
         {
             output = std::shared_ptr<Output>(new OutputGPIO(config["outputs"][outputIndex]["properties"]));
         }
-        else if (outputType == "SPI1")
+        else if (outputType == "apa102_spi1")
         {
             output = std::shared_ptr<Output>(new OutputSPI1(config["outputs"][outputIndex]["properties"]));
         }
-        else if (outputType == "UART")
+        else if (outputType == "adalight_uart")
         {
             output = std::shared_ptr<Output>(new OutputUART(config["outputs"][outputIndex]["properties"]));
         }
-        else if (outputType == "PWM_bcm2835" || outputType == "PWM")
+        else if (outputType == "adalight_serial")
+        {
+            output = std::shared_ptr<Output>(new OutputSerialDefault(config["outputs"][outputIndex]["properties"]));
+        }
+        else if (outputType == "pwm_hw")
         {
             output = std::shared_ptr<Output>(new OutputPWMbcm2835(config["outputs"][outputIndex]["properties"]));
         }
-        else if (outputType == "PWM_pigpio")
+        else if (outputType == "pwm_gpio")
         {
             output = std::shared_ptr<Output>(new OutputPWMpigpio(config["outputs"][outputIndex]["properties"]));
         }
