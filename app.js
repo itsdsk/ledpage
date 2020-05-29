@@ -5,7 +5,7 @@ const media = require("./media.js");
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var httpPort = process.env.PORT || 3000;
+var httpPort = process.env.PORT || 80;
 http.listen(httpPort, function () {
   console.log(`Opened server on http://localhost:${httpPort}`);
 });
