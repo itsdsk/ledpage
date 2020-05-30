@@ -16,16 +16,20 @@ using json = nlohmann::json;
 
 struct LedNode
 {
-    unsigned x_pos;
-    unsigned y_pos;
+    float x_pos;
+    float y_pos;
     unsigned r;
     unsigned pos;
     vector<unsigned> positions;
-    LedNode(unsigned x, unsigned y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
+
+    LedNode(float x, float y, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY) :
+        LedNode(x, y, 1, confW, confH, screenX, screenY) { };
+
+    LedNode(float x, float y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
     {
         setPosition(x, y, r, confW, confH, screenX, screenY);
     };
-    void setPosition(unsigned x, unsigned y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
+    void setPosition(float x, float y, unsigned r, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY)
     {
         // set original positions and radius in config
         x_pos = x;
@@ -100,7 +104,11 @@ public:
         // add leds
         for (auto &led : config["outputs"][outputIndex]["leds"])
         {
-            ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
+            // check if sampling radius is specified in config
+            if (led.contains("r"))
+                ledNodes.emplace_back(led["x"], led["y"], led["r"], configW, configH, screenX, screenY);
+            else
+                ledNodes.emplace_back(led["x"], led["y"], configW, configH, screenX, screenY);
         }
         // get output properties
         const string outputType = config["outputs"][outputIndex]["type"];

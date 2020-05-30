@@ -5,62 +5,52 @@
     },
     "outputs": [
         {
-            "type": "WS2812",
+            "type": "apa102_spi0",
             "properties": {
-                "port": "/dev/ttyACM0",
                 "colorOrder": "rgb",
-                "rate": 460800
+                "clockDivider": 64
             },
             "leds": [
                 {
                     "x": 160,
-                    "y": 120,
-                    "r": 50
+                    "y": 120
                 },
                 {
                     "x": 480,
-                    "y": 120,
-                    "r": 50
+                    "y": 120
                 },
                 {
                     "x": 480,
-                    "y": 360,
-                    "r": 50
+                    "y": 360
                 },
                 {
                     "x": 160,
-                    "y": 360,
-                    "r": 50
+                    "y": 360
                 }
             ]
         },
         {
-            "type": "WS2812",
+            "type": "apa102_spi1",
             "properties": {
-                "port": "/dev/ttyACM1",
                 "colorOrder": "rgb",
-                "rate": 460800
+                "clockDivider": 64
             },
             "leds": [
                 {
                     "x": 320,
-                    "y": 60,
-                    "r": 50
+                    "y": 60
                 },
                 {
                     "x": 560,
-                    "y": 240,
-                    "r": 50
+                    "y": 240
                 },
                 {
                     "x": 320,
-                    "y": 420,
-                    "r": 50
+                    "y": 420
                 },
                 {
                     "x": 80,
-                    "y": 240,
-                    "r": 50
+                    "y": 240
                 }
             ]
         }
