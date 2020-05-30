@@ -84,7 +84,7 @@ rendererSocket.event.on('data', function (data) {
             // tell backend where media is playing and how to transition
             backendMsg.window = {
                 half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
-                fade: config_settings.fade
+                fade: rendererMsg.fade || config_settings.fade
             }
             // check if screenshot is needed
             if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
@@ -347,7 +347,7 @@ module.exports = {
             });
         });
     },
-    playLocalMedia: function (dirAndVersion) {
+    playLocalMedia: function (dirAndVersion, thisFadeDuration = config_settings.fade) {
         var filePath = path.join(mediaDir, dirAndVersion.directory);
         if (dirAndVersion.version) {
             console.log(`warning: cannot play old versions of media (DAT is deprecated)`);
@@ -380,13 +380,14 @@ module.exports = {
         // send media file path to renderer
         rendererSocket.write(JSON.stringify({
             command: 'loadURL',
-            path: ('file://' + filePath + "/index.html")
+            path: ('file://' + filePath + "/index.html"),
+            fade: thisFadeDuration
         }));
         // update playback status
         playback.playingFadeIn = {
             directory: dirAndVersion.directory,
             startTime: Date.now(),
-            fadeDuration: config_settings.fade
+            fadeDuration: thisFadeDuration
         };
         // add metadata from database to playback status
         db.get(`SELECT title, source FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
@@ -412,7 +413,7 @@ module.exports = {
             playback.playingFadeIn = false;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
-        }, config_settings.fade, dirAndVersion.directory);
+        }, thisFadeDuration, dirAndVersion.directory);
 
         // send playbackstatus changed update to client
         module.exports.eventEmitter.emit('playbackstatus');
@@ -424,7 +425,7 @@ module.exports = {
         //     // send size to app
         //     backendSocket.write(`{"window":{"size":${itemrow.blur_amt}}}`);
         // });
-        console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest'));
+        console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest') + ', fade: ' + thisFadeDuration);
     },
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
@@ -534,12 +535,13 @@ module.exports = {
             config_settings.autoplayDuration.max = msg.autoplayMaxRange;
         }
     },
-    playRemoteMedia: function (name) {
+    playRemoteMedia: function (name, thisFadeDuration = 1000) {
         // TODO: check if URL is valid?
         // send media file path to renderer
         rendererSocket.write(JSON.stringify({
             command: 'loadURL',
-            path: name
+            path: name,
+            fade: thisFadeDuration
         }));
         // do not take screenshot
         mediaRequiringScreenshot = null;
@@ -547,7 +549,7 @@ module.exports = {
         playback.playingFadeIn = {
             directory: name,
             startTime: Date.now(),
-            fadeDuration: config_settings.fade,
+            fadeDuration: thisFadeDuration,
             title: `<Live URL>`,
             source: name
         };
@@ -565,7 +567,7 @@ module.exports = {
             playback.playingFadeIn = false;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
-        }, config_settings.fade, name);
+        }, thisFadeDuration, name);
         // send playbackstatus changed update to client
         module.exports.eventEmitter.emit('playbackstatus');
         console.log('USER INPUT::playing remote media: ' + name);
@@ -638,7 +640,7 @@ module.exports = {
             playback.playing = playback.playingFadeIn || playback.playingAutoNext;
             // autoplay early by restarting timeout
             clearTimeout(playback.autoplayTimerID);
-            playback.autoplayTimerID = setTimeout(autoplayNext, 0);
+            playback.autoplayTimerID = setTimeout(autoplayNext, 0, 1000); // override fade duration to be 1000 (ms)
         } else
             console.log(`error skipping to next media: autoplay is off`);
     },
@@ -736,7 +738,7 @@ function runCommand(command, callback) {
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
 
-function autoplayNext() {
+function autoplayNext(thisFadeDuration = config_settings.fade) {
     // check there are items in playlist
     if (autoplayList && autoplayList.length > 0) {
         // check randomness and bounds
@@ -752,7 +754,7 @@ function autoplayNext() {
         // play item
         module.exports.playLocalMedia({
             directory: autoplayList[autoplayPos]
-        });
+        }, thisFadeDuration);
         // choose random timespan in min-max range to wait before playing next
         var delayTime = Math.random() * Math.abs(config_settings.autoplayDuration.max - config_settings.autoplayDuration.min);
         delayTime += Math.min(config_settings.autoplayDuration.max, config_settings.autoplayDuration.min); // add min of range

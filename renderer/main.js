@@ -55,7 +55,8 @@ class RenderWindow {
       if (this.client) this.client.write(JSON.stringify({
         loaded: true,
         whichWindow: this.side,
-        URL: this.browserWindow.webContents.getURL()
+        URL: this.browserWindow.webContents.getURL(),
+        fade: this.loadMessage.fade
       }));
     }, 300);
   }
