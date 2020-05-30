@@ -1,7 +1,6 @@
 #pragma GCC system_header
-//#ifdef RPI
+
 #include <bcm_host.h>
-//#endif
 
 // STL includes
 #include <cstdint>
@@ -14,8 +13,7 @@
 
 class FrameGrabber
 {
-  public:
-//#ifdef RPI
+public:
     /// Handle to the display that is being captured
     DISPMANX_DISPLAY_HANDLE_T _vc_display;
 
@@ -24,7 +22,6 @@ class FrameGrabber
 
     /// Rectangle of the captured resource that is transfered to user space
     VC_RECT_T _rectangle;
-//#endif
 
     /// Flags (transforms) for creating snapshots
     int _vc_flags;
@@ -34,12 +31,6 @@ class FrameGrabber
     /// Height of the captured snapshot [pixels]
     unsigned _height;
 
-    // the selected VideoMode
-    // VideoMode _videoMode;
-
-    // number of pixels to crop after capturing
-    unsigned _cropLeft, _cropRight, _cropTop, _cropBottom;
-
     // temp buffer when capturing with unsupported pitch size or
     // when we need to crop the image
     ColorRgba *_captureBuffer;
@@ -48,21 +39,12 @@ class FrameGrabber
     unsigned _captureBufferSize;
 
     // constructor
-    FrameGrabber() :
-//#ifdef RPI
-                                                                _vc_display(0),
-                                                                _vc_resource(0),
-//#endif
-                                                                _vc_flags(0),
-                                                                // _videoMode(VIDEO_2D),
-                                                                _cropLeft(0),
-                                                                _cropRight(0),
-                                                                _cropTop(0),
-                                                                _cropBottom(0),
-                                                                _captureBuffer(new ColorRgba[0]),
-                                                                _captureBufferSize(0)
+    FrameGrabber() : _vc_display(0),
+                     _vc_resource(0),
+                     _vc_flags(0),
+                     _captureBuffer(new ColorRgba[0]),
+                     _captureBufferSize(0)
     {
-//#ifdef RPI
         // Initiase BCM
         bcm_host_init();
 
@@ -81,7 +63,7 @@ class FrameGrabber
 
             _width = vc_info.width;
             _height = vc_info.height;
-            std::cout << "DISPMANXGRABBER INFO: Display opened with resolution: " << _width << "x" << _height << std::endl;
+            std::cout << "Display opened with resolution: " << _width << "x" << _height << std::endl;
 
             // Close the displaye
             vc_dispmanx_display_close(_vc_display);
@@ -98,95 +80,18 @@ class FrameGrabber
 
         // Define the capture rectangle with the same size
         vc_dispmanx_rect_set(&_rectangle, 0, 0, _width, _height);
-
-//#endif
-    }
-    // destructor
-    ~FrameGrabber()
-    {
-        delete[] _captureBuffer;
-//#ifdef RPI
-        // Clean up resources
-        vc_dispmanx_resource_delete(_vc_resource);
-
-        // De-init BCM
-        bcm_host_deinit();
-//#endif
     }
     void setFlags(const int vc_flags)
     {
         _vc_flags = vc_flags;
     }
 
-    // void setVideoMode(const VideoMode videoMode)
-    // {
-    //     _videoMode = videoMode;
-    // }
-
-    void setCropping(unsigned cropLeft, unsigned cropRight, unsigned cropTop, unsigned cropBottom)
-    {
-        if (cropLeft + cropRight >= _width || cropTop + cropBottom >= _height)
-        {
-            std::cout
-                << "DISPMANXGRABBER ERROR: Rejecting invalid crop values"
-                << " left: " << cropLeft
-                << " right: " << cropRight
-                << " top: " << cropTop
-                << " bottom: " << cropBottom
-                << std::endl;
-            return;
-        }
-        _cropLeft = cropLeft;
-        _cropRight = cropRight;
-        _cropTop = cropTop;
-        _cropBottom = cropBottom;
-
-        if (cropLeft > 0 || cropRight > 0 || cropTop > 0 || cropBottom > 0)
-        {
-            std::cout
-                << "DISPMANXGRABBER INFO: Cropping " << _width << "x" << _height << " image"
-                << " left: " << cropLeft
-                << " right: " << cropRight
-                << " top: " << cropTop
-                << " bottom: " << cropBottom
-                << std::endl;
-        }
-    }
     void grabFrame(Image<ColorRgba> &image)
     {
         int ret;
 
-        // vc_dispmanx_resource_read_data doesn't seem to work well
-        // with arbitrary positions so we have to handle cropping by ourselves
-        unsigned cropLeft = _cropLeft;
-        unsigned cropRight = _cropRight;
-        unsigned cropTop = _cropTop;
-        unsigned cropBottom = _cropBottom;
-//#ifdef RPI
-        if (_vc_flags & DISPMANX_SNAPSHOT_FILL)
-        {
-            // disable cropping, we are capturing the video overlay window
-            cropLeft = cropRight = cropTop = cropBottom = 0;
-        }
-
-        unsigned imageWidth = _width - cropLeft - cropRight;
-        unsigned imageHeight = _height - cropTop - cropBottom;
-
-        // // calculate final image dimensions and adjust top/left cropping in 3D modes
-        // switch (_videoMode)
-        // {
-        // case VIDEO_3DSBS:
-        //     imageWidth = imageWidth / 2;
-        //     cropLeft = cropLeft / 2;
-        //     break;
-        // case VIDEO_3DTAB:
-        //     imageHeight = imageHeight / 2;
-        //     cropTop = cropTop / 2;
-        //     break;
-        // case VIDEO_2D:
-        // default:
-        //     break;
-        // }
+        unsigned imageWidth = _width;
+        unsigned imageHeight = _height;
 
         // resize the given image if needed
         if (image.width() != imageWidth || image.height() != imageHeight)
@@ -198,7 +103,7 @@ class FrameGrabber
         _vc_display = vc_dispmanx_display_open(0);
         if (_vc_display < 0)
         {
-            std::cout << "DISPMANXGRABBER ERROR: Cannot open display: " << _vc_display << std::endl;
+            std::cout << "ERROR: Cannot open display: " << _vc_display << std::endl;
             return;
         }
 
@@ -206,7 +111,7 @@ class FrameGrabber
         ret = vc_dispmanx_snapshot(_vc_display, _vc_resource, (DISPMANX_TRANSFORM_T)_vc_flags);
         if (ret < 0)
         {
-            std::cout << "DISPMANXGRABBER ERROR: Snapshot failed: " << ret << std::endl;
+            std::cout << "ERROR: Snapshot failed: " << ret << std::endl;
             vc_dispmanx_display_close(_vc_display);
             return;
         }
@@ -238,7 +143,7 @@ class FrameGrabber
         ret = vc_dispmanx_resource_read_data(_vc_resource, &_rectangle, capturePtr, capturePitch);
         if (ret < 0)
         {
-            std::cout << "DISPMANXGRABBER ERROR: vc_dispmanx_resource_read_data failed: " << ret << std::endl;
+            std::cout << "ERROR: vc_dispmanx_resource_read_data failed: " << ret << std::endl;
             vc_dispmanx_display_close(_vc_display);
             return;
         }
@@ -246,8 +151,8 @@ class FrameGrabber
         // copy capture data to image if we captured to temp buffer
         if (imagePtr != capturePtr)
         {
-            // adjust source pointer to top/left cropping
-            uint8_t *src_ptr = (uint8_t *)capturePtr + cropLeft * sizeof(ColorRgba) + cropTop * capturePitch;
+            // get source pointer
+            uint8_t *src_ptr = (uint8_t *)capturePtr;
 
             for (unsigned y = 0; y < imageHeight; y++)
             {
@@ -259,6 +164,15 @@ class FrameGrabber
 
         // Close the displaye
         vc_dispmanx_display_close(_vc_display);
-//#endif
+    }
+    // destructor
+    ~FrameGrabber()
+    {
+        delete[] _captureBuffer;
+        // Clean up resources
+        vc_dispmanx_resource_delete(_vc_resource);
+
+        // De-init BCM
+        bcm_host_deinit();
     }
 };
