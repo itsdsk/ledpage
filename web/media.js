@@ -34,7 +34,7 @@ db.serialize(function () {
 
 // directory of media requiring screenshot
 var mediaRequiringScreenshot;
-var screenshotPath = path.join(__dirname, 'public', 'screenshot.ppm');
+var screenshotPath = path.join(__dirname, '../', 'public', 'screenshot.ppm');
 
 //
 var backendSocket = new sockets.DomainClient("backend");
@@ -189,7 +189,7 @@ function saveScreenshot(side) {
     }
 }
 
-var mediaDir = path.join(__dirname, 'public', 'media');
+var mediaDir = path.join(__dirname, '../', 'public', 'media');
 var config; // device config
 var config_settings; // settings
 module.exports = {
@@ -223,12 +223,12 @@ module.exports = {
             });
         });
         // get config JSON
-        var configPath = path.join(__dirname, 'public', 'config.json');
+        var configPath = path.join(__dirname, '../', 'public', 'config.json');
         try {
             config = require(configPath);
         } catch (ex) {
             console.log("Error getting config: " + ex);
-            var pathToDefault = path.join(__dirname, 'public', '.default_config.json');
+            var pathToDefault = path.join(__dirname, '../', 'public', '.default_config.json');
             fs.copyFile(pathToDefault, configPath, (err) => {
                 if (err) console.log(err)
                 else {
@@ -238,12 +238,12 @@ module.exports = {
             });
         }
         // get settings JSON
-        var settingsPath = path.join(__dirname, 'public', 'settings.json');
+        var settingsPath = path.join(__dirname, '../', 'public', 'settings.json');
         try {
             config_settings = require(settingsPath);
         } catch (ex) {
             console.log("Error getting settings.json: " + ex);
-            var pathToDefaultSettings = path.join(__dirname, 'public', '.default_settings.json');
+            var pathToDefaultSettings = path.join(__dirname, '../', 'public', '.default_settings.json');
             fs.copyFile(pathToDefaultSettings, settingsPath, (err) => {
                 if (err) console.log(err)
                 else {
@@ -643,13 +643,13 @@ module.exports = {
     },
     saveConfig: function () {
         // save settings
-        var settingsPath = path.join(__dirname, 'public', 'settings.json');
+        var settingsPath = path.join(__dirname, '../', 'public', 'settings.json');
         console.log("USER INPUT::saving settings to " + settingsPath);
         fs.writeFile(settingsPath, JSON.stringify(config_settings, null, 4), function (err) {
             if (err) console.log(err);
         });
         // save output
-        var configPath = path.join(__dirname, 'public', 'config.json');
+        var configPath = path.join(__dirname, '../', 'public', 'config.json');
         console.log("USER INPUT::saving output config to " + configPath);
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);

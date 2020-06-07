@@ -14,7 +14,7 @@ http.listen(httpPort, function () {
 media.generateDb();
 
 // serve static files
-app.use(express.static('public'));
+app.use(express.static('../public'));
 
 // client websocket routes
 io.on('connection', function (socket) {

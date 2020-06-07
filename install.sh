@@ -45,7 +45,9 @@ EOT"
 sudo systemctl enable disk-backend-daemon
 
 # get app dependencies
+cd ./web
 npm install
+cd ../
 
 # add renderer to service manager
 sudo bash -c "> /etc/systemd/system/disk-renderer-daemon.service"
@@ -55,7 +57,7 @@ Description=Disk Renderer
 After=disk-ui-daemon.service
 
 [Service]
-ExecStart=/usr/bin/startx $BASEDIR/node_modules/electron/dist/electron --no-sandbox $BASEDIR/renderer.js
+ExecStart=/usr/bin/startx $BASEDIR/web/node_modules/electron/dist/electron --no-sandbox $BASEDIR/web/renderer.js
 Restart=on-failure
 RestartSec=5s
 
@@ -65,7 +67,9 @@ EOT"
 sudo systemctl enable disk-renderer-daemon
 
 # run script to build web pages
+cd ./web
 npm run build
+cd ../
 # add renderer to service manager
 sudo bash -c "> /etc/systemd/system/disk-ui-daemon.service"
 sudo bash -c "cat <<EOT >> /etc/systemd/system/disk-ui-daemon.service
@@ -74,7 +78,7 @@ Description=Disk UI
 
 [Service]
 User=root
-WorkingDirectory=$BASEDIR
+WorkingDirectory=$BASEDIR/web
 ExecStart=/usr/bin/node app.js
 Restart=on-failure
 RestartSec=5s

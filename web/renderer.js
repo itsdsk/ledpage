@@ -118,10 +118,6 @@ app.on('ready', () => {
     console.log(err);
   });
 
-  // initial page load
-  var initialURL = `index.html`;
-  //mainWindowA.loadFile(initialURL);
-
   // bool state to say which window to load to
   var flipWindow = false;
 
