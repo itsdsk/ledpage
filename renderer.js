@@ -52,6 +52,7 @@ class RenderWindow {
       this.browserWindow.show();
       this.browserWindow.focus();
       // report loaded to client
+      console.log(`sending loaded`);
       if (this.client) this.client.write(JSON.stringify({
         loaded: true,
         whichWindow: this.side,
@@ -286,6 +287,7 @@ app.on('ready', () => {
                           if (err) console.log(`error saving metadata: ${err}`);
                           console.log(`saved page ${msg.URL} to ${newDirectory}`);
                           // report loaded to client
+                          console.log(`sending saved`);
                           if (client) client.write(JSON.stringify({
                             saved: true,
                             directory: randomName

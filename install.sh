@@ -44,10 +44,9 @@ WantedBy=multi-user.target
 EOT"
 sudo systemctl enable disk-backend-daemon
 
-# get renderer dependencies
-cd ./renderer/
+# get app dependencies
 npm install
-cd ../
+
 # add renderer to service manager
 sudo bash -c "> /etc/systemd/system/disk-renderer-daemon.service"
 sudo bash -c "cat <<EOT >> /etc/systemd/system/disk-renderer-daemon.service
@@ -56,7 +55,7 @@ Description=Disk Renderer
 After=disk-ui-daemon.service
 
 [Service]
-ExecStart=/usr/bin/startx $BASEDIR/renderer/node_modules/electron/dist/electron --no-sandbox $BASEDIR/renderer/main.js
+ExecStart=/usr/bin/startx $BASEDIR/node_modules/electron/dist/electron --no-sandbox $BASEDIR/renderer.js
 Restart=on-failure
 RestartSec=5s
 
@@ -65,8 +64,6 @@ WantedBy=multi-user.target
 EOT"
 sudo systemctl enable disk-renderer-daemon
 
-# get app dependencies
-npm install
 # run script to build web pages
 npm run build
 # add renderer to service manager
