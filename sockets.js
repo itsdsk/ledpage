@@ -57,7 +57,7 @@ exports.DomainClient = class DomainClient {
                 console.log(`Connected to ${this.name}`);
             })
             .on('data', (data) => {
-                console.log(`Received data from ${this.name}: ${data.toString()}`);
+                console.log(`Received data from ${this.name}`);
                 this.event.emit('data', data);
             })
             .on('end', () => {

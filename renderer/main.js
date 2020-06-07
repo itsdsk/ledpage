@@ -152,6 +152,50 @@ app.on('ready', () => {
     var server = net.createServer(function (stream) {
         console.log('Connection acknowledged.');
 
+        // reguarly take screenshot and send to ui process
+        var screenshotViewTimeout;
+        var screenshotViewFrequency = 5000; // ms
+        function screenshotView() {
+          // get window currently playing
+          var currentWindow = false;
+          if (flipWindow) {
+            currentWindow = windowB.browserWindow;
+          } else {
+            currentWindow = windowA.browserWindow;
+          }
+          currentWindow.capturePage().then(image => {
+            if (!image) console.log(`error taking screenshot: image is null`);
+            // check screenshot is valid
+            if (image.isEmpty() == false) {
+              // send screenshot
+              var screenshotMsg = JSON.stringify({
+                status: true,
+                screenshot: image.toJPEG(60).toJSON()
+              });
+              console.log(`sending screenshot ${JSON.stringify(image.getSize())} size: ${screenshotMsg.length}`);
+              if (!stream.write(screenshotMsg)) {
+                // wait for data to clear from memory
+                stream.once('drain', () => {
+                  // repeat
+                  screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+                });
+              } else {
+                // repeat
+                screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+              }
+            } else {
+              // image is empty, repeat
+              screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+            }
+          });
+          // // repeat
+          // screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+        }
+        screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+
+        stream.on('error', function (err) {
+          console.log(`error in stream: ${err}`);
+        });
         stream.on('end', function () {
           console.log('Client disconnected.');
         });
@@ -263,6 +307,9 @@ app.on('ready', () => {
       .listen(socket)
       .on('connection', function (socket) {
         console.log('Client connected.');
+      })
+      .on('error', function (err) {
+        console.log(`server error: ${err}`);
       });
     return server;
   }

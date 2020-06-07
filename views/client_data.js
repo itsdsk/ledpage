@@ -91,7 +91,8 @@ export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackSta
     // create formatted status object
     var pbStatus = {
         'nowPlaying': nowPlaying,
-        'nextPlaying': nextPlaying
+        'nextPlaying': nextPlaying,
+        'screenshotDataURL': $playbackStatus.screenshot
     };
 
     // add channel currently autoplaying

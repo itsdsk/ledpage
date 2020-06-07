@@ -65,14 +65,23 @@ var playback = {
 }
 // program exit flag
 var SHUTDOWN = false;
+// current screenshot from renderer
+var rendererScreenshotBuffer = false;
 // IPC definition, data events
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('data', function (data) {
-    console.log("media in data from renderer: " + data.toString());
-    if (data.toString() === '__disconnect') {
+    var dataAsString = data.toString();
+    console.log("renderer msg length: " + dataAsString.length);
+    if (dataAsString === '__disconnect') {
         cleanup();
     } else {
-        var rendererMsg = JSON.parse(data.toString());
+        var rendererMsg;
+        try {
+            rendererMsg = JSON.parse(dataAsString);
+        } catch (e) {
+            console.log(`error parsing json from renderer: ${e}`);
+            return;
+        }
         // message backend to switch
         if (rendererMsg.loaded) {
             // update currentURL when halfway through transition
@@ -108,6 +117,18 @@ rendererSocket.event.on('data', function (data) {
                         module.exports.eventEmitter.emit('addmediaitem', element);
                     });
                 });
+            }
+        } else if (rendererMsg.status) {
+            //
+            //console.log(`got renderer status`);
+            if (rendererMsg.screenshot) {
+                // get jpeg data buffer
+                rendererScreenshotBuffer = Buffer.from(rendererMsg.screenshot.data);
+                // save screenshot to file
+                // fs.writeFile(path.join(__dirname, 'renderer_screenshot.jpg'), rendererScreenshotBuffer, function (err) {
+                //     if (err) console.log(`error writing file of screenshot: ${err}`);
+                //     console.log(`saved screenshot`);
+                // });
             }
         }
     }
@@ -237,7 +258,8 @@ module.exports = {
         var _status = {
             playing: playback.playing,
             playingFadeIn: playback.playingFadeIn,
-            playingAutoNext: playback.playingAutoNext
+            playingAutoNext: playback.playingAutoNext,
+            screenshot: `data:image/jpeg;base64,${rendererScreenshotBuffer.toString('base64')}`
         };
         // add playback channel
         if (playback.autoplayTimerID)
