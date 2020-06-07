@@ -21,6 +21,8 @@ struct LedNode
     unsigned r;
     unsigned pos;
     vector<unsigned> positions;
+    std::vector<std::vector<float>> gaussian_weight;
+    vector<pair<float,unsigned>> gaussian_pos;
 
     LedNode(float x, float y, unsigned confW, unsigned confH, unsigned screenX, unsigned screenY) :
         LedNode(x, y, 1, confW, confH, screenX, screenY) { };
@@ -40,22 +42,58 @@ struct LedNode
         unsigned mapped_y = unsigned((y / float(confH)) * (screenY));
         // reset sample points
         positions.clear();
+        gaussian_pos.clear();
         // get sampling area boundary
         unsigned min_x = max((int)mapped_x - (int)r, (0));
         unsigned max_x = min((int)mapped_x + (int)r, (int)(screenX / 2));
         unsigned min_y = max((int)mapped_y - (int)r, (0));
         unsigned max_y = min((int)mapped_y + (int)r, (int)screenY);
+        // get gaussian kernel
+        gaussian_weight = gaussian_filter(r, 1.0);
         // go through pixels to sample
-        unsigned samplingResolution = 2;
+        unsigned samplingResolution = 1;
         for (unsigned ix = min_x; ix < max_x; ix += samplingResolution)
             for (unsigned iy = min_y; iy < max_y; iy += samplingResolution)
             {
                 // get 1-dimensional index of pixel in image and add to positions
                 unsigned position = iy * screenX + ix;
                 positions.emplace_back(position);
+                // add 1-dimensional index of pixel and blur weight to vector
+                gaussian_pos.emplace_back(gaussian_weight[ix-min_x][iy-min_y], position);
             }
         //cout << "Set LED: " << x_pos << "," << y_pos << " r:" << r << " samples: " << positions.size() << endl;
     }
+
+    std::vector<std::vector<float>> gaussian_filter(int kernel_size = 2, float sigma = 1.0)
+    {
+        // width of convolution kernel
+        int W = (kernel_size * 2) + 1;
+        // 2d vector to contain matrix
+        std::vector<std::vector<float>> kernel(
+            W, std::vector<float>(W, 0.0)
+        );
+        float mean = W/2;
+        float sum = 0.0; // For accumulating the kernel values
+        for (int x = 0; x < W; ++x) 
+            for (int y = 0; y < W; ++y) {
+                kernel[x][y] = exp( -0.5 * (pow((x-mean)/sigma, 2.0) + pow((y-mean)/sigma,2.0)) )
+                                / (2 * M_PI * sigma * sigma);
+
+                // Accumulate the kernel values
+                sum += kernel[x][y];
+            }
+
+        // Normalize the kernel
+        for (int x = 0; x < W; ++x)
+        {
+            for (int y = 0; y < W; ++y)
+            {
+                kernel[x][y] /= sum;
+            }
+        }
+        return kernel;
+    }
+
 };
 
 enum ColorOrder
@@ -167,46 +205,46 @@ public:
             // get colors on left side
             if (sampleL)
             {
-                // initialise sum of colours
-                uint_fast16_t cummR = 0;
-                uint_fast16_t cummG = 0;
-                uint_fast16_t cummB = 0;
+                // initialise colour accumulator
+                float accR = 0.0;
+                float accG = 0.0;
+                float accB = 0.0;
                 // iterate through pixels
-                for (unsigned position : ledNode.positions)
+                for (const auto& elem : ledNode.gaussian_pos)
                 {
                     // get pixel address
-                    const Pixel_T &pixel = image.memptr()[position];
-                    // sample colour from pixel
-                    cummR += pixel.red;
-                    cummG += pixel.green;
-                    cummB += pixel.blue;
+                    const Pixel_T &pixel = image.memptr()[elem.second];
+                    // sample color from pixel and multiply by convolution kernel weight
+                    accR += elem.first * pixel.red;
+                    accG += elem.first * pixel.green;
+                    accB += elem.first * pixel.blue;
                 }
-                // calc mean average of sampled colours
-                avgR_L = uint8_t(cummR / ledNode.positions.size());
-                avgG_L = uint8_t(cummG / ledNode.positions.size());
-                avgB_L = uint8_t(cummB / ledNode.positions.size());
+                // cast color type
+                avgR_L = uint8_t(accR);
+                avgG_L = uint8_t(accG);
+                avgB_L = uint8_t(accB);
             }
             // get colours on right side
             if (sampleR)
             {
-                // initialise sum of colours
-                uint_fast16_t cummR = 0;
-                uint_fast16_t cummG = 0;
-                uint_fast16_t cummB = 0;
+                // initialise colour accumulator
+                float accR = 0.0;
+                float accG = 0.0;
+                float accB = 0.0;
                 // iterate through pixels
-                for (unsigned position : ledNode.positions)
+                for (const auto& elem : ledNode.gaussian_pos)
                 {
                     // get pixel address (add display width / 2 to get right hand side)
-                    const Pixel_T &pixel = image.memptr()[position + screenHalfX];
-                    // sample colour from pixel
-                    cummR += pixel.red;
-                    cummG += pixel.green;
-                    cummB += pixel.blue;
+                    const Pixel_T &pixel = image.memptr()[elem.second + screenHalfX];
+                    // sample color from pixel and multiply by convolution kernel weight
+                    accR += elem.first * pixel.red;
+                    accG += elem.first * pixel.green;
+                    accB += elem.first * pixel.blue;
                 }
-                // calc mean average of sampled colours
-                avgR_R = uint8_t(cummR / ledNode.positions.size());
-                avgG_R = uint8_t(cummG / ledNode.positions.size());
-                avgB_R = uint8_t(cummB / ledNode.positions.size());
+                // cast color type
+                avgR_R = uint8_t(accR);
+                avgG_R = uint8_t(accG);
+                avgB_R = uint8_t(accB);
             }
 
             // set final LED colour
