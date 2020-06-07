@@ -439,6 +439,10 @@
 </div>
 
 <div class="preview-container">
+    <!-- show current screenshot and channel -->
+    <!-- <img src={$livePlaybackStatus.screenshotDataURL}>
+    <p>{$livePlaybackStatus.channel || 'no chanel'}</p> -->
+
 
   <div class="preview-container--child">
     {#if showConfig}
