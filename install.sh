@@ -17,7 +17,12 @@ sudo apt install xserver-xorg-core \
   sqlite3 \
   libboost-all-dev \
   nodejs \
-  cmake # for raspberry pi 4
+  cmake \
+  bluetooth \
+  pi-bluetooth \
+  bluez \
+  blueman \
+  libbluetooth-dev
 
 # get absolute path to directory
 BASEDIR=$(dirname $(readlink -f $0))

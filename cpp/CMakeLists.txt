@@ -37,4 +37,4 @@ set(main_SOURCES
 
 add_executable( ${PROJECT_NAME} ${main_SOURCES})
 
-target_link_libraries(main ${BCM_LIBRARIES} serial ${Boost_LIBRARIES} bcm2835 ${pigpio_LIBRARY})
+target_link_libraries(main ${BCM_LIBRARIES} serial ${Boost_LIBRARIES} bcm2835 ${pigpio_LIBRARY} bluetooth)

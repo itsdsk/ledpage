@@ -138,6 +138,27 @@ integer
 ##### description
 PWM clock speed in Hz (more [info](http://abyz.me.uk/rpi/pigpio/cif.html))
 
+### Bluetooth Serial Port Profile
+
+Arduino with HC-05 module connected via Bluetooth. SPP must be enabled on the Raspberry Pi and the device should be trusted beforehand.
+
+```javascript
+{
+    "type": "bluetooth_spp",
+    "properties": {
+        "colorOrder": "rgb",
+        "MAC": "00:00:00:00:00:00"
+    },
+    "leds": [ /* ... */ ]
+}
+```
+
+#### MAC
+##### type
+string 
+##### description
+MAC address of bluetooth server
+
 ## Settings
 
 ```javascript

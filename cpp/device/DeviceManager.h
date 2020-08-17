@@ -6,6 +6,7 @@
 #include <device/OutputUART.h>
 #include <device/OutputPWMbcm2835.h>
 #include <device/OutputPWMpigpio.h>
+#include <device/OutputBluetooth.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -174,6 +175,10 @@ public:
         else if (outputType == "pwm_gpio")
         {
             output = std::shared_ptr<Output>(new OutputPWMpigpio(config["outputs"][outputIndex]["properties"]));
+        }
+        else if (outputType == "bluetooth_spp")
+        {
+            output = std::shared_ptr<Output>(new OutputBluetooth(config["outputs"][outputIndex]["properties"]));
         }
         else
         {
