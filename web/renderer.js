@@ -2,6 +2,7 @@ const electron = require('electron');
 const path = require('path');
 const net = require('net');
 const fs = require('fs');
+const { exec } = require("child_process");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -22,6 +23,7 @@ class RenderWindow {
   side;
   loadMessage;
   client;
+  windowSize;
   constructor(windowOpts, side) {
     this.side = side;
     // create browser window
@@ -29,6 +31,7 @@ class RenderWindow {
     // move window
     this.browserWindow.setPosition(side == 'A' ? 0 : windowOpts.width, 0);
     // log
+    this.windowSize = this.browserWindow.getContentSize();
     console.log(`${side} size: ${JSON.stringify(this.browserWindow.getContentSize())} position: ${JSON.stringify(this.browserWindow.getPosition())}`);
     // add handlers
     this.browserWindow.webContents.on('did-finish-load', this.onLoadFinished.bind(this));
@@ -42,6 +45,24 @@ class RenderWindow {
     //
     this.browserWindow.loadURL(this.loadMessage.path);
   }
+  mouseClick(norm_x = 0.5, norm_y = 0.5) {
+    // fake mouse click in location
+    var click_x = norm_x * this.windowSize[0];
+    var click_y = norm_y * this.windowSize[1];
+    if (this.side == 'B') click_x += this.windowSize[0];
+    // fake mouse click
+    var clickCmd = `xdotool mousemove ${Math.floor(click_x)} ${Math.floor(click_y)} click 1`;
+    exec(clickCmd, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`fake mouse error: ${error.message}`);
+          return;
+      }
+      if (stderr) {
+          console.log(`fake mouse stderr: ${stderr}`);
+          return;
+      }
+    });
+  }
   // behaviour on pageload
   async onLoadFinished() {
     setTimeout(() => {
@@ -51,6 +72,7 @@ class RenderWindow {
       }
       this.browserWindow.show();
       this.browserWindow.focus();
+      // TODO: reset automouseclick timer
       // report loaded to client
       console.log(`sending loaded`);
       if (this.client) this.client.write(JSON.stringify({
@@ -123,6 +145,24 @@ app.on('ready', () => {
 
   // bool state to say whether to save page
   var savePage = false;
+
+  // fake mouse click periodically
+  var autoClickPeriod = 5000;
+  var autoClickTimeout;
+  function autoMouseClick() {
+    // send fake user gesture to trigger event in page
+    if (flipWindow) {
+      // trigger event
+      windowB.mouseClick(Math.random(), Math.random());
+    } else {
+      // trigger event
+      windowA.mouseClick(Math.random(), Math.random());
+    }
+    if (autoClickPeriod > 0) {
+      autoClickTimeout = setTimeout(autoMouseClick, autoClickPeriod);
+    }
+  }
+  autoClickTimeout = setTimeout(autoMouseClick, autoClickPeriod);
 
   // create UNIX socket to receive URLs on
   var client; // keep track of connected client
@@ -222,17 +262,11 @@ app.on('ready', () => {
             // send fake user gesture to trigger event in page
             console.log(`sending mouse click event to window ${flipWindow ? 'B' : 'A'}`);
             if (flipWindow) {
-              // hide previous window
-              windowA.browserWindow.hide();
-              windowA.browserWindow.minimize();
               // trigger event
-              windowB.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+              windowB.mouseClick(Math.random(), Math.random());
             } else {
-              // hide previous window
-              windowB.browserWindow.hide();
-              windowB.browserWindow.minimize();
               // trigger event
-              windowA.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
+              windowA.mouseClick(Math.random(), Math.random());
             }
            } else if (msg.command == "saveURL") {
             // get right browser window

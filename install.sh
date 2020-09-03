@@ -22,7 +22,9 @@ sudo apt install xserver-xorg-core \
   pi-bluetooth \
   bluez \
   blueman \
-  libbluetooth-dev
+  libbluetooth-dev \
+  libxtst-dev \
+  xdotool
 
 # get absolute path to directory
 BASEDIR=$(dirname $(readlink -f $0))
