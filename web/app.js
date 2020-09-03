@@ -59,11 +59,11 @@ io.on('connection', function (socket) {
   });
   // play demo
   socket.on('play', function (dirAndVersion) {
-    media.stopAutoplay();
+    media.delayAutoplay();
     media.playLocalMedia(dirAndVersion);
   });
   socket.on('playURL', function (msg) {
-    media.stopAutoplay();
+    media.delayAutoplay();
     media.playRemoteMedia(msg);
   });
   // autoplay

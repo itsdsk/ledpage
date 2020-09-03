@@ -277,8 +277,6 @@ module.exports = {
         }));
     },
     renameMedia: function (msg, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
         // get demo.json
         var metaPath = path.join(mediaDir, msg.directory, 'demo.json');
         var meta = require(metaPath);
@@ -299,8 +297,6 @@ module.exports = {
         // get demo.json TODO: check msg length?
         var metaPath = path.join(mediaDir, msg, 'demo.json');
         var meta = require(metaPath);
-        // stop autoplay
-        module.exports.stopAutoplay();
         console.log("USER INPUT::deleting media " + meta.demo.title + " from " + meta.directory + ":\n");
         // delete media in database
         var deleteMediaQuery = "DELETE FROM media WHERE directory = ?";
@@ -323,8 +319,6 @@ module.exports = {
         db.run(createQuery, [msg], callback);
     },
     deleteConnection: function (msg) {
-        // stop autoplay
-        module.exports.stopAutoplay();
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE media_directory = ? AND channel_name = ?";
@@ -346,8 +340,6 @@ module.exports = {
         });
     },
     createConnection: function (msg, callback) {
-        // stop autoplay
-        module.exports.stopAutoplay();
         console.log("USER INPUT::creating connection: " + msg);
         // create connection in database
         var sql = "INSERT INTO connections (media_directory, channel_name) VALUES (?, ?)";
@@ -654,6 +646,23 @@ module.exports = {
         fs.writeFile(configPath, JSON.stringify(config, null, 4), function (err) {
             if (err) console.log(err);
         });
+    },
+    delayAutoplay: function() {
+        // to call when playing specific media instead of stopAutoplay
+        if (playback.autoplayTimerID) {
+            // update playback status
+            var delayTime = (5 * 60) * 1000; // 5 minutes
+            playback.playingAutoNext.startTime = Date.now() + config_settings.fade + delayTime;
+            // autoplay early by restarting timeout
+            clearTimeout(playback.autoplayTimerID);
+            playback.autoplayTimerID = null;
+            // todo make delay longer
+            playback.autoplayTimerID = setTimeout(autoplayNext, config_settings.fade + delayTime);
+            // send playbackstatus changed update to client
+            //module.exports.eventEmitter.emit('playbackstatus');
+        } else {
+            // TODO: start autoplaying
+        }
     },
     playNext: function () {
         console.log("USER INPUT::playing next");
