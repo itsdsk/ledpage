@@ -370,8 +370,14 @@ module.exports = {
         db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
             if (err) console.log(`error updating playcount in database: ${err}`);
             // get playcount and check screenshot
-            db.get(`SELECT playcount FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
+            db.get(`SELECT playcount, source FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
                 if (err) console.log(`Error getting media info from db: ${err}`);
+                // send media file path to renderer, preferring source URL over directory
+                rendererSocket.write(JSON.stringify({
+                    command: 'loadURL',
+                    path: row.source != 'about:none' ? row.source : ('file://' + filePath + '/index.html'),
+                    fade: thisFadeDuration
+                }));
                 // get demo.json
                 var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
                 var meta = require(metaPath);
@@ -391,12 +397,6 @@ module.exports = {
                 }
             });
         });
-        // send media file path to renderer
-        rendererSocket.write(JSON.stringify({
-            command: 'loadURL',
-            path: ('file://' + filePath + "/index.html"),
-            fade: thisFadeDuration
-        }));
         // update playback status
         playback.playingFadeIn = {
             directory: dirAndVersion.directory,
