@@ -407,7 +407,7 @@ module.exports = {
         db.get(`SELECT title, source FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, itemrow) => {
             if (err) console.log(`playLocalMedia: Error getting media metadata from database for ${dirAndVersion.directory}`);
             playback.playingFadeIn.title = itemrow.title;
-            playback.playingFadeIn.source = itemrow.source;
+            playback.playingFadeIn.source = itemrow.source != 'about:none' ? itemrow.source : `/media/${dirAndVersion.directory}/index.html`;
         });
         // update playback status when fade is over
         clearTimeout(playback.transitioningTimerID);
@@ -421,7 +421,7 @@ module.exports = {
             db.get(`SELECT title, source FROM media WHERE directory = ?`, [playingDirectory], (err, itemrow) => {
                 if (err) console.log(`playLocalMedia end transition: Error getting media metadata from database for ${playingDirectory}`);
                 playback.playing.title = itemrow.title;
-                playback.playing.source = itemrow.source;
+                playback.playing.source = itemrow.source != 'about:none' ? itemrow.source : `/media/${playingDirectory}/index.html`;
             });
             //
             playback.playingFadeIn = false;
@@ -803,7 +803,7 @@ function autoplayNext(thisFadeDuration = config_settings.fade) {
             if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
             // store media metadata in playback object
             playback.playingAutoNext.title = itemrow.title;
-            playback.playingAutoNext.source = itemrow.source;
+            playback.playingAutoNext.source = itemrow.source != 'about:none' ? itemrow.source : `/media/${autoplayList[autoplayPos]}/index.html`;
             // send playbackstatus changed update to client
             module.exports.eventEmitter.emit('playbackstatus');
         });
