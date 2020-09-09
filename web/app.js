@@ -141,6 +141,10 @@ io.on('connection', function (socket) {
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }
+    // send settings to refresh client (fix web ui issue where the wrong brightness is displayed if clicking 'config' after changing brightness)
+    media.loadSettings(function (elements) {
+      socket.emit('settings', elements);
+    });
   });
   // create channel and add media to it
   socket.on('addnewchannel', function (msg) {
