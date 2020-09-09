@@ -8,5 +8,6 @@
         "min": 30000,
         "max": 60000
     },
-    "startupPlaylist": ""
+    "startupPlaylist": "",
+    "autoClickPeriod": 0
 }

@@ -53,6 +53,13 @@
     max: 300000,
     step: 1000
   };
+  $: autoClickPeriod = {
+    name: "autoClickPeriod",
+    value: $config_settings.autoClickPeriod || 0,
+    min: 0,
+    max: 15000,
+    step: 1000
+  };
 </script>
 
 <style>
@@ -73,7 +80,7 @@
 
 <div id="config-main">
 
-  {#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax] as item}
+  {#each [brightness, desaturation, gamma, blur, fade, autoplayDurationMin, autoplayDurationMax, autoClickPeriod] as item}
     <div class="config--control">
       <ConfigurationSlider {...item} />
     </div>

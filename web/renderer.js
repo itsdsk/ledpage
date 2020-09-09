@@ -147,22 +147,40 @@ app.on('ready', () => {
   var savePage = false;
 
   // fake mouse click periodically
-  var autoClickPeriod = 5000;
+  var autoClickPeriod = 0;
   var autoClickTimeout;
   function autoMouseClick() {
     // send fake user gesture to trigger event in page
     if (flipWindow) {
       // trigger event
       windowB.mouseClick(Math.random(), Math.random());
+      // needed to get BLE auth?
+      //windowB.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
     } else {
       // trigger event
       windowA.mouseClick(Math.random(), Math.random());
+      // needed to get BLE auth?
+      // windowA.browserWindow.webContents.executeJavaScript('document.dispatchEvent(new Event("click"));', true);
     }
+    // check whether repeat click
     if (autoClickPeriod > 0) {
+      // wait then repeat click
       autoClickTimeout = setTimeout(autoMouseClick, autoClickPeriod);
     }
   }
-  autoClickTimeout = setTimeout(autoMouseClick, autoClickPeriod);
+  // update period of autoclick and stop/start
+  function resetAutoClickPeriod(newAutoClickPeriod) {
+    // remove old timeout
+    if (autoClickTimeout) {
+      clearTimeout(autoClickTimeout);
+    }
+    // save new autoclickperiod
+    autoClickPeriod = newAutoClickPeriod;
+    // restart timeout
+    if (autoClickPeriod > 0) {
+      autoClickTimeout = setTimeout(autoMouseClick, 500);
+    }
+  }
 
   // create UNIX socket to receive URLs on
   var client; // keep track of connected client
@@ -333,6 +351,10 @@ app.on('ready', () => {
                 }
               });
             }
+          } else if (msg.command == "setAutoClickPeriod") {
+            // set auto click period
+            console.log(`setting autoclickperiod to ${msg.newValue}`);
+            resetAutoClickPeriod(msg.newValue);
           }
         });
       })

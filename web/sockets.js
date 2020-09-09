@@ -55,6 +55,7 @@ exports.DomainClient = class DomainClient {
                 this.connected = true;
                 clearInterval(this.connectInterval);
                 console.log(`Connected to ${this.name}`);
+                this.event.emit('connect');
             })
             .on('data', (data) => {
                 console.log(`Received data from ${this.name}`);

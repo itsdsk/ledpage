@@ -171,7 +171,9 @@ MAC address of bluetooth server
     "autoplayDuration": {
         "min": 30000,
         "max": 60000
-    }
+    },
+    "startupPlaylist": "",
+    "autoClickPeriod": 0
 }
 ```
 

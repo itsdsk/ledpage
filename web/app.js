@@ -135,6 +135,9 @@ io.on('connection', function (socket) {
       case 'autoplayMaxRange':
         media.setAutoplayTimeRange(updateObj);
         break;
+      case 'autoClickPeriod':
+        media.setAutoClickPeriod(updateObj);
+        break;
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }

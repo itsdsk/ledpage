@@ -69,6 +69,20 @@ var SHUTDOWN = false;
 var rendererScreenshotBuffer = false;
 // IPC definition, data events
 var rendererSocket = new sockets.DomainClient("renderer");
+rendererSocket.event.on('connect', function () {
+    // update renderer with autoclickperiod
+    if (config_settings) {
+        // set autoclickperiod
+        if (config_settings.autoClickPeriod) {
+            rendererSocket.write(JSON.stringify({
+                command: 'setAutoClickPeriod',
+                newValue: config_settings.autoClickPeriod
+            }));
+        }
+    } else {
+        console.log('error no config settings yet')
+    }
+});
 rendererSocket.event.on('data', function (data) {
     var dataAsString = data.toString();
     console.log("renderer msg length: " + dataAsString.length);
@@ -491,6 +505,16 @@ module.exports = {
         console.log(`set crossfade msg: ${JSON.stringify(msg)}`);
         // update local config object
         config_settings.fade = msg.fade;
+    },
+    setAutoClickPeriod: function (msg) {
+        console.log(`set autoclickperiod msg: ${JSON.stringify(msg)}`);
+        // update local config object
+        config_settings.autoClickPeriod = msg.autoClickPeriod;
+        // update renderer
+        rendererSocket.write(JSON.stringify({
+            command: 'setAutoClickPeriod',
+            newValue: msg.autoClickPeriod
+        }));
     },
     stopAutoplay: function () {
         // update playback status
