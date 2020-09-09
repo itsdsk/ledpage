@@ -27,15 +27,14 @@ exports.DomainClient = class DomainClient {
         this.event = new EventEmitter();
         this.connectInterval = null;
         //
-        if (connectFlag) {
-            console.log(`Constructing client ${this.name} with path ${this.socketname}`);
-            this.startConnecting();
-        }
+        console.log(`Constructing client ${this.name} with path ${this.socketname}`);
     }
 
     startConnecting() {
-        clearInterval(this.connectInterval);
-        this.connectInterval = setInterval(this.connectToSocket.bind(this), 2500);
+        if (connectFlag) {
+            clearInterval(this.connectInterval);
+            this.connectInterval = setInterval(this.connectToSocket.bind(this), 2500);
+        }
     }
 
     write(msg) {

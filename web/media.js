@@ -79,6 +79,8 @@ rendererSocket.event.on('connect', function () {
                 newValue: config_settings.autoClickPeriod
             }));
         }
+        // start autoplay
+        setTimeout(module.exports.startAutoplay, 500, config_settings.startupPlaylist);
     } else {
         console.log('error no config settings yet')
     }
@@ -230,9 +232,13 @@ module.exports = {
                         }
                     }
                 });
-                // start autoplay on last item
+                // finishing loading library
                 if (index == files.length - 1) {
-                    setTimeout(module.exports.startAutoplay, 500, config_settings.startupPlaylist);
+                    // connect to IPC sockets
+                    setTimeout(() => {
+                        backendSocket.startConnecting();
+                        rendererSocket.startConnecting();
+                    }, 1000);
                 }
             });
         });
