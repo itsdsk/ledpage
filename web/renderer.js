@@ -3,6 +3,7 @@ const path = require('path');
 const net = require('net');
 const fs = require('fs');
 const { exec } = require("child_process");
+var sockets = require('./sockets.js');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -146,6 +147,9 @@ app.on('ready', () => {
   // bool state to say whether to save page
   var savePage = false;
 
+  // start IPC server to send screenshots
+  var screenshotSocket = new sockets.DomainServer("screenshots");
+
   // fake mouse click periodically
   var autoClickPeriod = 0;
   var autoClickTimeout;
@@ -209,7 +213,7 @@ app.on('ready', () => {
 
         // reguarly take screenshot and send to ui process
         var screenshotViewTimeout;
-        var screenshotViewFrequency = 5000; // ms
+        var screenshotViewFrequency = 5000; // ms // TODO: implement variable frequency
         function screenshotView() {
           // get window currently playing
           var currentWindow = false;
@@ -227,26 +231,20 @@ app.on('ready', () => {
                 status: true,
                 screenshot: image.toJPEG(60).toJSON()
               });
-              console.log(`sending screenshot ${JSON.stringify(image.getSize())} size: ${screenshotMsg.length}`);
-              if (!stream.write(screenshotMsg)) {
-                // wait for data to clear from memory
-                stream.once('drain', () => {
-                  // repeat
-                  screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-                });
-              } else {
+              screenshotSocket.write(screenshotMsg, () => {
                 // repeat
                 screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-              }
+              });
             } else {
               // image is empty, repeat
               screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
             }
           });
-          // // repeat
-          // screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
         }
-        screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+        // automatically start sending screenshots after launch
+        setTimeout(() => {
+          screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
+        }, 10000);
 
         stream.on('error', function (err) {
           console.log(`error in stream: ${err}`);
