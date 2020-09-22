@@ -25,6 +25,7 @@ class RenderWindow {
   loadMessage;
   client;
   windowSize;
+  loadTimeout;
   constructor(windowOpts, side) {
     this.side = side;
     // create browser window
@@ -34,6 +35,8 @@ class RenderWindow {
     // log
     this.windowSize = this.browserWindow.getContentSize();
     console.log(`${side} size: ${JSON.stringify(this.browserWindow.getContentSize())} position: ${JSON.stringify(this.browserWindow.getPosition())}`);
+    // init
+    this.loadTimeout = null;
     // add handlers
     this.browserWindow.webContents.on('did-finish-load', this.onLoadFinished.bind(this));
     this.browserWindow.webContents.on('console-message', this.onConsoleOutput.bind(this));
@@ -45,6 +48,16 @@ class RenderWindow {
     console.log(`loadurl ${this.side}: ${JSON.stringify(msg)}`)
     //
     this.browserWindow.loadURL(this.loadMessage.path);
+    // reset load timeout
+    if (this.loadTimeout != null) {
+      clearTimeout(this.loadTimeout);
+    }
+    // start load timeout to switch screens if media doesnt load in time
+    this.loadTimeout = setTimeout(() => {
+      console.log(`${this.side}: timed out while loading`);
+      // send ipc msg to ui
+      this.onLoadFinished();
+    }, 10000);
   }
   mouseClick(norm_x = 0.5, norm_y = 0.5) {
     // fake mouse click in location
@@ -66,6 +79,10 @@ class RenderWindow {
   }
   // behaviour on pageload
   async onLoadFinished() {
+    // stop timer to call this automatically
+    if (this.loadTimeout != null) {
+      clearTimeout(this.loadTimeout);
+    }
     setTimeout(() => {
       // show newly opened window
       if (this.browserWindow.isMinimized()) {
@@ -82,6 +99,8 @@ class RenderWindow {
           URL: this.browserWindow.webContents.getURL(),
           fade: this.loadMessage.fade
         }));
+        // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
+        this.client = null;
       };
     }, 300);
   }
