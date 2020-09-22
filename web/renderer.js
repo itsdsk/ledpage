@@ -75,13 +75,14 @@ class RenderWindow {
       this.browserWindow.focus();
       // TODO: reset automouseclick timer
       // report loaded to client
-      console.log(`sending loaded`);
-      if (this.client) this.client.write(JSON.stringify({
-        loaded: true,
-        whichWindow: this.side,
-        URL: this.browserWindow.webContents.getURL(),
-        fade: this.loadMessage.fade
-      }));
+      if (this.client) {
+        this.client.write(JSON.stringify({
+          loaded: true,
+          whichWindow: this.side,
+          URL: this.browserWindow.webContents.getURL(),
+          fade: this.loadMessage.fade
+        }));
+      };
     }, 300);
   }
   // bluetooth device request handler

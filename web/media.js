@@ -113,6 +113,8 @@ rendererSocket.event.on('data', function (data) {
             }
             // send message to backend
             backendSocket.write(JSON.stringify(backendMsg));
+            // send update to clients
+            module.exports.eventEmitter.emit('switchingsides', JSON.stringify({targetSide: rendererMsg.whichWindow, fadeDuration: rendererMsg.fade}));
         } else if (rendererMsg.saved) {
             console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
             // parse metadata of new media

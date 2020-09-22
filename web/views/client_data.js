@@ -4,6 +4,15 @@ import {
     derived
 } from 'svelte/store';
 
+export const sideStatus = writable({
+    'targetSide': 'A',
+    'fadeDuration': 2500
+});
+socket.on("switchingsides", function (msg) {
+    var parsedUpdate = JSON.parse(msg);
+    sideStatus.set(parsedUpdate);
+});
+
 export const config = writable({
     'outputs': []
 });

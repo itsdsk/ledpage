@@ -219,3 +219,9 @@ media.eventEmitter.on('screenshot', function (latestScreenshot) {
   // send to clients
   io.sockets.emit('screenshotR', latestScreenshot);
 });
+
+// send changing sides update
+media.eventEmitter.on('switchingsides', function (msg) {
+  // send to clients
+  io.sockets.emit('switchingsides', msg);
+});
