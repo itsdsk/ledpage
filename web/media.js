@@ -143,6 +143,44 @@ rendererSocket.event.on('data', function (data) {
     }
 });
 
+// current screenshot from renderer
+var screenshotBufferA = false;
+var screenshotBufferB = false;
+// screenshots socket
+var screenshotsSocket = new sockets.DomainClient("screenshots");
+screenshotsSocket.event.on('data', function (data) {
+    var dataAsString = data.toString();
+    // console.log("screenshot msg length: " + dataAsString.length);
+    if (dataAsString === '__disconnect') {
+        cleanup();
+    } else {
+        // try parsing screenshot msg
+        var screenshotMsg;
+        try {
+            screenshotMsg = JSON.parse(dataAsString);
+        } catch (e) {
+            console.log(`Error parsing JSON for screenshot (length: ${dataAsString.length}): ${e}`);
+            return;
+        }
+        if (screenshotMsg.screenshot) {
+            // check side
+            if (screenshotMsg.side == 'A') {
+                // get jpeg data buffer
+                screenshotBufferA = Buffer.from(screenshotMsg.screenshot.data);
+            } else {
+                // get jpeg data buffer
+                screenshotBufferB = Buffer.from(screenshotMsg.screenshot.data);
+            }
+            // save screenshot to file
+            // fs.writeFile(path.join(__dirname, 'renderer_screenshot.jpg'), rendererScreenshotBuffer, function (err) {
+            //     if (err) console.log(`error writing file of screenshot: ${err}`);
+            //     console.log(`saved screenshot`);
+            // });
+            // console.log(`screenshot ${screenshotMsg.side} of ${JSON.stringify(screenshotMsg.path)}`)
+        }
+    }
+});
+
 function cleanup() {
     if (!SHUTDOWN) {
         SHUTDOWN = true;
@@ -152,6 +190,9 @@ function cleanup() {
         }
         if (backendSocket.connected) {
             backendSocket.socket.end();
+        }
+        if (screenshotsSocket.connected) {
+            screenshotsSocket.socket.end();
         }
         process.exit(0);
     }
@@ -231,6 +272,7 @@ module.exports = {
                     setTimeout(() => {
                         backendSocket.startConnecting();
                         rendererSocket.startConnecting();
+                        screenshotsSocket.startConnecting();
                     }, 1000);
                 }
             });
