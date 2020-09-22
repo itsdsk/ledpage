@@ -22,6 +22,36 @@ socket.on("settings", function (sett) {
     config_settings.set(sett);
 });
 
+// screenshot
+export const screenshotSideA = writable({
+    '1': '',
+    '2': '',
+    'switch': true
+});
+export const screenshotSideB = writable({
+    '1': '',
+    '2': '',
+    'switch': true
+});
+socket.on("screenshotR", function (screenshotData) {
+    // parse msg
+    var parsedScreenshot = JSON.parse(screenshotData);
+    // check screen side
+    if (parsedScreenshot.side == 'A') {
+        // save screenshot in store
+        screenshotSideA.update(obj => Object.assign(obj, {
+            [obj.switch ? '1' : '2']: parsedScreenshot.dataURL,
+            'switch': !obj.switch
+        }));
+    } else { // side == 'B'
+        // save screenshot in store
+        screenshotSideB.update(obj => Object.assign(obj, {
+            [obj.switch ? '1' : '2']: parsedScreenshot.dataURL,
+            'switch': !obj.switch
+        }));
+    }
+});
+
 export const playbackStatus = writable({});
 
 socket.on("nowplaying", function (playback) {

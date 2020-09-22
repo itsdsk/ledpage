@@ -208,7 +208,14 @@ media.eventEmitter.on('addmediaitem', function (mediaItem) {
 media.eventEmitter.on('playbackstatus', function () {
   setTimeout(() => {
     media.nowPlaying(function (playbackStatus) {
+      // broadcast playback status to clients
       io.sockets.emit('nowplaying', playbackStatus);
     });
   }, 250); // 250ms delay to wait for playbackstatus to be updated
+});
+
+// send screenshot
+media.eventEmitter.on('screenshot', function (latestScreenshot) {
+  // send to clients
+  io.sockets.emit('screenshotR', latestScreenshot);
 });

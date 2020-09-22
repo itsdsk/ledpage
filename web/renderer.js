@@ -217,10 +217,16 @@ app.on('ready', () => {
         function screenshotView() {
           // get window currently playing
           var currentWindow = false;
+          var loadMsg = false;
+          var side = false;
           if (flipWindow) {
             currentWindow = windowB.browserWindow;
+            loadMsg = windowB.loadMessage;
+            side = windowB.side;
           } else {
             currentWindow = windowA.browserWindow;
+            loadMsg = windowA.loadMessage;
+            side = windowA.side;
           }
           currentWindow.capturePage().then(image => {
             if (!image) console.log(`error taking screenshot: image is null`);
@@ -229,7 +235,9 @@ app.on('ready', () => {
               // send screenshot
               var screenshotMsg = JSON.stringify({
                 status: true,
-                screenshot: image.toJPEG(60).toJSON()
+                screenshot: image.toJPEG(20).toJSON(),
+                side: side,
+                path: loadMsg.path
               });
               screenshotSocket.write(screenshotMsg, () => {
                 // repeat

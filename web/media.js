@@ -167,9 +167,21 @@ screenshotsSocket.event.on('data', function (data) {
             if (screenshotMsg.side == 'A') {
                 // get jpeg data buffer
                 screenshotBufferA = Buffer.from(screenshotMsg.screenshot.data);
+                // send to clients
+                var screenshotMsgForApp = {
+                    dataURL: `data:image/jpeg;base64,${screenshotBufferA.toString('base64')}`,
+                    side: screenshotMsg.side
+                };
+                module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
             } else {
                 // get jpeg data buffer
                 screenshotBufferB = Buffer.from(screenshotMsg.screenshot.data);
+                // send to clients
+                var screenshotMsgForApp = {
+                    dataURL: `data:image/jpeg;base64,${screenshotBufferB.toString('base64')}`,
+                    side: screenshotMsg.side
+                };
+                module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
             }
             // save screenshot to file
             // fs.writeFile(path.join(__dirname, 'renderer_screenshot.jpg'), rendererScreenshotBuffer, function (err) {
