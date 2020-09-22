@@ -77,3 +77,100 @@ exports.DomainClient = class DomainClient {
             });
     }
 };
+
+// unix socket server class
+exports.DomainServer = class DomainServer {
+    constructor(name) {
+        // 
+        this.name = name;
+        //
+        this.socketname = `/tmp/${this.name}.sock`;
+        //
+        this.connected = false;
+        this.socket = null;
+        this.socket_stream = null;
+        this.event = new EventEmitter();
+        this.connectInterval = null;
+        //
+        if (connectFlag) {
+            console.log(`Constructing server ${this.name} with path ${this.socketname}`);
+            this.createSocket.call(this);
+        }
+    }
+
+    write(msg, callback) {
+        if (this.connected) {
+            if (this.socket_stream != null) {
+                if (!this.socket_stream.write(msg)) {
+                    // console.log(`Error writing out of socket: all or part of the data was queued in memory`);
+                    // wait for data to clear from memory
+                    this.socket_stream.once('drain', () => {
+                        // console.log(`Info: Socket buffer free`);
+                        if (callback) callback();
+                    });
+                } else {
+                    // console.log(`Info: Server finished writing to socket`);
+                    if (callback) callback();
+                }
+            } else {
+                console.log(`Error sending msg to ${this.name}: stream is null`);
+                if (callback) callback();
+            }
+        } else {
+            if (connectFlag) {
+                console.log(`Error sending msg to ${this.name}: socket disconnected`);
+            }
+            if (callback) callback();
+        }
+    }
+
+    createSocket() {
+        this.prepareServer.call(this, () => {
+            console.log(`Creating server ${this.name} with path ${this.socketname}`);
+            // create server
+            this.socket = net.createServer(function (stream) {
+                stream.on('error', function (err) {
+                    console.log(`socket server error in stream: ${err}`);
+                });
+                stream.on('end', function () {
+                    console.log('socket server Client disconnected.');
+                });
+                /*stream.on('data', function (msg) {
+                    // parse buffer
+                    msg = JSON.parse(msg.toString());
+            
+                    console.log('socket server Client:', JSON.stringify(msg));
+                });*/
+            })
+            .listen(this.socketname)
+            .on('connection', (stream) => {
+                console.log(`Client connected to server ${this.socketname}`);
+                this.connected = true;
+                this.socket_stream = stream;
+            })
+            .on('error', err => {
+                console.log(`${this.socketname} Server error: ${err}`);
+            });
+        });
+    }
+
+    prepareServer(callback) {
+        const SOCKETFILE = this.socketname;
+        // check for leftover socket file / failed cleanup
+        require('fs').stat(SOCKETFILE, function (err, stats) {
+            if (err) {
+              // ready to start server, no leftover socket found
+              callback();
+            } else {
+                // remove leftover socket file
+                require('fs').unlink(SOCKETFILE, function (err) {
+                    if (err) {
+                        console.log("ERROR REMOVING LEFTOVER SOCKET FILE");
+                    }
+                    // ready to start server
+                    callback();
+                });
+            }
+        });
+    }
+};
