@@ -1,6 +1,6 @@
-# Disk Web Mapper
+# Disk Interaction System
 
-Disk web mapper is an app for things with physical outputs, such as LEDs and motors, that cycles through websites while translating the video of the screen to electronic devices(s) in any position.
+Disk Interaction System is an app for things with physical outputs, such as LEDs and motors, that cycles through websites while translating the video of the screen to electronic devices(s) in any position.
 
 ## Supported hardware
 
@@ -14,8 +14,8 @@ Disk web mapper is an app for things with physical outputs, such as LEDs and mot
 Download with dependencies in terminal:
 
 ```bash
-git clone --recurse-submodules -j8 https://github.com/itsdsk/disk-web-mapper.git
-cd ./disk-web-mapper
+git clone --recurse-submodules -j8 https://github.com/itsdsk/disk-interaction-system.git
+cd ./disk-interaction-system
 ```
 
 Install web UI:
