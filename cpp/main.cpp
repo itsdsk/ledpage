@@ -35,6 +35,10 @@ bool receivedScreenshotCommand = false;
 float brightness = 0.0125f;
 float desaturation = 0.0f; // 0.0 = normal colour, 1.0 = grayscale
 float gammaValue = 2.2f;
+// logging
+unsigned int performanceReadPeriod = 600;
+unsigned int frameCount = 0;
+unsigned int lastPerformanceRead = 0;
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -321,11 +325,22 @@ int main(int argc, char *argv[])
         deviceManagers.emplace_back(config, i, grabber->_width, grabber->_height);
     }
 
+    //
+    lastPerformanceRead = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
     // display screen on device
     while (receivedQuitSignal == false)
     {
         //s.broadcast("test broadcast");
+        frameCount++;
+        if (frameCount % performanceReadPeriod == 0) {
+            unsigned int timeNow = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+            unsigned int timeElapsed = timeNow - lastPerformanceRead; // ms
+            float framerateNow = float(performanceReadPeriod) / float(timeElapsed);
+            framerateNow *= 1000.0; // s
+            cout << "FPS: " << framerateNow << endl;
+            lastPerformanceRead = timeNow;
+        }
 
         // should pixel sample radi change size
         if (changeSize > 0)
