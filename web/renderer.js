@@ -5,6 +5,9 @@ const fs = require('fs');
 const { exec } = require("child_process");
 var sockets = require('./sockets.js');
 
+// disable electron warnings
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let windowA = null;
