@@ -11,9 +11,13 @@
     config_settings,
     livePlaybackStatus,
     mediaFeedObjects,
-    channelObjects
+    channelObjects,
+    screenshotSideA,
+    screenshotSideB,
+    sideStatus
   } from "./client_data.js";
   import { tweened } from "svelte/motion";
+  import { fade } from 'svelte/transition';
 
   let showConfig = false;
   $: iframeSrc = $livePlaybackStatus.nowPlaying
@@ -401,6 +405,37 @@
     text-transform: uppercase;
     padding: 0.3em 0;
   }
+
+  .cf2parent {
+    position: relative;
+    height: 200px;
+    width: 200px;
+    margin: 0 auto;
+  }
+
+  .cf2 {
+    position: absolute;
+    left: 0;
+    height: 200px;
+    width: 200px;
+    margin: 0 auto;
+  }
+  .cf2img {
+    position: absolute;
+    left: 0;
+    -webkit-transition: opacity 4s;
+    -moz-transition: opacity 4s;
+    -o-transition: opacity 4s;
+    transition: opacity 4s;
+  }
+
+  .cf2img.transparent {
+    opacity: 0;
+  }
+
+  .cf2.transparent {
+    opacity: 0;
+  }
 </style>
 
 <svelte:window bind:scrollY />
@@ -455,9 +490,21 @@
         {/each}
       </MapContainer>
     {:else}
-      <iframe
+      <div class="cf2parent">
+        <div class="cf2">
+          <img class="bottom cf2img" src={$screenshotSideA['1']} />
+          <img class="top cf2img {$screenshotSideA['switch'] ? '' : 'transparent'}" src={$screenshotSideA['2']} />
+        </div>
+        {#if $sideStatus.targetSide == 'B'}
+          <div transition:fade="{{ duration: ($sideStatus.fadeDuration) }}" class="cf2">
+            <img class="bottom cf2img" src={$screenshotSideB['1']} />
+            <img class="top cf2img {$screenshotSideB['switch'] ? '' : 'transparent'}" src={$screenshotSideB['2']} />
+          </div>
+        {/if}
+      </div>
+      <!-- <iframe
         src={iframeSrc}
-        title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} />
+        title={$livePlaybackStatus.nowPlaying ? $livePlaybackStatus.nowPlaying.title : 'Nothing playing'} /> -->
     {/if}
   </div>
 
