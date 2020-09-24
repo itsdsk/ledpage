@@ -236,7 +236,7 @@ app.on('ready', () => {
 
         // reguarly take screenshot and send to ui process
         var screenshotViewTimeout;
-        var screenshotViewFrequency = 5000; // ms // TODO: implement variable frequency
+        var screenshotViewFrequency = 0; // ms
         function screenshotView() {
           // get window currently playing
           var currentWindow = false;
@@ -272,10 +272,6 @@ app.on('ready', () => {
             }
           });
         }
-        // automatically start sending screenshots after launch
-        setTimeout(() => {
-          screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-        }, 10000);
 
         stream.on('error', function (err) {
           console.log(`error in stream: ${err}`);
@@ -305,6 +301,16 @@ app.on('ready', () => {
             }
             // flip window to display on
             flipWindow = !flipWindow;
+          } else if (msg.command == "automaticScreenshotPeriod") {
+            // change frequency of automatic screenshots
+            console.log(`changing frequency of automatic screenshots to ${msg.newValue}ms`);
+            if (screenshotViewTimeout != null)
+              clearTimeout(screenshotViewTimeout);
+            // save new frequency (ms)
+            screenshotViewFrequency = msg.newValue;
+            // restart timer
+            if (screenshotViewFrequency > 0)
+              screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
           } else if (msg.command == "fakeInput") {
             // send fake user gesture to trigger event in page
             console.log(`sending mouse click event to window ${flipWindow ? 'B' : 'A'}`);
