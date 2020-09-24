@@ -494,8 +494,6 @@ module.exports = {
             });
             //
             playback.playingFadeIn = false;
-            // send playbackstatus changed update to client
-            module.exports.eventEmitter.emit('playbackstatus');
         }, thisFadeDuration, dirAndVersion.directory);
 
         // send playbackstatus changed update to client
@@ -658,8 +656,6 @@ module.exports = {
             };
             // clear fading in
             playback.playingFadeIn = false;
-            // send playbackstatus changed update to client
-            module.exports.eventEmitter.emit('playbackstatus');
         }, thisFadeDuration, name);
         // send playbackstatus changed update to client
         module.exports.eventEmitter.emit('playbackstatus');
@@ -861,31 +857,31 @@ function autoplayNext(thisFadeDuration = config_settings.fade) {
             // reset counter at end
             autoplayPos = 0;
         }
-        // play item
-        module.exports.playLocalMedia({
-            directory: autoplayList[autoplayPos]
-        }, thisFadeDuration);
+        // get next autoplay index
+        var nextAutoplayPos = (autoplayPos + 1) % autoplayList.length;
         // choose random timespan in min-max range to wait before playing next
         var delayTime = Math.random() * Math.abs(config_settings.autoplayDuration.max - config_settings.autoplayDuration.min);
         delayTime += Math.min(config_settings.autoplayDuration.max, config_settings.autoplayDuration.min); // add min of range
-        // increment autoplay position
-        autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // update playback status
         playback.playingAutoNext = {
-            directory: autoplayList[autoplayPos],
+            directory: autoplayList[nextAutoplayPos],
             startTime: Date.now() + config_settings.fade + delayTime,
             fadeDuration: config_settings.fade
         }
         // get metadata for next media from database
         var selectQuery = `SELECT title, source FROM media WHERE directory = ?`;
-        db.get(selectQuery, [autoplayList[autoplayPos]], (err, itemrow) => {
-            if (err) console.log(`Error getting media metadata from database for ${autoplayList[autoplayPos]}`);
+        db.get(selectQuery, [autoplayList[nextAutoplayPos]], (err, itemrow) => {
+            if (err) console.log(`Error getting media metadata from database for next item on autoplay: ${autoplayList[nextAutoplayPos]}`);
             // store media metadata in playback object
             playback.playingAutoNext.title = itemrow.title;
-            playback.playingAutoNext.source = itemrow.source != 'about:none' ? itemrow.source : `/media/${autoplayList[autoplayPos]}/index.html`;
-            // send playbackstatus changed update to client
-            module.exports.eventEmitter.emit('playbackstatus');
+            playback.playingAutoNext.source = itemrow.source != 'about:none' ? itemrow.source : `/media/${autoplayList[nextAutoplayPos]}/index.html`;
         });
+        // play item
+        module.exports.playLocalMedia({
+            directory: autoplayList[autoplayPos]
+        }, thisFadeDuration);
+        // increment autoplay position
+        autoplayPos = (autoplayPos + 1) % autoplayList.length;
         // start timer to autoplay next
         playback.autoplayTimerID = setTimeout(autoplayNext, config_settings.fade + delayTime);
     } else {
