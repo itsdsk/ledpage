@@ -26,15 +26,49 @@
 
 using boost::asio::local::stream_protocol;
 using namespace std::chrono;
+
+// time changing property
+struct animatedProperty {
+    unsigned int timeChanged = 0; // unix epoch time ms property was changed
+    unsigned int fadeDuration = 1000; // transition duration in ms
+    float initialValue = 0.0;
+    float lastValue = 0.0;
+    float targetValue = 0.0;
+    void setTarget(float newTargetValue, unsigned int newFadeDuration = 1000) {
+        // record current time
+        timeChanged = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        // update values
+        fadeDuration = newFadeDuration;
+        initialValue = lastValue;
+        targetValue = newTargetValue;
+    }
+    float getUpdatedValue(unsigned int currentms){
+        // check if finished transitioning
+        unsigned int elapsedTime = currentms - timeChanged;
+        if (elapsedTime > fadeDuration) {
+            // set prop to final value
+            lastValue = targetValue;
+        } else {
+            // percent time passed
+            float lerp_amt = float(elapsedTime) / float(fadeDuration);
+            // interpolate value
+            lastValue = initialValue + (lerp_amt * (targetValue - initialValue));
+        }
+        return lastValue;
+    }
+};
+
 // signal/radius to change sampling radius for all LEDs
 unsigned changeSize = 0;
 unsigned int fadeDuration = 2500; // fade transition duration in ms
-unsigned int timeLoadedL = 0; // unix epoch time ms left window loaded
-unsigned int timeLoadedR = 1; // unix epoch time ms right window loaded
 bool receivedScreenshotCommand = false;
-float brightness = 0.0125f;
-float desaturation = 0.0f; // 0.0 = normal colour, 1.0 = grayscale
-float gammaValue = 2.2f;
+
+// animated properties
+animatedProperty browserWindowMix; // interpolate value: 0 = left screen, 1 = right
+animatedProperty brightness;
+animatedProperty desaturation; // 0.0 = normal colour, 1.0 = grayscale
+animatedProperty gammaValue;
+
 // logging
 unsigned int performanceReadPeriod = 600;
 unsigned int frameCount = 0;
@@ -93,9 +127,9 @@ public:
                     std::cout << "key1 is window" << std::endl;
                     if (element1.value().find("brightness") != element1.value().end())
                     {
-                        // get brightness amt
-                        brightness = element1.value()["brightness"].get<float>();
-                        std::cout << "user changing brightness to: " << brightness << std::endl;
+                        // get brightness amt and update property
+                        brightness.setTarget(element1.value()["brightness"].get<float>(), 1000);
+                        std::cout << "user changing brightness to: " << brightness.targetValue << std::endl;
                     }
                     if (element1.value().find("blur") != element1.value().end())
                     {
@@ -111,29 +145,21 @@ public:
                     }
                     if (element1.value().find("half") != element1.value().end())
                     {
-                        // check which half of the window content has loaded on
-                        int screenHalf = element1.value()["half"].get<int>();
-                        unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-                        if (screenHalf == 0) {
-                            // save time left window loaded
-                            timeLoadedL = currentms;
-                        } else if (screenHalf == 1) {
-                            // save time right window loaded
-                            timeLoadedR = currentms;
-                        }
-                        std::cout << "user switching window side to " << (timeLoadedL > timeLoadedR ? "left" : "right") << std::endl;
+                        // get browser window side and update property
+                        browserWindowMix.setTarget(element1.value()["half"].get<float>(), fadeDuration);
+                        std::cout << "user switching window side to " << browserWindowMix.targetValue << " with fade " << fadeDuration << std::endl;
                     }
                     if (element1.value().find("desaturation") != element1.value().end())
                     {
-                        // get desaturation amt
-                        desaturation = element1.value()["desaturation"].get<float>();
-                        std::cout << "user changing desaturation to: " << desaturation << std::endl;
+                        // get desaturation amt and update property
+                        desaturation.setTarget(element1.value()["desaturation"].get<float>(), 1000);
+                        std::cout << "user changing desaturation to: " << desaturation.targetValue << std::endl;
                     }
                     if (element1.value().find("gamma") != element1.value().end())
                     {
-                        // get gammaValue amt
-                        gammaValue = element1.value()["gamma"].get<float>();
-                        std::cout << "user changing gammaValue to: " << gammaValue << std::endl;
+                        // get gammaValue amt and update property
+                        gammaValue.setTarget(element1.value()["gamma"].get<float>(), 1000);
+                        std::cout << "user changing gammaValue to: " << gammaValue.targetValue << std::endl;
                     }
                 }
                 else if (key1 == "command")
@@ -306,11 +332,13 @@ int main(int argc, char *argv[])
     }
 
     // load settings from config file // TODO: check values exist in config
-    brightness = settings["brightness"];
-    desaturation = settings["desaturation"];
-    gammaValue = settings["gamma"];
     changeSize = settings["blur"];
     fadeDuration = settings["fade"];
+
+    // set animated props
+    brightness.setTarget(settings["brightness"], 10000);
+    desaturation.setTarget(settings["desaturation"], 1000);
+    gammaValue.setTarget(settings["gamma"], 1000);
 
     // create framegrabber and image object
     _w = config["window"]["width"];
@@ -359,6 +387,7 @@ int main(int argc, char *argv[])
             // complete signal
             changeSize = 0;
         }
+        // grab frame
         grabber->grabFrame(_image);
         //
         if (receivedScreenshotCommand)
@@ -366,25 +395,17 @@ int main(int argc, char *argv[])
             saveScreenshot(_image);
             receivedScreenshotCommand = false;
         }
-        // 
-        float crossfadeNorm = 0.0f; // interpolate value: 0 = left screen, 1 = right
+        // get current time
         unsigned int currentms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-        // check if currently transitioning media
-        if (currentms - fadeDuration > max(timeLoadedL, timeLoadedR)) {
-            // set to 100% opacity to most recently updated side of screen
-            crossfadeNorm = timeLoadedL > timeLoadedR ? 0.0f : 1.0f;
-        } else {
-            // get phase of crossfade in ms (0 - fadeDuration)
-            unsigned int fadems = currentms - max(timeLoadedL, timeLoadedR);
-            // get phase of crossfade in pc (0 - 1)
-            float fadepc = float(fadems) / fadeDuration;
-            // set in direction
-            crossfadeNorm = timeLoadedL > timeLoadedR ? 1.0f - fadepc : fadepc;
-        }
-        // update
+        // update properties
+        browserWindowMix.getUpdatedValue(currentms);
+        brightness.getUpdatedValue(currentms);
+        desaturation.getUpdatedValue(currentms);
+        gammaValue.getUpdatedValue(currentms);
+        // update output devices
         for (auto &deviceManager : deviceManagers)
         {
-            deviceManager.update(_image, brightness, desaturation, gammaValue, crossfadeNorm);
+            deviceManager.update(_image, brightness.lastValue, desaturation.lastValue, gammaValue.lastValue, browserWindowMix.lastValue);
         }
     }
 
