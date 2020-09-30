@@ -42,6 +42,7 @@ Description=Disk Backend
 After=disk-renderer-daemon.service
 
 [Service]
+SyslogIdentifier=cpp
 ExecStart=$BASEDIR/cpp/main -d -c \"$BASEDIR/public/config.json\" -p \"$BASEDIR/public/settings.json\"
 Restart=on-failure
 RestartSec=5s
@@ -64,6 +65,7 @@ Description=Disk Renderer
 After=disk-ui-daemon.service
 
 [Service]
+SyslogIdentifier=gfx
 ExecStart=/usr/bin/startx $BASEDIR/web/node_modules/electron/dist/electron --no-sandbox $BASEDIR/web/renderer.js
 Restart=on-failure
 RestartSec=5s
@@ -84,6 +86,7 @@ sudo bash -c "cat <<EOT >> /etc/systemd/system/disk-ui-daemon.service
 Description=Disk UI
 
 [Service]
+SyslogIdentifier=web
 User=root
 WorkingDirectory=$BASEDIR/web
 ExecStart=/usr/bin/node app.js
