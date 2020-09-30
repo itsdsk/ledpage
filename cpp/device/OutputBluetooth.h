@@ -87,7 +87,8 @@ public:
             int status = ::write(bluetooth_sock, (char*)_ledBuffer.c_str(), _ledBuffer.length());
             if (status < 0)
             {
-                perror("Bluetooth TX Error");
+                if (num_connection_errors < 5)
+                    perror("Bluetooth TX Error");
                 // increment counter
                 num_connection_errors++;
             }
@@ -115,5 +116,5 @@ public:
     bool connection_status = false;
     std::string MAC_addr = "00:00:00:00:00:00";
     unsigned num_connection_errors = 0;
-    unsigned max_connection_errors = 2000;
+    unsigned max_connection_errors = 600;
 };
