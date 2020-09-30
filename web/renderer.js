@@ -42,6 +42,10 @@ class RenderWindow {
     this.loadTimeout = null;
     // add handlers
     this.browserWindow.webContents.on('did-finish-load', this.onLoadFinished.bind(this));
+    this.browserWindow.webContents.on('did-fail-load', this.onLoadFailed.bind(this));
+    this.browserWindow.webContents.on('did-fail-provisional-load', this.onProvisionalLoadFailed.bind(this));
+    this.browserWindow.webContents.on('dom-ready', this.onDomReady.bind(this));
+    this.browserWindow.webContents.on('did-stop-loading', this.onStopLoading.bind(this));
     this.browserWindow.webContents.on('console-message', this.onConsoleOutput.bind(this));
     this.browserWindow.webContents.on('select-bluetooth-device', this.onSelectBluetoothDevice.bind(this));
   }
@@ -106,6 +110,19 @@ class RenderWindow {
         this.client = null;
       };
     }, 300);
+  }
+  // behaviour on page load fail
+  async onLoadFailed(error) {
+    //console.log(`${this.side}: Load failed, ${error}`)
+  }
+  async onStopLoading() {
+    //console.log(`${this.side} stopped loading`);
+  }
+  async onProvisionalLoadFailed(error) {
+    //console.log(`${this.side}: Provisional load failed, ${error}`);
+  }
+  async onDomReady() {
+    //console.log(`${this.side} DOM ready`);
   }
   // bluetooth device request handler
   onSelectBluetoothDevice(event, deviceList, callback) {
