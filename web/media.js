@@ -18,7 +18,12 @@ db.serialize(function () {
     db.run(`CREATE TABLE channels (
         name TEXT PRIMARY KEY
     )`);
-    // create tables for relational types (files and connections)
+    // create tables for relational types (thumbnails, files and connections)
+    db.run(`CREATE TABLE thumbnails (
+        media_directory TEXT NOT NULL, filename TEXT NOT NULL,
+        FOREIGN KEY(media_directory) REFERENCES media(directory),
+        UNIQUE(media_directory, filename)
+    )`);
     db.run(`CREATE TABLE files (
         media_directory TEXT NOT NULL, filename TEXT NOT NULL, data TEXT NOT NULL,
         FOREIGN KEY(media_directory) REFERENCES media(directory),
@@ -665,11 +670,23 @@ module.exports = {
         // get media items from db with list of channels
         var mediaQuery = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
         FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
-        db.all(mediaQuery, (err, dbreturn) => {
+        // get media items and channels with list of thumbnails
+        var mediaQuery2 = `SELECT title, directory, source, image, modified, playcount, channels, json_group_array(thumbnails.filename) AS screenshots
+        FROM (${mediaQuery}) LEFT JOIN thumbnails ON directory = thumbnails.media_directory GROUP BY directory`;
+        db.all(mediaQuery2, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
-            // parse list of channels to json array from string
+            // parse string returned from db to json array
             for(var i = 0; i < dbreturn.length; i++) {
+                // add channels
                 dbreturn[i].channels = JSON.parse(dbreturn[i].channels);
+                // add screenshots
+                var screenshot_filenames = JSON.parse(dbreturn[i].screenshots);
+                if (screenshot_filenames.length > 0 && screenshot_filenames[0] != null) {
+                    dbreturn[i].screenshots = screenshot_filenames;
+                } else {
+                    dbreturn[i].screenshots = null;
+                }
+                // return list of media after parsing last item
                 if (i == dbreturn.length - 1) {
                     callback(dbreturn);
                 }
@@ -677,13 +694,26 @@ module.exports = {
         });
     },
     loadMediaItem: function (directory, callback) {
-        // get single media item and list of channels from db
-        var mediaQuery = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
-        FROM connections INNER JOIN media ON media.directory = connections.media_directory WHERE media.directory = ?`;
-        db.get(mediaQuery, [directory], (err, dbreturn) => {
+        // get item with channels
+        var mediaQuery1 = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount,
+            json_group_array(connections.channel_name) AS channels
+            FROM connections INNER JOIN media ON media.directory = connections.media_directory WHERE media.directory = ?`;
+        // get item with channels and thumbnails
+        var mediaQuery2 = `SELECT title, directory, source, image, modified, playcount,
+            channels, json_group_array(thumbnails.filename) AS screenshots
+            FROM (${mediaQuery1}) LEFT JOIN thumbnails ON directory = thumbnails.media_directory WHERE directory = ?`;
+        db.get(mediaQuery2, [directory, directory], (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
-            // parse list of channels to json array from string
+            // parse json array from string returned from db
             dbreturn.channels = JSON.parse(dbreturn.channels);
+            // add screenshots
+            var screenshot_filenames = JSON.parse(dbreturn.screenshots);
+            if (screenshot_filenames.length > 0 && screenshot_filenames[0] != null) {
+                dbreturn.screenshots = screenshot_filenames;
+            } else {
+                dbreturn.screenshots = null;
+            }
+            // return media item
             callback(dbreturn);
         });
     },
@@ -816,6 +846,13 @@ function parseMediaItemDirectory(directory, meta, callback) {
                 db.run(addFileQuery, [directory, filename, buf]);
             });
         });
+        // add thumbnails to database
+        if (meta.demo.thumbnails) {
+            var addThumbnailQuery = "INSERT INTO thumbnails (media_directory, filename) VALUES (?, ?)";
+            meta.demo.thumbnails.forEach(filename => {
+                db.run(addThumbnailQuery, [directory, filename]);
+            });
+        }
         // add channels to database
         var addChannelQuery = "INSERT INTO channels (name) VALUES (?)";
         var addConnectQuery = "INSERT INTO connections (media_directory, channel_name) VALUES (?, ?)";
