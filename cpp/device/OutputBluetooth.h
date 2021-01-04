@@ -102,6 +102,9 @@ public:
             // no bluetooth connection, increment counter
             num_connection_errors++;
         }
+        // delay loop (fixes errors in covid lamp)
+        usleep(16666);
+        // continue
         return 0;
     }
     virtual ~OutputBluetooth()
