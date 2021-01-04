@@ -148,6 +148,7 @@ public:
             return;
         }
 
+        /* obsolete? - removed 04/01/2020
         // copy capture data to image if we captured to temp buffer
         if (imagePtr != capturePtr)
         {
@@ -161,6 +162,7 @@ public:
                        imagePitch);
             }
         }
+        */
 
         // Close the displaye
         vc_dispmanx_display_close(_vc_display);
