@@ -443,14 +443,16 @@ module.exports = {
         // update playcount in database
         db.run(`UPDATE media SET playcount = playcount + 1 WHERE directory = ?`, [dirAndVersion.directory], (err) => {
             if (err) console.log(`error updating playcount in database: ${err}`);
-            // get playcount and check screenshot
-            db.get(`SELECT playcount, source FROM media WHERE directory = ?`, [dirAndVersion.directory], (err, row) => {
-                if (err) console.log(`Error getting media info from db: ${err}`);
-                // send media file path to renderer, preferring source URL over directory
+            // get media info from database
+            module.exports.loadMediaItem(dirAndVersion.directory, row => {
+                // send play media command to renderer, preferring source URL over local file path (todo: add toggle to prefer local/remote path)
                 rendererSocket.write(JSON.stringify({
                     command: 'loadURL',
                     path: row.source != 'about:none' ? row.source : ('file://' + filePath + '/index.html'),
-                    fade: thisFadeDuration
+                    fade: thisFadeDuration,
+                    image: row.image,
+                    screenshots: row.screenshots,
+                    directory: dirAndVersion.directory
                 }));
                 // get demo.json
                 var metaPath = path.join(mediaDir, dirAndVersion.directory, 'demo.json');
@@ -637,7 +639,8 @@ module.exports = {
         rendererSocket.write(JSON.stringify({
             command: 'loadURL',
             path: name,
-            fade: thisFadeDuration
+            fade: thisFadeDuration,
+            image: null
         }));
         // do not take screenshot
         mediaRequiringScreenshot = null;
