@@ -149,14 +149,46 @@ class RenderWindow {
       // TODO: reset automouseclick timer
       // report loaded to client
       if (this.client) {
-        this.client.write(JSON.stringify({
-          loaded: true,
-          whichWindow: this.side,
-          URL: this.browserWindow.webContents.getURL(),
-          fade: this.loadMessage.fade
-        }));
-        // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
-        this.client = null;
+        // check if media has screenshot
+        var has_screenshot = (this.loadMessage.screenshots && this.loadMessage.screenshots.length > 0) ? true : false;
+        // if playing remote media without screenshot
+        if (!this.loadMessage.directory && !has_screenshot) {
+          this.saveScreenshot(null, new_screenshot => {
+            console.log(`saved new screenshot ${JSON.stringify(new_screenshot)}`);
+            // report loaded to client with saved screenshot
+            this.client.write(JSON.stringify({
+              loaded: true,
+              whichWindow: this.side,
+              URL: this.browserWindow.webContents.getURL(),
+              fade: this.loadMessage.fade,
+              image: `/${new_screenshot.filename}`,
+              screenshots: [new_screenshot.filename],
+              directory: this.loadMessage.directory
+            }));
+            // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
+            this.client = null;
+          });
+        } else {
+          // report loaded to client
+          this.client.write(JSON.stringify({
+            loaded: true,
+            whichWindow: this.side,
+            URL: this.browserWindow.webContents.getURL(),
+            fade: this.loadMessage.fade,
+            image: this.loadMessage.image,
+            screenshots: this.loadMessage.screenshots,
+            directory: this.loadMessage.directory
+          }));
+          // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
+          this.client = null;
+        }
+        if (this.loadMessage.directory && has_screenshot) {
+          // do not take screenshot
+          console.log(`do not take screenshot`);
+        } else {
+          // take screenshot
+          console.log(`take screenshot`);
+        }
       };
     }, 300);
   }
