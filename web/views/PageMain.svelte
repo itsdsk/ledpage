@@ -92,6 +92,9 @@
 
   function sendScreenshot() {
     console.log("sending screenshot request cmd");
+    //
+    socket.emit('screenshot');
+    /*
     // test to save screenshot on click
     if (mainSocket.readyState != 1) {
       mainSocket = new WebSocket(
@@ -106,6 +109,7 @@
         command: "screenshot"
       })
     );
+    */
   }
 
   let nextPlayingImg = null;

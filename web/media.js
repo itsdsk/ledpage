@@ -786,6 +786,12 @@ module.exports = {
             command: 'fakeInput'
         }));
     },
+    takeScreenshot: function () {
+        console.log(`USER INPUT::taking screenshot`);
+        rendererSocket.write(JSON.stringify({
+            command: 'takeScreenshot'
+        }));
+    },
     setStartupPlaylist: function (msg) {
         console.log(`USER INPUT::set startup playlist to ${msg}`);
         config_settings.startupPlaylist = msg;

@@ -367,6 +367,13 @@ app.on('ready', () => {
             }
             // flip window to display on
             flipWindow = !flipWindow;
+          } else if (msg.command == "takeScreenshot") {
+            // take screenshot
+            if (flipWindow) {
+              windowB.saveScreenshot(client);
+            } else {
+              windowA.saveScreenshot(client);
+            }
           } else if (msg.command == "automaticScreenshotPeriod") {
             // change frequency of automatic screenshots
             console.log(`changing frequency of automatic screenshots to ${msg.newValue}ms`);

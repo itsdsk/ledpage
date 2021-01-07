@@ -181,6 +181,10 @@ io.on('connection', function (socket) {
   socket.on('fakemouseinput', function () {
     media.fakeMouseInput();
   });
+  // renderer screenshot
+  socket.on('screenshot', function () {
+    media.takeScreenshot();
+  });
   // get logs
   socket.on('getlogs', function () {
     media.getLogs(function (logs) {
