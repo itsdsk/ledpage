@@ -84,6 +84,55 @@ class RenderWindow {
       }
     });
   }
+  // save screenshot aon disk and send update with new filename in callback
+  saveScreenshot(client_tmp = null, callback = null) {
+    //
+    this.browserWindow.capturePage().then(image => {
+      if (!image) console.log(`error taking screenshot: image is null`);
+      // check screenshot is valid
+      if (image.isEmpty() == false) {
+        var d = new Date();
+        var new_filename = `screenshot_${d.getDate()}${d.getMonth()}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}-${d.getSeconds()}.jpg`;
+        // add screenshot to media list
+        if (!this.loadMessage.screenshots)
+          this.loadMessage.screenshots = [];
+        this.loadMessage.screenshots.push(new_filename);
+        // choose file name to save screenshot
+        var confObj = {
+          savedScreenshot: true,
+          filename: new_filename,
+          whichWindow: this.side,
+          screenshots: this.loadMessage.screenshots
+        };
+        // choose location to save screenshot
+        var savePath;
+        if (this.loadMessage.directory && this.loadMessage.directory.length) {
+          // save under local directory
+          confObj.directory = this.loadMessage.directory;
+          console.log(`save screenshot in local folder`);
+          savePath = path.join(__dirname, '../', 'public', 'media', this.loadMessage.directory, confObj.filename);
+        } else {
+          console.log(`saving screenshot in public`);
+          savePath = path.join(__dirname, '../', 'public', confObj.filename);
+        }
+        console.log(`full path: ${savePath}`);
+        fs.writeFile(savePath, image.toJPEG(20), (err) => {
+          if (err) console.log(`error capturing page: ${err}`);
+          // report loaded to client
+          console.log(`saved screenshot:\n${JSON.stringify(confObj, null, 2)}`);
+          if (client_tmp) {
+            client_tmp.write(JSON.stringify(confObj));
+          };
+          // callback
+          if (callback) {
+            callback(confObj);
+          }
+        });
+      } else {
+        // image is empty
+      }
+    });
+  }
   // behaviour on pageload
   async onLoadFinished() {
     // stop timer to call this automatically
