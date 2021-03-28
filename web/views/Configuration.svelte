@@ -42,14 +42,14 @@
   $: autoplayDurationMin = {
     name: "autoplayMinRange",
     value: $config_settings.autoplayDuration.min || 30000,
-    min: 15000,
+    min: 500,
     max: 300000,
     step: 1000
   };
   $: autoplayDurationMax = {
     name: "autoplayMaxRange",
     value: $config_settings.autoplayDuration.max || 60000,
-    min: 15000,
+    min: 500,
     max: 300000,
     step: 1000
   };

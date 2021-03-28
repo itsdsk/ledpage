@@ -1,4 +1,5 @@
 <script>
+  import { fade } from 'svelte/transition';
   import { channelObjects } from "./client_data.js";
   export let directory;
   export let title;
@@ -7,6 +8,14 @@
   export let channels;
   export let playcount;
   export let source;
+  export let screenshots;
+
+  let sIdx = 0; // screenshot index
+  const next = () => {
+    if (screenshots && screenshots.length > 0)
+      sIdx = (sIdx + 1) % screenshots.length;
+  };
+  setInterval(next, 5000);
 
   let channelsOpen = false;
 
@@ -97,6 +106,7 @@
     display: block;
     margin: auto;
     width: 100%;
+    position: absolute;
   }
   .sub-title:after {
     content: attr(data-title);
@@ -142,7 +152,13 @@
 </style>
 
 <div class="media__feed__block">
-  <img src={image} alt="no image available" />
+  {#if screenshots && screenshots.length > 0}
+  {#each [screenshots[sIdx]] as src (sIdx)}
+    <img transition:fade="{{ duration: 5000 }}" src={src != null ? `/media/${directory}/${src}` : null} alt="no image available" />	
+  {/each}
+  {:else}
+  <p>no screenshots</p>
+  {/if}
   <p
     class="sub-title"
     style="text-align:center;"

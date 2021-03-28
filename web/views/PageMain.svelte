@@ -217,6 +217,13 @@
       //
     }
   }
+
+  // generic index for arrays of screenshots to be cycled through
+  let screenshotIndex = 0;
+  const rotateScreenshots = () => {
+    screenshotIndex += 1;
+  };
+  setInterval(rotateScreenshots, 2750); // time period to fade between screenshots
 </script>
 
 <style>
@@ -427,6 +434,8 @@
   .cf2img {
     position: absolute;
     left: 0;
+    width: 200px;
+    height: 200px;
     -webkit-transition: opacity 4s;
     -moz-transition: opacity 4s;
     -o-transition: opacity 4s;
@@ -439,6 +448,10 @@
 
   .cf2.transparent {
     opacity: 0;
+  }
+
+  .browser-window--preview {
+    position: absolute;
   }
 </style>
 
@@ -496,13 +509,23 @@
     {:else}
       <div class="cf2parent">
         <div class="cf2">
-          <img class="bottom cf2img" src={$screenshotSideA['1']} />
-          <img class="top cf2img {$screenshotSideA['switch'] ? '' : 'transparent'}" src={$screenshotSideA['2']} />
+          {#if $screenshotSideA.screenshots.length > 0}
+            {#each [$screenshotSideA.screenshots[screenshotIndex % $screenshotSideA.screenshots.length]] as src (screenshotIndex % $screenshotSideA.screenshots.length)}
+              <img transition:fade="{{ duration: 2500 }}" src={src != null ? ($screenshotSideA.directory ? `/media/${$screenshotSideA.directory}/${src}` : `/${src}`) : null} alt="Preview of browser window A" class="browser-window--preview"/>
+            {/each}
+          {:else}
+            <p>no pic for a</p>
+          {/if}
         </div>
         {#if $sideStatus.targetSide == 'B'}
-          <div transition:fade="{{ duration: ($sideStatus.fadeDuration) }}" class="cf2">
-            <img class="bottom cf2img" src={$screenshotSideB['1']} />
-            <img class="top cf2img {$screenshotSideB['switch'] ? '' : 'transparent'}" src={$screenshotSideB['2']} />
+          <div transition:fade="{{ duration: $sideStatus.fadeDuration }}" class="cf2">
+            {#if $screenshotSideB.screenshots.length > 0}
+              {#each [$screenshotSideB.screenshots[screenshotIndex % $screenshotSideB.screenshots.length]] as src (screenshotIndex % $screenshotSideB.screenshots.length)}
+                <img transition:fade|local="{{ duration: 2500 }}" src={src != null ? ($screenshotSideB.directory ? `/media/${$screenshotSideB.directory}/${src}` : `/${src}`) : null} alt="Preview of browser window B" class="browser-window--preview"/>
+              {/each}
+            {:else}
+              <p>no pic for b</p>
+            {/if}
           </div>
         {/if}
       </div>

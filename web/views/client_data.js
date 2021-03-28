@@ -35,12 +35,16 @@ socket.on("settings", function (sett) {
 export const screenshotSideA = writable({
     '1': '',
     '2': '',
-    'switch': true
+    'switch': true,
+    'screenshots': [],
+    'directory': null
 });
 export const screenshotSideB = writable({
     '1': '',
     '2': '',
-    'switch': true
+    'switch': true,
+    'screenshots': [],
+    'directory': null
 });
 socket.on("screenshotR", function (screenshotData) {
     // parse msg
@@ -50,13 +54,17 @@ socket.on("screenshotR", function (screenshotData) {
         // save screenshot in store
         screenshotSideA.update(obj => Object.assign(obj, {
             [obj.switch ? '1' : '2']: parsedScreenshot.dataURL,
-            'switch': !obj.switch
+            'switch': !obj.switch,
+            'screenshots': parsedScreenshot.screenshots || [],
+            'directory': parsedScreenshot.directory
         }));
     } else { // side == 'B'
         // save screenshot in store
         screenshotSideB.update(obj => Object.assign(obj, {
             [obj.switch ? '1' : '2']: parsedScreenshot.dataURL,
-            'switch': !obj.switch
+            'switch': !obj.switch,
+            'screenshots': parsedScreenshot.screenshots || [],
+            'directory': parsedScreenshot.directory
         }));
     }
 });
