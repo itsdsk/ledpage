@@ -134,6 +134,53 @@ rendererSocket.event.on('data', function (data) {
                     });
                 });
             }
+        } else if (rendererMsg.savedScreenshot) {
+            console.log(`renderer saved screenshot ${JSON.stringify(rendererMsg, null, 2)}`);
+            // check if website is in library
+            if (rendererMsg.directory && rendererMsg.directory.length > 0) {
+                // update media db and json
+                // update client
+                console.log("USER INPUT::adding screenshot");
+                // create connection in database
+                var sql = "INSERT INTO thumbnails (media_directory, filename) VALUES (?, ?)";
+                db.run(sql, [rendererMsg.directory, rendererMsg.filename], (err) => {
+                    if (err) console.log(`error updating database: ${err}`);
+                    // get path and load json
+                    var metaPath = path.join(mediaDir, rendererMsg.directory, 'demo.json');
+                    var meta = require(metaPath);
+                    // check for thumbnails array in metadata
+                    if (meta.demo.thumbnails) {
+                        // check screenshot is not already saved
+                        var index = meta.demo.thumbnails.indexOf(rendererMsg.filename);
+                        if (index == -1) {
+                            // add screenshot
+                            meta.demo.thumbnails.push(rendererMsg.filename);
+                        }
+                    } else {
+                        // create array of thumbnails in metadata and add first screenshot
+                        meta.demo.thumbnails = [rendererMsg.filename];
+                    }
+                    // send screenshot to web ui clients
+                    var screenshotMsgForApp = {
+                        dataURL: rendererMsg.image,
+                        side: rendererMsg.whichWindow,
+                        screenshots: rendererMsg.screenshots,
+                        directory: rendererMsg.directory
+                    };
+                    console.log(`sending screenshot msg:\n${JSON.stringify(screenshotMsgForApp)}`);
+                    module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
+                    // update web ui clients
+                    module.exports.eventEmitter.emit('updatemediaitem', rendererMsg.directory);
+                    // save json to disk
+                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                        if (err) console.log(err);
+                        console.log(`finished saving media`);
+                    });
+                });
+            } else {
+                //
+                console.log(`not saving screenshot bc website isnt in library`);
+            }
         } else if (rendererMsg.status) {
             //
             //console.log(`got renderer status`);

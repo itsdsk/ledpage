@@ -207,6 +207,13 @@ io.on('connection', function (socket) {
 media.eventEmitter.on('addmediaitem', function (mediaItem) {
   io.emit('addmediaitem', mediaItem);
 });
+media.eventEmitter.on('updatemediaitem', function (mediaItemDirectory) {
+  // load updated media item and send back to client
+  console.log(`sending updated media item ${mediaItemDirectory} to client`);
+  media.loadMediaItem(mediaItemDirectory, updatedMediaItem => {
+    io.emit('updatemediaitem', updatedMediaItem);
+  });
+});
 
 // send playbackstatus changed update to client
 media.eventEmitter.on('playbackstatus', function () {
