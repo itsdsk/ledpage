@@ -485,6 +485,9 @@
       <PlaybackStatusElement {...$livePlaybackStatus.nextPlaying} />
     </div>
   {/if}
+  <button on:click={() => socket.emit('fakemouseinput')}>
+    Click
+  </button>
   <div on:click={() => (showConfig = !showConfig)}>
     {showConfig ? 'Back' : 'Settings'}
   </div>
