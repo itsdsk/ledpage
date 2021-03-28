@@ -12,8 +12,10 @@ class OutputSerialDefault : public OutputSerial
   public:
     //
     OutputSerialDefault(const json &properties) : OutputSerial(properties) {}
-    int write(const std::vector<ColorRgb> &ledValues)
+    int write(std::vector<ColorRgb> &ledValues,  float &brightness)
     {
+        // apply brightness
+        setBrightness(ledValues, brightness);
         if (_ledBuffer.size() == 0)
         {
             _ledBuffer.resize(6 + 3 * ledValues.size());

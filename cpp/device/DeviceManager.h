@@ -283,11 +283,6 @@ public:
             avgG = uint8_t(255 * pow(avgG/255.0f, 1.0f/gamma));
             avgB = uint8_t(255 * pow(avgB/255.0f, 1.0f/gamma));
 
-            // apply brightness
-            avgR = uint8_t(avgR * brightness);
-            avgG = uint8_t(avgG * brightness);
-            avgB = uint8_t(avgB * brightness);
-
             // define {R, G, B} as colour object
             ColorRgb col = {avgR, avgG, avgB};
 
@@ -325,7 +320,7 @@ public:
             //cout << col << endl;
         }
         // write LED colours to device
-        return output->write(ledValues);
+        return output->write(ledValues, brightness);
     }
     ~DeviceManager()
     {

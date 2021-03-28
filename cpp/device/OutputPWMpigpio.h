@@ -53,8 +53,10 @@ public:
             std::cout << "pwm error - could not jump start" << std::endl;
         }
     };
-    int write(const std::vector<ColorRgb> &ledValues)
+    int write(std::vector<ColorRgb> &ledValues,  float &brightness)
     {
+        // apply brightness
+        setBrightness(ledValues, brightness);
         // get colour (max speed is RANGE = 255 * 3)
         uint32_t data = 0;
         data += ledValues[0].red;

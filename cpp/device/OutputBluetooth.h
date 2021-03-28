@@ -43,8 +43,10 @@ public:
             perror("Error opening bluetooth");
         }
     };
-    int write(const std::vector<ColorRgb> &ledValues)
+    int write(std::vector<ColorRgb> &ledValues,  float &brightness)
     {
+        // apply brightness
+        setBrightness(ledValues, brightness);
         // check if output buffer object is initialised
         if (_ledBuffer.length() == 0)
         {
