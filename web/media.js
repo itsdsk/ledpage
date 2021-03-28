@@ -876,13 +876,10 @@ function parseMediaItemDirectory(directory, meta, callback) {
         var itemPath = path.join(mediaDir, directory);
         // add image to media database TODO: check if files exist
         if (meta.demo.image && meta.demo.image.length > 0) {
-            var imagePath = path.join(itemPath, meta.demo.image);
-            fs.readFile(imagePath, function (err, buf) {
-                if (err) throw err;
-                var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
-                db.run(addImgQuery, [decodedImage, directory]);
-            });
+            // add image to media database
+            var imagePath = `/media/${directory}/${meta.demo.image}`;
+            var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
+            db.run(addImgQuery, [imagePath, directory]);
         }
         // add playcount
         if (meta.demo.playcount) {

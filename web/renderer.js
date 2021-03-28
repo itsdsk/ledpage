@@ -467,6 +467,7 @@ app.on('ready', () => {
                             "channels": ["firstchannel"],
                             "playcount": 0,
                             "image": "thumb.jpg",
+                            "thumbnails": ["thumb.jpg"],
                             "modified": timestamp
                           }
                         }
