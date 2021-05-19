@@ -8,6 +8,7 @@
 #include <device/OutputPWMpigpio.h>
 #include <device/OutputBluetooth.h>
 #include <device/OutputI2Cbcm2835.h>
+#include <device/OutputI2Cdev.h>
 #include <grabber/ColorRgb.h>
 #include <grabber/ColorRgba.h>
 #include <grabber/Image.h>
@@ -176,6 +177,10 @@ public:
         else if (outputType == "arduino_i2c")
         {
             output = std::shared_ptr<Output>(new OutputI2Cbcm2835(config["outputs"][outputIndex]["properties"]));
+        }
+        else if (outputType == "arduino_i2c_dev")
+        {
+            output = std::shared_ptr<Output>(new OutputI2Cdev(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "pwm_gpio")
         {
