@@ -21,12 +21,12 @@ public:
         }
         else
         {
-            std::cout << "initialised bcm2835" << std::endl;
+            std::cout << "initialised bcm2835 for i2c" << std::endl;
         }
         std::cout << "BCM2835 Version: " << BCM2835_VERSION << std::endl;
         if (!bcm2835_i2c_begin())
         {
-            std::cout << "bcm2835_i2c_begin failedg. Are you running as root??\n"
+            std::cout << "bcm2835_i2c_begin failed. Are you running as root??\n"
                       << std::endl;
             return;
         }
@@ -51,6 +51,11 @@ public:
             // set led buffer size (contains 10 colours)
             _ledBuffer.resize(32); // 32 = maximum i2c buffer on arduino
         }
+        // init error counters
+        unsigned err_NACK = 0;
+        unsigned err_CLKT = 0;
+        unsigned err_DATA = 0;
+        unsigned err_ELSE = 0;
         // set brightness in header
         _ledBuffer[1] = brightness * 255;
         // break frame into parts
@@ -76,15 +81,28 @@ public:
                 if (i2cWriteStatus == BCM2835_I2C_REASON_OK) {
                     //std::cout << "BCM2835_I2C_REASON_OK" << std::endl;
                 } else if (i2cWriteStatus == BCM2835_I2C_REASON_ERROR_NACK) {
-                    std::cout << "BCM2835_I2C_REASON_ERROR_NACK" << std::endl;
+                    err_NACK++;
                 } else if (i2cWriteStatus == BCM2835_I2C_REASON_ERROR_CLKT ) {
-                    std::cout << "BCM2835_I2C_REASON_ERROR_CLKT" << std::endl;
+                    err_CLKT++;
                 } else if (i2cWriteStatus == BCM2835_I2C_REASON_ERROR_DATA) {
-                    std::cout << "BCM2835_I2C_REASON_ERROR_DATA" << std::endl;
+                    err_DATA++;
+                } else {
+                    err_ELSE++;
                 }
                 bcm2835_delayMicroseconds(100);
         }
+        // log errors
+        if (err_NACK > 0) {
+            std::cout << err_NACK << " x BCM2835_I2C_REASON_ERROR_NACK" << std::endl;
+        }
+        if (err_CLKT > 0)
+            std::cout << err_CLKT << " x BCM2835_I2C_REASON_ERROR_CLKT" << std::endl;
+        if (err_DATA > 0)
+            std::cout << err_DATA << " x BCM2835_I2C_REASON_ERROR_DATA" << std::endl;
+        if (err_ELSE > 0)
+            std::cout << err_ELSE << " x Unknown Error with BCM2835 I2C" << std::endl;
         //bcm2835_delay(1);
+        // bcm2835_delayMicroseconds(100);
         return 0;
     }
     virtual ~OutputI2Cbcm2835()
