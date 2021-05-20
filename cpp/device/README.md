@@ -9,6 +9,17 @@
 }
 ```
 
+## Window
+
+Contains the dimensions in which the LED coordinates are mapped. Note that the coordinate system is mapped so that the top left corner is considered (0,0).
+
+```javascript
+{
+    "width": 640,
+    "height": 480
+}
+```
+
 ## Outputs
 
 ### APA102 on Pi GPIO #0
