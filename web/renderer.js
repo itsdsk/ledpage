@@ -15,6 +15,7 @@ let windowB = null;
 
 const {
   app,
+  session,
   BrowserWindow
 } = electron;
 
@@ -257,6 +258,18 @@ app.on('ready', () => {
   // create 2 windows
   windowA = new RenderWindow(windowOpts, 'A');
   windowB = new RenderWindow(windowOpts, 'B');
+  
+  // grant permission for microphone
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    let allowedPermissions = ["media"];
+    if (allowedPermissions.includes(permission)) {
+        callback(true); // Approve permission request
+    } else {
+        // console.error(`Denied permission request for '${permission}'`);
+        callback(false); // Deny
+    }
+  });
+  
   //
   process.on('uncaughtException', (err) => {
     console.log(err);
