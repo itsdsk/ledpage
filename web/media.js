@@ -121,6 +121,13 @@ rendererSocket.event.on('data', function (data) {
             backendSocket.write(JSON.stringify(backendMsg));
             // send update to clients
             module.exports.eventEmitter.emit('switchingsides', JSON.stringify({targetSide: rendererMsg.whichWindow, fadeDuration: rendererMsg.fade}));
+            // send screenshot to web ui clients
+            var screenshotMsgForApp = {
+                side: rendererMsg.whichWindow,
+                screenshots: rendererMsg.screenshots,
+                directory: rendererMsg.directory
+            };
+            module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
         } else if (rendererMsg.saved) {
             console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
             // parse metadata of new media
