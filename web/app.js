@@ -10,6 +10,8 @@ http.listen(httpPort, function () {
   console.log(`Opened server on http://localhost:${httpPort}`);
 });
 
+// media.deleteAllThumbnails();
+
 // scan content
 media.generateDb();
 

@@ -866,7 +866,8 @@ module.exports = {
             runCommand('shutdown now');
         else if (msg == "reboot")
             runCommand('reboot');
-    }
+    },
+    deleteAllThumbnails: deleteAllThumbnails
 };
 
 function parseMediaItemDirectory(directory, meta, callback) {
@@ -978,6 +979,50 @@ function autoplayNext(thisFadeDuration = config_settings.fade) {
         // error autoplaying
         console.log(`error autoplaying - list is empty`);
     }
+}
+
+// helper function to remove all images
+function deleteAllThumbnails() {
+    // read media directory
+    fs.readdir(mediaDir, function (err, files) {
+        files.forEach( (file, index) => {
+            var itemPath = path.join(mediaDir, file);
+            fs.stat(itemPath, function (err, stats) {
+                if (err) console.log("err: " + err);
+                // check if subpath is a directory
+                if (stats.isDirectory()) {
+                    // check folder is not hidden (unless media directory is unpopulated)
+                    if (itemPath.includes('/.') == false || files.length == 1) {
+                        // load media metadata
+                        var jsonpath = path.join(itemPath, 'demo.json');
+                        var meta = require(jsonpath);
+                        if (meta) {
+                            // check thumbnails
+                            if (meta.demo.thumbnails) {
+                                console.log(`${file} / ${JSON.stringify(meta.demo.thumbnails)}`)
+                                // remove each file
+                                var thumbnails_list = meta.demo.thumbnails;
+                                thumbnails_list.forEach(filename => {
+                                    // remove image on disk
+                                    var imagepath = path.join(itemPath, filename);
+                                    fs.unlink(imagepath, function (err) {
+                                        if (err) console.log(`err deleting img ${imagepath}: ${err}`);
+                                        console.log(`removed image ${imagepath}`);
+                                    });
+                                });
+                                // save demo json without thumbnails
+                                meta.demo.thumbnails = null;
+                                fs.writeFile(jsonpath, JSON.stringify(meta, null, 4), function (err) {
+                                    if (err) console.log(`error saving json ${jsonpath}: ${err}`);
+                                    console.log(`updated json ${jsonpath}`);
+                                })
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    });
 }
 
     // updateConfig: function (msg) {
