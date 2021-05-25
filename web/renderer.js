@@ -176,7 +176,6 @@ class RenderWindow {
             whichWindow: this.side,
             URL: this.browserWindow.webContents.getURL(),
             fade: this.loadMessage.fade,
-            image: this.loadMessage.image,
             screenshots: this.loadMessage.screenshots,
             directory: this.loadMessage.directory
           }));
@@ -479,7 +478,6 @@ app.on('ready', () => {
                             "files": ["index.html"],
                             "channels": ["firstchannel"],
                             "playcount": 0,
-                            "image": "thumb.jpg",
                             "thumbnails": ["thumb.jpg"],
                             "modified": timestamp
                           }

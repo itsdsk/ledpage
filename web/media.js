@@ -12,7 +12,7 @@ db.serialize(function () {
     // create tables for primitive types (media and channel)
     db.run(`CREATE TABLE media (
         directory TEXT PRIMARY KEY, title TEXT, description TEXT,
-        image BLOB, blur_amt INT DEFAULT 50, modified TEXT,
+        blur_amt INT DEFAULT 50, modified TEXT,
         source TEXT, playcount INT DEFAULT 0
     )`);
     db.run(`CREATE TABLE channels (
@@ -111,10 +111,11 @@ rendererSocket.event.on('data', function (data) {
             }
             // check if screenshot is needed
             if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
+                console.log(`skipping legacy screenshot mode`);
                 // tell backend to take screenshot
-                backendMsg.command = "screenshot";
+                // backendMsg.command = "screenshot";
                 // start watching for screenshot to be saved
-                saveScreenshot(rendererMsg.whichWindow);
+                // saveScreenshot(rendererMsg.whichWindow); // legacy screenshot function?
             }
             // send message to backend
             backendSocket.write(JSON.stringify(backendMsg));
@@ -162,7 +163,6 @@ rendererSocket.event.on('data', function (data) {
                     }
                     // send screenshot to web ui clients
                     var screenshotMsgForApp = {
-                        dataURL: rendererMsg.image,
                         side: rendererMsg.whichWindow,
                         screenshots: rendererMsg.screenshots,
                         directory: rendererMsg.directory
@@ -265,6 +265,7 @@ function cleanup() {
 }
 process.on('SIGINT', cleanup);
 
+// legacy screenshot function?
 function saveScreenshot(side) {
     // check directory of media
     if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
@@ -278,7 +279,6 @@ function saveScreenshot(side) {
                 // get demo.json and add image to it
                 var metaPath = path.join(mediaDir, mediaRequiringScreenshot, 'demo.json');
                 var meta = require(metaPath);
-                meta.demo.image = "thumb.jpg";
                 //
                 var targetJpegPath = path.join(mediaDir, mediaRequiringScreenshot, meta.demo.image);
                 // convert and crop half of image
@@ -497,7 +497,6 @@ module.exports = {
                     command: 'loadURL',
                     path: row.source != 'about:none' ? row.source : ('file://' + filePath + '/index.html'),
                     fade: thisFadeDuration,
-                    image: row.image,
                     screenshots: row.screenshots,
                     directory: dirAndVersion.directory
                 }));
@@ -510,14 +509,6 @@ module.exports = {
                 fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                     if (err) console.log(err);
                 });
-                // check if screenshot is missing
-                if (meta.demo.image && meta.demo.image.length > 0) {
-                    // do not take screenshot
-                    mediaRequiringScreenshot = null;
-                } else {
-                    // flag media directory to take screenshot of
-                    mediaRequiringScreenshot = dirAndVersion.directory;
-                }
             });
         });
         // update playback status
@@ -686,8 +677,7 @@ module.exports = {
         rendererSocket.write(JSON.stringify({
             command: 'loadURL',
             path: name,
-            fade: thisFadeDuration,
-            image: null
+            fade: thisFadeDuration
         }));
         // do not take screenshot
         mediaRequiringScreenshot = null;
@@ -718,10 +708,10 @@ module.exports = {
     },
     loadMediaFeed: function (params, callback) {
         // get media items from db with list of channels
-        var mediaQuery = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
+        var mediaQuery = `SELECT media.title, media.directory, media.source, media.modified, media.playcount, json_group_array(connections.channel_name) AS channels
         FROM connections INNER JOIN media ON media.directory = connections.media_directory GROUP BY media.directory`;
         // get media items and channels with list of thumbnails
-        var mediaQuery2 = `SELECT title, directory, source, image, modified, playcount, channels, json_group_array(thumbnails.filename) AS screenshots
+        var mediaQuery2 = `SELECT title, directory, source, modified, playcount, channels, json_group_array(thumbnails.filename) AS screenshots
         FROM (${mediaQuery}) LEFT JOIN thumbnails ON directory = thumbnails.media_directory GROUP BY directory`;
         db.all(mediaQuery2, (err, dbreturn) => {
             if (err) console.log(`err: ${err}`);
@@ -745,11 +735,11 @@ module.exports = {
     },
     loadMediaItem: function (directory, callback) {
         // get item with channels
-        var mediaQuery1 = `SELECT media.title, media.directory, media.source, media.image, media.modified, media.playcount,
+        var mediaQuery1 = `SELECT media.title, media.directory, media.source, media.modified, media.playcount,
             json_group_array(connections.channel_name) AS channels
             FROM connections INNER JOIN media ON media.directory = connections.media_directory WHERE media.directory = ?`;
         // get item with channels and thumbnails
-        var mediaQuery2 = `SELECT title, directory, source, image, modified, playcount,
+        var mediaQuery2 = `SELECT title, directory, source, modified, playcount,
             channels, json_group_array(thumbnails.filename) AS screenshots
             FROM (${mediaQuery1}) LEFT JOIN thumbnails ON directory = thumbnails.media_directory WHERE directory = ?`;
         db.get(mediaQuery2, [directory, directory], (err, dbreturn) => {
@@ -875,13 +865,6 @@ function parseMediaItemDirectory(directory, meta, callback) {
     var insertQuery = "INSERT INTO media (directory, title, source, description, modified) VALUES (?, ?, ?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.source || 'about:none', meta.demo.description, meta.demo.modified], function () {
         var itemPath = path.join(mediaDir, directory);
-        // add image to media database TODO: check if files exist
-        if (meta.demo.image && meta.demo.image.length > 0) {
-            // add image to media database
-            var imagePath = `/media/${directory}/${meta.demo.image}`;
-            var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
-            db.run(addImgQuery, [imagePath, directory]);
-        }
         // add playcount
         if (meta.demo.playcount) {
             db.run(`UPDATE media SET playcount = ? WHERE directory = ?`, [meta.demo.playcount, directory]);
