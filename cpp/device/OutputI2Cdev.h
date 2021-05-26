@@ -70,8 +70,8 @@ public:
             // usleep(1200);
         }
         // log errors
-        if (write_error_count > frameParts / 2)
-            std::cout << "Failed to write to the i2c bus." << std::endl;
+        if (write_error_count > 1)
+            std::cout << "Failed to write to the i2c bus " << write_error_count << " times." << std::endl;
         return 0;
     }
     virtual ~OutputI2Cdev()
