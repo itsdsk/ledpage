@@ -74,6 +74,11 @@ unsigned int performanceReadPeriod = 600;
 unsigned int frameCount = 0;
 unsigned int lastPerformanceRead = 0;
 
+// limit framerate
+float framerateLimiterTarget = 1000.0 / 30.0; // desired period between frames in ms
+std::chrono::system_clock::time_point framerateLimiterTimeA = std::chrono::system_clock::now();
+std::chrono::system_clock::time_point framerateLimiterTimeB = std::chrono::system_clock::now();
+
 class session
     : public boost::enable_shared_from_this<session>
 {
@@ -359,6 +364,17 @@ int main(int argc, char *argv[])
     // display screen on device
     while (receivedQuitSignal == false)
     {
+        // limit framerate
+        framerateLimiterTimeA = std::chrono::system_clock::now();
+        std::chrono::duration<double, std::milli> work_time = framerateLimiterTimeA - framerateLimiterTimeB;
+        if (work_time.count() < framerateLimiterTarget)
+        {
+            std::chrono::duration<double, std::milli> delta_ms(framerateLimiterTarget - work_time.count());
+            auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+            std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+        }
+        framerateLimiterTimeB = std::chrono::system_clock::now();
+
         //s.broadcast("test broadcast");
         frameCount++;
         if (frameCount % performanceReadPeriod == 0) {
