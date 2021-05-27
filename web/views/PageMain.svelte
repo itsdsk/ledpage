@@ -420,7 +420,7 @@
   .cf2parent {
     position: relative;
     height: 200px;
-    width: 200px;
+    width: 400px; /* change depending on thumbnail size, todo: this dynamically */
     margin: 0 auto;
   }
 

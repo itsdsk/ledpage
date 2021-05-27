@@ -15,6 +15,7 @@
 <style>
   .media {
     margin: 32px;
+    min-height: 200px; /* bodge to fix media block height being too small, todo: this but properly */
   }
 
   .media__header {
