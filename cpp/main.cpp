@@ -75,9 +75,12 @@ unsigned int frameCount = 0;
 unsigned int lastPerformanceRead = 0;
 
 // limit framerate
+// #define LIMIT_FRAMERATE
+#ifdef LIMIT_FRAMERATE
 float framerateLimiterTarget = 1000.0 / 30.0; // desired period between frames in ms
 std::chrono::system_clock::time_point framerateLimiterTimeA = std::chrono::system_clock::now();
 std::chrono::system_clock::time_point framerateLimiterTimeB = std::chrono::system_clock::now();
+#endif
 
 class session
     : public boost::enable_shared_from_this<session>
@@ -365,6 +368,7 @@ int main(int argc, char *argv[])
     while (receivedQuitSignal == false)
     {
         // limit framerate
+        #ifdef LIMIT_FRAMERATE
         framerateLimiterTimeA = std::chrono::system_clock::now();
         std::chrono::duration<double, std::milli> work_time = framerateLimiterTimeA - framerateLimiterTimeB;
         if (work_time.count() < framerateLimiterTarget)
@@ -374,6 +378,7 @@ int main(int argc, char *argv[])
             std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
         }
         framerateLimiterTimeB = std::chrono::system_clock::now();
+        #endif
 
         //s.broadcast("test broadcast");
         frameCount++;
