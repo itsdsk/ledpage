@@ -81,6 +81,9 @@
     "memory_resource": "cpp",
     "random": "cpp",
     "set": "cpp",
-    "string": "cpp"
+    "string": "cpp",
+    "strstream": "cpp",
+    "variant": "cpp",
+    "bit": "cpp"
   }
 }
