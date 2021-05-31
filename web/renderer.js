@@ -272,6 +272,12 @@ app.on('ready', () => {
   // create 2 windows
   windowA = new RenderWindow(windowOpts, 'A');
   windowB = new RenderWindow(windowOpts, 'B');
+
+  // log GPU features
+  setTimeout(() => {
+    console.log(`GPU:\n${JSON.stringify(app.getGPUFeatureStatus(), null, 2)}`);
+    // app.getGPUInfo('complete'); // or 'basic'
+  }, 3000);
   
   // grant permission for microphone
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
