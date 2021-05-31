@@ -23,6 +23,12 @@ const {
 app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 app.commandLine.appendSwitch('enable-web-bluetooth', true);
 
+// graphics
+app.disableHardwareAcceleration();
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
+
 class RenderWindow {
   browserWindow;
   side;
@@ -231,7 +237,6 @@ class RenderWindow {
 
 }
 
-// app.disableHardwareAcceleration();
 /*
  we initialize our application display as a callback of the electronJS "ready" event
  */
