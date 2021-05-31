@@ -246,10 +246,12 @@ app.on('ready', () => {
     width,
     height
   } = electron.screen.getPrimaryDisplay().workAreaSize
-  console.log(`Detected screen size: ${JSON.stringify({ width, height })}`);
+  console.log(`Display work area size: ${JSON.stringify({width, height})} (setting width to 1/4 actual value)`);
+  // get actual width (vc4-fkms-v3d flag causes width to change to 3200)
+  var accWidth = height * 4;
   // window options (electronJS)
   const windowOpts = {
-    width: (width / 2),
+    width: (accWidth / 2),
     height: height,
     // useContentSize: true,
     // fullscreen: true,
