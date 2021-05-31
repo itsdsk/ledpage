@@ -16,7 +16,19 @@ class OutputI2Cdev : public Output
 public:
     OutputI2Cdev(const json &properties)
     {
-        if ((file_i2c = open(filename, O_RDWR)) < 0)
+        // check properties object contains MAC address of bluetooth device
+        if (properties.contains("device"))
+        {
+            filename = properties["device"];
+            std::cout << "Using I2C address " << filename << std::endl;
+        }
+        else
+        {
+            std::cout << "No I2C device specified in properties, defaulting to " << filename << std::endl;
+        }
+
+        // try to connect to I2C
+        if ((file_i2c = open(filename.c_str(), O_RDWR)) < 0)
         {
             std::cout << "Failed to open the i2c bus" << std::endl;
             return;
@@ -86,6 +98,6 @@ public:
     int _i2cHandle;
     unsigned char buffer[32]; // 32 = maximum i2c buffer on arduino 
     unsigned frameParts = 0; // number of 32 byte messages per frame
-    char* filename = "/dev/i2c-1"; // file descriptor for i2c
+    std::string filename = "/dev/i2c-3"; // file descriptor for i2c
     int file_i2c;
 };
