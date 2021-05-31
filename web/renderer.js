@@ -432,6 +432,13 @@ app.on('ready', () => {
             }
             // flip window to display on
             flipWindow = !flipWindow;
+          } else if (msg.command == "unloadSide") {
+            // unload browser window
+            console.log(`unloading ${msg.side}`);
+            // get right browser window
+            var _browserWindow = msg.side == 'A' ? windowA.browserWindow : windowB.browserWindow;
+            // load empty webpage
+            _browserWindow.loadURL('about:blank');
           } else if (msg.command == "takeScreenshot") {
             // take screenshot
             if (flipWindow) {

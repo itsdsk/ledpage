@@ -65,6 +65,8 @@ var playback = {
 var SHUTDOWN = false;
 // current screenshot from renderer
 var rendererScreenshotBuffer = false;
+// timer to tell renderer to unload old window when faded out
+var unloadBrowserWindowTimerID = false;
 // IPC definition, data events
 var rendererSocket = new sockets.DomainClient("renderer");
 rendererSocket.event.on('connect', function () {
@@ -119,6 +121,16 @@ rendererSocket.event.on('data', function (data) {
             }
             // send message to backend
             backendSocket.write(JSON.stringify(backendMsg));
+            // tell renderer to close old window when fade is done
+            clearTimeout(unloadBrowserWindowTimerID);
+            unloadBrowserWindowTimerID = null;
+            unloadBrowserWindowTimerID = setTimeout((windowSide) => {
+                // send msg to renderer to unload window side
+                rendererSocket.write(JSON.stringify({
+                    command: 'unloadSide',
+                    side: windowSide == 'A' ? 'B' : 'A'
+                }));
+            }, rendererMsg.fade + 250, rendererMsg.whichWindow);
             // send update to clients
             module.exports.eventEmitter.emit('switchingsides', JSON.stringify({targetSide: rendererMsg.whichWindow, fadeDuration: rendererMsg.fade}));
             // send screenshot to web ui clients
