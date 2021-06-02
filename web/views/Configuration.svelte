@@ -6,7 +6,7 @@
 
   $: brightness = {
     name: "brightness",
-    value: $config_settings.brightness || 0.0125,
+    value: $config_settings.brightness || 0.0,
     min: 0.0,
     max: 1.0,
     step: 0.0005
@@ -20,35 +20,35 @@
   };
   $: gamma = {
     name: "gamma",
-    value: $config_settings.gamma || 2.2,
+    value: $config_settings.gamma || 0.0,
     min: 0.0,
     max: 5.0,
     step: 0.01
   };
   $: blur = {
     name: "blur",
-    value: $config_settings.blur || 50,
+    value: $config_settings.blur || 0,
     min: 0,
     max: 48,
     step: 1
   };
   $: fade = {
     name: "fade",
-    value: $config_settings.fade || 25000,
+    value: $config_settings.fade || 0,
     min: 0,
     max: 25000,
     step: 100
   };
   $: autoplayDurationMin = {
     name: "autoplayMinRange",
-    value: $config_settings.autoplayDuration.min || 30000,
+    value: $config_settings.autoplayDuration.min || 500,
     min: 500,
     max: 300000,
     step: 1000
   };
   $: autoplayDurationMax = {
     name: "autoplayMaxRange",
-    value: $config_settings.autoplayDuration.max || 60000,
+    value: $config_settings.autoplayDuration.max || 500,
     min: 500,
     max: 300000,
     step: 1000
