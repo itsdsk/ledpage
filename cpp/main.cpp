@@ -59,7 +59,7 @@ struct animatedProperty {
 };
 
 // signal/radius to change sampling radius for all LEDs
-unsigned changeSize = 0;
+int changeSize = 0;
 unsigned int fadeDuration = 2500; // fade transition duration in ms
 bool receivedScreenshotCommand = false;
 
@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
         }
 
         // should pixel sample radi change size
-        if (changeSize > 0)
+        if (changeSize >= 0)
         {
             cout << "changing blur size: " << std::to_string(changeSize) << endl;
             // iterate over each device in manager
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
                 }
             }
             // complete signal
-            changeSize = 0;
+            changeSize = -1;
         }
         // grab frame
         grabber->grabFrame(_image);

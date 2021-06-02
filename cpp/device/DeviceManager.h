@@ -46,6 +46,13 @@ struct LedNode
         // reset sample points
         positions.clear();
         gaussian_pos.clear();
+        // set to 1 pixel
+        if (r == 0) {
+            // set blurring off by adding 1 pixel
+            positions.emplace_back(mapped_y * screenX + mapped_x);
+            gaussian_pos.emplace_back(1.0, mapped_y * screenX + mapped_x);
+            return;
+        }
         // get sampling area boundary
         unsigned min_x = max((int)mapped_x - (int)r, (0));
         unsigned max_x = min((int)mapped_x + (int)r, (int)(screenX / 2));

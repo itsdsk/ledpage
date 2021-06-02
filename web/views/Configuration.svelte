@@ -28,7 +28,7 @@
   $: blur = {
     name: "blur",
     value: $config_settings.blur || 50,
-    min: 1,
+    min: 0,
     max: 48,
     step: 1
   };
