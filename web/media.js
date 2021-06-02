@@ -677,7 +677,7 @@ module.exports = {
                 autoplayList.push(row.directory);
             });
             // start autoplay
-            playback.autoplayTimerID = setTimeout(autoplayNext, 0);
+            playback.autoplayTimerID = setTimeout(autoplayNext, 0, 1000);
         });
     },
     setAutoplayTimeRange: function (msg) {

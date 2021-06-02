@@ -62,7 +62,7 @@ io.on('connection', function (socket) {
   // play demo
   socket.on('play', function (dirAndVersion) {
     media.delayAutoplay();
-    media.playLocalMedia(dirAndVersion);
+    media.playLocalMedia(dirAndVersion, 1000);
   });
   socket.on('playURL', function (msg) {
     media.delayAutoplay();
