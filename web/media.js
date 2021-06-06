@@ -777,7 +777,8 @@ module.exports = {
         });
     },
     loadChannelList: function (params, callback) {
-        db.all(`SELECT channel_name, count(media_directory) AS count FROM connections GROUP BY channel_name`, (err, info) => {
+        // updated to sort channels by size
+        db.all(`SELECT channel_name, count(media_directory) AS count FROM connections GROUP BY channel_name ORDER BY count DESC`, (err, info) => {
             if (err) console.log(`err: ${err}`);
             db.get('SELECT count(*) AS count FROM media', (err, countall) => {
                 if (err) console.log(`err: ${err}`);
