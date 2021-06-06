@@ -645,9 +645,26 @@
             {#if $livePlaybackStatus.nowPlaying.title === '<Live URL>'}
               Live URL
               <button on:click={downloadURL}>Download</button>
-            {:else}{$livePlaybackStatus.nowPlaying.title}{/if}
+            {:else}
+              {$livePlaybackStatus.nowPlaying.title}
+            {/if}
           {:else}Nothing{/if}
         </p>
+        <div>
+        {#each currentChannelsList as channelObject(channelObject.channel_name)}
+          <div>
+            <input
+              type="checkbox"
+              checked={channelObject.added}
+              on:change={e => socket.emit(
+                  e.target.checked ? 'createconnection' : 'deleteconnection',
+                  [$mediaFeedObjects[currentPlayingIndex].directory, channelObject.channel_name]
+                )}
+                />
+            {channelObject.channel_name}
+          </div>
+        {/each}
+        </div>
         <div class="now-playing--link">
           <a href={iframeSrc}>{iframeSrc}</a>
         </div>
