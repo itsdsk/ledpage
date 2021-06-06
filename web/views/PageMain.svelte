@@ -120,6 +120,17 @@
       mediaItem.directory === $livePlaybackStatus.nowPlaying.directory
   ) : -1;
 
+  // get list of channels and their status in the content currently playing TODO: return completely empty list if currentlyPlayingIndex == -1
+  $: currentChannelsList = $channelObjects.reduce((accumulator, currentValue) => {
+    if (currentValue.channel_name) {
+      accumulator.push({
+        channel_name: currentValue.channel_name,
+        added: currentPlayingIndex >= 0 ? $mediaFeedObjects[currentPlayingIndex].channels.includes(currentValue.channel_name) : false
+      });
+    }
+    return accumulator;
+  }, []);
+
   $: updateNextPlayingImg($livePlaybackStatus);
 
   $: progressStatus = $livePlaybackStatus.nextPlaying
