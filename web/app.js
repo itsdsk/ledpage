@@ -164,7 +164,7 @@ io.on('connection', function (socket) {
             media.loadMediaItem(msg[0], updatedMediaItem => {
               io.emit('updatemediaitem', updatedMediaItem);
             });
-          });  
+          });
         });
       });
     } else {
@@ -173,11 +173,31 @@ io.on('connection', function (socket) {
   });
   // delete connection
   socket.on('deleteconnection', function (msg) {
-    media.deleteConnection(msg);
+    media.deleteConnection(msg, () => {
+      // get updated list of channels from db
+      media.loadChannelList({}, function (elements) {
+        // send updated channel list back to client
+        io.emit('channellist', elements);
+        // load updated media item and send back to client
+        media.loadMediaItem(msg[0], updatedMediaItem => {
+          io.emit('updatemediaitem', updatedMediaItem);
+        });
+      });
+    });
   });
   // create connection
   socket.on('createconnection', function (msg) {
-    media.createConnection(msg);
+    media.createConnection(msg, () => {
+      // get updated list of channels from db
+      media.loadChannelList({}, function (elements) {
+        // send updated channel list back to client
+        io.emit('channellist', elements);
+        // load updated media item and send back to client
+        media.loadMediaItem(msg[0], updatedMediaItem => {
+          io.emit('updatemediaitem', updatedMediaItem);
+        });
+      });
+    });
   });
   // renderer user gesture input
   socket.on('fakemouseinput', function () {
