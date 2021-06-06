@@ -142,7 +142,7 @@
       if (feedIndex == -1) {
         nextPlayingImg = null;
       } else {
-        nextPlayingImg = $mediaFeedObjects[feedIndex].image;
+        nextPlayingImg = $mediaFeedObjects[feedIndex].screenshots != null && $mediaFeedObjects[feedIndex].screenshots[0] != null ? `/media/${$mediaFeedObjects[feedIndex].directory}/${$mediaFeedObjects[feedIndex].screenshots[0]}` : null;
       }
     } else {
       nextPlayingImg = null;
