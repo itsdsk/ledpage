@@ -114,6 +114,12 @@
 
   let nextPlayingImg = null;
 
+  // get index of content currently playing in mediafeed
+  $: currentPlayingIndex = $livePlaybackStatus.nowPlaying != null ? $mediaFeedObjects.findIndex(
+    mediaItem =>
+      mediaItem.directory === $livePlaybackStatus.nowPlaying.directory
+  ) : -1;
+
   $: updateNextPlayingImg($livePlaybackStatus);
 
   $: progressStatus = $livePlaybackStatus.nextPlaying
