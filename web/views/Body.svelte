@@ -1,4 +1,5 @@
 <script>
+    import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import {
         mediaFeedObjects,
@@ -8,7 +9,7 @@
     } from "./client_data.js";
 
     //
-    let selectedChannel = "all media";
+    let selectedChannel = -1;
 
     let urlinputelement;
     let urlInputValid = false;
@@ -32,6 +33,13 @@
                       $livePlaybackStatus.nowPlaying.directory
               )
             : -1;
+
+    onMount(() => {
+        setTimeout(() => {
+            selectedChannel = $livePlaybackStatus.channel || "all media";
+        }, 1000);
+    });
+
     // index for arrays of screenshots to be cycled through
     let screenshotIndex = 0;
     const rotateScreenshots = () => {
