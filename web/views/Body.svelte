@@ -78,10 +78,12 @@
         <nav>
             <div
                 style="position:relative;width:400px;height:200px;margin:auto;"
+                on:click|preventDefault={() => socket.emit("fakemouseinput")}
             >
                 {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
                     {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
-                        <img
+                        <input
+                            type="image"
                             src={src != null
                                 ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
                                 : ""}
