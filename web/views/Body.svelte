@@ -143,46 +143,53 @@
                                 )}s
                             </code>
                         </summary>
-                        <ul style="text-align: left;">
-                            <li style="display:block;">
-                                <a
-                                    href={currentPlayingIndex >= 0
-                                        ? $mediaFeedObjects[currentPlayingIndex]
-                                              .source
-                                        : "/"}
-                                    target="_blank"
+                        <form>
+                            <fieldset>
+                                <legend
+                                    style="margin-left:auto;margin-right:auto;"
                                 >
-                                    {currentPlayingIndex >= 0
-                                        ? $mediaFeedObjects[currentPlayingIndex]
-                                              .title
-                                        : $livePlaybackStatus.nowPlaying
-                                        ? $livePlaybackStatus.nowPlaying.title
-                                        : "Nothing"}
-                                </a>
-                            </li>
-                            <li
-                                style="display:block;overflow:auto;white-space:nowrap;margin:0;"
-                            >
-                                {#if currentPlayingIndex >= 0}
-                                    {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
-                                        <button>
-                                            {channel}
-                                        </button>
-                                    {/each}
-                                    <input
-                                        type="text"
-                                        placeholder="Enter playlist"
-                                        size="10"
-                                    />
-                                {/if}
-                            </li>
-                            <li>
-                                Up Next:
-                                <ul>
-                                    <li>TODO</li>
-                                </ul>
-                            </li>
-                        </ul>
+                                    <a
+                                        href={currentPlayingIndex >= 0
+                                            ? $mediaFeedObjects[
+                                                  currentPlayingIndex
+                                              ].source
+                                            : "/"}
+                                        target="_blank"
+                                    >
+                                        {currentPlayingIndex >= 0
+                                            ? $mediaFeedObjects[
+                                                  currentPlayingIndex
+                                              ].title
+                                            : $livePlaybackStatus.nowPlaying
+                                            ? $livePlaybackStatus.nowPlaying
+                                                  .title
+                                            : "Nothing"}
+                                    </a>
+                                </legend>
+                                <div style="overflow:auto;white-space:nowrap;">
+                                    {#if currentPlayingIndex >= 0}
+                                        Channels:
+                                        {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
+                                            <button>
+                                                {channel}
+                                            </button>
+                                        {/each}
+                                        <input
+                                            type="text"
+                                            placeholder="Enter playlist"
+                                            size="10"
+                                        />
+                                    {/if}
+                                </div>
+                                <div style="overflow:auto;white-space:nowrap;">
+                                    Advanced:
+                                    <button> Screenshot </button>
+                                    <button> Play next </button>
+                                    <button> Reset </button>
+                                    <button> Delete </button>
+                                </div>
+                            </fieldset>
+                        </form>
                     </details>
                 </li>
             </ul>
@@ -249,7 +256,7 @@
                 >
                     {#if index == 0}
                         <strong>
-                            {channelObject.channel_name || "all media"} ({channelObject.count})
+                            &#9658; {channelObject.channel_name || "all media"} ({channelObject.count})
                         </strong>
                     {:else}
                         {channelObject.channel_name || "all media"} ({channelObject.count})
