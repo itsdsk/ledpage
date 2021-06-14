@@ -52,7 +52,15 @@
     <header>
         <nav>
             <form>
-                <div>
+                <button
+                    type="submit"
+                    on:click|preventDefault={playURL}
+                    style="float:right;margin-left:0.4078125rem;margin-right:0;"
+                    disabled={!urlInputValid}
+                >
+                    Play
+                </button>
+                <div style="overflow:hidden;">
                     <input
                         type="url"
                         placeholder="Enter URL to display"
@@ -64,14 +72,8 @@
                             urlInputValid = urlinputelement.matches(":valid");
                         }}
                         required
+                        style="width:100%;"
                     />
-                    <button
-                        type="submit"
-                        on:click|preventDefault={playURL}
-                        disabled={!urlInputValid}
-                    >
-                        Play
-                    </button>
                 </div>
             </form>
         </nav>
