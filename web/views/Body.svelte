@@ -102,15 +102,34 @@
                         <summary>Now Playing</summary>
                         <ul>
                             <li>
-                                <a href="/">Source</a> | <a href="/">Saved</a>
+                                <a
+                                    href={currentPlayingIndex >= 0
+                                        ? $mediaFeedObjects[currentPlayingIndex]
+                                              .source
+                                        : "/"}
+                                    target="_blank"
+                                >
+                                    {currentPlayingIndex >= 0
+                                        ? $mediaFeedObjects[currentPlayingIndex]
+                                              .title
+                                        : $livePlaybackStatus.nowPlaying
+                                        ? $livePlaybackStatus.nowPlaying.title
+                                        : "Nothing"}
+                                </a>
                             </li>
-                            <li>
-                                {currentPlayingIndex >= 0
-                                    ? $mediaFeedObjects[currentPlayingIndex]
-                                          .title
-                                    : $livePlaybackStatus.nowPlaying
-                                    ? $livePlaybackStatus.nowPlaying.title
-                                    : "Nothing"}
+                            <li style="overflow:auto;white-space:nowrap;">
+                                {#if currentPlayingIndex >= 0}
+                                    {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
+                                        <button>
+                                            {channel}
+                                        </button>
+                                    {/each}
+                                    <input
+                                        type="text"
+                                        placeholder="Enter playlist"
+                                        size="10"
+                                    />
+                                {/if}
                             </li>
                         </ul>
                     </details>
