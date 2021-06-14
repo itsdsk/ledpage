@@ -191,7 +191,7 @@
     <article>
         <h2>Saved Media</h2>
         <div style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;">
-            {#each $channelObjects as channelObject}
+            {#each $livePlaybackStatus.channel ? [$channelObjects.find((item) => (item.channel_name || "all media") === $livePlaybackStatus.channel), ...$channelObjects.filter((item) => (item.channel_name || "all media") !== $livePlaybackStatus.channel)] : $channelObjects as channelObject}
                 <button
                     on:click|preventDefault={() => {
                         if (
