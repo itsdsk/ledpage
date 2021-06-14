@@ -111,37 +111,36 @@
         </nav>
     </header>
     <article>
-        <div>
-            <fieldset>
-                {#each $channelObjects as channelObject}
-                    <button
-                        on:click|preventDefault={() => {
-                            if (
-                                (channelObject.channel_name || "all media") ==
-                                selectedChannel
-                            ) {
-                                // play channel
-                                socket.emit(
-                                    "autoplay",
-                                    selectedChannel === "all media"
-                                        ? null
-                                        : selectedChannel
-                                );
-                            } else {
-                                // view channel
-                                selectedChannel =
-                                    channelObject.channel_name || "all media";
-                            }
-                        }}
-                        type={(channelObject.channel_name || "all media") ==
-                        selectedChannel
-                            ? "submit"
-                            : "button"}
-                    >
-                        {channelObject.channel_name || "all media"} ({channelObject.count})
-                    </button>
-                {/each}
-            </fieldset>
+        <h2>Saved Media</h2>
+        <div style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;">
+            {#each $channelObjects as channelObject}
+                <button
+                    on:click|preventDefault={() => {
+                        if (
+                            (channelObject.channel_name || "all media") ==
+                            selectedChannel
+                        ) {
+                            // play channel
+                            socket.emit(
+                                "autoplay",
+                                selectedChannel === "all media"
+                                    ? null
+                                    : selectedChannel
+                            );
+                        } else {
+                            // view channel
+                            selectedChannel =
+                                channelObject.channel_name || "all media";
+                        }
+                    }}
+                    type={(channelObject.channel_name || "all media") ==
+                    selectedChannel
+                        ? "submit"
+                        : "button"}
+                >
+                    {channelObject.channel_name || "all media"} ({channelObject.count})
+                </button>
+            {/each}
         </div>
         <div>
             {#each $mediaFeedObjects.filter((m) => selectedChannel === "all media" || m.channels.includes(selectedChannel)) as mediaFeedObject}
