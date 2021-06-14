@@ -1,4 +1,5 @@
 <script>
+    import { fade } from "svelte/transition";
     import {
         mediaFeedObjects,
         channelObjects,
@@ -31,6 +32,12 @@
                       $livePlaybackStatus.nowPlaying.directory
               )
             : -1;
+    // index for arrays of screenshots to be cycled through
+    let screenshotIndex = 0;
+    const rotateScreenshots = () => {
+        screenshotIndex++;
+    };
+    setInterval(rotateScreenshots, 2750);
 </script>
 
 <section>
@@ -59,6 +66,24 @@
                     </button>
                 </div>
             </form>
+        </nav>
+        <nav>
+            <div
+                style="position:relative;width:400px;height:200px;margin:auto;"
+            >
+                {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
+                    {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
+                        <img
+                            src={src != null
+                                ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
+                                : ""}
+                            alt="preview img"
+                            transition:fade={{ duration: 2500 }}
+                            style="position:absolute;display:block;"
+                        />
+                    {/each}
+                {/if}
+            </div>
         </nav>
         <nav>
             <ul>
