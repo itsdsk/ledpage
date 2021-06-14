@@ -96,21 +96,33 @@
         <nav>
             <ul>
                 <li>
-                    <img
-                        src={currentPlayingIndex >= 0
-                            ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${$mediaFeedObjects[currentPlayingIndex].screenshots[0]}`
-                            : ""}
-                        alt="preview img"
-                    />
+                    <details>
+                        <summary>Now Playing</summary>
+                        <ul>
+                            <li>
+                                <a href="/">Source</a> | <a href="/">Saved</a>
+                            </li>
+                            <li>
+                                {currentPlayingIndex >= 0
+                                    ? $mediaFeedObjects[currentPlayingIndex]
+                                          .title
+                                    : $livePlaybackStatus.nowPlaying
+                                    ? $livePlaybackStatus.nowPlaying.title
+                                    : "Nothing"}
+                            </li>
+                        </ul>
+                    </details>
                 </li>
                 <li>
-                    Now Playing: {currentPlayingIndex >= 0
-                        ? $mediaFeedObjects[currentPlayingIndex].title
-                        : $livePlaybackStatus.nowPlaying
-                        ? $livePlaybackStatus.nowPlaying.title
-                        : "Nothing"}
+                    <details>
+                        <summary>Up Next</summary>
+                        <ul>
+                            <li>Todo</li>
+                            <li><a href="/">Source</a></li>
+                            <li><a href="/">Saved</a></li>
+                        </ul>
+                    </details>
                 </li>
-                <li>link3</li>
             </ul>
         </nav>
         <nav>
