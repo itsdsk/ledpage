@@ -78,32 +78,44 @@
             </form>
         </nav>
         <nav>
-            <div
-                style="position:relative;width:400px;height:200px;margin:auto;"
-                on:click|preventDefault={() => socket.emit("fakemouseinput")}
-            >
-                {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
-                    {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
-                        <input
-                            type="image"
-                            src={src != null
-                                ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
-                                : ""}
-                            alt="preview img"
-                            transition:fade={{ duration: 2500 }}
-                            style="position:absolute;display:block;"
-                        />
-                    {/each}
-                {/if}
-            </div>
+            <ul>
+                <li>
+                    <div
+                        style="position:relative;width:400px;height:200px;margin:auto;"
+                        on:click|preventDefault={() =>
+                            socket.emit("fakemouseinput")}
+                    >
+                        {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
+                            {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
+                                <input
+                                    type="image"
+                                    src={src != null
+                                        ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
+                                        : ""}
+                                    alt="preview img"
+                                    transition:fade={{ duration: 2500 }}
+                                    style="position:absolute;display:block;"
+                                />
+                            {/each}
+                        {/if}
+                    </div>
+                </li>
+            </ul>
         </nav>
         <nav>
             <ul>
                 <li>
                     <details>
-                        <summary>Now Playing</summary>
-                        <ul>
-                            <li>
+                        <summary
+                            >Now Playing <code>
+                                {Math.round(
+                                    $livePlaybackStatus.nextPlaying
+                                        .timeFromStart / 1000
+                                )}s
+                            </code>
+                        </summary>
+                        <ul style="text-align: left;">
+                            <li style="display:block;">
                                 <a
                                     href={currentPlayingIndex >= 0
                                         ? $mediaFeedObjects[currentPlayingIndex]
@@ -119,7 +131,9 @@
                                         : "Nothing"}
                                 </a>
                             </li>
-                            <li style="overflow:auto;white-space:nowrap;">
+                            <li
+                                style="display:block;overflow:auto;white-space:nowrap;margin:0;"
+                            >
                                 {#if currentPlayingIndex >= 0}
                                     {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
                                         <button>
@@ -133,16 +147,12 @@
                                     />
                                 {/if}
                             </li>
-                        </ul>
-                    </details>
-                </li>
-                <li>
-                    <details>
-                        <summary>Up Next</summary>
-                        <ul>
-                            <li>Todo</li>
-                            <li><a href="/">Source</a></li>
-                            <li><a href="/">Saved</a></li>
+                            <li>
+                                Up Next:
+                                <ul>
+                                    <li>TODO</li>
+                                </ul>
+                            </li>
                         </ul>
                     </details>
                 </li>
