@@ -46,6 +46,35 @@
         screenshotIndex++;
     };
     setInterval(rotateScreenshots, 2750);
+
+    // sorted channels
+    let sortedChannels = [];
+
+    $: sortChannels(
+        $livePlaybackStatus.channel,
+        $channelObjects,
+        selectedChannel
+    );
+
+    function sortChannels() {
+        if ($channelObjects && $channelObjects.length > 0) {
+            // move currently-playing-channel to front of array
+            sortedChannels = [
+                $channelObjects.find(
+                    (item) =>
+                        (item.channel_name || "all media") ===
+                        ($livePlaybackStatus.channel || "all media")
+                ),
+                ...$channelObjects.filter(
+                    (item) =>
+                        (item.channel_name || "all media") !==
+                        ($livePlaybackStatus.channel || "all media")
+                ),
+            ];
+        } else {
+            sortedChannels = [];
+        }
+    }
 </script>
 
 <section>
@@ -191,7 +220,7 @@
     <article>
         <h2>Saved Media</h2>
         <div style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;">
-            {#each $livePlaybackStatus.channel ? [$channelObjects.find((item) => (item.channel_name || "all media") === $livePlaybackStatus.channel), ...$channelObjects.filter((item) => (item.channel_name || "all media") !== $livePlaybackStatus.channel)] : $channelObjects as channelObject}
+            {#each sortedChannels as channelObject, index}
                 <button
                     on:click|preventDefault={() => {
                         if (
@@ -211,12 +240,20 @@
                                 channelObject.channel_name || "all media";
                         }
                     }}
-                    type={(channelObject.channel_name || "all media") ==
-                    selectedChannel
+                    type={index == 0
+                        ? "reset"
+                        : (channelObject.channel_name || "all media") ==
+                          selectedChannel
                         ? "submit"
                         : "button"}
                 >
-                    {channelObject.channel_name || "all media"} ({channelObject.count})
+                    {#if index == 0}
+                        <strong>
+                            {channelObject.channel_name || "all media"} ({channelObject.count})
+                        </strong>
+                    {:else}
+                        {channelObject.channel_name || "all media"} ({channelObject.count})
+                    {/if}
                 </button>
             {/each}
         </div>
