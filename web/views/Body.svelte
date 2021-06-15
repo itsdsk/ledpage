@@ -106,95 +106,79 @@
                 </div>
             </form>
         </nav>
-        <nav>
-            <ul>
-                <li>
-                    <div
-                        style="position:relative;width:400px;height:200px;margin:auto;"
-                        on:click|preventDefault={() =>
-                            socket.emit("fakemouseinput")}
+        <div
+            style="position:relative;width:400px;height:200px;margin-bottom:1.125rem;"
+            on:click|preventDefault={() => socket.emit("fakemouseinput")}
+        >
+            {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
+                {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
+                    <input
+                        type="image"
+                        src={src != null
+                            ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
+                            : ""}
+                        alt="preview img"
+                        transition:fade={{ duration: 2500 }}
+                        style="position:absolute;display:block;"
+                    />
+                {/each}
+            {/if}
+        </div>
+        <details style="margin-bottom:1.85625rem;">
+            <summary>
+                <strong>
+                    Now Playing
+                    <code>
+                        {Math.round(
+                            $livePlaybackStatus.nextPlaying.timeFromStart / 1000
+                        )}s
+                    </code>
+                </strong>
+            </summary>
+            <form>
+                <h3
+                    style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"
+                >
+                    <a
+                        href={currentPlayingIndex >= 0
+                            ? $mediaFeedObjects[currentPlayingIndex].source
+                            : "/"}
+                        target="_blank"
                     >
-                        {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
-                            {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
-                                <input
-                                    type="image"
-                                    src={src != null
-                                        ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
-                                        : ""}
-                                    alt="preview img"
-                                    transition:fade={{ duration: 2500 }}
-                                    style="position:absolute;display:block;"
-                                />
-                            {/each}
-                        {/if}
-                    </div>
-                </li>
-            </ul>
-        </nav>
-        <nav>
-            <ul>
-                <li>
-                    <details>
-                        <summary
-                            >Now Playing <code>
-                                {Math.round(
-                                    $livePlaybackStatus.nextPlaying
-                                        .timeFromStart / 1000
-                                )}s
-                            </code>
-                        </summary>
-                        <form>
-                            <fieldset>
-                                <legend
-                                    style="margin-left:auto;margin-right:auto;"
-                                >
-                                    <a
-                                        href={currentPlayingIndex >= 0
-                                            ? $mediaFeedObjects[
-                                                  currentPlayingIndex
-                                              ].source
-                                            : "/"}
-                                        target="_blank"
-                                    >
-                                        {currentPlayingIndex >= 0
-                                            ? $mediaFeedObjects[
-                                                  currentPlayingIndex
-                                              ].title
-                                            : $livePlaybackStatus.nowPlaying
-                                            ? $livePlaybackStatus.nowPlaying
-                                                  .title
-                                            : "Nothing"}
-                                    </a>
-                                </legend>
-                                <div style="overflow:auto;white-space:nowrap;">
-                                    {#if currentPlayingIndex >= 0}
-                                        Channels:
-                                        {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
-                                            <button>
-                                                {channel}
-                                            </button>
-                                        {/each}
-                                        <input
-                                            type="text"
-                                            placeholder="Enter playlist"
-                                            size="10"
-                                        />
-                                    {/if}
-                                </div>
-                                <div style="overflow:auto;white-space:nowrap;">
-                                    Advanced:
-                                    <button> Screenshot </button>
-                                    <button> Play next </button>
-                                    <button> Reset </button>
-                                    <button> Delete </button>
-                                </div>
-                            </fieldset>
-                        </form>
-                    </details>
-                </li>
-            </ul>
-        </nav>
-        <nav>
+                        {currentPlayingIndex >= 0
+                            ? $mediaFeedObjects[currentPlayingIndex].title
+                            : $livePlaybackStatus.nowPlaying
+                            ? $livePlaybackStatus.nowPlaying.title
+                            : "Nothing"}
+                    </a>
+                </h3>
+                <p>Channels</p>
+                <div
+                    style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
+                >
+                    {#if currentPlayingIndex >= 0}
+                        {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
+                            <button>
+                                {channel}
+                            </button>
+                        {/each}
+                        <input
+                            type="text"
+                            placeholder="Enter playlist"
+                            size="10"
+                        />
+                    {/if}
+                </div>
+                <p>Commands</p>
+                <div style="overflow:auto;white-space:nowrap;">
+                    <button> Screenshot </button>
+                    <button> Play next </button>
+                    <button> Reset </button>
+                    <button> Delete </button>
+                </div>
+            </form>
+        </details>
+        <div>
             <form>
                 <label>Brightness:</label>
                 <button
@@ -222,7 +206,7 @@
                     +
                 </button>
             </form>
-        </nav>
+        </div>
     </header>
     <article>
         <h2>Saved Media</h2>
