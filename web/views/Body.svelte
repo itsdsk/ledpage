@@ -258,9 +258,33 @@
             </form>
         </details>
         <div>
-            <form>
-                <label>Brightness:</label>
+            <form
+                on:submit|preventDefault={() => {
+                    return false;
+                }}
+            >
+                <p style="margin-bottom:0.7875rem;">Brightness:</p>
+                <input
+                    type="number"
+                    min="0.0"
+                    max="100"
+                    step="0.1"
+                    style="width:4.5em;"
+                    placeholder="{$config_settings.brightness
+                        ? ($config_settings.brightness * 100).toFixed(
+                              $config_settings.brightness < 0.2 ? 1 : 0
+                          )
+                        : 0}%"
+                    on:change|preventDefault={(e) => {
+                        socket.emit("config/update", {
+                            name: "brightness",
+                            value: e.target.value / 100.0,
+                        });
+                        e.target.value = "";
+                    }}
+                />
                 <button
+                    type="button"
                     on:click|preventDefault={() => {
                         socket.emit("config/update", {
                             name: "brightness",
@@ -271,16 +295,19 @@
                     -
                 </button>
                 <button
+                    type="button"
                     on:click|preventDefault={() => {
                         socket.emit("config/update", {
                             name: "brightness",
-                            value: Math.min(
-                                1.25 * $config_settings.brightness,
-                                1.0
-                            ),
+                            value:
+                                $config_settings.brightness > 0.0
+                                    ? Math.min(
+                                          1.25 * $config_settings.brightness,
+                                          1.0
+                                      )
+                                    : 0.04,
                         });
                     }}
-                    disabled={$config_settings.brightness === 1.0}
                 >
                     +
                 </button>
