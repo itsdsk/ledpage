@@ -169,7 +169,23 @@
                 >
                     {#if currentPlayingIndex >= 0}
                         {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
-                            <button>
+                            <button
+                                type="button"
+                                on:click|preventDefault={() => {
+                                    if (
+                                        window.confirm(
+                                            `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                        )
+                                    ) {
+                                        socket.emit("deleteconnection", [
+                                            $mediaFeedObjects[
+                                                currentPlayingIndex
+                                            ].directory,
+                                            channel,
+                                        ]);
+                                    }
+                                }}
+                            >
                                 {channel}
                             </button>
                         {/each}
