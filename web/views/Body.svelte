@@ -193,6 +193,28 @@
                             type="text"
                             placeholder="Enter playlist"
                             size="10"
+                            on:change|preventDefault={(e) => {
+                                if (
+                                    $channelObjects.find(
+                                        (channelObject) =>
+                                            channelObject.channel_name ===
+                                            e.target.value
+                                    )
+                                ) {
+                                    socket.emit("createconnection", [
+                                        $mediaFeedObjects[currentPlayingIndex]
+                                            .directory,
+                                        e.target.value,
+                                    ]);
+                                } else {
+                                    socket.emit("addnewchannel", [
+                                        $mediaFeedObjects[currentPlayingIndex]
+                                            .directory,
+                                        e.target.value,
+                                    ]);
+                                }
+                                e.target.value = "";
+                            }}
                         />
                     {/if}
                 </div>
