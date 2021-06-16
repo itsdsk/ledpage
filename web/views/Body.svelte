@@ -220,10 +220,40 @@
                 </div>
                 <p style="margin-bottom:0.7875rem;">Commands:</p>
                 <div style="overflow:auto;white-space:nowrap;">
-                    <button> Screenshot </button>
-                    <button> Play next </button>
-                    <button> Reset </button>
-                    <button> Delete </button>
+                    <button
+                        type="button"
+                        on:click|preventDefault={() => {
+                            socket.emit("screenshot");
+                        }}
+                    >
+                        Screenshot
+                    </button>
+                    <button
+                        type="button"
+                        on:click|preventDefault={() => {
+                            socket.emit("playnext");
+                        }}
+                    >
+                        Play next
+                    </button>
+                    <button
+                        type="button"
+                        on:click|preventDefault={() => {
+                            if (
+                                window.confirm(
+                                    `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                )
+                            ) {
+                                socket.emit(
+                                    "deletemedia",
+                                    $mediaFeedObjects[currentPlayingIndex]
+                                        .directory
+                                );
+                            }
+                        }}
+                    >
+                        Delete
+                    </button>
                 </div>
             </form>
         </details>
