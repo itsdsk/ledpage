@@ -135,7 +135,20 @@
                     </code>
                 </strong>
             </summary>
-            <form>
+            <form
+                on:submit|preventDefault={() => {
+                    return false;
+                }}
+            >
+                <h1
+                    style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
+                >
+                    {currentPlayingIndex >= 0
+                        ? $mediaFeedObjects[currentPlayingIndex].title
+                        : $livePlaybackStatus.nowPlaying
+                        ? $livePlaybackStatus.nowPlaying.title
+                        : "Nothing"}
+                </h1>
                 <h3
                     style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
                 >
@@ -146,10 +159,8 @@
                         target="_blank"
                     >
                         {currentPlayingIndex >= 0
-                            ? $mediaFeedObjects[currentPlayingIndex].title
-                            : $livePlaybackStatus.nowPlaying
-                            ? $livePlaybackStatus.nowPlaying.title
-                            : "Nothing"}
+                            ? $mediaFeedObjects[currentPlayingIndex].source
+                            : "/"}
                     </a>
                 </h3>
                 <p style="margin-bottom:0.7875rem;">Channels:</p>
