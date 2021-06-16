@@ -107,7 +107,7 @@
             </form>
         </nav>
         <div
-            style="position:relative;width:400px;height:200px;margin-bottom:1.125rem;"
+            style="position:relative;width:400px;height:200px;margin-bottom:0.7875rem;"
             on:click|preventDefault={() => socket.emit("fakemouseinput")}
         >
             {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
@@ -137,7 +137,7 @@
             </summary>
             <form>
                 <h3
-                    style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"
+                    style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
                 >
                     <a
                         href={currentPlayingIndex >= 0
@@ -152,7 +152,7 @@
                             : "Nothing"}
                     </a>
                 </h3>
-                <p>Channels</p>
+                <p style="margin-bottom:0.7875rem;">Channels:</p>
                 <div
                     style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
                 >
@@ -169,7 +169,7 @@
                         />
                     {/if}
                 </div>
-                <p>Commands</p>
+                <p style="margin-bottom:0.7875rem;">Commands:</p>
                 <div style="overflow:auto;white-space:nowrap;">
                     <button> Screenshot </button>
                     <button> Play next </button>
