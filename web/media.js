@@ -458,7 +458,7 @@ module.exports = {
         var createQuery = "INSERT INTO channels (name) VALUES (?)";
         db.run(createQuery, [msg], callback);
     },
-    deleteConnection: function (msg) {
+    deleteConnection: function (msg, callback) {
         console.log("USER INPUT::deleting connection: " + msg);
         // delete connection in database
         var sql = "DELETE FROM connections WHERE media_directory = ? AND channel_name = ?";
@@ -476,6 +476,7 @@ module.exports = {
             // save json to disk
             fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
                 if (err) console.log(err);
+                if (callback) callback();
             });
         });
     },
