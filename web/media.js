@@ -816,7 +816,7 @@ module.exports = {
         // to call when playing specific media instead of stopAutoplay
         if (playback.autoplayTimerID) {
             // update playback status
-            var delayTime = (10 * 60) * 1000; // 10 minutes
+            var delayTime = (30 * 60) * 1000; // 30 minutes
             playback.playingAutoNext.startTime = Date.now() + config_settings.fade + delayTime;
             // autoplay early by restarting timeout
             clearTimeout(playback.autoplayTimerID);
