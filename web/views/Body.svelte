@@ -20,7 +20,17 @@
         ) {
             // URL is validated
             socket.emit("playURL", urlinputelement.value);
-            console.log(`playing URL: ${urlinputelement.value}`);
+        }
+    }
+    function downloadURL() {
+        if ($livePlaybackStatus.nowPlaying.directory.length > 0) {
+            // URL is validated
+            socket.emit(
+                "createmediaURL",
+                $livePlaybackStatus.nowPlaying.directory
+            );
+        } else {
+            console.log("cannot create media from URL as it is invalid");
         }
     }
 
@@ -150,121 +160,149 @@
                     return false;
                 }}
             >
-                <h1
-                    style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
-                >
-                    {currentPlayingIndex >= 0
-                        ? $mediaFeedObjects[currentPlayingIndex].title
-                        : $livePlaybackStatus.nowPlaying
-                        ? $livePlaybackStatus.nowPlaying.title
-                        : "Nothing"}
-                </h1>
-                <h3
-                    style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
-                >
-                    <a
-                        href={currentPlayingIndex >= 0
-                            ? $mediaFeedObjects[currentPlayingIndex].source
-                            : "/"}
-                        target="_blank"
+                {#if currentPlayingIndex < 0}
+                    <h3
+                        style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
                     >
-                        {currentPlayingIndex >= 0
-                            ? $mediaFeedObjects[currentPlayingIndex].source
-                            : "/"}
-                    </a>
-                </h3>
-                <p style="margin-bottom:0.7875rem;">Channels:</p>
-                <div
-                    style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
-                >
-                    {#if currentPlayingIndex >= 0}
-                        {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
-                            <button
-                                type="button"
-                                on:click|preventDefault={() => {
+                        <a
+                            href={$livePlaybackStatus.nowPlaying
+                                ? $livePlaybackStatus.nowPlaying.directory
+                                : "/"}
+                            target="_blank"
+                        >
+                            {$livePlaybackStatus.nowPlaying
+                                ? $livePlaybackStatus.nowPlaying.directory
+                                : "/"}
+                        </a>
+                    </h3>
+                    <p style="margin-bottom:0.7875rem;">Options:</p>
+                    <div style="overflow:auto;white-space:nowrap;">
+                        <button
+                            type="button"
+                            on:click|preventDefault={downloadURL}
+                        >
+                            Save to library
+                        </button>
+                        <button
+                            type="button"
+                            on:click|preventDefault={() => {
+                                socket.emit("playnext");
+                            }}
+                        >
+                            Back to playlist
+                        </button>
+                    </div>
+                {:else}
+                    <h1
+                        style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
+                    >
+                        {$mediaFeedObjects[currentPlayingIndex].title}
+                    </h1>
+                    <h3
+                        style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
+                    >
+                        <a
+                            href={$mediaFeedObjects[currentPlayingIndex].source}
+                            target="_blank"
+                        >
+                            {$mediaFeedObjects[currentPlayingIndex].source}
+                        </a>
+                    </h3>
+                    <p style="margin-bottom:0.7875rem;">Channels:</p>
+                    <div
+                        style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
+                    >
+                        {#if currentPlayingIndex >= 0}
+                            {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
+                                <button
+                                    type="button"
+                                    on:click|preventDefault={() => {
+                                        if (
+                                            window.confirm(
+                                                `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                            )
+                                        ) {
+                                            socket.emit("deleteconnection", [
+                                                $mediaFeedObjects[
+                                                    currentPlayingIndex
+                                                ].directory,
+                                                channel,
+                                            ]);
+                                        }
+                                    }}
+                                >
+                                    {channel}
+                                </button>
+                            {/each}
+                            <input
+                                type="text"
+                                placeholder="Enter playlist"
+                                size="10"
+                                on:change|preventDefault={(e) => {
                                     if (
-                                        window.confirm(
-                                            `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                        $channelObjects.find(
+                                            (channelObject) =>
+                                                channelObject.channel_name ===
+                                                e.target.value
                                         )
                                     ) {
-                                        socket.emit("deleteconnection", [
+                                        socket.emit("createconnection", [
                                             $mediaFeedObjects[
                                                 currentPlayingIndex
                                             ].directory,
-                                            channel,
+                                            e.target.value,
+                                        ]);
+                                    } else {
+                                        socket.emit("addnewchannel", [
+                                            $mediaFeedObjects[
+                                                currentPlayingIndex
+                                            ].directory,
+                                            e.target.value,
                                         ]);
                                     }
+                                    e.target.value = "";
                                 }}
-                            >
-                                {channel}
-                            </button>
-                        {/each}
-                        <input
-                            type="text"
-                            placeholder="Enter playlist"
-                            size="10"
-                            on:change|preventDefault={(e) => {
+                            />
+                        {/if}
+                    </div>
+                    <p style="margin-bottom:0.7875rem;">Commands:</p>
+                    <div style="overflow:auto;white-space:nowrap;">
+                        <button
+                            type="button"
+                            on:click|preventDefault={() => {
+                                socket.emit("screenshot");
+                            }}
+                        >
+                            Screenshot
+                        </button>
+                        <button
+                            type="button"
+                            on:click|preventDefault={() => {
+                                socket.emit("playnext");
+                            }}
+                        >
+                            Play next
+                        </button>
+                        <button
+                            type="button"
+                            on:click|preventDefault={() => {
                                 if (
-                                    $channelObjects.find(
-                                        (channelObject) =>
-                                            channelObject.channel_name ===
-                                            e.target.value
+                                    window.confirm(
+                                        `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
                                     )
                                 ) {
-                                    socket.emit("createconnection", [
+                                    socket.emit(
+                                        "deletemedia",
                                         $mediaFeedObjects[currentPlayingIndex]
-                                            .directory,
-                                        e.target.value,
-                                    ]);
-                                } else {
-                                    socket.emit("addnewchannel", [
-                                        $mediaFeedObjects[currentPlayingIndex]
-                                            .directory,
-                                        e.target.value,
-                                    ]);
+                                            .directory
+                                    );
                                 }
-                                e.target.value = "";
                             }}
-                        />
-                    {/if}
-                </div>
-                <p style="margin-bottom:0.7875rem;">Commands:</p>
-                <div style="overflow:auto;white-space:nowrap;">
-                    <button
-                        type="button"
-                        on:click|preventDefault={() => {
-                            socket.emit("screenshot");
-                        }}
-                    >
-                        Screenshot
-                    </button>
-                    <button
-                        type="button"
-                        on:click|preventDefault={() => {
-                            socket.emit("playnext");
-                        }}
-                    >
-                        Play next
-                    </button>
-                    <button
-                        type="button"
-                        on:click|preventDefault={() => {
-                            if (
-                                window.confirm(
-                                    `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
-                                )
-                            ) {
-                                socket.emit(
-                                    "deletemedia",
-                                    $mediaFeedObjects[currentPlayingIndex]
-                                        .directory
-                                );
-                            }
-                        }}
-                    >
-                        Delete
-                    </button>
-                </div>
+                        >
+                            Delete
+                        </button>
+                    </div>
+                {/if}
             </form>
         </details>
         <div>
