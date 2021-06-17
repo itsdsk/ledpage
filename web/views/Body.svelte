@@ -122,6 +122,16 @@
                         style="position:absolute;display:block;"
                     />
                 {/each}
+            {:else if $livePlaybackStatus.nowPlaying}
+                {#each [`screenshot_tmp.jpg?${screenshotIndex}`] as src (screenshotIndex)}
+                    <input
+                        type="image"
+                        src={src != null ? `/${src}` : ""}
+                        alt="preview img"
+                        transition:fade={{ duration: 2500 }}
+                        style="position:absolute;display:block;"
+                    />
+                {/each}
             {/if}
         </div>
         <details style="margin-bottom:1.85625rem;">
