@@ -151,6 +151,10 @@ rendererSocket.event.on('data', function (data) {
                     module.exports.loadMediaItem(rendererMsg.directory, element => {
                         // send media item to client
                         module.exports.eventEmitter.emit('addmediaitem', element);
+                        // play media
+                        module.exports.playLocalMedia({
+                            directory: rendererMsg.directory
+                        }, 1000);
                     });
                 });
             }
