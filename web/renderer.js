@@ -98,8 +98,13 @@ class RenderWindow {
       if (!image) console.log(`error taking screenshot: image is null`);
       // check screenshot is valid
       if (image.isEmpty() == false) {
-        var d = new Date();
-        var new_filename = `screenshot_${d.getDate()}${d.getMonth()}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}-${d.getSeconds()}.jpg`;
+        var new_filename = "";
+        if (this.loadMessage.directory && this.loadMessage.directory.length) {
+          var d = new Date();
+          new_filename = `screenshot_${d.getDate()}${d.getMonth()}${d.getFullYear()}_${d.getHours()}${d.getMinutes()}-${d.getSeconds()}.jpg`;
+        } else {
+          new_filename = `screenshot_tmp.jpg`;
+        }
         // add screenshot to media list
         if (!this.loadMessage.screenshots)
           this.loadMessage.screenshots = [];
