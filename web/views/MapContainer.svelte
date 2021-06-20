@@ -19,10 +19,16 @@
 <svelte:window on:resize={resizeSVG} bind:innerWidth={windowWidth} />
 
 <svg
-  viewBox="0 0 {width}
-  {height}"
+  viewBox="0 0 {width} {height}"
   width={Math.min(windowWidth - 10, 360)}
-  style="border:1px solid black"
-  bind:this={svg}>
+  bind:this={svg}
+>
   <slot />
 </svg>
+
+<style>
+  svg {
+    border: 1px solid #d9d9d9;
+    border-radius: 3.6px;
+  }
+</style>
