@@ -118,6 +118,13 @@
         <nav>
             <form>
                 <button
+                    type="button"
+                    style="float:left;padding:0.4078125rem;"
+                    on:click={() => (location.href = "/setup.html")}
+                >
+                    ...
+                </button>
+                <button
                     type="submit"
                     on:click|preventDefault={playURL}
                     style="float:right;margin-left:0.4078125rem;margin-right:0;"
