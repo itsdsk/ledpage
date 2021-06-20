@@ -9,6 +9,28 @@
 <section>
     <header>
         <h1>
+            <span style="float:right;">
+                <button
+                    type="button"
+                    class="power"
+                    on:click|preventDefault={() => {
+                        if (window.confirm("Do you really want to reboot?"))
+                            socket.emit("systempower", "reboot");
+                    }}
+                >
+                    Restart
+                </button>
+                <button
+                    type="button"
+                    class="power"
+                    on:click|preventDefault={() => {
+                        if (window.confirm("Do you really want to shutdown?"))
+                            socket.emit("systempower", "shutdown");
+                    }}
+                >
+                    Shutdown
+                </button>
+            </span>
             Setup
         </h1>
         {#if $config}
@@ -77,5 +99,12 @@
 
     thead th {
         border-bottom-width: 2.16px;
+    }
+
+    .power {
+        background: #db423c;
+        color: white;
+        padding: 0.407813rem;
+        margin: 0 0 1.125rem 0.45rem;
     }
 </style>
