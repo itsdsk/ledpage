@@ -219,11 +219,13 @@
                         </button>
                     </div>
                 {:else}
-                    <h1
-                        style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
-                    >
-                        {$mediaFeedObjects[currentPlayingIndex].title}
-                    </h1>
+                    {#if $mediaFeedObjects[currentPlayingIndex].title !== $mediaFeedObjects[currentPlayingIndex].source}
+                        <h1
+                            style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
+                        >
+                            {$mediaFeedObjects[currentPlayingIndex].title}
+                        </h1>
+                    {/if}
                     <h3
                         style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
                     >
