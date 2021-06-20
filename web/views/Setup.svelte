@@ -70,9 +70,27 @@
             </table>
         {/if}
     </header>
+    <article>
+        {#if $config_settings}
+            <h3>settings.json</h3>
+            <pre
+                id="settings"
+                spellcheck="false"
+                contenteditable="true"
+                role="textbox">
+                {JSON.stringify($config_settings, null, 2)}
+            </pre>
+        {/if}
+    </article>
 </section>
 
 <style>
+    pre {
+        border: 1px solid #595959;
+        border-radius: 3.6px;
+        padding: 0.3375rem 0.39375rem;
+    }
+
     table {
         display: table;
         width: auto;
