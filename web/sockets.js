@@ -27,6 +27,9 @@ exports.DomainClient = class DomainClient {
         this.event = new EventEmitter();
         this.connectInterval = null;
         //
+        this.messageQueue = [];
+        this.writeTimeoutID = 0;
+        //
         console.log(`Constructing client ${this.name} with path ${this.socketname}`);
     }
 
@@ -39,11 +42,24 @@ exports.DomainClient = class DomainClient {
 
     write(msg) {
         if (this.socket) {
-            this.socket.write(msg);
+            this.messageQueue.push(msg);
+            if (!this.writeTimeoutID) {
+                this.writeTimeoutID = setTimeout(this.writeOut.bind(this), 0);
+            }
         } else {
             if (connectFlag) {
                 console.log(`Error sending msg to ${this.name}: socket is null`);
             }
+        }
+    }
+
+    writeOut() {
+        let message = this.messageQueue.shift();
+        this.socket.write(message);
+        if (this.messageQueue.length) {
+            this.writeTimeoutID = setTimeout(this.writeOut.bind(this), 100);
+        } else {
+            this.writeTimeoutID = null;
         }
     }
 
