@@ -237,6 +237,7 @@
                             <input
                                 type="text"
                                 placeholder="Enter playlist"
+                                list="channels"
                                 size="10"
                                 on:change|preventDefault={(e) => {
                                     if (
@@ -263,6 +264,13 @@
                                     e.target.value = "";
                                 }}
                             />
+                            <datalist id="channels">
+                                {#each $channelObjects as channel}
+                                    {#if channel.channel_name}
+                                        <option value={channel.channel_name} />
+                                    {/if}
+                                {/each}
+                            </datalist>
                         {/if}
                     </div>
                     <p style="margin-bottom:0.7875rem;">Commands:</p>
@@ -317,6 +325,7 @@
                     min="0.0"
                     max="100"
                     step="0.1"
+                    list="brightnesses"
                     style="width:4.5em;"
                     placeholder="{$config_settings.brightness
                         ? ($config_settings.brightness * 100).toFixed(
@@ -331,6 +340,12 @@
                         e.target.value = "";
                     }}
                 />
+                <datalist id="brightnesses">
+                    <option value="0" />
+                    <option value="33" />
+                    <option value="66" />
+                    <option value="100" />
+                </datalist>
                 <button
                     type="button"
                     on:click|preventDefault={() => {
