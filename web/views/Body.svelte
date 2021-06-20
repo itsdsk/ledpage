@@ -244,6 +244,7 @@
                             {#each playingChannels as channel, index}
                                 <button
                                     type="button"
+                                    class:playing={index === 0}
                                     on:click|preventDefault={() => {
                                         if (
                                             window.confirm(
@@ -434,14 +435,9 @@
                           selectedChannel
                         ? "submit"
                         : "button"}
+                    class:playing={index == 0}
                 >
-                    {#if index == 0}
-                        <strong>
-                            &#9658; {channelObject.channel_name || "all media"} ({channelObject.count})
-                        </strong>
-                    {:else}
-                        {channelObject.channel_name || "all media"} ({channelObject.count})
-                    {/if}
+                    {channelObject.channel_name || "all media"} ({channelObject.count})
                 </button>
             {/each}
         </div>
@@ -472,4 +468,19 @@
     input[type="image"] {
         padding: 0;
     }
+
+    button.playing {
+        font-weight: bold;
+        animation: Channel-playing-pulse infinite 1s ease-in-out alternate;
+    }
+
+    @keyframes Channel-playing-pulse {
+        from {
+            background: #f2f2f2;
+        }
+        to {
+            background: #d9d9d9;
+        }
+    }
+
 </style>
