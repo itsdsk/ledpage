@@ -85,6 +85,32 @@
             sortedChannels = [];
         }
     }
+
+    // sorted media channels
+    let playingChannels = [];
+
+    $: updatePlayingChannels(
+        currentPlayingIndex,
+        $livePlaybackStatus.channel,
+        $mediaFeedObjects[currentPlayingIndex]
+    );
+
+    function updatePlayingChannels() {
+        //
+        if (currentPlayingIndex >= 0) {
+            // move currently-playing-channel to front of array
+            playingChannels = [
+                $mediaFeedObjects[currentPlayingIndex].channels.find(
+                    (item) => item === $livePlaybackStatus.channel
+                ),
+                ...$mediaFeedObjects[currentPlayingIndex].channels.filter(
+                    (item) => item !== $livePlaybackStatus.channel
+                ),
+            ];
+        } else {
+            playingChannels = [];
+        }
+    }
 </script>
 
 <section>
@@ -213,7 +239,7 @@
                         style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
                     >
                         {#if currentPlayingIndex >= 0}
-                            {#each $mediaFeedObjects[currentPlayingIndex].channels as channel}
+                            {#each playingChannels as channel, index}
                                 <button
                                     type="button"
                                     on:click|preventDefault={() => {
