@@ -449,10 +449,20 @@
                         ? `/media/${mediaFeedObject.directory}/${mediaFeedObject.screenshots[0]}`
                         : `${mediaFeedObject.title}`}
                     alt={mediaFeedObject.title}
-                    on:click|preventDefault={() => {
-                        socket.emit("play", {
-                            directory: mediaFeedObject.directory,
-                        });
+                    class:playing={currentPlayingIndex >= 0 &&
+                        mediaFeedObject.directory ===
+                            $mediaFeedObjects[currentPlayingIndex].directory}
+                    on:click|preventDefault={(e) => {
+                        if (e.target.classList.contains("playing")) {
+                            window.scroll(0, 0);
+                            document
+                                .querySelector("details")
+                                .setAttribute("open", "");
+                        } else {
+                            socket.emit("play", {
+                                directory: mediaFeedObject.directory,
+                            });
+                        }
                     }}
                 />
             {/each}
