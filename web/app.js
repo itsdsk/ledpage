@@ -38,10 +38,10 @@ io.on('connection', function (socket) {
       media.loadSettings(function (elements) {
         socket.emit('settings', elements);
       });
-      media.nowPlaying(function (playbackStatus) {
-        socket.emit('nowplaying', (playbackStatus));
-      });
     }
+  });
+  media.nowPlaying(function (playbackStatus) {
+    socket.emit('nowplaying', (playbackStatus));
   });
   // upload config file
   socket.on('updateconfigfile', function (msg) {
