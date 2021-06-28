@@ -249,26 +249,31 @@
                     >
                         {#if currentPlayingIndex >= 0}
                             {#each playingChannels as channel, index}
-                                <button
-                                    type="button"
-                                    class:playing={index === 0}
-                                    on:click|preventDefault={() => {
-                                        if (
-                                            window.confirm(
-                                                `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
-                                            )
-                                        ) {
-                                            socket.emit("deleteconnection", [
-                                                $mediaFeedObjects[
-                                                    currentPlayingIndex
-                                                ].directory,
-                                                channel,
-                                            ]);
-                                        }
-                                    }}
-                                >
-                                    {channel}
-                                </button>
+                                {#if channel}
+                                    <button
+                                        type="button"
+                                        class:playing={index === 0}
+                                        on:click|preventDefault={() => {
+                                            if (
+                                                window.confirm(
+                                                    `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                                )
+                                            ) {
+                                                socket.emit(
+                                                    "deleteconnection",
+                                                    [
+                                                        $mediaFeedObjects[
+                                                            currentPlayingIndex
+                                                        ].directory,
+                                                        channel,
+                                                    ]
+                                                );
+                                            }
+                                        }}
+                                    >
+                                        {channel}
+                                    </button>
+                                {/if}
                             {/each}
                             <input
                                 type="text"
