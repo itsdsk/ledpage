@@ -98,6 +98,24 @@
                 }}>
                 {JSON.stringify($config, null, 2)}
             </pre>
+            <button
+                type="submit"
+                class="submit"
+                on:click|preventDefault={() => {
+                    var configStr = document.querySelector("#config").innerHTML;
+                    try {
+                        var configJSON = JSON.parse(configStr);
+                        if (
+                            window.confirm(
+                                "Are you sure you want to save a new configuration file?"
+                            )
+                        )
+                            socket.emit("updateconfigfile", configJSON);
+                    } catch (exception) {
+                        alert("Error parsing json: " + exception);
+                    }
+                }}>Save</button
+            >
         {/if}
     </article>
 </section>
