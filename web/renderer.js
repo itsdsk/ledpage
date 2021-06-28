@@ -5,6 +5,9 @@ const fs = require('fs');
 const { exec } = require("child_process");
 var sockets = require('./sockets.js');
 
+// constants
+const screenshotQuality = 50;
+
 // disable electron warnings
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
@@ -128,7 +131,7 @@ class RenderWindow {
           savePath = path.join(__dirname, '../', 'public', confObj.filename);
         }
         console.log(`full path: ${savePath}`);
-        fs.writeFile(savePath, image.toJPEG(20), (err) => {
+        fs.writeFile(savePath, image.toJPEG(screenshotQuality), (err) => {
           if (err) console.log(`error capturing page: ${err}`);
           // report loaded to client
           console.log(`saved screenshot:\n${JSON.stringify(confObj, null, 2)}`);
@@ -394,7 +397,7 @@ app.on('ready', () => {
               // send screenshot
               var screenshotMsg = JSON.stringify({
                 status: true,
-                screenshot: image.toJPEG(20).toJSON(),
+                screenshot: image.toJPEG(screenshotQuality).toJSON(),
                 side: side,
                 path: loadMsg.path
               });
@@ -496,7 +499,7 @@ app.on('ready', () => {
                     _browserWindow.capturePage().then(image => {
                       //console.log(`captured page screenshot`);
                       if (!image) console.log(`error capturing page: image is null`);
-                      fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(80), (err) => {
+                      fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(screenshotQuality), (err) => {
                         if (err) console.log(`error capturing page: ${err}`);
                         //console.log(`saved screenshot`);
                         // get datetime
