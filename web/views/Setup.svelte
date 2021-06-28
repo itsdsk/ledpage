@@ -77,7 +77,11 @@
                 id="settings"
                 spellcheck="false"
                 contenteditable="true"
-                role="textbox">
+                role="textbox"
+                on:paste|preventDefault={(e) => {
+                    var text = e.clipboardData.getData("text/plain");
+                    document.execCommand("insertHTML", false, text);
+                }}>
                 {JSON.stringify($config_settings, null, 2)}
             </pre>
         {/if}
