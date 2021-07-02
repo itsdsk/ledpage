@@ -364,10 +364,10 @@
                     max="100"
                     step="0.1"
                     list="brightnesses"
-                    style="width:4.5em;"
+                    id="brightness"
                     placeholder="{$config_settings.brightness
                         ? ($config_settings.brightness * 100).toFixed(
-                              $config_settings.brightness < 0.2 ? 1 : 0
+                              $config_settings.brightness < 0.1 ? 1 : 0
                           )
                         : 0}%"
                     on:change|preventDefault={(e) => {
@@ -486,6 +486,13 @@
 
     input[type="image"] {
         padding: 0;
+    }
+
+    #brightness {
+        width: 4em;
+        appearance: textfield;
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
     }
 
     button.playing {
