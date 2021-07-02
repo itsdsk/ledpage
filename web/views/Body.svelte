@@ -495,9 +495,13 @@
         -webkit-appearance: textfield;
     }
 
+    button.playing::before {
+        content: "\25B6\2002";
+        color: #595959;
+    }
+
     button.playing {
-        font-weight: bold;
-        animation: Channel-playing-pulse infinite 1s ease-in-out alternate;
+        border-width: 2px;
     }
 
     @keyframes Channel-playing-pulse {
