@@ -199,3 +199,85 @@ export function sortMediaFeed(selectedSortMode = 'Recently added') {
         console.log(`error in update sorting`);
     }
 };
+
+export const showConnectionMessage = writable(false);
+export const connectionLogs = writable([]);
+
+// put this in client data
+var getTimeStamp = () => {
+    var date = new Date();
+    return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    });
+};
+
+socket.on("connect", () => {
+    setTimeout(() => {
+        showConnectionMessage.set(false);
+    }, 2000);
+});
+
+socket.on("disconnect", (reason) => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Disconnected"],
+        dd: [`Reason: ${reason}`],
+    }, ...cl]);
+});
+
+socket.on("connect_error", () => {
+    connectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Connection Error"],
+        dd: [`Attempting to reconnect in 1000ms`],
+    }, ...cl]);
+    setTimeout(() => {
+        socket.connect();
+    }, 1000);
+});
+
+socket.io.on("error", (error) => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Manager connection error"],
+        dd: [`Message: ${error}`],
+    }, ...cl]);
+});
+
+socket.io.on("reconnect", (attempt) => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Success"],
+        dd: [`Reconnected on attempt ${attempt}`],
+    }, ...cl]);
+    setTimeout(() => {
+        showConnectionMessage.set(false);
+    }, 2000);
+});
+
+socket.io.on("reconnect_attempt", (attempt) => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Reconnecting"],
+        dd: [`Attempting to reconnect (${attempt})`],
+    }, ...cl]);
+});
+
+socket.io.on("reconnect_error", (error) => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Error reconnecting"],
+        dd: [`Error reconnecting: ${error}`],
+    }, ...cl]);
+});
+
+socket.io.on("reconnect_failed", () => {
+    showConnectionMessage.set(true);
+    connectionLogs.update(cl => [{
+        dt: [getTimeStamp(), "Reconnection failed"],
+        dd: [`Refresh to continue`],
+    }, ...cl]);
+});

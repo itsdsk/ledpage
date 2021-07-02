@@ -6,6 +6,8 @@
         channelObjects,
         livePlaybackStatus,
         config_settings,
+        showConnectionMessage,
+        connectionLogs,
     } from "./client_data.js";
 
     //
@@ -491,9 +493,49 @@
             {/each}
         </div>
     </article>
+    {#if $showConnectionMessage}
+        <article id="connecting">
+            <h1>Loading</h1>
+            {#if $connectionLogs.length}
+                <dl>
+                    {#each $connectionLogs as connectionLog}
+                        {#each connectionLog.dt as dt}
+                            <dt>
+                                {dt}
+                            </dt>
+                        {/each}
+                        {#each connectionLog.dd as dd}
+                            <dd>
+                                {dd}
+                            </dd>
+                        {/each}
+                    {/each}
+                </dl>
+                <button
+                    type="button"
+                    on:click|preventDefault={() => {
+                        socket.connect();
+                    }}
+                >
+                    Reconnect
+                </button>
+            {/if}
+        </article>
+    {/if}
 </section>
 
 <style>
+    #connecting {
+        opacity: 0.95;
+        /* background: #fff; */
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        top: 0;
+        left: 0;
+        position: fixed;
+    }
+
     input[type="image"] {
         padding: 0;
     }
