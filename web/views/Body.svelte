@@ -494,10 +494,6 @@
 </section>
 
 <style>
-    section {
-        width: 1300px;
-    }
-
     input[type="image"] {
         padding: 0;
     }
