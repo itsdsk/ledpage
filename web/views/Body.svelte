@@ -452,28 +452,42 @@
         </div>
         <div>
             {#each $mediaFeedObjects.filter((m) => selectedChannel === "all media" || m.channels.includes(selectedChannel)) as mediaFeedObject}
-                <input
-                    type="image"
-                    src={mediaFeedObject.screenshots[0] != null
-                        ? `/media/${mediaFeedObject.directory}/${mediaFeedObject.screenshots[0]}`
-                        : `${mediaFeedObject.title}`}
-                    alt={mediaFeedObject.title}
+                <span
+                    class="feed"
                     class:playing={currentPlayingIndex >= 0 &&
                         mediaFeedObject.directory ===
                             $mediaFeedObjects[currentPlayingIndex].directory}
-                    on:click|preventDefault={(e) => {
-                        if (e.target.classList.contains("playing")) {
-                            window.scroll(0, 0);
-                            document
-                                .querySelector("details")
-                                .setAttribute("open", "");
-                        } else {
-                            socket.emit("play", {
-                                directory: mediaFeedObject.directory,
-                            });
-                        }
-                    }}
-                />
+                >
+                    <input
+                        type="image"
+                        src={mediaFeedObject.screenshots[
+                            mediaFeedObject.screenshots.length - 1
+                        ] != null
+                            ? `/media/${mediaFeedObject.directory}/${
+                                  mediaFeedObject.screenshots[
+                                      mediaFeedObject.screenshots.length - 1
+                                  ]
+                              }`
+                            : `${mediaFeedObject.title}`}
+                        alt={mediaFeedObject.title}
+                        class:playing={currentPlayingIndex >= 0 &&
+                            mediaFeedObject.directory ===
+                                $mediaFeedObjects[currentPlayingIndex]
+                                    .directory}
+                        on:click|preventDefault={(e) => {
+                            if (e.target.classList.contains("playing")) {
+                                window.scroll(0, 0);
+                                document
+                                    .querySelector("details")
+                                    .setAttribute("open", "");
+                            } else {
+                                socket.emit("play", {
+                                    directory: mediaFeedObject.directory,
+                                });
+                            }
+                        }}
+                    />
+                </span>
             {/each}
         </div>
     </article>
@@ -511,6 +525,25 @@
         to {
             background: #d9d9d9;
         }
+    input[type="image"].playing {
+        filter: opacity(0.25);
+    }
+
+    .feed.playing::after {
+        content: "\25B6";
+        font-size: 3em;
+        color: white;
+        position: absolute;
+        z-index: 1;
+        height: 1em;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .feed {
+        position: relative;
+        display: inline-block;
     }
 
 </style>
