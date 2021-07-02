@@ -137,9 +137,6 @@
                         type="url"
                         placeholder="Enter URL to display"
                         bind:this={urlinputelement}
-                        on:keyup={(e) => {
-                            if (e.key === "Enter") playURL();
-                        }}
                         on:input={() => {
                             urlInputValid = urlinputelement.matches(":valid");
                         }}
