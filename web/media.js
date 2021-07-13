@@ -204,6 +204,8 @@ rendererSocket.event.on('data', function (data) {
                 //
                 console.log(`not saving screenshot bc website isnt in library`);
             }
+        } else if (rendererMsg.dimensions) {
+            windowDims = rendererMsg.dimensions;
         } else if (rendererMsg.status) {
             //
             //console.log(`got renderer status`);
@@ -856,6 +858,9 @@ module.exports = {
         rendererSocket.write(JSON.stringify({
             command: 'takeScreenshot'
         }));
+    },
+    windowDimensions: function (callback) {
+        callback(JSON.stringify(windowDims));
     },
     setStartupPlaylist: function (msg) {
         console.log(`USER INPUT::set startup playlist to ${msg}`);

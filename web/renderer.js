@@ -32,6 +32,11 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
 
+let windowDims = {
+  width: null,
+  height: null
+};
+
 class RenderWindow {
   browserWindow;
   side;
@@ -253,14 +258,15 @@ app.on('ready', () => {
   const {
     width,
     height
-  } = electron.screen.getPrimaryDisplay().workAreaSize
-  console.log(`Display work area size: ${JSON.stringify({width, height})} (setting width to 1/4 actual value)`);
-  // get actual width (vc4-fkms-v3d flag causes width to change to 3200)
-  var accWidth = height * 4;
+  } = electron.screen.getPrimaryDisplay().workAreaSize;
+  windowDims.width = Math.floor(width / 4); // get actual width by dividing by 4 - bc vc4-fkms-v3d flag causes width to be 4x larger
+  windowDims.height = height;
+  console.log(`Detected display size: ${JSON.stringify({width, height})}`);
+  console.log(`Window dimensions: ${JSON.stringify(windowDims)} (setting width to 1/4 of actual value bc of vc4-fkms-v3d bug)`);
   // window options (electronJS)
   const windowOpts = {
-    width: (accWidth / 2),
-    height: height,
+    width: windowDims.width,
+    height: windowDims.height,
     // useContentSize: true,
     // fullscreen: true,
     // enableLargerThanScreen: true,
@@ -372,7 +378,12 @@ app.on('ready', () => {
     console.log('Creating server.');
     var server = net.createServer(function (stream) {
         console.log('Connection acknowledged.');
-
+        // send window dimensions to client
+        stream.write(JSON.stringify(
+          {
+            dimensions: windowDims
+          }
+        ));
         // reguarly take screenshot and send to ui process
         var screenshotViewTimeout;
         var screenshotViewFrequency = 0; // ms

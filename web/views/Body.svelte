@@ -113,6 +113,13 @@
             playingChannels = [];
         }
     }
+
+    let previewStyleStr = "";
+    socket.on("windowdims", function (windowDims) {
+        var windowDimensions = JSON.parse(windowDims);
+        previewStyleStr += `width:${windowDimensions.width}px;`;
+        previewStyleStr += `height:${windowDimensions.height}px;`;
+    });
 </script>
 
 <section>
@@ -149,7 +156,8 @@
             </form>
         </nav>
         <div
-            style="position:relative;width:400px;height:200px;margin-bottom:0.7875rem;"
+            style={previewStyleStr}
+            id="preview"
             on:click|preventDefault={() => socket.emit("fakemouseinput")}
         >
             {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
@@ -525,6 +533,11 @@
 </section>
 
 <style>
+    #preview {
+        position: relative;
+        margin-bottom: 0.7875rem;
+    }
+
     #connecting {
         opacity: 0.95;
         /* background: #fff; */

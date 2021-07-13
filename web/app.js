@@ -43,6 +43,9 @@ io.on('connection', function (socket) {
   media.nowPlaying(function (playbackStatus) {
     socket.emit('nowplaying', (playbackStatus));
   });
+  media.windowDimensions(function (windowDims) {
+    socket.emit('windowdims', windowDims);
+  });
   // upload config file
   socket.on('updateconfigfile', function (msg) {
     // update in memory
