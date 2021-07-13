@@ -84,6 +84,79 @@
                 }}>
                 {JSON.stringify($config_settings, null, 2)}
             </pre>
+            <div>
+                <button
+                    type="submit"
+                    class="submit"
+                    on:click|preventDefault={() => {
+                        var settingsStr =
+                            document.querySelector("#settings").innerHTML;
+                        try {
+                            var settingsJSON = JSON.parse(settingsStr);
+                            if (
+                                window.confirm(
+                                    "Are you sure you want to save a new settings file?"
+                                )
+                            ) {
+                                // check if values have changed
+                                for (const [key, value] of Object.entries(
+                                    settingsJSON
+                                )) {
+                                    if (
+                                        typeof value === "object" &&
+                                        value !== null
+                                    ) {
+                                        if (key == "autoplayDuration") {
+                                            if (
+                                                value.min !==
+                                                $config_settings
+                                                    .autoplayDuration.min
+                                            ) {
+                                                var data = {
+                                                    name: "autoplayMinRange",
+                                                    value: value.min,
+                                                };
+                                                socket.emit(
+                                                    "config/update",
+                                                    data
+                                                );
+                                            }
+                                            if (
+                                                value.max !==
+                                                $config_settings
+                                                    .autoplayDuration.max
+                                            ) {
+                                                console.log(
+                                                    `changed autoplay max`
+                                                );
+                                                var data = {
+                                                    name: "autoplayMaxRange",
+                                                    value: value.max,
+                                                };
+                                                socket.emit(
+                                                    "config/update",
+                                                    data
+                                                );
+                                            }
+                                        }
+                                    } else if (
+                                        value !== $config_settings[key]
+                                    ) {
+                                        var data = {
+                                            name: key,
+                                            value: value,
+                                        };
+                                        socket.emit("config/update", data);
+                                    }
+                                }
+                                socket.emit("saveconfig");
+                            }
+                        } catch (exception) {
+                            alert("Error parsing json: " + exception);
+                        }
+                    }}>Save</button
+                >
+            </div>
         {/if}
         {#if $config}
             <h3>config.json</h3>

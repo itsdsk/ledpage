@@ -143,6 +143,9 @@ io.on('connection', function (socket) {
       case 'autoClickPeriod':
         media.setAutoClickPeriod(updateObj);
         break;
+      case 'startupPlaylist':
+        media.setStartupPlaylist(msg.value);
+        break;
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }
