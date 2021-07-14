@@ -948,7 +948,12 @@ function runCommand(command, callback) {
 var autoplayList = []; // list of items to autoplay
 var autoplayPos = 0; // index in autoplay list
 
-function autoplayNext(thisFadeDuration = config_settings.fade) {
+async function autoplayNext(thisFadeDuration = config_settings.fade) {
+    // check if screen is on
+    while (config_settings.brightness == 0.0) {
+        // pause until switched on
+        await new Promise(r => setTimeout(r, Math.max(thisFadeDuration / 2, 5000)));
+    }
     // check there are items in playlist
     if (autoplayList && autoplayList.length > 0) {
         // check randomness and bounds
