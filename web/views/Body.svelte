@@ -57,7 +57,7 @@
     const rotateScreenshots = () => {
         screenshotIndex++;
     };
-    setInterval(rotateScreenshots, 2750);
+    setInterval(rotateScreenshots, 2500);
 
     // sorted channels
     let sortedChannels = [];
@@ -114,12 +114,30 @@
         }
     }
 
-    let previewStyleStr = "";
+    let windowDimensions = {
+        width: 0,
+        height: 0,
+        ratio: 100,
+    };
     socket.on("windowdims", function (windowDims) {
-        var windowDimensions = JSON.parse(windowDims);
-        previewStyleStr += `width:${windowDimensions.width}px;`;
-        previewStyleStr += `height:${windowDimensions.height}px;`;
+        var parsed = JSON.parse(windowDims);
+        // calc aspect ratio as percentage
+        parsed.ratio = 100 * (parsed.height / parsed.width);
+        windowDimensions = parsed;
     });
+
+    let playback_timer = 0;
+    $: if ($config_settings.brightness > 0.0) {
+        var secs = Math.round(
+            $livePlaybackStatus.nextPlaying.timeFromStart / 1000
+        );
+        var absSecs = Math.abs(secs);
+        playback_timer = `${secs < 0 ? "-" : "+"}${Math.floor(absSecs / 60)}:${
+            absSecs % 60
+        }`;
+    } else {
+        playback_timer = `--:--`;
+    }
 </script>
 
 <section>
@@ -155,45 +173,43 @@
                 </div>
             </form>
         </nav>
-        <div
-            style={previewStyleStr}
-            id="preview"
-            on:click|preventDefault={() => socket.emit("fakemouseinput")}
-        >
-            {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
-                {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
-                    <input
-                        type="image"
-                        src={src != null
-                            ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
-                            : ""}
-                        alt="preview img"
-                        transition:fade={{ duration: 2500 }}
-                        style="position:absolute;display:block;"
-                    />
-                {/each}
-            {:else if $livePlaybackStatus.nowPlaying}
-                {#each [`screenshot_tmp.jpg?${screenshotIndex}`] as src (screenshotIndex)}
-                    <input
-                        type="image"
-                        src={src != null ? `/${src}` : ""}
-                        alt="preview img"
-                        transition:fade={{ duration: 2500 }}
-                        style="position:absolute;display:block;"
-                    />
-                {/each}
-            {/if}
+        <div style="width:{windowDimensions.width}px;">
+            <div
+                style="padding-bottom:{windowDimensions.ratio}%;"
+                id="preview"
+                on:click|preventDefault={() => socket.emit("fakemouseinput")}
+            >
+                {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
+                    {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
+                        <input
+                            type="image"
+                            src={src != null
+                                ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
+                                : ""}
+                            alt="preview img"
+                            transition:fade={{ duration: 2500 }}
+                            class="preview__img"
+                        />
+                    {/each}
+                {:else if $livePlaybackStatus.nowPlaying}
+                    {#each [`screenshot_tmp.jpg?${screenshotIndex}`] as src (screenshotIndex)}
+                        <input
+                            type="image"
+                            src={src != null ? `/${src}` : ""}
+                            alt="preview img"
+                            transition:fade={{ duration: 2500 }}
+                            class="preview__img"
+                        />
+                    {/each}
+                {/if}
+                <span id="time" style="padding-top:{windowDimensions.ratio}%;">
+                    {playback_timer}
+                </span>
+            </div>
         </div>
         <details style="margin-bottom:1.85625rem;">
             <summary>
-                <strong>
-                    Now Playing
-                    <code>
-                        {Math.round(
-                            $livePlaybackStatus.nextPlaying.timeFromStart / 1000
-                        )}s
-                    </code>
-                </strong>
+                <strong>Now Playing</strong>
             </summary>
             <form
                 on:submit|preventDefault={() => {
@@ -533,9 +549,26 @@
 </section>
 
 <style>
+    .preview__img {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    #time {
+        position: relative;
+        display: block;
+        text-align: right;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        font-size: 0.8em;
+        z-index: -1;
+    }
+
     #preview {
         position: relative;
         margin-bottom: 0.7875rem;
+        height: 0;
     }
 
     #connecting {
