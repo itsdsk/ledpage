@@ -48,7 +48,7 @@
                 </MapContainer>
             </div>
             <table>
-                <thead style="display:table-header-group;">
+                <thead>
                     <tr>
                         <th>Type</th>
                         <th>Count</th>
@@ -201,31 +201,7 @@
     }
 
     table {
-        display: table;
         width: auto;
-    }
-
-    td,
-    th {
-        display: table-cell;
-        border-bottom: 1.08px solid #595959;
-        padding: 0.4078125rem 1.125rem;
-    }
-
-    thead {
-        display: table-header-group;
-    }
-
-    tbody {
-        display: table-row-group;
-    }
-
-    tr {
-        display: table-row;
-    }
-
-    thead th {
-        border-bottom-width: 2.16px;
     }
 
     .power {
