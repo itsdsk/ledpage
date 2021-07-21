@@ -164,6 +164,9 @@
                         type="url"
                         placeholder="Enter URL to display"
                         bind:this={urlinputelement}
+                        on:click={() => {
+                            urlinputelement.select();
+                        }}
                         on:input={() => {
                             urlInputValid = urlinputelement.matches(":valid");
                         }}
@@ -501,15 +504,14 @@
                                 $mediaFeedObjects[currentPlayingIndex]
                                     .directory}
                         on:click|preventDefault={(e) => {
+                            socket.emit("play", {
+                                directory: mediaFeedObject.directory,
+                            });
                             if (e.target.classList.contains("playing")) {
                                 window.scroll(0, 0);
                                 document
                                     .querySelector("details")
                                     .setAttribute("open", "");
-                            } else {
-                                socket.emit("play", {
-                                    directory: mediaFeedObject.directory,
-                                });
                             }
                         }}
                     />
