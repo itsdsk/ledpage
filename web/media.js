@@ -333,6 +333,7 @@ function saveScreenshot(side) {
 var mediaDir = path.join(__dirname, '../', 'public', 'media');
 var config; // device config
 var config_settings; // settings
+var windowDims; // dimensions of renderer
 module.exports = {
     // event emitter
     eventEmitter: new EventEmitter(),
