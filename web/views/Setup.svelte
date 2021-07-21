@@ -55,7 +55,7 @@
                 <tbody>
                     {#each $config.outputs as output, i}
                         <tr
-                            class:activeOutputChain={activeOutputChain === i}
+                            class:selected={activeOutputChain === i}
                             on:click={() =>
                                 (activeOutputChain =
                                     activeOutputChain === i ? null : i)}
@@ -192,6 +192,10 @@
 </section>
 
 <style>
+    tr.selected {
+        text-decoration: underline dotted;
+    }
+
     pre {
         border: 1px solid #595959;
         border-radius: 3.6px;
