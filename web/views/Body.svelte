@@ -8,6 +8,7 @@
         config_settings,
         showConnectionMessage,
         connectionLogs,
+        playbackStatus,
     } from "./client_data.js";
 
     //
@@ -132,9 +133,19 @@
             $livePlaybackStatus.nextPlaying.timeFromStart / 1000
         );
         var absSecs = Math.abs(secs);
-        playback_timer = `${secs < 0 ? "-" : "+"}${Math.floor(absSecs / 60)}:${
+        playback_timer = `${Math.floor(absSecs / 60)}:${String(
             absSecs % 60
-        }`;
+        ).padStart(2, "0")}`;
+        if (secs < 0) {
+            playback_timer = "-" + playback_timer;
+        } else {
+            var fadeDurationSeconds = Math.round(
+                $playbackStatus.playingFadeIn.fadeDuration / 1000
+            );
+            playback_timer += ` / ${Math.floor(fadeDurationSeconds / 60)}:${
+                fadeDurationSeconds % 60
+            }`;
+        }
     } else {
         playback_timer = `--:--`;
     }
