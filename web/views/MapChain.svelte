@@ -1,50 +1,41 @@
 <script>
-  import { draw, blur } from "svelte/transition";
   export let output;
-  export let fillColour = "#333";
-  export let visibility = "hidden";
-
-  let circleDuration = 500;
+  export let selected = false;
 </script>
 
-<style>
-  line {
-    stroke: black;
-    stroke-width: 2px;
-  }
-  circle {
-    stroke: black;
-    stroke-width: 2px;
-  }
-  circle:hover {
-    r: 12px;
-    fill: black;
-  }
-  g:hover > circle:not(:hover) {
-    r: 8px;
-    fill: black;
-  }
-  g:hover > line {
-    /* visibility: visible; */
-  }
-</style>
-
-<g>
+<g on:click>
   {#each output.leds as led, i}
-    <circle
-      in:blur={{ duration: circleDuration }}
-      cx={led.x}
-      cy={led.y}
-      r={visibility === "hidden" ? 6 : 8}
-      fill={visibility === 'hidden' ? '#dddddd' : 'black'}
-      on:click />
+    <circle cx={led.x} cy={led.y} class:selected />
     {#if i < output.leds.length - 1}
       <line
-        {visibility}
+        class:selected
         x1={led.x}
         y1={led.y}
         x2={output.leds[i + 1].x}
-        y2={output.leds[i + 1].y} />
+        y2={output.leds[i + 1].y}
+      />
     {/if}
   {/each}
 </g>
+
+<style>
+  circle.selected,
+  g:hover > circle {
+    fill: #1c1c1c;
+    stroke-width: 6px;
+  }
+  line.selected,
+  g:hover > line {
+    stroke-width: 4px;
+    stroke-linecap: round;
+  }
+  line {
+    stroke: white;
+    stroke-width: 1px;
+  }
+  circle {
+    fill: white;
+    stroke: white;
+    r: 10px;
+  }
+</style>

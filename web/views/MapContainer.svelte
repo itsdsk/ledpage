@@ -20,7 +20,7 @@
 
 <svg
   viewBox="0 0 {width} {height}"
-  width={Math.min(windowWidth - 10, 360)}
+  width={Math.min(windowWidth - 10, 640)}
   bind:this={svg}
 >
   <slot />
@@ -28,7 +28,7 @@
 
 <style>
   svg {
-    border: 1px solid #d9d9d9;
+    border: 1px solid #333;
     border-radius: 3.6px;
   }
 </style>

@@ -39,9 +39,7 @@
                     {#each $config.outputs as output, i}
                         <MapChain
                             {output}
-                            visibility={activeOutputChain == i
-                                ? "visible"
-                                : "hidden"}
+                            selected={activeOutputChain == i ? true : false}
                             on:click={() => (activeOutputChain = i)}
                         />
                     {/each}
