@@ -10,6 +10,8 @@
         connectionLogs,
         playbackStatus,
     } from "./client_data.js";
+    import MenuToggle from "./MenuToggle.svelte";
+    import Menu from "./Menu.svelte";
 
     //
     let selectedChannel = -1;
@@ -155,11 +157,9 @@
     let showSidePanel = false;
     let autoToggleSidePanel = false;
     $: if ($showConnectionMessage) {
-        showSidePanel = true;
-        autoToggleSidePanel = true;
+        showSidePanel = autoToggleSidePanel = true;
     } else if (autoToggleSidePanel) {
-        showSidePanel = false;
-        autoToggleSidePanel = false;
+        showSidePanel = autoToggleSidePanel = false;
     }
 </script>
 
@@ -168,13 +168,9 @@
         <nav>
             <form>
                 {#if windowWidth < 1536}
-                    <button
-                        class="menu__toggle menu__toggle--small"
-                        type="button"
+                    <MenuToggle
                         on:click={() => (showSidePanel = !showSidePanel)}
-                    >
-                        ☰
-                    </button>
+                    />
                 {/if}
                 <button
                     type="submit"
@@ -545,129 +541,16 @@
         </div>
     </article>
     {#if windowWidth > 1536 || showSidePanel}
-        <article class="menu">
-            <button
-                class="menu__toggle menu__toggle--big"
-                type="button"
-                on:click={() => (showSidePanel = false)}
-            >
-                ☰
-            </button>
-            <nav>
-                <ul>
-                    <li class="menu__item menu__item--active">
-                        <a class="menu__link" href="/"> Home </a>
-                    </li>
-                    <li class="menu__item">
-                        <a class="menu__link" href="/setup"> Setup </a>
-                    </li>
-                </ul>
-            </nav>
-            <p class="menu__item">
-                {$showConnectionMessage ? "Disconnected" : "Connected"}
-            </p>
-            {#if $connectionLogs.length}
-                <dl class="menu__item">
-                    {#each $connectionLogs as connectionLog}
-                        {#each connectionLog.dt as dt}
-                            <dt>
-                                {dt}
-                            </dt>
-                        {/each}
-                        {#each connectionLog.dd as dd}
-                            <dd>
-                                {dd}
-                            </dd>
-                        {/each}
-                    {/each}
-                </dl>
-                <button
-                    type="button"
-                    class="menu__item"
-                    on:click|preventDefault={() => {
-                        socket.connect();
-                    }}
-                >
-                    Reconnect
-                </button>
-            {/if}
-        </article>
+        <Menu
+            active={"home"}
+            on:click={() => (showSidePanel = autoToggleSidePanel = false)}
+        />
     {/if}
 </section>
 
 <svelte:window bind:innerWidth={windowWidth} />
 
 <style>
-    .menu {
-        opacity: 0.95;
-        width: 318px;
-        height: 100%;
-        z-index: 10;
-        top: 0;
-        left: 0;
-        position: fixed;
-        border-top: none;
-        border-bottom: none;
-        border-left: none;
-        padding-top: 79.2px;
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-
-    .menu__toggle {
-        border: none;
-    }
-
-    .menu__item {
-        padding: 18px 43.2px;
-    }
-
-    .menu__link {
-        color: white;
-        display: block;
-    }
-
-    .menu__toggle--big {
-        width: 100%;
-        width: -moz-available;
-        width: -webkit-fill-available;
-        width: stretch;
-        text-align: left;
-        padding: 0.4078125rem 0.99rem;
-        margin-left: 43.2px;
-        margin-right: 43.2px;
-        background: none;
-    }
-
-    .menu__toggle--small {
-        float: left;
-        padding: 0.4078125rem 0.99rem;
-    }
-
-    .menu__item--active {
-        background: #333;
-    }
-
-    @media not screen and (max-width: 767px) {
-        .menu__toggle--big {
-            padding-left: 0px;
-            background: none;
-        }
-    }
-
-    @media (max-width: 767px) {
-        .menu {
-            padding-top: 36px;
-        }
-        .menu__toggle--big {
-            margin-left: 18px;
-            margin-right: 18px;
-        }
-        .menu__item {
-            padding: 18px 18px;
-        }
-    }
-
     .preview__img {
         position: absolute;
         display: block;
