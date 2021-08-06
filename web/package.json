@@ -24,6 +24,8 @@
     "postinstall": "npm run build",
     "start": "node app.js -n",
     "build": "rollup -c",
+    "buildindex": "rollup -c --environment INDEX",
+    "buildsetup": "rollup -c --environment SETUP",
     "dev": "rollup -c -w"
   }
 }
