@@ -523,7 +523,7 @@ app.on('ready', () => {
                             "source": msg.URL,
                             "description": msg.URL,
                             "files": ["index.html"],
-                            "channels": ["firstchannel"],
+                            "channels": [msg.channel],
                             "playcount": 0,
                             "thumbnails": ["thumb.jpg"],
                             "modified": timestamp

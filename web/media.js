@@ -420,7 +420,8 @@ module.exports = {
         rendererSocket.write(JSON.stringify({
             command: 'saveURL',
             URL: msg,
-            mediaDir: mediaDir
+            mediaDir: mediaDir,
+            channel: playback.channel || config_settings.startupPlaylist
         }));
     },
     renameMedia: function (msg, callback) {
