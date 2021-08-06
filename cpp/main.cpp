@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <climits>
+#include <cmath>
 #include <unistd.h>
 #include <signal.h>
 #include <chrono>
@@ -51,6 +52,8 @@ struct animatedProperty {
         } else {
             // percent time passed
             float lerp_amt = float(elapsedTime) / float(fadeDuration);
+            // ease in out quad
+            lerp_amt = lerp_amt < 0.5 ? 2.0 * lerp_amt * lerp_amt : 1.0 - pow(-2.0 * lerp_amt + 2.0, 2.0) / 2.0;
             // interpolate value
             lastValue = initialValue + (lerp_amt * (targetValue - initialValue));
         }
