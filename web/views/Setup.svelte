@@ -1,14 +1,33 @@
 <script>
-    import { config_settings, config } from "./client_data.js";
+    import {
+        config_settings,
+        config,
+        showConnectionMessage,
+    } from "./client_data.js";
     import MapContainer from "./MapContainer.svelte";
     import MapChain from "./MapChain.svelte";
+    import MenuToggle from "./MenuToggle.svelte";
+    import Menu from "./Menu.svelte";
 
     let activeOutputChain = null;
+
+    let windowWidth = 10;
+
+    let showSidePanel = false;
+    let autoToggleSidePanel = false;
+    $: if ($showConnectionMessage) {
+        showSidePanel = autoToggleSidePanel = true;
+    } else if (autoToggleSidePanel) {
+        showSidePanel = autoToggleSidePanel = false;
+    }
 </script>
 
 <section>
     <header>
-        <h1>
+        <nav>
+            {#if windowWidth < 1536}
+                <MenuToggle on:click={() => (showSidePanel = !showSidePanel)} />
+            {/if}
             <span style="float:right;">
                 <button
                     type="button"
@@ -31,8 +50,7 @@
                     Shutdown
                 </button>
             </span>
-            Setup
-        </h1>
+        </nav>
         {#if $config}
             <div>
                 <MapContainer>
@@ -189,7 +207,15 @@
             >
         {/if}
     </article>
+    {#if windowWidth > 1536 || showSidePanel}
+        <Menu
+            active={"setup"}
+            on:click={() => (showSidePanel = autoToggleSidePanel = false)}
+        />
+    {/if}
 </section>
+
+<svelte:window bind:innerWidth={windowWidth} />
 
 <style>
     tr.selected {
