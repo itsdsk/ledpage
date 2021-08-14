@@ -243,9 +243,14 @@ class RenderWindow {
       callback(result.deviceId);
     }
   }
-  // log windows
+  // print logs from website if they start with 'DISK' or are errors
   onConsoleOutput(event, level, message, line, sourceId) {
-    console.log(`${this.side} console: ${message}`);
+    // check if log is error (levels 0 - 3 correspond with verbose, info, warning, and error)
+    if (level == 3) {
+      console.log(`${this.side} console error: ${message}`);
+    } else if (String(message).startsWith("DISK")) {
+      console.log(`${this.side} console: ${message.substring(5)}`)
+    }
   }
 
 }
