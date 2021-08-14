@@ -173,15 +173,16 @@
                     />
                 {/if}
                 <button
+                    class="url__submit"
                     type="submit"
                     on:click|preventDefault={playURL}
-                    style="float:right;margin-left:0.4078125rem;margin-right:0;"
                     disabled={!urlInputValid}
                 >
                     Play
                 </button>
-                <div style="overflow:hidden;">
+                <div class="url__container">
                     <input
+                        class="url__input"
                         type="url"
                         placeholder="Enter URL to display"
                         bind:this={urlinputelement}
@@ -192,15 +193,14 @@
                             urlInputValid = urlinputelement.matches(":valid");
                         }}
                         required
-                        style="width:100%;"
                     />
                 </div>
             </form>
         </nav>
-        <div style="width:{windowDimensions.width}px;">
+        <div class="preview" style="--window-width: {windowDimensions.width}px">
             <div
-                style="padding-bottom:{windowDimensions.ratio}%;"
-                id="preview"
+                class="preview__window"
+                style="--window-ratio: {windowDimensions.ratio}%"
                 on:click|preventDefault={() => socket.emit("fakemouseinput")}
             >
                 {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
@@ -226,12 +226,15 @@
                         />
                     {/each}
                 {/if}
-                <span id="time" style="padding-top:{windowDimensions.ratio}%;">
+                <span
+                    class="preview__timer"
+                    style="--window-ratio: {windowDimensions.ratio}%"
+                >
                     {playback_timer}
                 </span>
             </div>
         </div>
-        <details style="margin-bottom:1.85625rem;">
+        <details class="status">
             <summary>
                 <strong>Now Playing</strong>
             </summary>
@@ -241,9 +244,7 @@
                 }}
             >
                 {#if currentPlayingIndex < 0}
-                    <h3
-                        style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
-                    >
+                    <h3 class="status__url">
                         <a
                             href={$livePlaybackStatus.nowPlaying
                                 ? $livePlaybackStatus.nowPlaying.directory
@@ -255,16 +256,18 @@
                                 : "/"}
                         </a>
                     </h3>
-                    <p style="margin-bottom:0.7875rem;">Options:</p>
-                    <div style="overflow:auto;white-space:nowrap;">
+                    <p class="status__label">Options:</p>
+                    <div class="status__buttons">
                         <button
                             type="button"
+                            class="action"
                             on:click|preventDefault={downloadURL}
                         >
                             Save to library
                         </button>
                         <button
                             type="button"
+                            class="action"
                             on:click|preventDefault={() => {
                                 socket.emit("playnext");
                             }}
@@ -274,15 +277,11 @@
                     </div>
                 {:else}
                     {#if $mediaFeedObjects[currentPlayingIndex].title !== $mediaFeedObjects[currentPlayingIndex].source}
-                        <h1
-                            style="overflow:auto;white-space:nowrap;text-overflow:clip;margin:0.7875rem 0;"
-                        >
+                        <h1 class="status__title">
                             {$mediaFeedObjects[currentPlayingIndex].title}
                         </h1>
                     {/if}
-                    <h3
-                        style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0.7875rem 0;"
-                    >
+                    <h3 class="status__url">
                         <a
                             href={$mediaFeedObjects[currentPlayingIndex].source}
                             target="_blank"
@@ -290,15 +289,14 @@
                             {$mediaFeedObjects[currentPlayingIndex].source}
                         </a>
                     </h3>
-                    <p style="margin-bottom:0.7875rem;">Channels:</p>
-                    <div
-                        style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;"
-                    >
+                    <p class="status__label">Channels:</p>
+                    <div class="status__buttons status__buttons--channels">
                         {#if currentPlayingIndex >= 0}
                             {#each playingChannels as channel, index}
                                 {#if channel}
                                     <button
                                         type="button"
+                                        class="connect"
                                         class:playing={index === 0}
                                         on:click|preventDefault={() => {
                                             if (
@@ -361,10 +359,11 @@
                             </datalist>
                         {/if}
                     </div>
-                    <p style="margin-bottom:0.7875rem;">Commands:</p>
-                    <div style="overflow:auto;white-space:nowrap;">
+                    <p class="status__label">Commands:</p>
+                    <div class="status__buttons">
                         <button
                             type="button"
+                            class="action"
                             on:click|preventDefault={() => {
                                 socket.emit("screenshot");
                             }}
@@ -373,6 +372,7 @@
                         </button>
                         <button
                             type="button"
+                            class="action"
                             on:click|preventDefault={() => {
                                 socket.emit("playnext");
                             }}
@@ -381,6 +381,7 @@
                         </button>
                         <button
                             type="button"
+                            class="action"
                             on:click|preventDefault={() => {
                                 if (
                                     window.confirm(
@@ -407,7 +408,7 @@
                     return false;
                 }}
             >
-                <p style="margin-bottom:0.7875rem;">Brightness:</p>
+                <p class="status__label">Brightness:</p>
                 <input
                     type="number"
                     min="0.0"
@@ -467,7 +468,7 @@
     </header>
     <article>
         <h2>Saved Media</h2>
-        <div style="overflow:auto;white-space:nowrap;margin-bottom:1.125rem;">
+        <div class="channels">
             {#each sortedChannels as channelObject, index}
                 <button
                     on:click|preventDefault={() => {
@@ -551,6 +552,24 @@
 <svelte:window bind:innerWidth={windowWidth} />
 
 <style>
+    .url__submit {
+        float: right;
+        margin-left: 0.4078125rem;
+        margin-right: 0;
+    }
+
+    .url__container {
+        overflow: hidden;
+    }
+
+    .url__input {
+        width: 100%;
+    }
+
+    .preview {
+        width: var(--window-width);
+    }
+
     .preview__img {
         position: absolute;
         display: block;
@@ -558,7 +577,15 @@
         height: 100%;
     }
 
-    #time {
+    .preview__window {
+        position: relative;
+        padding-bottom: var(--window-ratio);
+        margin-bottom: 0.7875rem;
+        height: 0;
+    }
+
+    .preview__timer {
+        padding-top: var(--window-ratio);
         position: relative;
         display: block;
         text-align: right;
@@ -567,14 +594,39 @@
         z-index: -1;
     }
 
-    #preview {
-        position: relative;
-        margin-bottom: 0.7875rem;
-        height: 0;
-    }
-
     input[type="image"] {
         padding: 0;
+    }
+
+    .status {
+        margin-bottom: 1.85625rem;
+    }
+
+    .status__title {
+        overflow: auto;
+        white-space: nowrap;
+        text-overflow: clip;
+        margin: 0.7875rem 0;
+    }
+
+    .status__url {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin: 0.7875rem 0;
+    }
+
+    .status__label {
+        margin-bottom: 0.7875rem;
+    }
+
+    .status__buttons {
+        overflow: auto;
+        white-space: nowrap;
+    }
+
+    .status__buttons--channels {
+        margin-bottom: 1.125rem;
     }
 
     #brightness {
@@ -609,8 +661,34 @@
         transform: translate(-50%, -50%);
     }
 
+    .channels {
+        overflow: auto;
+        white-space: nowrap;
+        margin-bottom: 1.125rem;
+    }
+
     .feed {
         position: relative;
         display: inline-block;
+    }
+
+    .action,
+    .connect {
+        border: 1px solid #a3a2a2;
+    }
+    .action {
+        background: #275a90;
+    }
+
+    .action:hover {
+        background: #173454;
+    }
+
+    .connect {
+        background: #2a6f3b;
+    }
+
+    .connect:hover {
+        background: #db423c;
     }
 </style>
