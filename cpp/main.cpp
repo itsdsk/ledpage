@@ -125,8 +125,7 @@ public:
         if (!error)
         {
             std::string receivedData(data_.begin(), data_.begin() + bytes_transferred);
-            // std::cout << "received data: " << receivedData << std::endl;
-            // std::cout << "length: " << bytes_transferred << std::endl;
+            std::cout << "received data: " << receivedData << " (" << bytes_transferred << " bytes)" << std::endl;
             // parse msg redeiced as json
             auto jdata = json::parse(receivedData);
             // go through top level of JSON object received
@@ -135,50 +134,48 @@ public:
                 string key1 = element1.key();
                 if (key1 == "window")
                 {
-                    std::cout << "key1 is window" << std::endl;
                     if (element1.value().find("brightness") != element1.value().end())
                     {
                         // get brightness amt and update property
                         brightness.setTarget(element1.value()["brightness"].get<float>(), 1000);
-                        std::cout << "user changing brightness to: " << brightness.targetValue << std::endl;
+                        // std::cout << "user changing brightness to: " << brightness.targetValue << std::endl;
                     }
                     if (element1.value().find("blur") != element1.value().end())
                     {
                         // get size
                         changeSize = element1.value()["blur"].get<int>();
-                        std::cout << "user changing blur size to: " << std::to_string(changeSize) << std::endl;
+                        // std::cout << "user changing blur size to: " << std::to_string(changeSize) << std::endl;
                     }
                     if (element1.value().find("fade") != element1.value().end())
                     {
                         // get size
                         fadeDuration = element1.value()["fade"].get<int>();
-                        std::cout << "user changing fade to: " << std::to_string(fadeDuration) << std::endl;
+                        // std::cout << "user changing fade to: " << std::to_string(fadeDuration) << std::endl;
                     }
                     if (element1.value().find("half") != element1.value().end())
                     {
                         // get browser window side and update property
                         browserWindowMix.setTarget(element1.value()["half"].get<float>(), fadeDuration);
-                        std::cout << "user switching window side to " << browserWindowMix.targetValue << " with fade " << fadeDuration << std::endl;
+                        // std::cout << "user switching window side to " << browserWindowMix.targetValue << " with fade " << fadeDuration << std::endl;
                     }
                     if (element1.value().find("desaturation") != element1.value().end())
                     {
                         // get desaturation amt and update property
                         desaturation.setTarget(element1.value()["desaturation"].get<float>(), 1000);
-                        std::cout << "user changing desaturation to: " << desaturation.targetValue << std::endl;
+                        // std::cout << "user changing desaturation to: " << desaturation.targetValue << std::endl;
                     }
                     if (element1.value().find("gamma") != element1.value().end())
                     {
                         // get gammaValue amt and update property
                         gammaValue.setTarget(element1.value()["gamma"].get<float>(), 1000);
-                        std::cout << "user changing gammaValue to: " << gammaValue.targetValue << std::endl;
+                        // std::cout << "user changing gammaValue to: " << gammaValue.targetValue << std::endl;
                     }
                 }
                 else if (key1 == "command")
                 {
-                    cout << "key1 is command" << endl;
                     if (element1.value() == "screenshot")
                     {
-                        cout << "screenshot" << endl;
+                        // cout << "screenshot" << endl;
                         receivedScreenshotCommand = true;
                     }
                 }
@@ -390,7 +387,8 @@ int main(int argc, char *argv[])
             unsigned int timeElapsed = timeNow - lastPerformanceRead; // ms
             float framerateNow = float(performanceReadPeriod) / float(timeElapsed);
             framerateNow *= 1000.0; // s
-            cout << "FPS: " << framerateNow << endl;
+            if (framerateNow < 24.0)
+                cout << "FPS: " << framerateNow << endl;
             lastPerformanceRead = timeNow;
         }
 

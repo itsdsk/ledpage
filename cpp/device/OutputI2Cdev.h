@@ -50,6 +50,8 @@ public:
         {
             // calc number of 10-colour parts needed to send frame
             frameParts = (unsigned)ceil(ledValues.size() / 10.0);
+            // set error logging threshold to 50% of frameParts
+            write_error_threshold = (unsigned)floor(frameParts / 2.0);
         }
         // init error counter
         unsigned write_error_count = 0;
@@ -82,7 +84,7 @@ public:
             // usleep(1200);
         }
         // log errors
-        if (write_error_count > 1)
+        if (write_error_count > write_error_threshold)
         {
             std::cout << "Failed to write to the i2c bus " << write_error_count << " times." << std::endl;
             // pause before retrying
@@ -98,6 +100,7 @@ public:
     int _i2cHandle;
     unsigned char buffer[32]; // 32 = maximum i2c buffer on arduino 
     unsigned frameParts = 0; // number of 32 byte messages per frame
+    unsigned write_error_threshold = 0; // number of failed writes to ignore
     std::string filename = "/dev/i2c-3"; // file descriptor for i2c
     int file_i2c;
 };

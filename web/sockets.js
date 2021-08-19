@@ -73,7 +73,7 @@ exports.DomainClient = class DomainClient {
                 this.event.emit('connect');
             })
             .on('data', (data) => {
-                console.log(`Received data from ${this.name}`);
+                // console.log(`Socket Client: Received data from ${this.name}, length: ${data.length}`);
                 this.event.emit('data', data);
             })
             .on('end', () => {

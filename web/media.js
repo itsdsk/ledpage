@@ -87,7 +87,6 @@ rendererSocket.event.on('connect', function () {
 });
 rendererSocket.event.on('data', function (data) {
     var dataAsString = data.toString();
-    console.log("renderer msg length: " + dataAsString.length);
     if (dataAsString === '__disconnect') {
         cleanup();
     } else {
@@ -95,7 +94,7 @@ rendererSocket.event.on('data', function (data) {
         try {
             rendererMsg = JSON.parse(dataAsString);
         } catch (e) {
-            console.log(`error parsing json from renderer: ${e}`);
+            console.log(`error parsing json from renderer: ${e}\n${dataAsString}`);
             return;
         }
         // message backend to switch
@@ -294,7 +293,6 @@ process.on('SIGINT', cleanup);
 function saveScreenshot(side) {
     // check directory of media
     if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
-        console.log('waiting for screenshot from backend');
         // watch screenshot file for changes // TODO: make work if file does not exist yet
         const watcher = fs.watch(screenshotPath, (eventType, filename) => {
             // stop watching once file has been changed

@@ -294,6 +294,7 @@ app.on('ready', () => {
 
   // log GPU features
   setTimeout(() => {
+    console.log(`Electron version: ${process.versions.electron}`);
     console.log(`GPU:\n${JSON.stringify(app.getGPUFeatureStatus(), null, 2)}`);
     // app.getGPUInfo('complete'); // or 'basic'
   }, 3000);
@@ -439,8 +440,6 @@ app.on('ready', () => {
           // parse buffer
           msg = JSON.parse(msg.toString());
 
-          console.log('Client:', JSON.stringify(msg));
-
           // save client
           client = stream;
 
@@ -457,8 +456,6 @@ app.on('ready', () => {
             // flip window to display on
             flipWindow = !flipWindow;
           } else if (msg.command == "unloadSide") {
-            // unload browser window
-            console.log(`unloading ${msg.side}`);
             // get right browser window
             var _browserWindow = msg.side == 'A' ? windowA.browserWindow : windowB.browserWindow;
             // load empty webpage
