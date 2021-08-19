@@ -11,5 +11,5 @@ public/media/*
 .directory*
 public/config.json
 public/settings.json
-public/svelte-bundle.*
+public/*-bundle.*
 config_gens
