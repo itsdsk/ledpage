@@ -12,6 +12,7 @@
     } from "./client_data.js";
     import MenuToggle from "./MenuToggle.svelte";
     import Menu from "./Menu.svelte";
+    import Player from "./Player.svelte";
 
     //
     let selectedChannel = -1;
@@ -25,17 +26,6 @@
         ) {
             // URL is validated
             socket.emit("playURL", urlinputelement.value);
-        }
-    }
-    function downloadURL() {
-        if ($livePlaybackStatus.nowPlaying.directory.length > 0) {
-            // URL is validated
-            socket.emit(
-                "createmediaURL",
-                $livePlaybackStatus.nowPlaying.directory
-            );
-        } else {
-            console.log("cannot create media from URL as it is invalid");
         }
     }
 
@@ -88,32 +78,6 @@
             ];
         } else {
             sortedChannels = [];
-        }
-    }
-
-    // sorted media channels
-    let playingChannels = [];
-
-    $: updatePlayingChannels(
-        currentPlayingIndex,
-        $livePlaybackStatus.channel,
-        $mediaFeedObjects[currentPlayingIndex]
-    );
-
-    function updatePlayingChannels() {
-        //
-        if (currentPlayingIndex >= 0) {
-            // move currently-playing-channel to front of array
-            playingChannels = [
-                $mediaFeedObjects[currentPlayingIndex].channels.find(
-                    (item) => item === $livePlaybackStatus.channel
-                ),
-                ...$mediaFeedObjects[currentPlayingIndex].channels.filter(
-                    (item) => item !== $livePlaybackStatus.channel
-                ),
-            ];
-        } else {
-            playingChannels = [];
         }
     }
 
@@ -234,236 +198,8 @@
                 </span>
             </div>
         </div>
-        <details class="status">
-            <summary>
-                <strong>Now Playing</strong>
-            </summary>
-            <form
-                on:submit|preventDefault={() => {
-                    return false;
-                }}
-            >
-                {#if currentPlayingIndex < 0}
-                    <h3 class="status__url">
-                        <a
-                            href={$livePlaybackStatus.nowPlaying
-                                ? $livePlaybackStatus.nowPlaying.directory
-                                : "/"}
-                            target="_blank"
-                        >
-                            {$livePlaybackStatus.nowPlaying
-                                ? $livePlaybackStatus.nowPlaying.directory
-                                : "/"}
-                        </a>
-                    </h3>
-                    <p class="status__label">Options:</p>
-                    <div class="status__buttons">
-                        <button
-                            type="button"
-                            class="action"
-                            on:click|preventDefault={downloadURL}
-                        >
-                            Save to library
-                        </button>
-                        <button
-                            type="button"
-                            class="action"
-                            on:click|preventDefault={() => {
-                                socket.emit("playnext");
-                            }}
-                        >
-                            Back to playlist
-                        </button>
-                    </div>
-                {:else}
-                    {#if $mediaFeedObjects[currentPlayingIndex].title !== $mediaFeedObjects[currentPlayingIndex].source}
-                        <h1 class="status__title">
-                            {$mediaFeedObjects[currentPlayingIndex].title}
-                        </h1>
-                    {/if}
-                    <h3 class="status__url">
-                        <a
-                            href={$mediaFeedObjects[currentPlayingIndex].source}
-                            target="_blank"
-                        >
-                            {$mediaFeedObjects[currentPlayingIndex].source}
-                        </a>
-                    </h3>
-                    <p class="status__label">Channels:</p>
-                    <div class="status__buttons status__buttons--channels">
-                        {#if currentPlayingIndex >= 0}
-                            {#each playingChannels as channel, index}
-                                {#if channel}
-                                    <button
-                                        type="button"
-                                        class="connect"
-                                        class:playing={index === 0}
-                                        on:click|preventDefault={() => {
-                                            if (
-                                                window.confirm(
-                                                    `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[currentPlayingIndex].title}'?`
-                                                )
-                                            ) {
-                                                socket.emit(
-                                                    "deleteconnection",
-                                                    [
-                                                        $mediaFeedObjects[
-                                                            currentPlayingIndex
-                                                        ].directory,
-                                                        channel,
-                                                    ]
-                                                );
-                                            }
-                                        }}
-                                    >
-                                        {channel}
-                                    </button>
-                                {/if}
-                            {/each}
-                            <input
-                                type="text"
-                                placeholder="Enter playlist"
-                                list="channels"
-                                size="10"
-                                on:change|preventDefault={(e) => {
-                                    if (
-                                        $channelObjects.find(
-                                            (channelObject) =>
-                                                channelObject.channel_name ===
-                                                e.target.value
-                                        )
-                                    ) {
-                                        socket.emit("createconnection", [
-                                            $mediaFeedObjects[
-                                                currentPlayingIndex
-                                            ].directory,
-                                            e.target.value,
-                                        ]);
-                                    } else {
-                                        socket.emit("addnewchannel", [
-                                            $mediaFeedObjects[
-                                                currentPlayingIndex
-                                            ].directory,
-                                            e.target.value,
-                                        ]);
-                                    }
-                                    e.target.value = "";
-                                }}
-                            />
-                            <datalist id="channels">
-                                {#each $channelObjects as channel}
-                                    {#if channel.channel_name}
-                                        <option value={channel.channel_name} />
-                                    {/if}
-                                {/each}
-                            </datalist>
-                        {/if}
-                    </div>
-                    <p class="status__label">Commands:</p>
-                    <div class="status__buttons">
-                        <button
-                            type="button"
-                            class="action"
-                            on:click|preventDefault={() => {
-                                socket.emit("screenshot");
-                            }}
-                        >
-                            Screenshot
-                        </button>
-                        <button
-                            type="button"
-                            class="action"
-                            on:click|preventDefault={() => {
-                                socket.emit("playnext");
-                            }}
-                        >
-                            Play next
-                        </button>
-                        <button
-                            type="button"
-                            class="action"
-                            on:click|preventDefault={() => {
-                                if (
-                                    window.confirm(
-                                        `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
-                                    )
-                                ) {
-                                    socket.emit(
-                                        "deletemedia",
-                                        $mediaFeedObjects[currentPlayingIndex]
-                                            .directory
-                                    );
-                                }
-                            }}
-                        >
-                            Delete
-                        </button>
-                    </div>
-                {/if}
-            </form>
-        </details>
         <div>
-            <form
-                on:submit|preventDefault={() => {
-                    return false;
-                }}
-            >
-                <p class="status__label">Brightness:</p>
-                <input
-                    type="number"
-                    min="0.0"
-                    max="100"
-                    step="0.1"
-                    list="brightnesses"
-                    id="brightness"
-                    placeholder="{$config_settings.brightness
-                        ? ($config_settings.brightness * 100).toFixed(
-                              $config_settings.brightness < 0.1 ? 1 : 0
-                          )
-                        : 0}%"
-                    on:change|preventDefault={(e) => {
-                        socket.emit("config/update", {
-                            name: "brightness",
-                            value: e.target.value / 100.0,
-                        });
-                        e.target.value = "";
-                    }}
-                />
-                <datalist id="brightnesses">
-                    <option value="0" />
-                    <option value="33" />
-                    <option value="66" />
-                    <option value="100" />
-                </datalist>
-                <button
-                    type="button"
-                    on:click|preventDefault={() => {
-                        socket.emit("config/update", {
-                            name: "brightness",
-                            value: 0.75 * $config_settings.brightness,
-                        });
-                    }}
-                >
-                    -
-                </button>
-                <button
-                    type="button"
-                    on:click|preventDefault={() => {
-                        socket.emit("config/update", {
-                            name: "brightness",
-                            value:
-                                $config_settings.brightness > 0.0
-                                    ? Math.min(
-                                          1.25 * $config_settings.brightness,
-                                          1.0
-                                      )
-                                    : 0.04,
-                        });
-                    }}
-                >
-                    +
-                </button>
-            </form>
+            <Player libraryIndex={currentPlayingIndex} />
         </div>
     </header>
     <article>
@@ -529,12 +265,6 @@
                             socket.emit("play", {
                                 directory: mediaFeedObject.directory,
                             });
-                            if (e.target.classList.contains("playing")) {
-                                window.scroll(0, 0);
-                                document
-                                    .querySelector("details")
-                                    .setAttribute("open", "");
-                            }
                         }}
                     />
                 </span>
@@ -591,6 +321,7 @@
         text-align: right;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         font-size: 0.8em;
+        color: #d9d9d9;
         z-index: -1;
     }
 
@@ -598,42 +329,12 @@
         padding: 0;
     }
 
-    .status {
-        margin-bottom: 1.85625rem;
+    input[type="image"]:hover {
+        opacity: 0.5;
     }
 
-    .status__title {
-        overflow: auto;
-        white-space: nowrap;
-        text-overflow: clip;
-        margin: 0.7875rem 0;
-    }
-
-    .status__url {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        margin: 0.7875rem 0;
-    }
-
-    .status__label {
-        margin-bottom: 0.7875rem;
-    }
-
-    .status__buttons {
-        overflow: auto;
-        white-space: nowrap;
-    }
-
-    .status__buttons--channels {
-        margin-bottom: 1.125rem;
-    }
-
-    #brightness {
-        width: 4em;
-        appearance: textfield;
-        -moz-appearance: textfield;
-        -webkit-appearance: textfield;
+    input[type="image"]:active {
+        opacity: 0.125;
     }
 
     button.playing::before {
@@ -670,25 +371,5 @@
     .feed {
         position: relative;
         display: inline-block;
-    }
-
-    .action,
-    .connect {
-        border: 1px solid #a3a2a2;
-    }
-    .action {
-        background: #275a90;
-    }
-
-    .action:hover {
-        background: #173454;
-    }
-
-    .connect {
-        background: #2a6f3b;
-    }
-
-    .connect:hover {
-        background: #db423c;
     }
 </style>
