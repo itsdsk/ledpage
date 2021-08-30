@@ -2,7 +2,9 @@ const electron = require('electron');
 const path = require('path');
 const net = require('net');
 const fs = require('fs');
-const { exec } = require("child_process");
+const {
+  exec
+} = require("child_process");
 var sockets = require('./sockets.js');
 
 // constants
@@ -27,7 +29,7 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 app.commandLine.appendSwitch('enable-web-bluetooth', true);
 
 // graphics
-app.disableHardwareAcceleration();
+app.disableHardwareAcceleration(); // can be enabled on rpi4 with DRM VC4 V3D driver enabled
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
@@ -90,12 +92,12 @@ class RenderWindow {
     var clickCmd = `xdotool mousemove ${Math.floor(click_x)} ${Math.floor(click_y)} click 1`;
     exec(clickCmd, (error, stdout, stderr) => {
       if (error) {
-          console.log(`fake mouse error: ${error.message}`);
-          return;
+        console.log(`fake mouse error: ${error.message}`);
+        return;
       }
       if (stderr) {
-          console.log(`fake mouse stderr: ${stderr}`);
-          return;
+        console.log(`fake mouse stderr: ${stderr}`);
+        return;
       }
     });
   }
@@ -286,6 +288,7 @@ app.on('ready', () => {
       sandbox: false,
       nodeIntegration: false,
       overlayScrollbars: false,
+      webSecurity: false // disable same-origin-policy to autoplay file:///
     },
   };
   // create 2 windows
@@ -298,18 +301,18 @@ app.on('ready', () => {
     console.log(`GPU:\n${JSON.stringify(app.getGPUFeatureStatus(), null, 2)}`);
     // app.getGPUInfo('complete'); // or 'basic'
   }, 3000);
-  
+
   // grant permission for microphone
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
     let allowedPermissions = ["media"];
     if (allowedPermissions.includes(permission)) {
-        callback(true); // Approve permission request
+      callback(true); // Approve permission request
     } else {
-        // console.error(`Denied permission request for '${permission}'`);
-        callback(false); // Deny
+      console.error(`Denied permission request for '${permission}'`);
+      callback(false); // Deny
     }
   });
-  
+
   //
   process.on('uncaughtException', (err) => {
     console.log(err);
@@ -327,6 +330,7 @@ app.on('ready', () => {
   // fake mouse click periodically
   var autoClickPeriod = 0;
   var autoClickTimeout;
+
   function autoMouseClick() {
     // send fake user gesture to trigger event in page
     if (flipWindow) {
@@ -385,11 +389,9 @@ app.on('ready', () => {
     var server = net.createServer(function (stream) {
         console.log('Connection acknowledged.');
         // send window dimensions to client
-        stream.write(JSON.stringify(
-          {
-            dimensions: windowDims
-          }
-        ));
+        stream.write(JSON.stringify({
+          dimensions: windowDims
+        }));
         // reguarly take screenshot and send to ui process
         var screenshotViewTimeout;
         var screenshotViewFrequency = 0; // ms
@@ -487,7 +489,7 @@ app.on('ready', () => {
               // trigger event
               windowA.mouseClick(Math.random(), Math.random());
             }
-           } else if (msg.command == "saveURL") {
+          } else if (msg.command == "saveURL") {
             // get right browser window
             var _browserWindow = false;
             if (windowA.browserWindow.webContents.getURL() == msg.URL) {
