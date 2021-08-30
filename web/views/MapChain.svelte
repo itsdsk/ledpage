@@ -2,9 +2,18 @@
   export let output;
   export let selected = false;
   export let nodeIndex = -1;
+
+  let nodeRadius = `${
+    Math.sqrt(
+      Math.pow(output.leds[0].x - output.leds[1].x, 2) +
+        Math.pow(output.leds[0].y - output.leds[1].y, 2)
+    ) /
+      2 -
+    0.75
+  }px`;
 </script>
 
-<g class:selected>
+<g class:selected style="--node-radius: {nodeRadius}">
   {#each output.leds as led, i}
     {#if i != output.leds.length - 1}
       <line
@@ -35,7 +44,7 @@
   circle {
     fill: #5b86b4;
     stroke-width: 0px;
-    r: 11px;
+    r: var(--node-radius);
   }
 
   circle:hover,
