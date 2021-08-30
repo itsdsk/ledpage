@@ -4,6 +4,7 @@
         config,
         showConnectionMessage,
     } from "./client_data.js";
+    import PowerButtons from "./PowerButtons.svelte";
     import MapContainer from "./MapContainer.svelte";
     import MapChain from "./MapChain.svelte";
     import MenuToggle from "./MenuToggle.svelte";
@@ -28,28 +29,7 @@
             {#if windowWidth < 1536}
                 <MenuToggle on:click={() => (showSidePanel = !showSidePanel)} />
             {/if}
-            <span style="float:right;">
-                <button
-                    type="button"
-                    class="power"
-                    on:click|preventDefault={() => {
-                        if (window.confirm("Do you really want to reboot?"))
-                            socket.emit("systempower", "reboot");
-                    }}
-                >
-                    Restart
-                </button>
-                <button
-                    type="button"
-                    class="power"
-                    on:click|preventDefault={() => {
-                        if (window.confirm("Do you really want to shutdown?"))
-                            socket.emit("systempower", "shutdown");
-                    }}
-                >
-                    Shutdown
-                </button>
-            </span>
+            <PowerButtons />
         </nav>
         {#if $config}
             <div>
