@@ -10,7 +10,8 @@
     import MenuToggle from "./MenuToggle.svelte";
     import Menu from "./Menu.svelte";
 
-    let activeOutputChain = null;
+    let activeOutputChain = -1;
+    let activeNode = -1;
 
     let windowWidth = 10;
 
@@ -21,7 +22,24 @@
     } else if (autoToggleSidePanel) {
         showSidePanel = autoToggleSidePanel = false;
     }
+
+    let totalNodes = 0;
+    $: if ($config.outputs && $config.outputs.length > 0) {
+        totalNodes = $config.outputs.reduce(
+            (acc, cur) => acc + cur.leds.length,
+            0
+        );
+    }
+
+    let svg;
 </script>
+
+<svelte:body
+    on:click={(e) => {
+        if (svg.contains(e.target) == false) {
+            activeOutputChain = activeNode = -1;
+        }
+    }} />
 
 <section>
     <header>
@@ -33,37 +51,35 @@
         </nav>
         {#if $config}
             <div>
-                <MapContainer>
-                    {#each $config.outputs as output, i}
-                        <MapChain
-                            {output}
-                            selected={activeOutputChain == i ? true : false}
-                            on:click={() => (activeOutputChain = i)}
-                        />
-                    {/each}
-                </MapContainer>
+                <span bind:this={svg}>
+                    <MapContainer>
+                        {#each $config.outputs as output, i}
+                            <MapChain
+                                {output}
+                                selected={activeOutputChain == i}
+                                nodeIndex={activeOutputChain == i
+                                    ? activeNode
+                                    : -1}
+                                on:click={(e) => {
+                                    activeOutputChain = i;
+                                    activeNode = parseInt(
+                                        e.target.dataset.index
+                                    );
+                                }}
+                            />
+                        {/each}
+                    </MapContainer>
+                </span>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each $config.outputs as output, i}
-                        <tr
-                            class:selected={activeOutputChain === i}
-                            on:click={() =>
-                                (activeOutputChain =
-                                    activeOutputChain === i ? null : i)}
-                        >
-                            <td>{output.type}</td>
-                            <td>{output.leds.length}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
+            <p>
+                {#if activeOutputChain == -1}
+                    Showing {totalNodes} nodes on {$config.outputs.length}
+                    {$config.outputs.length < 2 ? "device" : "devices"}.
+                {:else}
+                    Node {activeNode + 1}, device
+                    {activeOutputChain + 1}.
+                {/if}
+            </p>
         {/if}
     </header>
     <article>
@@ -198,24 +214,16 @@
 <svelte:window bind:innerWidth={windowWidth} />
 
 <style>
-    tr.selected {
-        text-decoration: underline dotted;
-    }
-
     pre {
         border: 1px solid #595959;
         border-radius: 3.6px;
         padding: 0.3375rem 0.39375rem;
     }
 
-    table {
-        width: auto;
-    }
-
-    .power {
-        background: #db423c;
-        color: white;
-        padding: 0.407813rem;
-        margin: 0 0 1.125rem 0.45rem;
+    .submit {
+        background: #2a6f3b;
+        float: right;
+        margin-right: 0;
+        margin-left: 0.45rem;
     }
 </style>
