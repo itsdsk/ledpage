@@ -17,4 +17,4 @@ cd ../../
 
 # compile
 cmake ./
-make
+make -j 4
