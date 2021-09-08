@@ -9,6 +9,8 @@ var sockets = require('./sockets.js');
 
 // constants
 const screenshotQuality = 50;
+const graphicsDriver = false ? 'VC4' : ''; // set to true if using `dtoverlay=vc4-fkms-v3d`
+const pixelDoubling = false; // set to true if width appears as double when using `vc4-fkms-v3d`
 
 // disable electron warnings
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -29,7 +31,10 @@ app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 app.commandLine.appendSwitch('enable-web-bluetooth', true);
 
 // graphics
-app.disableHardwareAcceleration(); // can be enabled on rpi4 with DRM VC4 V3D driver enabled
+if (graphicsDriver != 'VC4') {
+  console.log('Disabling hardware acceleration because graphics driver is not VC4 - this can be re-enabled in renderer.js');
+  app.disableHardwareAcceleration();
+}
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
@@ -266,10 +271,14 @@ app.on('ready', () => {
     width,
     height
   } = electron.screen.getPrimaryDisplay().workAreaSize;
-  windowDims.width = Math.floor(width / 4); // get actual width by dividing by 4 - bc vc4-fkms-v3d flag causes width to be 4x larger
+  if (pixelDoubling) {
+    windowDims.width = Math.floor(width / 4); // get actual width by dividing by 4 - bc vc4-fkms-v3d flag causes width to be 4x larger
+  } else {
+    windowDims.width = Math.floor(width / 2);
+  }
   windowDims.height = height;
   console.log(`Detected display size: ${JSON.stringify({width, height})}`);
-  console.log(`Window dimensions: ${JSON.stringify(windowDims)} (setting width to 1/4 of actual value bc of vc4-fkms-v3d bug)`);
+  console.log(`Window dimensions: ${JSON.stringify(windowDims)} ${pixelDoubling ? ' (halving width to fix pixel doubling - can be disabled in renderer.js)' : ''}`);
   // window options (electronJS)
   const windowOpts = {
     width: windowDims.width,
