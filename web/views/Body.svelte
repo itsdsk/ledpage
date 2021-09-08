@@ -270,6 +270,7 @@
                               }`
                             : `${mediaFeedObject.title}`}
                         alt={mediaFeedObject.title}
+                        class="feed__image"
                         class:playing={currentPlayingIndex >= 0 &&
                             mediaFeedObject.directory ===
                                 $mediaFeedObjects[currentPlayingIndex]
@@ -345,6 +346,11 @@
         padding: 0;
     }
 
+    .feed__image {
+        width: 100%;
+        margin: 0;
+    }
+
     input[type="image"]:hover {
         opacity: 0.5;
     }
@@ -387,5 +393,13 @@
     .feed {
         position: relative;
         display: inline-block;
+        padding: 5px 10px;
+        width: 33%;
+    }
+
+    @media (max-width: 1536px) {
+        .feed {
+            width: 50%;
+        }
     }
 </style>
