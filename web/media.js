@@ -580,6 +580,8 @@ module.exports = {
     },
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
+        // round to 3 decimal places
+        msg.brightness = Math.round(msg.brightness * 1000) / 1000;
         // update local config object
         config_settings.brightness = msg.brightness;
         // update backend
