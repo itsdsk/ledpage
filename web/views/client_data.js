@@ -202,17 +202,6 @@ export function sortMediaFeed(selectedSortMode = 'Recently added') {
 
 export const showConnectionMessage = writable(false);
 
-// put this in client data
-var getTimeStamp = () => {
-    var date = new Date();
-    return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-    });
-};
-
 socket.on("connect", () => {
     setTimeout(() => {
         showConnectionMessage.set(false);
