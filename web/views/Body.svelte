@@ -164,7 +164,10 @@
                 </div>
             </form>
         </nav>
-        <div class="preview" style="--window-width: {windowDimensions.width}px">
+        <div
+            class="preview"
+            style="--window-width: {Math.min(windowWidth - 10, 640)}px"
+        >
             <div
                 class="preview__window"
                 style="--window-ratio: {windowDimensions.ratio}%"
