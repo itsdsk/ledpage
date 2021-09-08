@@ -93,6 +93,7 @@
     });
 
     let playback_timer = 0;
+    let playback_label = 0; // 0=PAUSED, 1=FADING, 2=PLAYING
     $: if ($config_settings.brightness > 0.0) {
         var secs = Math.round(
             $livePlaybackStatus.nextPlaying.timeFromStart / 1000
@@ -103,6 +104,7 @@
         ).padStart(2, "0")}`;
         if (secs < 0) {
             playback_timer = "-" + playback_timer;
+            if (playback_label != 2) playback_label = 2;
         } else {
             var fadeDurationSeconds = Math.round(
                 $playbackStatus.playingFadeIn.fadeDuration / 1000
@@ -110,9 +112,11 @@
             playback_timer += ` / ${Math.floor(fadeDurationSeconds / 60)}:${
                 fadeDurationSeconds % 60
             }`;
+            if (playback_label != 1) playback_label = 1;
         }
     } else {
         playback_timer = `--:--`;
+        if (playback_label != 0) playback_label = 0;
     }
 
     let windowWidth = 10;
@@ -193,7 +197,14 @@
                     class="preview__timer"
                     style="--window-ratio: {windowDimensions.ratio}%"
                 >
-                    {playback_timer}
+                    {playback_label == 0
+                        ? "PAUSED"
+                        : playback_label == 1
+                        ? "FADING"
+                        : playback_label == 2
+                        ? "PLAYING"
+                        : "ERROR"}
+                    <span class="clock">{playback_timer}</span>
                 </span>
             </div>
         </div>
@@ -317,11 +328,14 @@
         padding-top: var(--window-ratio);
         position: relative;
         display: block;
-        text-align: right;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         font-size: 0.8em;
         color: #d9d9d9;
         z-index: -1;
+    }
+
+    .clock {
+        float: right;
     }
 
     input[type="image"] {
