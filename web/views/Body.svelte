@@ -7,7 +7,6 @@
         livePlaybackStatus,
         config_settings,
         showConnectionMessage,
-        connectionLogs,
         playbackStatus,
     } from "./client_data.js";
     import MenuToggle from "./MenuToggle.svelte";

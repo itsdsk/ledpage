@@ -145,7 +145,7 @@ export const livePlaybackStatus = derived([playbackStatus, time], ([$playbackSta
     // add channel currently autoplaying
     if ($playbackStatus.channel)
         pbStatus.channel = $playbackStatus.channel;
-        
+
     // set the final playback status
     set(pbStatus);
 }, {});
@@ -201,7 +201,6 @@ export function sortMediaFeed(selectedSortMode = 'Recently added') {
 };
 
 export const showConnectionMessage = writable(false);
-export const connectionLogs = writable([]);
 
 // put this in client data
 var getTimeStamp = () => {
@@ -222,18 +221,12 @@ socket.on("connect", () => {
 
 socket.on("disconnect", (reason) => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Disconnected"],
-        dd: [`Reason: ${reason}`],
-    }, ...cl]);
+    console.log(`Socket disconnected: ${reason}`);
 });
 
 socket.on("connect_error", () => {
     connectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Connection Error"],
-        dd: [`Attempting to reconnect in 1000ms`],
-    }, ...cl]);
+    console.log(`Socket disconnected due to unknown error`)
     setTimeout(() => {
         socket.connect();
     }, 1000);
@@ -241,18 +234,12 @@ socket.on("connect_error", () => {
 
 socket.io.on("error", (error) => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Manager connection error"],
-        dd: [`Message: ${error}`],
-    }, ...cl]);
+    console.log(`Socket error: ${error}`);
 });
 
 socket.io.on("reconnect", (attempt) => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Success"],
-        dd: [`Reconnected on attempt ${attempt}`],
-    }, ...cl]);
+    console.log(`Successfully reconnected to socket on attempt ${attempt}`);
     setTimeout(() => {
         showConnectionMessage.set(false);
     }, 2000);
@@ -260,24 +247,15 @@ socket.io.on("reconnect", (attempt) => {
 
 socket.io.on("reconnect_attempt", (attempt) => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Reconnecting"],
-        dd: [`Attempting to reconnect (${attempt})`],
-    }, ...cl]);
+    console.log(`Reconnecting to socket, attempt ${attempt}`);
 });
 
 socket.io.on("reconnect_error", (error) => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Error reconnecting"],
-        dd: [`Error reconnecting: ${error}`],
-    }, ...cl]);
+    console.log(`Error reconnecting to socket: ${error}`);
 });
 
 socket.io.on("reconnect_failed", () => {
     showConnectionMessage.set(true);
-    connectionLogs.update(cl => [{
-        dt: [getTimeStamp(), "Reconnection failed"],
-        dd: [`Refresh to continue`],
-    }, ...cl]);
+    console.log(`Reconnection failed for unknown reason`);
 });

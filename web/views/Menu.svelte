@@ -1,5 +1,5 @@
 <script>
-    import { showConnectionMessage, connectionLogs } from "./client_data";
+    import { showConnectionMessage } from "./client_data";
     export let active;
 </script>
 
@@ -27,22 +27,6 @@
                 <circle cx="50" cy="50" r="40" />
             </svg>
         </p>
-        {#if $connectionLogs.length}
-            <dl>
-                {#each $connectionLogs as connectionLog}
-                    {#each connectionLog.dt as dt}
-                        <dt>
-                            {dt}
-                        </dt>
-                    {/each}
-                    {#each connectionLog.dd as dd}
-                        <dd>
-                            {dd}
-                        </dd>
-                    {/each}
-                {/each}
-            </dl>
-        {/if}
     </div>
 </article>
 
@@ -75,12 +59,6 @@
 
     p.disconnected > svg > circle {
         fill: #db423c;
-    }
-
-    dl {
-        overflow-y: scroll;
-        white-space: nowrap;
-        max-height: 30%;
     }
 
     .current {
@@ -117,8 +95,7 @@
     }
 
     li,
-    p,
-    dl {
+    p {
         padding: 18px 43.2px;
     }
 
@@ -143,8 +120,7 @@
             margin-right: 18px;
         }
         li,
-        p,
-        dl {
+        p {
             padding: 18px;
         }
     }
