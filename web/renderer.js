@@ -317,7 +317,7 @@ app.on('ready', () => {
     if (allowedPermissions.includes(permission)) {
       callback(true); // Approve permission request
     } else {
-      console.error(`Denied permission request for '${permission}'`);
+      // console.error(`Denied permission request for '${permission}'`);
       callback(false); // Deny
     }
   });
