@@ -395,7 +395,7 @@
         position: relative;
         display: inline-block;
         padding: 5px 10px;
-        width: 33%;
+        width: 33.333%;
     }
 
     @media (max-width: 1536px) {
