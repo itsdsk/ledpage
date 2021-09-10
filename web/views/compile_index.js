@@ -1,5 +1,5 @@
-import Body from './Body.svelte';
+import Index from './Index.svelte';
 
-new Body({
+new Index({
 	target: document.querySelector('body')
 });
