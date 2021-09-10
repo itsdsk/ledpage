@@ -19,7 +19,7 @@
         <p
             class:disconnected={$showConnectionMessage}
             on:click={() => {
-                socket.connect();
+                window.socket.connect();
                 console.log("reconnecting");
             }}
         >

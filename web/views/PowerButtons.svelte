@@ -10,7 +10,7 @@
                 class="power"
                 on:click|preventDefault={() => {
                     if (window.confirm("Do you really want to reboot?"))
-                        socket.emit("systempower", "reboot");
+                        window.socket.emit("systempower", "reboot");
                 }}
             >
                 Restart
@@ -20,7 +20,7 @@
                 class="power"
                 on:click|preventDefault={() => {
                     if (window.confirm("Do you really want to shutdown?"))
-                        socket.emit("systempower", "shutdown");
+                        window.socket.emit("systempower", "shutdown");
                 }}
             >
                 Shutdown

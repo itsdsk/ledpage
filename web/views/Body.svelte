@@ -24,7 +24,7 @@
             urlinputelement.matches(":valid")
         ) {
             // URL is validated
-            socket.emit("playURL", urlinputelement.value);
+            window.socket.emit("playURL", urlinputelement.value);
         }
     }
 
@@ -85,7 +85,7 @@
         height: 0,
         ratio: 100,
     };
-    socket.on("windowdims", function (windowDims) {
+    window.socket.on("windowdims", function (windowDims) {
         var parsed = JSON.parse(windowDims);
         // calc aspect ratio as percentage
         parsed.ratio = 100 * (parsed.height / parsed.width);
@@ -171,7 +171,8 @@
             <div
                 class="preview__window"
                 style="--window-ratio: {windowDimensions.ratio}%"
-                on:click|preventDefault={() => socket.emit("fakemouseinput")}
+                on:click|preventDefault={() =>
+                    window.socket.emit("fakemouseinput")}
             >
                 {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
                     {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
@@ -226,7 +227,7 @@
                             selectedChannel
                         ) {
                             // play channel
-                            socket.emit(
+                            window.socket.emit(
                                 "autoplay",
                                 selectedChannel === "all media"
                                     ? null
@@ -276,7 +277,7 @@
                                 $mediaFeedObjects[currentPlayingIndex]
                                     .directory}
                         on:click|preventDefault={(e) => {
-                            socket.emit("play", {
+                            window.socket.emit("play", {
                                 directory: mediaFeedObject.directory,
                             });
                         }}

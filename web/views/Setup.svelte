@@ -128,7 +128,7 @@
                                                     name: "autoplayMinRange",
                                                     value: value.min,
                                                 };
-                                                socket.emit(
+                                                window.socket.emit(
                                                     "config/update",
                                                     data
                                                 );
@@ -145,7 +145,7 @@
                                                     name: "autoplayMaxRange",
                                                     value: value.max,
                                                 };
-                                                socket.emit(
+                                                window.socket.emit(
                                                     "config/update",
                                                     data
                                                 );
@@ -158,10 +158,13 @@
                                             name: key,
                                             value: value,
                                         };
-                                        socket.emit("config/update", data);
+                                        window.socket.emit(
+                                            "config/update",
+                                            data
+                                        );
                                     }
                                 }
-                                socket.emit("saveconfig");
+                                window.socket.emit("saveconfig");
                             }
                         } catch (exception) {
                             alert("Error parsing json: " + exception);
@@ -195,7 +198,7 @@
                                 "Are you sure you want to save a new configuration file?"
                             )
                         )
-                            socket.emit("updateconfigfile", configJSON);
+                            window.socket.emit("updateconfigfile", configJSON);
                     } catch (exception) {
                         alert("Error parsing json: " + exception);
                     }

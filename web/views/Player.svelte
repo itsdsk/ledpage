@@ -46,7 +46,7 @@
     function downloadURL() {
         if ($livePlaybackStatus.nowPlaying.directory.length > 0) {
             // URL is validated
-            socket.emit(
+            window.socket.emit(
                 "createmediaURL",
                 $livePlaybackStatus.nowPlaying.directory
             );
@@ -95,7 +95,7 @@
                               )
                             : 0}%"
                         on:change|preventDefault={(e) => {
-                            socket.emit("config/update", {
+                            window.socket.emit("config/update", {
                                 name: "brightness",
                                 value: e.target.value / 100.0,
                             });
@@ -111,7 +111,7 @@
                     <button
                         type="button"
                         on:click|preventDefault={() => {
-                            socket.emit("config/update", {
+                            window.socket.emit("config/update", {
                                 name: "brightness",
                                 value: 0.75 * $config_settings.brightness,
                             });
@@ -122,7 +122,7 @@
                     <button
                         type="button"
                         on:click|preventDefault={() => {
-                            socket.emit("config/update", {
+                            window.socket.emit("config/update", {
                                 name: "brightness",
                                 value:
                                     $config_settings.brightness > 0.0
@@ -156,7 +156,7 @@
                                             `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[libraryIndex].title}'?`
                                         )
                                     ) {
-                                        socket.emit("deleteconnection", [
+                                        window.socket.emit("deleteconnection", [
                                             $mediaFeedObjects[libraryIndex]
                                                 .directory,
                                             channel,
@@ -181,12 +181,12 @@
                                         e.target.value
                                 )
                             ) {
-                                socket.emit("createconnection", [
+                                window.socket.emit("createconnection", [
                                     $mediaFeedObjects[libraryIndex].directory,
                                     e.target.value,
                                 ]);
                             } else {
-                                socket.emit("addnewchannel", [
+                                window.socket.emit("addnewchannel", [
                                     $mediaFeedObjects[libraryIndex].directory,
                                     e.target.value,
                                 ]);
@@ -208,7 +208,7 @@
                         type="button"
                         class="action"
                         on:click|preventDefault={() => {
-                            socket.emit("screenshot");
+                            window.socket.emit("screenshot");
                         }}
                     >
                         Screenshot
@@ -217,7 +217,7 @@
                         type="button"
                         class="action"
                         on:click|preventDefault={() => {
-                            socket.emit("playnext");
+                            window.socket.emit("playnext");
                         }}
                     >
                         Play next
@@ -231,7 +231,7 @@
                                     `Do you really want to delete '${$mediaFeedObjects[libraryIndex].title}'?`
                                 )
                             ) {
-                                socket.emit(
+                                window.socket.emit(
                                     "deletemedia",
                                     $mediaFeedObjects[libraryIndex].directory
                                 );
@@ -255,7 +255,7 @@
                         type="button"
                         class="action"
                         on:click|preventDefault={() => {
-                            socket.emit("playnext");
+                            window.socket.emit("playnext");
                         }}
                     >
                         Back to playlist
