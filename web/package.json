@@ -16,7 +16,7 @@
     "svelte": "^3.38.2"
   },
   "optionalDependencies": {
-    "electron": "13.1.8",
+    "electron": "13.3.0",
     "electron-rebuild": "1.10.1"
   },
   "scripts": {
