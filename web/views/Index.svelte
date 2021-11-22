@@ -147,6 +147,7 @@
                 {/if}
                 <button
                     class="url__submit"
+                    title="Play"
                     type="submit"
                     on:click|preventDefault={playURL}
                     disabled={!urlInputValid}
@@ -172,6 +173,7 @@
         </nav>
         <div
             class="preview"
+            title="Click to trigger mouseclick"
             style="--window-width: {Math.min(windowWidth - 10, 640)}px"
         >
             <div
@@ -227,6 +229,10 @@
         <div class="channels">
             {#each sortedChannels as channelObject, index}
                 <button
+                    title={(channelObject.channel_name || "all media") ==
+                    selectedChannel
+                        ? "Play"
+                        : "View"}
                     on:click|preventDefault={() => {
                         if (
                             (channelObject.channel_name || "all media") ==
@@ -277,6 +283,7 @@
                               }`
                             : `${mediaFeedObject.title}`}
                         alt={mediaFeedObject.title}
+                        title={mediaFeedObject.title}
                         class="feed__image"
                         class:playing={currentPlayingIndex >= 0 &&
                             mediaFeedObject.directory ===

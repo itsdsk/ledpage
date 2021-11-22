@@ -32,7 +32,7 @@
                 showButtons = !showButtons;
             }}
         >
-            Power
+            Power Off
         </button>
     </span>
 </form>

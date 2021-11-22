@@ -177,6 +177,9 @@
                         }
                     }}>Save</button
                 >
+                <p>
+                    Make sure <code>settings.json</code> is valid before saving.
+                </p>
             </div>
         {/if}
         {#if $config}
@@ -210,6 +213,9 @@
                     }
                 }}>Save</button
             >
+            <p>
+                Make sure <code>config.json</code> is valid before saving.
+            </p>
         {/if}
     </article>
     {#if windowWidth > 1536 || showSidePanel}

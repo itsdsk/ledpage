@@ -59,7 +59,14 @@
 </script>
 
 <div class="main">
-    <h3 class="title">
+    <h3
+        class="title"
+        title={libraryIndex >= 0
+            ? $mediaFeedObjects[libraryIndex].title
+            : $livePlaybackStatus.nowPlaying
+            ? $livePlaybackStatus.nowPlaying.directory
+            : "Untitled"}
+    >
         {#if libraryIndex >= 0}
             {$mediaFeedObjects[libraryIndex].title}
         {:else if $livePlaybackStatus.nowPlaying}
