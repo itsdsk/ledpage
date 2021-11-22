@@ -86,6 +86,22 @@ string
 ##### description
 path to USB device e.g. /dev/ttyACM0
 
+### 'Disk One' on Pi USB port
+
+Specific to 'disk one': Neopixel/WS2812 via Arduino connected to Raspberry Pi via USB serial / RS232
+
+```javascript
+{
+    "type": "disk1_serial",
+    "properties": {
+        "port": "/dev/ttyACM0",
+        "colorOrder": "rgb",
+        "rate": 57600
+    },
+    "leds": [ /* ... */ ]
+}
+```
+
 ### UART
 
 Arduino connected to Raspberry Pi GPIO pin `BCM 14` (UART)

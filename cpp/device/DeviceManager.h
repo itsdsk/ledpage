@@ -1,6 +1,7 @@
 #include <vector>
 #include <device/Output.h>
 #include <device/OutputSerialDefault.h>
+#include <device/OutputSerialDisk1.h>
 #include <device/OutputGPIO.h>
 #include <device/OutputSPI1.h>
 #include <device/OutputUART.h>
@@ -176,6 +177,10 @@ public:
         else if (outputType == "adalight_serial")
         {
             output = std::shared_ptr<Output>(new OutputSerialDefault(config["outputs"][outputIndex]["properties"]));
+        }
+        else if (outputType == "disk1_serial")
+        {
+            output = std::shared_ptr<Output>(new OutputSerialDisk1(config["outputs"][outputIndex]["properties"]));
         }
         else if (outputType == "pwm_hw")
         {
