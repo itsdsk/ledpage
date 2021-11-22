@@ -13,6 +13,12 @@
     import Menu from "./Menu.svelte";
     import Player from "./Player.svelte";
 
+    $: if ($config_settings.title) {
+        document.title = $config_settings.title;
+    } else {
+        document.title = "Untitled";
+    }
+
     //
     let selectedChannel = -1;
 

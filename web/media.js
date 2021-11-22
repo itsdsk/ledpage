@@ -867,6 +867,10 @@ module.exports = {
         console.log(`USER INPUT::set startup playlist to ${msg}`);
         config_settings.startupPlaylist = msg;
     },
+    setTitle: function (msg) {
+        console.log(`USER INPUT::set title to ${msg}`);
+        config_settings.title = msg;
+    },
     getLogs: function (callback) {
         console.log("USER INPUT::getting service logs");
         runCommand('journalctl -u disk-backend-daemon.service -b --no-pager --lines=128', function (backendLogs) {

@@ -144,6 +144,9 @@ io.on('connection', function (socket) {
       case 'startupPlaylist':
         media.setStartupPlaylist(msg.value);
         break;
+      case 'title':
+        media.setTitle(msg.value);
+        break;
       default:
         console.log(`error parsing ${JSON.stringify(msg)}`);
     }

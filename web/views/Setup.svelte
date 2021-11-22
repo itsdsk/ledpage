@@ -10,6 +10,12 @@
     import MenuToggle from "./MenuToggle.svelte";
     import Menu from "./Menu.svelte";
 
+    $: if ($config_settings.title) {
+        document.title = `Setup - ${$config_settings.title}`;
+    } else {
+        document.title = "Setup - Untitled";
+    }
+
     let activeOutputChain = -1;
     let activeNode = -1;
 

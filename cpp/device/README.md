@@ -184,7 +184,8 @@ MAC address of bluetooth server
         "max": 60000
     },
     "startupPlaylist": "",
-    "autoClickPeriod": 0
+    "autoClickPeriod": 0,
+    "title": "DISK"
 }
 ```
 
