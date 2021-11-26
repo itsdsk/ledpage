@@ -254,6 +254,15 @@
                     <button
                         type="button"
                         class="action"
+                        on:click|preventDefault={() => {
+                            window.socket.emit("screenshot");
+                        }}
+                    >
+                        Screenshot
+                    </button>
+                    <button
+                        type="button"
+                        class="action"
                         on:click|preventDefault={downloadURL}
                     >
                         Save to library
