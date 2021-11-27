@@ -43,18 +43,6 @@
         }
     }
 
-    function downloadURL() {
-        if ($livePlaybackStatus.nowPlaying.directory.length > 0) {
-            // URL is validated
-            window.socket.emit(
-                "createmediaURL",
-                $livePlaybackStatus.nowPlaying.directory
-            );
-        } else {
-            console.log("cannot create media from URL as it is invalid");
-        }
-    }
-
     let open = false;
 </script>
 
@@ -209,78 +197,10 @@
                         {/each}
                     </datalist>
                 </div>
-                <div class="label">Commands:</div>
-                <div class="buttons">
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("screenshot");
-                        }}
-                    >
-                        Screenshot
-                    </button>
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("playnext");
-                        }}
-                    >
-                        Play next
-                    </button>
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={() => {
-                            if (
-                                window.confirm(
-                                    `Do you really want to delete '${$mediaFeedObjects[libraryIndex].title}'?`
-                                )
-                            ) {
-                                window.socket.emit(
-                                    "deletemedia",
-                                    $mediaFeedObjects[libraryIndex].directory
-                                );
-                            }
-                        }}
-                    >
-                        Delete
-                    </button>
-                </div>
-            {:else}
-                <div class="label">Options:</div>
-                <div class="buttons">
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("screenshot");
-                        }}
-                    >
-                        Screenshot
-                    </button>
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={downloadURL}
-                    >
-                        Save to library
-                    </button>
-                    <button
-                        type="button"
-                        class="action"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("playnext");
-                        }}
-                    >
-                        Back to playlist
-                    </button>
-                </div>
             {/if}
         {/if}
         <div class="toggle" on:click={() => (open = !open)}>
-            <strong>{open ? "Less" : "More"} Actions</strong>
+            <strong>{open ? "Less" : "More"} Info</strong>
         </div>
     </div>
 </div>
@@ -360,20 +280,9 @@
         margin-bottom: 1.85625rem;
     }
 
-    .action,
     .connect {
         border: 1px solid #a3a2a2;
-    }
-    .action {
-        background: #275a90;
-    }
-
-    .action:hover {
-        background: #173454;
-    }
-
-    .connect {
-        background: #2a6f3b;
+        background: none;
     }
 
     .connect:hover {

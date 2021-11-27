@@ -206,7 +206,7 @@
                     {/each}
                 {/if}
                 <span
-                    class="preview__timer"
+                    class="preview__footer"
                     style="--window-ratio: {windowDimensions.ratio}%"
                 >
                     {playback_label == 0
@@ -216,7 +216,79 @@
                         : playback_label == 2
                         ? "PLAYING"
                         : "ERROR"}
-                    <span class="clock">{playback_timer}</span>
+                    {playback_timer}
+                    <span class="control">
+                        <button
+                            type="button"
+                            class="control--btn"
+                            title="Play next URL"
+                            on:click|preventDefault|stopPropagation={() => {
+                                window.socket.emit("playnext");
+                            }}
+                        >
+                            SKIP
+                        </button>
+                        |
+                        <button
+                            type="button"
+                            class="control--btn"
+                            title="Take screenshot of URL"
+                            on:click|preventDefault|stopPropagation={() => {
+                                window.socket.emit("screenshot");
+                            }}
+                        >
+                            SCREENSHOT
+                        </button>
+                        |
+                        {#if currentPlayingIndex >= 0}
+                            <button
+                                type="button"
+                                class="control--btn"
+                                title="Remove URL from library"
+                                on:click|preventDefault|stopPropagation={() => {
+                                    if (
+                                        window.confirm(
+                                            `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                        )
+                                    ) {
+                                        window.socket.emit(
+                                            "deletemedia",
+                                            $mediaFeedObjects[
+                                                currentPlayingIndex
+                                            ].directory
+                                        );
+                                    }
+                                }}
+                            >
+                                DELETE
+                            </button>
+                        {:else}
+                            <button
+                                type="button"
+                                class="control--btn"
+                                title="Add URL to library"
+                                on:click|preventDefault|stopPropagation={() => {
+                                    if (
+                                        $livePlaybackStatus.nowPlaying.directory
+                                            .length > 0
+                                    ) {
+                                        // URL is validated
+                                        window.socket.emit(
+                                            "createmediaURL",
+                                            $livePlaybackStatus.nowPlaying
+                                                .directory
+                                        );
+                                    } else {
+                                        console.log(
+                                            "cannot create media from URL as it is invalid"
+                                        );
+                                    }
+                                }}
+                            >
+                                SAVE
+                            </button>
+                        {/if}
+                    </span>
                 </span>
             </div>
         </div>
@@ -333,6 +405,7 @@
         display: block;
         width: 100%;
         height: 100%;
+        z-index: 1;
     }
 
     .preview__window {
@@ -342,18 +415,30 @@
         height: 0;
     }
 
-    .preview__timer {
+    .preview__footer {
         padding-top: var(--window-ratio);
         position: relative;
         display: block;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         font-size: 0.8em;
         color: #d9d9d9;
-        z-index: -1;
     }
 
-    .clock {
+    .control {
         float: right;
+    }
+
+    .control--btn {
+        color: #d9d9d9;
+        background: none;
+        border: none;
+        font-size: inherit;
+        padding: inherit;
+        margin: inherit;
+    }
+
+    .control--btn:hover {
+        text-decoration: underline;
     }
 
     input[type="image"] {
