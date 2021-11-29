@@ -848,10 +848,11 @@ module.exports = {
         } else
             console.log(`error skipping to next media: autoplay is off`);
     },
-    fakeMouseInput: function () {
-        console.log("USER INPUT::send renderer gesture input");
+    fakeMouseInput: function (mousePosition) {
+        console.log(`USER INPUT::send renderer gesture input at ${mousePosition.x},${mousePosition.y}`);
         rendererSocket.write(JSON.stringify({
-            command: 'fakeInput'
+            command: 'fakeInput',
+            position: [mousePosition.x, mousePosition.y]
         }));
     },
     takeScreenshot: function () {

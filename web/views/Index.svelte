@@ -134,6 +134,20 @@
     } else if (autoToggleSidePanel) {
         showSidePanel = autoToggleSidePanel = false;
     }
+
+    function forwardMouseClick(event) {
+        const bounds = event.target.getBoundingClientRect();
+        const mousePosX =
+            Math.round(((event.clientX - bounds.left) / bounds.width) * 100) /
+            100;
+        const mousePosY =
+            Math.round(((event.clientY - bounds.top) / bounds.height) * 100) /
+            100;
+        window.socket.emit("fakemouseinput", {
+            x: mousePosX,
+            y: mousePosY,
+        });
+    }
 </script>
 
 <section>
@@ -179,8 +193,7 @@
             <div
                 class="preview__window"
                 style="--window-ratio: {windowDimensions.ratio}%"
-                on:click|preventDefault={() =>
-                    window.socket.emit("fakemouseinput")}
+                on:click|preventDefault={forwardMouseClick}
             >
                 {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
                     {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}

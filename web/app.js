@@ -207,8 +207,8 @@ io.on('connection', function (socket) {
     });
   });
   // renderer user gesture input
-  socket.on('fakemouseinput', function () {
-    media.fakeMouseInput();
+  socket.on('fakemouseinput', function (mousePosition) {
+    media.fakeMouseInput(mousePosition);
   });
   // renderer screenshot
   socket.on('screenshot', function () {

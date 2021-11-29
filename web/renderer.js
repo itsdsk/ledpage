@@ -500,13 +500,13 @@ app.on('ready', () => {
               screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
           } else if (msg.command == "fakeInput") {
             // send fake user gesture to trigger event in page
-            console.log(`sending mouse click event to window ${flipWindow ? 'B' : 'A'}`);
+            console.log(`sending mouse click event ${msg.position[0]},${msg.position[1]} to window ${flipWindow ? 'B' : 'A'}`);
             if (flipWindow) {
               // trigger event
-              windowB.mouseClick(Math.random(), Math.random());
+              windowB.mouseClick(msg.position[0], msg.position[1]);
             } else {
               // trigger event
-              windowA.mouseClick(Math.random(), Math.random());
+              windowA.mouseClick(msg.position[0], msg.position[1]);
             }
           } else if (msg.command == "saveURL") {
             // get right browser window
