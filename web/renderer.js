@@ -8,8 +8,8 @@ const {
 var sockets = require('./sockets.js');
 
 // constants
-const screenshotQuality = 50;
-const graphicsDriver = false ? 'VC4' : ''; // set to true if using `dtoverlay=vc4-fkms-v3d`
+const screenshotQuality = 70;
+const graphicsDriver = true ? 'VC4' : ''; // set to true if using `dtoverlay=vc4-fkms-v3d`
 const pixelDoubling = false; // set to true if width appears as double when using `vc4-fkms-v3d`
 
 // disable electron warnings
@@ -314,12 +314,16 @@ app.on('ready', () => {
   windowA = new RenderWindow(windowOpts, 'A');
   windowB = new RenderWindow(windowOpts, 'B');
 
+  /*
   // log GPU features
   setTimeout(() => {
     console.log(`Electron version: ${process.versions.electron}`);
     console.log(`GPU:\n${JSON.stringify(app.getGPUFeatureStatus(), null, 2)}`);
-    // app.getGPUInfo('complete'); // or 'basic'
+    app.getGPUInfo('complete').then(function (data) {
+      console.log(data);
+    }); // or 'basic'
   }, 3000);
+  */
 
   // grant permission for microphone
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
