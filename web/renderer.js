@@ -126,7 +126,7 @@ class RenderWindow {
         this.loadMessage.screenshots.push(new_filename);
         // choose file name to save screenshot
         var confObj = {
-          savedScreenshot: true,
+          type: 'savedScreenshot',
           filename: new_filename,
           whichWindow: this.side,
           screenshots: this.loadMessage.screenshots
@@ -190,26 +190,29 @@ class RenderWindow {
         var has_screenshot = (this.loadMessage.screenshots && this.loadMessage.screenshots.length > 0) ? true : false;
         // if playing remote media without screenshot
         if (!this.loadMessage.directory && !has_screenshot) {
-          this.saveScreenshot(null, new_screenshot => {
-            // report loaded to client with saved screenshot
-            this.client.write(JSON.stringify({
-              loaded: true,
-              whichWindow: this.side,
-              URL: this.browserWindow.webContents.getURL(),
-              fade: this.loadMessage.fade,
-              screenshots: [new_screenshot.filename],
-              directory: this.loadMessage.directory
-            }));
-            // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
-            this.client = null;
-          });
+          setTimeout(() => {
+            this.saveScreenshot(null, new_screenshot => {
+              // report loaded to client with saved screenshot
+              this.client.write(JSON.stringify({
+                type: 'loadFinished',
+                whichWindow: this.side,
+                URL: this.browserWindow.webContents.getURL(),
+                fade: this.loadMessage.fade,
+                screenshots: [new_screenshot.filename],
+                directory: this.loadMessage.directory
+              }));
+              // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
+              this.client = null;
+            });
+          }, 100); // pause to let page load
         } else if (this.loadMessage.directory && !has_screenshot) {
           // playing local media without screenshot
+          // todo: see if page loading pause should be added here
           this.saveScreenshot(this.client, new_screenshot => {
             setTimeout(() => {
               // report loaded to client with saved screenshot
               this.client.write(JSON.stringify({
-                loaded: true,
+                type: 'loadFinished',
                 whichWindow: this.side,
                 URL: this.browserWindow.webContents.getURL(),
                 fade: this.loadMessage.fade,
@@ -223,7 +226,7 @@ class RenderWindow {
         } else {
           // report loaded to client
           this.client.write(JSON.stringify({
-            loaded: true,
+            type: 'loadFinished',
             whichWindow: this.side,
             URL: this.browserWindow.webContents.getURL(),
             fade: this.loadMessage.fade,
@@ -348,7 +351,7 @@ app.on('ready', () => {
   var savePage = false;
 
   // start IPC server to send screenshots
-  var screenshotSocket = new sockets.DomainServer("screenshots");
+  var socketServer = new sockets.DomainServer("renderer");
 
   // fake mouse click periodically
   var autoClickPeriod = 0;
@@ -387,210 +390,127 @@ app.on('ready', () => {
     }
   }
 
-  // create UNIX socket to receive URLs on
-  var client; // keep track of connected client
-  const SOCKETFILE = "/tmp/renderer.sock";
-  // check for failed cleanup
-  require('fs').stat(SOCKETFILE, function (err, stats) {
-    if (err) {
-      // no leftover socket found... start server
-      createServer(SOCKETFILE);
-      return;
-    }
-    // remove leftover socket file then start server
-    require('fs').unlink(SOCKETFILE, function (err) {
-      if (err) {
-        console.log("ERROR REMOVING LEFTOVER SOCKET FILE");
-      }
-      createServer(SOCKETFILE);
-      return;
+  socketServer.event.on('connect', () => {
+    console.log(`client connection acknowledged`);
+    // send window dimensions to client
+    socketServer.write(JSON.stringify({
+      type: 'dimensions',
+      dimensions: windowDims
+    }), () => {
+      // console.log(`sent window dimensions to ui process`);
     });
   });
-
-  function createServer(socket) {
-    console.log('Creating server.');
-    var server = net.createServer(function (stream) {
-        console.log('Connection acknowledged.');
-        // send window dimensions to client
-        stream.write(JSON.stringify({
-          dimensions: windowDims
-        }));
-        // reguarly take screenshot and send to ui process
-        var screenshotViewTimeout;
-        var screenshotViewFrequency = 0; // ms
-        function screenshotView() {
-          // get window currently playing
-          var currentWindow = false;
-          var loadMsg = false;
-          var side = false;
-          if (flipWindow) {
-            currentWindow = windowB.browserWindow;
-            loadMsg = windowB.loadMessage;
-            side = windowB.side;
-          } else {
-            currentWindow = windowA.browserWindow;
-            loadMsg = windowA.loadMessage;
-            side = windowA.side;
-          }
-          currentWindow.capturePage().then(image => {
-            if (!image) console.log(`error taking screenshot: image is null`);
-            // check screenshot is valid
-            if (image.isEmpty() == false) {
-              // send screenshot
-              var screenshotMsg = JSON.stringify({
-                status: true,
-                screenshot: image.toJPEG(screenshotQuality).toJSON(),
-                side: side,
-                path: loadMsg.path
-              });
-              screenshotSocket.write(screenshotMsg, () => {
-                // repeat
-                screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-              });
-            } else {
-              // image is empty, repeat
-              screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-            }
-          });
-        }
-
-        stream.on('error', function (err) {
-          console.log(`error in stream: ${err}`);
-        });
-        stream.on('end', function () {
-          console.log('Client disconnected.');
-        });
-
-        stream.on('data', function (msg) {
-          // parse buffer
-          msg = JSON.parse(msg.toString());
-
-          // save client
-          client = stream;
-
-          // check type of message received
-          if (msg.command == "loadURL") {
-            // check save request
-            savePage = (msg.save ? true : false);
-            // display recieved URI
-            if (flipWindow) {
-              windowA.loadURL(msg, client);
-            } else {
-              windowB.loadURL(msg, client);
-            }
-            // flip window to display on
-            flipWindow = !flipWindow;
-          } else if (msg.command == "unloadSide") {
-            // get right browser window
-            var _browserWindow = msg.side == 'A' ? windowA.browserWindow : windowB.browserWindow;
-            // load empty webpage
-            _browserWindow.loadURL('about:blank');
-          } else if (msg.command == "takeScreenshot") {
-            // take screenshot
-            if (flipWindow) {
-              windowB.saveScreenshot(client);
-            } else {
-              windowA.saveScreenshot(client);
-            }
-          } else if (msg.command == "automaticScreenshotPeriod") {
-            // change frequency of automatic screenshots
-            console.log(`changing frequency of automatic screenshots to ${msg.newValue}ms`);
-            if (screenshotViewTimeout != null)
-              clearTimeout(screenshotViewTimeout);
-            // save new frequency (ms)
-            screenshotViewFrequency = msg.newValue;
-            // restart timer
-            if (screenshotViewFrequency > 0)
-              screenshotViewTimeout = setTimeout(screenshotView, screenshotViewFrequency);
-          } else if (msg.command == "fakeInput") {
-            // send fake user gesture to trigger event in page
-            console.log(`sending mouse click event ${msg.position[0]},${msg.position[1]} to window ${flipWindow ? 'B' : 'A'}`);
-            if (flipWindow) {
-              // trigger event
-              windowB.mouseClick(msg.position[0], msg.position[1]);
-            } else {
-              // trigger event
-              windowA.mouseClick(msg.position[0], msg.position[1]);
-            }
-          } else if (msg.command == "saveURL") {
-            // get right browser window
-            var _browserWindow = false;
-            if (windowA.browserWindow.webContents.getURL() == msg.URL) {
-              _browserWindow = windowA.browserWindow;
-            } else if (windowB.browserWindow.webContents.getURL() == msg.URL) {
-              _browserWindow = windowB.browserWindow;
-            } else {
-              console.log(`error saving url for ${msg.URL} (not matching ${windowA.browserWindow.webContents.getURL()} or ${windowB.browserWindow.webContents.getURL()})`);
-            }
-            // if requested URL is open
-            if (_browserWindow) {
-              // make directory
-              var randomName = "item_" + Math.random().toString(36).substring(2, 8);
-              var newDirectory = path.join(msg.mediaDir, randomName);
-              fs.mkdir(newDirectory, function (err) {
-                if (err) console.log(`err: ${err}`)
-                else {
-                  // save page
-                  _browserWindow.webContents.savePage(path.join(newDirectory, 'index.html'), 'HTMLComplete').then(() => {
-                    //console.log(`saved page successfully`);
-                    // save screenshot
-                    _browserWindow.capturePage().then(image => {
-                      //console.log(`captured page screenshot`);
-                      if (!image) console.log(`error capturing page: image is null`);
-                      fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(screenshotQuality), (err) => {
-                        if (err) console.log(`error capturing page: ${err}`);
-                        //console.log(`saved screenshot`);
-                        // get datetime
-                        var timestamp = new Date().toISOString();
-                        timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
-                        // build metadata object
-                        var newMetadata = {
-                          "demo": {
-                            "title": _browserWindow.webContents.getTitle(),
-                            "source": msg.URL,
-                            "description": msg.URL,
-                            "files": ["index.html"],
-                            "channels": [msg.channel],
-                            "playcount": 0,
-                            "thumbnails": ["thumb.jpg"],
-                            "modified": timestamp
-                          }
-                        }
-                        // save metadata
-                        fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(newMetadata, null, 4), function (err) {
-                          if (err) console.log(`error saving metadata: ${err}`);
-                          console.log(`saved page ${msg.URL} to ${newDirectory}`);
-                          // report loaded to client
-                          console.log(`sending saved`);
-                          if (client) client.write(JSON.stringify({
-                            saved: true,
-                            directory: randomName
-                          }));
-                        });
-                      });
-                    }).catch(err => {
-                      console.log(`error capturing page screenshot: ${err}`);
-                    });
-                  }).catch(err => {
-                    console.log(`didnt save page successfully: ${err}`);
+  socketServer.event.on('data', (msg) => {
+    var dataAsString = msg.toString();
+    var data;
+    try {
+      data = JSON.parse(dataAsString);
+    } catch (e) {
+      console.log(`error parsing json from ui socket: ${e}\n${dataAsString}`);
+      return;
+    }
+    // switch through message types
+    if (data.command == 'loadURL') {
+      console.log(`load URL received`);
+      // display recieved URI
+      if (flipWindow) {
+        windowA.loadURL(data, socketServer);
+      } else {
+        windowB.loadURL(data, socketServer);
+      }
+      // flip window to display on
+      flipWindow = !flipWindow;
+    } else if (data.command == 'unloadSide') {
+      // get right browser window
+      var _browserWindow = data.side == 'A' ? windowA.browserWindow : windowB.browserWindow;
+      // load empty webpage
+      _browserWindow.loadURL('about:blank');
+    } else if (data.command == 'fakeInput') {
+      // send fake user gesture to trigger event in page
+      console.log(`sending mouse click event ${data.position[0]},${data.position[1]} to window ${flipWindow ? 'B' : 'A'}`);
+      if (flipWindow) {
+        // trigger event
+        windowB.mouseClick(data.position[0], data.position[1]);
+      } else {
+        // trigger event
+        windowA.mouseClick(data.position[0], data.position[1]);
+      }
+    } else if (data.command == 'takeScreenshot') {
+      // take screenshot
+      if (flipWindow) {
+        windowB.saveScreenshot(socketServer);
+      } else {
+        windowA.saveScreenshot(socketServer);
+      }
+    } else if (data.command == 'saveURL') {
+      // get right browser window
+      var _browserWindow = false;
+      if (windowA.browserWindow.webContents.getURL() == data.URL) {
+        _browserWindow = windowA.browserWindow;
+      } else if (windowB.browserWindow.webContents.getURL() == data.URL) {
+        _browserWindow = windowB.browserWindow;
+      } else {
+        console.log(`error saving url for ${data.URL} (not matching ${windowA.browserWindow.webContents.getURL()} or ${windowB.browserWindow.webContents.getURL()})`);
+      }
+      // if requested URL is open
+      if (_browserWindow) {
+        // make directory
+        var randomName = "item_" + Math.random().toString(36).substring(2, 8);
+        var newDirectory = path.join(data.mediaDir, randomName);
+        fs.mkdir(newDirectory, function (err) {
+          if (err) console.log(`err: ${err}`)
+          else {
+            // save page
+            _browserWindow.webContents.savePage(path.join(newDirectory, 'index.html'), 'HTMLComplete').then(() => {
+              //console.log(`saved page successfully`);
+              // save screenshot
+              _browserWindow.capturePage().then(image => {
+                //console.log(`captured page screenshot`);
+                if (!image) console.log(`error capturing page: image is null`);
+                fs.writeFile(path.join(newDirectory, 'thumb.jpg'), image.toJPEG(screenshotQuality), (err) => {
+                  if (err) console.log(`error capturing page: ${err}`);
+                  //console.log(`saved screenshot`);
+                  // get datetime
+                  var timestamp = new Date().toISOString();
+                  timestamp = timestamp.substring(0, timestamp.lastIndexOf('.')); // trim ms out of datetime string
+                  // build metadata object
+                  var newMetadata = {
+                    "demo": {
+                      "title": _browserWindow.webContents.getTitle(),
+                      "source": data.URL,
+                      "description": data.URL,
+                      "files": ["index.html"],
+                      "channels": [data.channel],
+                      "playcount": 0,
+                      "thumbnails": ["thumb.jpg"],
+                      "modified": timestamp
+                    }
+                  }
+                  // save metadata
+                  fs.writeFile(path.join(newDirectory, 'demo.json'), JSON.stringify(newMetadata, null, 4), function (err) {
+                    if (err) console.log(`error saving metadata: ${err}`);
+                    console.log(`saved page ${data.URL} to ${newDirectory}`);
+                    // report loaded to client
+                    console.log(`sending saved`);
+                    if (socketServer.connected) socketServer.write(JSON.stringify({
+                      type: 'saved',
+                      directory: randomName
+                    }));
                   });
-                }
+                });
+              }).catch(err => {
+                console.log(`error capturing page screenshot: ${err}`);
               });
-            }
-          } else if (msg.command == "setAutoClickPeriod") {
-            // set auto click period
-            console.log(`setting autoclickperiod to ${msg.newValue}`);
-            resetAutoClickPeriod(msg.newValue);
+            }).catch(err => {
+              console.log(`didnt save page successfully: ${err}`);
+            });
           }
         });
-      })
-      .listen(socket)
-      .on('connection', function (socket) {
-        console.log('Client connected.');
-      })
-      .on('error', function (err) {
-        console.log(`server error: ${err}`);
-      });
-    return server;
-  }
+      }
+    } else if (data.command == 'setAutoClickPeriod') {
+      // set auto click period
+      console.log(`setting autoclickperiod to ${data.newValue}`);
+      resetAutoClickPeriod(data.newValue);
+    }
+  });
 });
