@@ -81,194 +81,134 @@ rendererSocket.event.on('connect', function () {
         console.log('error no config settings yet')
     }
 });
-rendererSocket.event.on('data', function (data) {
+rendererSocket.event.on('data', (data) => {
     var dataAsString = data.toString();
-    if (dataAsString === '__disconnect') {
-        cleanup();
-    } else {
-        var rendererMsg;
-        try {
-            rendererMsg = JSON.parse(dataAsString);
-        } catch (e) {
-            console.log(`error parsing json from renderer: ${e}\n${dataAsString}`);
-            return;
+    var rendererMsg;
+    try {
+        rendererMsg = JSON.parse(dataAsString);
+    } catch (e) {
+        console.log(`error parsing json from renderer: ${e}\n${dataAsString}`);
+        return;
+    }
+    // switch through message types
+    if (rendererMsg.type == 'dimensions') {
+        windowDims = rendererMsg.dimensions;
+        console.log(`got dimensions from renderer: ${JSON.stringify(windowDims)}`);
+    } else if (rendererMsg.type == 'loadFinished') {
+        // update currentURL when halfway through transition
+        changePlaybackID = setTimeout(function (URL) {
+            playback.currentURL = URL;
+        }, config_settings.fade / 2, rendererMsg.URL);
+        // object containing commands for backend
+        var backendMsg = {};
+        // tell backend where media is playing and how to transition
+        backendMsg.window = {
+            half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
+            fade: rendererMsg.fade || config_settings.fade
         }
-        // message backend to switch
-        if (rendererMsg.loaded) {
-            // update currentURL when halfway through transition
-            changePlaybackID = setTimeout(function (URL) {
-                playback.currentURL = URL;
-            }, config_settings.fade / 2, rendererMsg.URL);
-            // object containing commands for backend
-            var backendMsg = {};
-            // tell backend where media is playing and how to transition
-            backendMsg.window = {
-                half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
-                fade: rendererMsg.fade || config_settings.fade
-            }
-            // check if screenshot is needed
-            if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
-                console.log(`skipping legacy screenshot mode`);
-                // tell backend to take screenshot
-                // backendMsg.command = "screenshot";
-                // start watching for screenshot to be saved
-                // saveScreenshot(rendererMsg.whichWindow); // legacy screenshot function?
-            }
-            // send message to backend
-            backendSocket.write(JSON.stringify(backendMsg));
-            // tell renderer to close old window when fade is done
-            clearTimeout(unloadBrowserWindowTimerID);
-            unloadBrowserWindowTimerID = null;
-            unloadBrowserWindowTimerID = setTimeout((windowSide) => {
-                // send msg to renderer to unload window side
-                rendererSocket.write(JSON.stringify({
-                    command: 'unloadSide',
-                    side: windowSide == 'A' ? 'B' : 'A'
-                }));
-            }, rendererMsg.fade + 250, rendererMsg.whichWindow);
-            // send update to clients
-            module.exports.eventEmitter.emit('switchingsides', JSON.stringify({
-                targetSide: rendererMsg.whichWindow,
-                fadeDuration: rendererMsg.fade
+        // check if screenshot is needed
+        if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
+            console.log(`skipping legacy screenshot mode`);
+            // tell backend to take screenshot
+            // backendMsg.command = "screenshot";
+            // start watching for screenshot to be saved
+            // saveScreenshot(rendererMsg.whichWindow); // legacy screenshot function?
+        }
+        // send message to backend
+        backendSocket.write(JSON.stringify(backendMsg));
+        // tell renderer to close old window when fade is done
+        clearTimeout(unloadBrowserWindowTimerID);
+        unloadBrowserWindowTimerID = null;
+        unloadBrowserWindowTimerID = setTimeout((windowSide) => {
+            // send msg to renderer to unload window side
+            rendererSocket.write(JSON.stringify({
+                command: 'unloadSide',
+                side: windowSide == 'A' ? 'B' : 'A'
             }));
-            // send screenshot to web ui clients
-            var screenshotMsgForApp = {
-                side: rendererMsg.whichWindow,
-                screenshots: rendererMsg.screenshots,
-                directory: rendererMsg.directory
-            };
-            module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
-        } else if (rendererMsg.saved) {
-            console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
-            // parse metadata of new media
-            var newMetadata = require(path.join(mediaDir, rendererMsg.directory, 'demo.json'));
-            if (newMetadata) {
-                // add to database
-                parseMediaItemDirectory(rendererMsg.directory, newMetadata, () => {
-                    // retrieve from database
-                    module.exports.loadMediaItem(rendererMsg.directory, element => {
-                        // send media item to client
-                        module.exports.eventEmitter.emit('addmediaitem', element);
-                        // play media
-                        module.exports.playLocalMedia({
-                            directory: rendererMsg.directory
-                        }, 1000);
-                    });
-                });
-            }
-        } else if (rendererMsg.savedScreenshot) {
-            console.log(`renderer saved screenshot ${JSON.stringify(rendererMsg, null, 2)}`);
-            // check if website is in library
-            if (rendererMsg.directory && rendererMsg.directory.length > 0) {
-                // update media db and json
-                // update client
-                console.log("USER INPUT::adding screenshot");
-                // create connection in database
-                var sql = "INSERT INTO thumbnails (media_directory, filename) VALUES (?, ?)";
-                db.run(sql, [rendererMsg.directory, rendererMsg.filename], (err) => {
-                    if (err) console.log(`error updating database: ${err}`);
-                    // get path and load json
-                    var metaPath = path.join(mediaDir, rendererMsg.directory, 'demo.json');
-                    var meta = require(metaPath);
-                    // check for thumbnails array in metadata
-                    if (meta.demo.thumbnails) {
-                        // check screenshot is not already saved
-                        var index = meta.demo.thumbnails.indexOf(rendererMsg.filename);
-                        if (index == -1) {
-                            // add screenshot
-                            meta.demo.thumbnails.push(rendererMsg.filename);
-                        }
-                    } else {
-                        // create array of thumbnails in metadata and add first screenshot
-                        meta.demo.thumbnails = [rendererMsg.filename];
-                    }
-                    // send screenshot to web ui clients
-                    var screenshotMsgForApp = {
-                        side: rendererMsg.whichWindow,
-                        screenshots: rendererMsg.screenshots,
+        }, rendererMsg.fade + 250, rendererMsg.whichWindow);
+        // send update to clients
+        module.exports.eventEmitter.emit('switchingsides', JSON.stringify({
+            targetSide: rendererMsg.whichWindow,
+            fadeDuration: rendererMsg.fade
+        }));
+        // send screenshot to web ui clients
+        var screenshotMsgForApp = {
+            side: rendererMsg.whichWindow,
+            screenshots: rendererMsg.screenshots,
+            directory: rendererMsg.directory
+        };
+        module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
+
+    } else if (rendererMsg.type == 'saved') {
+        console.log(`adding newly saved URL to db: ${rendererMsg.directory}`);
+        // parse metadata of new media
+        var newMetadata = require(path.join(mediaDir, rendererMsg.directory, 'demo.json'));
+        if (newMetadata) {
+            // add to database
+            parseMediaItemDirectory(rendererMsg.directory, newMetadata, () => {
+                // retrieve from database
+                module.exports.loadMediaItem(rendererMsg.directory, element => {
+                    // send media item to client
+                    module.exports.eventEmitter.emit('addmediaitem', element);
+                    // play media
+                    module.exports.playLocalMedia({
                         directory: rendererMsg.directory
-                    };
-                    console.log(`sending screenshot msg:\n${JSON.stringify(screenshotMsgForApp)}`);
-                    module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
-                    // update web ui clients
-                    module.exports.eventEmitter.emit('updatemediaitem', rendererMsg.directory);
-                    // save json to disk
-                    fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                        if (err) console.log(err);
-                        console.log(`finished saving media`);
-                    });
+                    }, 1000);
                 });
-            } else {
-                //
-                console.log(`not saving screenshot bc website isnt in library`);
-            }
-        } else if (rendererMsg.dimensions) {
-            windowDims = rendererMsg.dimensions;
-        } else if (rendererMsg.status) {
+            });
+        }
+    } else if (rendererMsg.type == 'savedScreenshot') {
+        console.log(`renderer saved screenshot ${JSON.stringify(rendererMsg, null, 2)}`);
+        // check if website is in library
+        if (rendererMsg.directory && rendererMsg.directory.length > 0) {
+            // update media db and json
+            // update client
+            console.log("USER INPUT::adding screenshot");
+            // create connection in database
+            var sql = "INSERT INTO thumbnails (media_directory, filename) VALUES (?, ?)";
+            db.run(sql, [rendererMsg.directory, rendererMsg.filename], (err) => {
+                if (err) console.log(`error updating database: ${err}`);
+                // get path and load json
+                var metaPath = path.join(mediaDir, rendererMsg.directory, 'demo.json');
+                var meta = require(metaPath);
+                // check for thumbnails array in metadata
+                if (meta.demo.thumbnails) {
+                    // check screenshot is not already saved
+                    var index = meta.demo.thumbnails.indexOf(rendererMsg.filename);
+                    if (index == -1) {
+                        // add screenshot
+                        meta.demo.thumbnails.push(rendererMsg.filename);
+                    }
+                } else {
+                    // create array of thumbnails in metadata and add first screenshot
+                    meta.demo.thumbnails = [rendererMsg.filename];
+                }
+                // send screenshot to web ui clients
+                var screenshotMsgForApp = {
+                    side: rendererMsg.whichWindow,
+                    screenshots: rendererMsg.screenshots,
+                    directory: rendererMsg.directory
+                };
+                console.log(`sending screenshot msg:\n${JSON.stringify(screenshotMsgForApp)}`);
+                module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
+                // update web ui clients
+                module.exports.eventEmitter.emit('updatemediaitem', rendererMsg.directory);
+                // save json to disk
+                fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
+                    if (err) console.log(err);
+                    console.log(`finished saving media`);
+                });
+            });
+        } else {
             //
-            //console.log(`got renderer status`);
-            if (rendererMsg.screenshot) {
-                // get jpeg data buffer
-                rendererScreenshotBuffer = Buffer.from(rendererMsg.screenshot.data);
-                // save screenshot to file
-                // fs.writeFile(path.join(__dirname, 'renderer_screenshot.jpg'), rendererScreenshotBuffer, function (err) {
-                //     if (err) console.log(`error writing file of screenshot: ${err}`);
-                //     console.log(`saved screenshot`);
-                // });
-            }
+            console.log(`not saving screenshot bc website isnt in library`);
         }
     }
-});
+})
 
 // current screenshot from renderer
 var screenshotBufferA = false;
 var screenshotBufferB = false;
-// screenshots socket
-var screenshotsSocket = new sockets.DomainClient("screenshots");
-screenshotsSocket.event.on('data', function (data) {
-    var dataAsString = data.toString();
-    // console.log("screenshot msg length: " + dataAsString.length);
-    if (dataAsString === '__disconnect') {
-        cleanup();
-    } else {
-        // try parsing screenshot msg
-        var screenshotMsg;
-        try {
-            screenshotMsg = JSON.parse(dataAsString);
-        } catch (e) {
-            console.log(`Error parsing JSON for screenshot (length: ${dataAsString.length}): ${e}`);
-            return;
-        }
-        if (screenshotMsg.screenshot) {
-            // check side
-            if (screenshotMsg.side == 'A') {
-                // get jpeg data buffer
-                screenshotBufferA = Buffer.from(screenshotMsg.screenshot.data);
-                // send to clients
-                var screenshotMsgForApp = {
-                    dataURL: `data:image/jpeg;base64,${screenshotBufferA.toString('base64')}`,
-                    side: screenshotMsg.side
-                };
-                module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
-            } else {
-                // get jpeg data buffer
-                screenshotBufferB = Buffer.from(screenshotMsg.screenshot.data);
-                // send to clients
-                var screenshotMsgForApp = {
-                    dataURL: `data:image/jpeg;base64,${screenshotBufferB.toString('base64')}`,
-                    side: screenshotMsg.side
-                };
-                module.exports.eventEmitter.emit('screenshot', JSON.stringify(screenshotMsgForApp));
-            }
-            // save screenshot to file
-            // fs.writeFile(path.join(__dirname, 'renderer_screenshot.jpg'), rendererScreenshotBuffer, function (err) {
-            //     if (err) console.log(`error writing file of screenshot: ${err}`);
-            //     console.log(`saved screenshot`);
-            // });
-            // console.log(`screenshot ${screenshotMsg.side} of ${JSON.stringify(screenshotMsg.path)}`)
-        }
-    }
-});
 
 function cleanup() {
     if (!SHUTDOWN) {
@@ -279,9 +219,6 @@ function cleanup() {
         }
         if (backendSocket.connected) {
             backendSocket.socket.end();
-        }
-        if (screenshotsSocket.connected) {
-            screenshotsSocket.socket.end();
         }
         process.exit(0);
     }
@@ -361,7 +298,6 @@ module.exports = {
                     setTimeout(() => {
                         backendSocket.startConnecting();
                         rendererSocket.startConnecting();
-                        screenshotsSocket.startConnecting();
                     }, 1000);
                 }
             });
