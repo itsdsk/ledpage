@@ -69,72 +69,6 @@
         </a>
     </div>
     <div class="openable">
-        <div>
-            <form
-                on:submit|preventDefault={() => {
-                    return false;
-                }}
-            >
-                <div class="label">Brightness:</div>
-                <div class="buttons" class:buttons__brightness={open}>
-                    <input
-                        type="number"
-                        min="0.0"
-                        max="100"
-                        step="0.1"
-                        list="brightnesses"
-                        class="brightness"
-                        placeholder="{$config_settings.brightness
-                            ? ($config_settings.brightness * 100).toFixed(
-                                  $config_settings.brightness < 0.1 ? 1 : 0
-                              )
-                            : 0}%"
-                        on:change|preventDefault={(e) => {
-                            window.socket.emit("config/update", {
-                                name: "brightness",
-                                value: e.target.value / 100.0,
-                            });
-                            e.target.value = "";
-                        }}
-                    />
-                    <datalist id="brightnesses">
-                        <option value="0" />
-                        <option value="33" />
-                        <option value="66" />
-                        <option value="100" />
-                    </datalist>
-                    <button
-                        type="button"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("config/update", {
-                                name: "brightness",
-                                value: 0.75 * $config_settings.brightness,
-                            });
-                        }}
-                    >
-                        -
-                    </button>
-                    <button
-                        type="button"
-                        on:click|preventDefault={() => {
-                            window.socket.emit("config/update", {
-                                name: "brightness",
-                                value:
-                                    $config_settings.brightness > 0.0
-                                        ? Math.min(
-                                              1.25 *
-                                                  $config_settings.brightness,
-                                              1.0
-                                          )
-                                        : 0.04,
-                            });
-                        }}
-                    >
-                        +
-                    </button>
-                </div>
-            </form>
-        </div>
         {#if open}
             {#if libraryIndex >= 0}
                 <p class="label">Included in:</p>
@@ -218,6 +152,8 @@
         /* margin: 0.7875rem 0; */
     }
     .url {
+        display: flex;
+        align-items: center;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -232,10 +168,10 @@
     .buttons {
         overflow: auto;
         white-space: nowrap;
+        display: flex;
     }
 
-    .buttons__channels,
-    .buttons__brightness {
+    .buttons__channels {
         margin-bottom: 1.125rem;
     }
 
@@ -259,17 +195,6 @@
         cursor: pointer;
     }
 
-    .brightness {
-        width: 4em;
-        appearance: textfield;
-        -moz-appearance: textfield;
-        -webkit-appearance: textfield;
-    }
-
-    form {
-        margin-bottom: 0;
-    }
-
     .openable {
         border-top: solid 1px #333;
         border-bottom: solid 1px #333;
@@ -278,6 +203,7 @@
 
     .main {
         margin-bottom: 1.85625rem;
+        margin-top: 4rem;
     }
 
     .connect {

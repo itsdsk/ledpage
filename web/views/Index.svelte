@@ -13,6 +13,12 @@
     import Menu from "./Menu.svelte";
     import Player from "./Player.svelte";
 
+    import BrightIcon from "./icons/Bright.svelte";
+    import FastForwardIcon from "./icons/FastForward.svelte";
+    import MenuIcon from "./icons/Menu.svelte";
+    import PauseIcon from "./icons/Pause.svelte";
+    import PlayIcon from "./icons/Play.svelte";
+
     $: if ($config_settings.title) {
         document.title = $config_settings.title;
     } else {
@@ -148,6 +154,17 @@
             y: mousePosY,
         });
     }
+
+    var iconProps = {
+        viewBoxInset: 0,
+        strokeWidth: "2",
+        colour: "#fff",
+        size: "1.575rem",
+    };
+
+    let sliderActive = false;
+    let sliderCurve = 2; // logarithmic scale (1 = linear, higher = more exponential)
+    let optionsActive = false;
 </script>
 
 <section>
@@ -222,85 +239,159 @@
                     class="preview__footer"
                     style="--window-ratio: {windowDimensions.ratio}%"
                 >
-                    {playback_label == 0
-                        ? "PAUSED"
-                        : playback_label == 1
-                        ? "FADING"
-                        : playback_label == 2
-                        ? "PLAYING"
-                        : "ERROR"}
-                    {playback_timer}
                     <span class="control">
                         <button
                             type="button"
                             class="control--btn"
                             title="Play next URL"
                             on:click|preventDefault|stopPropagation={() => {
-                                window.socket.emit("playnext");
+                                if ($config_settings.brightness == 0.0) {
+                                    window.socket.emit("config/update", {
+                                        name: "brightness",
+                                        value: 0.04,
+                                    });
+                                } else {
+                                    window.socket.emit("playnext");
+                                }
                             }}
                         >
-                            SKIP
+                            {#if playback_label == 0}
+                                <!-- off -->
+                                <PauseIcon
+                                    {...Object.assign({}, iconProps, {
+                                        size: "2.1375rem",
+                                    })}
+                                />
+                            {:else if playback_label == 1}
+                                <!-- crossfading -->
+                                <FastForwardIcon
+                                    {...Object.assign({}, iconProps, {
+                                        size: "2.1375rem",
+                                    })}
+                                />
+                            {:else if playback_label == 2}
+                                <!-- playing -->
+                                <PlayIcon
+                                    {...Object.assign({}, iconProps, {
+                                        size: "2.1375rem",
+                                    })}
+                                />
+                            {/if}
                         </button>
-                        |
-                        <button
-                            type="button"
-                            class="control--btn"
-                            title="Take screenshot of URL"
-                            on:click|preventDefault|stopPropagation={() => {
-                                window.socket.emit("screenshot");
-                            }}
+                        <span
+                            class="slider"
+                            class:active={sliderActive}
+                            on:mouseenter={() => (sliderActive = true)}
+                            on:mouseleave={() => (sliderActive = false)}
                         >
-                            SCREENSHOT
-                        </button>
-                        |
-                        {#if currentPlayingIndex >= 0}
-                            <button
-                                type="button"
-                                class="control--btn"
-                                title="Remove URL from library"
-                                on:click|preventDefault|stopPropagation={() => {
-                                    if (
-                                        window.confirm(
-                                            `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
-                                        )
-                                    ) {
-                                        window.socket.emit(
-                                            "deletemedia",
-                                            $mediaFeedObjects[
-                                                currentPlayingIndex
-                                            ].directory
-                                        );
-                                    }
+                            <BrightIcon {...Object.assign({}, iconProps, {})} />
+                            <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.001"
+                                value={Math.pow(
+                                    $config_settings.brightness,
+                                    1 / sliderCurve
+                                )}
+                                on:change|preventDefault={(e) => {
+                                    var newBrightness =
+                                        Math.round(
+                                            Math.pow(
+                                                e.target.value,
+                                                sliderCurve
+                                            ) * 1000
+                                        ) / 1000;
+                                    window.socket.emit("config/update", {
+                                        name: "brightness",
+                                        value: newBrightness,
+                                    });
                                 }}
-                            >
-                                DELETE
-                            </button>
-                        {:else}
-                            <button
-                                type="button"
-                                class="control--btn"
-                                title="Add URL to library"
-                                on:click|preventDefault|stopPropagation={() => {
-                                    if (
-                                        $livePlaybackStatus.nowPlaying.directory
-                                            .length > 0
-                                    ) {
-                                        // URL is validated
-                                        window.socket.emit(
-                                            "createmediaURL",
-                                            $livePlaybackStatus.nowPlaying
-                                                .directory
-                                        );
-                                    } else {
-                                        console.log(
-                                            "cannot create media from URL as it is invalid"
-                                        );
-                                    }
-                                }}
-                            >
-                                SAVE
-                            </button>
-                        {/if}
+                            />
+                        </span>
+                        <span class="preview__text">
+                            {playback_timer}
+                        </span>
+                        <span class="spacer" />
+                        <span
+                            class="options"
+                            class:active={optionsActive}
+                            on:mouseenter={() => (optionsActive = true)}
+                            on:mouseleave={() => (optionsActive = false)}
+                        >
+                            <MenuIcon {...Object.assign({}, iconProps, {})} />
+                            <span>
+                                <ul class="options__list">
+                                    <li class="options__item">
+                                        <button
+                                            type="button"
+                                            class="options--btn"
+                                            title="Take screenshot of URL"
+                                            on:click|preventDefault|stopPropagation={() => {
+                                                window.socket.emit(
+                                                    "screenshot"
+                                                );
+                                            }}
+                                        >
+                                            Screenshot
+                                        </button>
+                                    </li>
+                                    <li class="options__item">
+                                        {#if currentPlayingIndex >= 0}
+                                            <button
+                                                type="button"
+                                                class="options--btn"
+                                                title="Remove URL from library"
+                                                on:click|preventDefault|stopPropagation={() => {
+                                                    if (
+                                                        window.confirm(
+                                                            `Do you really want to delete '${$mediaFeedObjects[currentPlayingIndex].title}'?`
+                                                        )
+                                                    ) {
+                                                        window.socket.emit(
+                                                            "deletemedia",
+                                                            $mediaFeedObjects[
+                                                                currentPlayingIndex
+                                                            ].directory
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                Delete
+                                            </button>
+                                        {:else}
+                                            <button
+                                                type="button"
+                                                class="options--btn"
+                                                title="Add URL to library"
+                                                on:click|preventDefault|stopPropagation={() => {
+                                                    if (
+                                                        $livePlaybackStatus
+                                                            .nowPlaying
+                                                            .directory.length >
+                                                        0
+                                                    ) {
+                                                        // URL is validated
+                                                        window.socket.emit(
+                                                            "createmediaURL",
+                                                            $livePlaybackStatus
+                                                                .nowPlaying
+                                                                .directory
+                                                        );
+                                                    } else {
+                                                        console.log(
+                                                            "cannot create media from URL as it is invalid"
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                Download
+                                            </button>
+                                        {/if}
+                                    </li>
+                                </ul>
+                            </span>
+                        </span>
                     </span>
                 </span>
             </div>
@@ -437,11 +528,65 @@
         color: #d9d9d9;
     }
 
+    .slider {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .slider > input[type="range"] {
+        display: none;
+        margin: auto 0;
+    }
+
+    .slider.active > input[type="range"] {
+        display: inline-block;
+    }
+
+    .options > span {
+        display: none;
+        position: absolute;
+        transform: translate(-100%, -100%);
+        z-index: 10;
+        background: #0d0d0d;
+        border-radius: 3.6px;
+        border: 1px solid #595959;
+    }
+
+    .options.active > span {
+        display: unset;
+    }
+
+    .options__list {
+        margin: 0;
+        list-style: none;
+    }
+
+    .options__item {
+        text-align: right;
+    }
+
+    .options--btn {
+        background: none;
+        border: none;
+        font-size: inherit;
+        padding: 0rem 0.5rem 0rem 1rem;
+        margin: inherit;
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+
     .control {
-        float: right;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
     }
 
     .control--btn {
+        display: flex;
+        align-items: center;
         color: #d9d9d9;
         background: none;
         border: none;
