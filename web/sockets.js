@@ -145,28 +145,27 @@ exports.DomainServer = class DomainServer {
             console.log(`Creating server ${this.name} with path ${this.socketname}`);
             // create server
             this.socket = net.createServer(function (stream) {
-                stream.on('error', function (err) {
-                    console.log(`socket server error in stream: ${err}`);
-                });
-                stream.on('end', function () {
-                    console.log('socket server Client disconnected.');
-                });
-                /*stream.on('data', function (msg) {
-                    // parse buffer
-                    msg = JSON.parse(msg.toString());
-            
-                    console.log('socket server Client:', JSON.stringify(msg));
-                });*/
-            })
-            .listen(this.socketname)
-            .on('connection', (stream) => {
-                console.log(`Client connected to server ${this.socketname}`);
-                this.connected = true;
-                this.socket_stream = stream;
-            })
-            .on('error', err => {
-                console.log(`${this.socketname} Server error: ${err}`);
-            });
+                    stream.on('error', function (err) {
+                        console.log(`socket server error in stream: ${err}`);
+                    });
+                    stream.on('end', function () {
+                        console.log('socket server Client disconnected.');
+                    });
+                })
+                .listen(this.socketname)
+                .on('connection', (stream) => {
+                    console.log(`Client connected to server ${this.socketname}`);
+                    this.connected = true;
+                    this.socket_stream = stream;
+                    this.event.emit('connect');
+                    this.socket_stream.on('data', msg => {
+                        // console.log(`Socket server: Received data from ${this.name}, length: ${msg.length}`);
+                        this.event.emit('data', msg);
+                    });
+                })
+                .on('error', err => {
+                    console.log(`${this.socketname} Server error: ${err}`);
+                })
         });
     }
 
@@ -175,8 +174,8 @@ exports.DomainServer = class DomainServer {
         // check for leftover socket file / failed cleanup
         require('fs').stat(SOCKETFILE, function (err, stats) {
             if (err) {
-              // ready to start server, no leftover socket found
-              callback();
+                // ready to start server, no leftover socket found
+                callback();
             } else {
                 // remove leftover socket file
                 require('fs').unlink(SOCKETFILE, function (err) {
