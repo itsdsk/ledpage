@@ -1,61 +1,44 @@
-# Disk Interaction System
+Web browser for Raspberry Pi that streams to addressable LEDs, motors and other outputs by sampling the image of the window at given 2D locations. It provides a web interface allowing the system to run headlessly.
 
-Disk Interaction System is an app for things with physical outputs, such as LEDs and motors, that cycles through websites while translating the video of the screen to electronic devices(s) in any position.
+## Supported outputs and inputs
 
-## Supported hardware
-
-* Raspberry Pi 3/4
-* DotStars
-* NeoPixels
-* DC Motors
+- UART
+- SPI
+- PWM
+- Bluetooth
+- WebAudio
+- WebBluetooth
+- WebRTC
 
 ## Installation
 
-Download with dependencies in terminal:
+- Connect a terminal to headless device running Raspberry Pi OS Lite: `ssh pi@<ip address>`.
+
+- Run these commands to download the repository and dependencies, build, install and add to start up.
 
 ```bash
 git clone --recurse-submodules -j8 https://github.com/itsdsk/disk-interaction-system.git
 cd ./disk-interaction-system
-```
-
-Install web UI:
-
-```bash
-npm install
-npm run dev
-# open http://localhost:3000
-```
-
-Create configuration file, for example:
-
-```javascript
-{
-    "window": {
-        "width": 640,
-        "height": 480
-    },
-    "outputs": [
-        {
-            "type": "apa102_spi0", // apa102_spi1, adalight_serial, adalight_uart, pwm_hw, pwm_gpio
-            "properties": {
-                "colorOrder": "rgb"
-            },
-            "leds": [
-                {
-                    "x": 320,
-                    "y": 240,
-                    "r": 50
-                }
-            ]
-        }
-    ]
-}
-```
-
-Install all on a Raspberry Pi running Raspbian Lite setup headlessly:
-
-```bash
 chmod +x install.sh
-./install.sh # then follow instructions at bottom of install.sh
-# open http://<IP address or 'raspberrypi.local'>:3000
+./install.sh
 ```
+
+- Follow the final instructions at end of [install.sh](install.sh).
+
+## Configure the display topology
+
+- Save a list of XY coordinates in a JSON file in the format described in [cpp/device/README.md](cpp/device/README.md).
+
+## Open the web UI
+
+- Nagivate to [http://raspberrypi.local](http://raspberrypi.local) from a device on the same local network.
+
+## Update the configuration
+
+- Go to the setup page of the web UI: [http://raspberrypi.local/setup](http://raspberrypi.local/setup).
+
+- Copy your configuration JSON into the text input.
+
+- Click update.
+
+- Reboot the Pi.
