@@ -1,6 +1,6 @@
 ![Photos of projects realised using this software](/examples/media/cover.webp "Cover image")
 
-Web browser for Raspberry Pi that streams to addressable LEDs, motors and other outputs by sampling the image of the window at given 2D locations. It provides a web interface allowing the system to run headlessly.
+Web browser for Raspberry Pi that streams to addressable LEDs, motors and other outputs by sampling the image of the window at given 2D locations. It provides a web interface allowing the system to run headlessly. There are videos of projects it is working in [here](examples/media/corona_lamp.mp4) and [here](exmples/media/square_two.mp4).
 
 ## Supported outputs and inputs
 
@@ -25,7 +25,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-- Follow the final instructions at end of [install.sh](install.sh).
+- Follow the final instructions at the end of [install.sh](install.sh).
 
 ## Configure the display topology
 
