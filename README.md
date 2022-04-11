@@ -29,15 +29,19 @@ chmod +x install.sh
 
 ## Configure the display topology
 
-- Save a list of XY coordinates in a JSON file in the format described in [cpp/device/README.md](cpp/device/README.md).
+- Save a list of XY coordinates using the format described in [cpp/device/README.md](cpp/device/README.md).
 
 ## Open the web UI
 
 - Nagivate to [http://raspberrypi.local](http://raspberrypi.local) from a device on the same local network.
 
+![Screenshots of the web UI homepage](/examples/media/web_ui_home.png)
+
 ## Update the configuration
 
 - Go to the setup page of the web UI: [http://raspberrypi.local/setup](http://raspberrypi.local/setup).
+
+![Screenshots of the web UI setup page](/examples/media/web_ui_setup.png)
 
 - Copy your configuration JSON into the text input.
 
