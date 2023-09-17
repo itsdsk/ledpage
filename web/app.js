@@ -152,7 +152,7 @@ io.on('connection', function (socket) {
     }
     // send settings to refresh client (fix web ui issue where the wrong brightness is displayed if clicking 'config' after changing brightness)
     media.loadSettings(function (elements) {
-      socket.emit('settings', elements);
+      io.emit('settings', elements);
     });
   });
   // create channel and add media to it
