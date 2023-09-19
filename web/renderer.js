@@ -191,7 +191,7 @@ class RenderWindow {
         // if playing remote media without screenshot
         if (!this.loadMessage.directory && !has_screenshot) {
           setTimeout(() => {
-            this.saveScreenshot(null, new_screenshot => {
+            this.saveScreenshot(this.client, new_screenshot => {
               // report loaded to client with saved screenshot
               this.client.write(JSON.stringify({
                 type: 'loadFinished',
@@ -199,12 +199,13 @@ class RenderWindow {
                 URL: this.browserWindow.webContents.getURL(),
                 fade: this.loadMessage.fade,
                 screenshots: [new_screenshot.filename],
-                directory: this.loadMessage.directory
+                directory: this.loadMessage.directory,
+                newScreenshot: true
               }));
               // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
               this.client = null;
             });
-          }, 100); // pause to let page load
+          }, 2000); // pause to let page load
         } else if (this.loadMessage.directory && !has_screenshot) {
           // playing local media without screenshot
           // todo: see if page loading pause should be added here
@@ -217,7 +218,8 @@ class RenderWindow {
                 URL: this.browserWindow.webContents.getURL(),
                 fade: this.loadMessage.fade,
                 screenshots: [new_screenshot.filename],
-                directory: this.loadMessage.directory
+                directory: this.loadMessage.directory,
+                newScreenshot: true
               }));
               // do not repeat, avoid resending when URL changes i.e. due to mouse click on hyperlink in page
               this.client = null;

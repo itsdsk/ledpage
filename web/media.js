@@ -1,6 +1,4 @@
-const util = require('util');
 const fs = require('fs');
-const copyFilePromise = util.promisify(fs.copyFile);
 const path = require('path');
 const EventEmitter = require('events');
 var sockets = require('./sockets.js');
@@ -36,10 +34,6 @@ db.serialize(function () {
         UNIQUE(media_directory, channel_name)
     )`);
 });
-
-// directory of media requiring screenshot
-var mediaRequiringScreenshot;
-var screenshotPath = path.join(__dirname, '../', 'public', 'screenshot.ppm');
 
 //
 var backendSocket = new sockets.DomainClient("backend");
@@ -110,14 +104,6 @@ rendererSocket.event.on('data', (data) => {
         backendMsg.window = {
             half: (rendererMsg.whichWindow == 'A' ? 0 : 1),
             fade: rendererMsg.fade || config_settings.fade
-        }
-        // check if screenshot is needed
-        if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0 && rendererMsg.URL.startsWith('file:///')) {
-            console.log(`skipping legacy screenshot mode`);
-            // tell backend to take screenshot
-            // backendMsg.command = "screenshot";
-            // start watching for screenshot to be saved
-            // saveScreenshot(rendererMsg.whichWindow); // legacy screenshot function?
         }
         // send message to backend
         backendSocket.write(JSON.stringify(backendMsg));
@@ -211,10 +197,6 @@ rendererSocket.event.on('data', (data) => {
     }
 })
 
-// current screenshot from renderer
-var screenshotBufferA = false;
-var screenshotBufferB = false;
-
 function cleanup() {
     if (!SHUTDOWN) {
         SHUTDOWN = true;
@@ -229,45 +211,6 @@ function cleanup() {
     }
 }
 process.on('SIGINT', cleanup);
-
-// legacy screenshot function?
-function saveScreenshot(side) {
-    // check directory of media
-    if (mediaRequiringScreenshot && mediaRequiringScreenshot.length > 0) {
-        // watch screenshot file for changes // TODO: make work if file does not exist yet
-        const watcher = fs.watch(screenshotPath, (eventType, filename) => {
-            // stop watching once file has been changed
-            watcher.close();
-            // wait 1 second for backend to finish changing file
-            setTimeout(function () {
-                // get demo.json and add image to it
-                var metaPath = path.join(mediaDir, mediaRequiringScreenshot, 'demo.json');
-                var meta = require(metaPath);
-                //
-                var targetJpegPath = path.join(mediaDir, mediaRequiringScreenshot, meta.demo.image);
-                // convert and crop half of image
-                var convertCommand = `convert ${screenshotPath} -gravity ${(side == 'A' ? 'West' : 'East')} -crop 50x100% +repage ${targetJpegPath}`;
-                // convert to jpeg
-                runCommand(convertCommand, function (stdout) {
-                    // add thumbnail to database
-                    fs.readFile(targetJpegPath, function (err, buf) {
-                        if (err) throw err;
-                        var decodedImage = "data:image/jpeg;base64," + buf.toString('base64');
-                        var addImgQuery = "UPDATE media SET image = ? WHERE directory = ?";
-                        db.run(addImgQuery, [decodedImage, mediaRequiringScreenshot], function (err) {
-                            // save demo.json
-                            fs.writeFile(metaPath, JSON.stringify(meta, null, 4), function (err) {
-                                if (err) console.log(err);
-                                // reset
-                                mediaRequiringScreenshot = null;
-                            });
-                        });
-                    });
-                });
-            }, 1000);
-        });
-    }
-}
 
 var mediaDir = path.join(__dirname, '../', 'public', 'media');
 var config; // device config
@@ -647,8 +590,6 @@ module.exports = {
             path: name,
             fade: thisFadeDuration
         }));
-        // do not take screenshot
-        mediaRequiringScreenshot = null;
         // update playback status
         playback.playingFadeIn = {
             directory: name,
