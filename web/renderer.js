@@ -165,16 +165,6 @@ class RenderWindow {
   }
   // behaviour on pageload
   async onLoadFinished() {
-    // hide p5.js Editor header
-    if (this.browserWindow.webContents.getURL().includes('editor.p5js.org')) {
-      this.browserWindow.webContents.insertCSS('nav.nav.preview-nav {display: none !important;}', {
-        cssOrigin: 'user'
-      }).then(result => {
-        // console.log(`Added CSS to hide p5.js Editor header`);
-      }).catch(error => {
-        console.log(`Error hiding p5.js Editor header: ${error}`);
-      });
-    }
     // stop timer to call this automatically
     if (this.loadTimeout != null) {
       clearTimeout(this.loadTimeout);
@@ -256,6 +246,16 @@ class RenderWindow {
   }
   async onDomReady() {
     //console.log(`${this.side} DOM ready`);
+    // hide p5.js Editor header
+    if (this.browserWindow.webContents.getURL().includes('editor.p5js.org')) {
+      await this.browserWindow.webContents.insertCSS('nav.nav.preview-nav {display: none !important;}', {
+        cssOrigin: 'user'
+      }).then(result => {
+        console.log(`Added CSS to hide p5.js Editor header`);
+      }).catch(error => {
+        console.log(`Error hiding p5.js Editor header: ${error}`);
+      });
+    }
   }
   // bluetooth device request handler
   onSelectBluetoothDevice(event, deviceList, callback) {
@@ -337,9 +337,10 @@ app.on('ready', () => {
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
     let allowedPermissions = ["media"];
     if (allowedPermissions.includes(permission)) {
+      console.log(`Granted permission for '${permission}'`);
       callback(true); // Approve permission request
     } else {
-      // console.error(`Denied permission request for '${permission}'`);
+      // console.error(`Denied permission for '${permission}'`);
       callback(false); // Deny
     }
   });
