@@ -82,7 +82,7 @@
                                 on:click|preventDefault={() => {
                                     if (
                                         window.confirm(
-                                            `Do you really want to disconnect '${channel}' from '${$mediaFeedObjects[libraryIndex].title}'?`
+                                            `Do you really want to remove '${$mediaFeedObjects[libraryIndex].title}' from '${channel}'?`
                                         )
                                     ) {
                                         window.socket.emit("deleteconnection", [
@@ -196,8 +196,6 @@
     }
 
     .openable {
-        border-top: solid 1px #333;
-        border-bottom: solid 1px #333;
         padding: 0.7875em 0px;
     }
 
