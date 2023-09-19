@@ -334,20 +334,6 @@
                             <span>
                                 <ul class="options__list">
                                     <li class="options__item">
-                                        <button
-                                            type="button"
-                                            class="options--btn"
-                                            title="Take screenshot of URL"
-                                            on:click|preventDefault|stopPropagation={() => {
-                                                window.socket.emit(
-                                                    "screenshot"
-                                                );
-                                            }}
-                                        >
-                                            Screenshot
-                                        </button>
-                                    </li>
-                                    <li class="options__item">
                                         {#if currentPlayingIndex >= 0}
                                             <button
                                                 type="button"
@@ -399,6 +385,20 @@
                                                 Download
                                             </button>
                                         {/if}
+                                    </li>
+                                    <li class="options__item">
+                                        <button
+                                            type="button"
+                                            class="options--btn"
+                                            title="Take screenshot of URL"
+                                            on:click|preventDefault|stopPropagation={() => {
+                                                window.socket.emit(
+                                                    "screenshot"
+                                                );
+                                            }}
+                                        >
+                                            Screenshot
+                                        </button>
                                     </li>
                                 </ul>
                             </span>
