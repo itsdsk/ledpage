@@ -39,6 +39,9 @@ app.commandLine.appendSwitch('ignore-gpu-blacklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
 
+// allow insecure https
+app.commandLine.appendSwitch('ignore-certificate-errors');
+
 let windowDims = {
   width: null,
   height: null
@@ -74,7 +77,7 @@ class RenderWindow {
   loadURL(msg, client) {
     this.loadMessage = msg;
     this.client = client;
-    console.log(`loadurl ${this.side}: ${JSON.stringify(msg)}`)
+    console.log(`loadurl ${this.side}: ${JSON.stringify(msg)}`);
     //
     this.browserWindow.loadURL(this.loadMessage.path);
     // reset load timeout
@@ -413,7 +416,6 @@ app.on('ready', () => {
     }
     // switch through message types
     if (data.command == 'loadURL') {
-      console.log(`load URL received`);
       // display recieved URI
       if (flipWindow) {
         windowA.loadURL(data, socketServer);
