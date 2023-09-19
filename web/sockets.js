@@ -108,6 +108,9 @@ exports.DomainServer = class DomainServer {
         this.event = new EventEmitter();
         this.connectInterval = null;
         //
+        this.messageQueue = [];
+        this.writeTimeoutID = 0;
+        //
         if (connectFlag) {
             console.log(`Constructing server ${this.name} with path ${this.socketname}`);
             this.createSocket.call(this);
@@ -117,17 +120,11 @@ exports.DomainServer = class DomainServer {
     write(msg, callback) {
         if (this.connected) {
             if (this.socket_stream != null) {
-                if (!this.socket_stream.write(msg)) {
-                    // console.log(`Error writing out of socket: all or part of the data was queued in memory`);
-                    // wait for data to clear from memory
-                    this.socket_stream.once('drain', () => {
-                        // console.log(`Info: Socket buffer free`);
-                        if (callback) callback();
-                    });
-                } else {
-                    // console.log(`Info: Server finished writing to socket`);
-                    if (callback) callback();
+                this.messageQueue.push(msg);
+                if (!this.writeTimeoutID) {
+                    this.writeTimeoutID = setTimeout(this.writeOut.bind(this), 0);
                 }
+                if (callback) callback();
             } else {
                 console.log(`Error sending msg to ${this.name}: stream is null`);
                 if (callback) callback();
@@ -140,18 +137,37 @@ exports.DomainServer = class DomainServer {
         }
     }
 
+    writeOut() {
+        let message = this.messageQueue.shift();
+        if (!this.socket_stream.write(message)) {
+            console.log(`Error writing out of ${this.name} socket`);
+            // console.log(`Error writing out of socket: all or part of the data was queued in memory`);
+            // wait for data to clear from memory
+            this.socket_stream.once('drain', () => {
+                // console.log(`Info: Socket buffer free`);
+            });
+        } else {
+            // console.log(`Info: Server finished writing to socket`);
+        }
+        if (this.messageQueue.length) {
+            this.writeTimeoutID = setTimeout(this.writeOut.bind(this), 100);
+        } else {
+            this.writeTimeoutID = null;
+        }
+    }
+
     createSocket() {
         this.prepareServer.call(this, () => {
             console.log(`Creating server ${this.name} with path ${this.socketname}`);
             // create server
             this.socket = net.createServer(function (stream) {
-                    stream.on('error', function (err) {
-                        console.log(`socket server error in stream: ${err}`);
-                    });
-                    stream.on('end', function () {
-                        console.log('socket server Client disconnected.');
-                    });
-                })
+                stream.on('error', function (err) {
+                    console.log(`socket server error in stream: ${err}`);
+                });
+                stream.on('end', function () {
+                    console.log('socket server Client disconnected.');
+                });
+            })
                 .listen(this.socketname)
                 .on('connection', (stream) => {
                     console.log(`Client connected to server ${this.socketname}`);
