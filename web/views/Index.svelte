@@ -244,6 +244,7 @@
                 <span
                     class="preview__footer"
                     style="--window-ratio: {windowDimensions.ratio}%"
+                    title=""
                 >
                     <span class="control">
                         <button
@@ -287,6 +288,10 @@
                         <span
                             class="slider"
                             class:active={sliderActive}
+                            title={`+${Math.floor(Math.pow(
+                                $config_settings.brightness,
+                                1 / sliderCurve
+                            ) * 100)}`}
                             on:mouseenter={() => (sliderActive = true)}
                             on:mouseleave={() => (sliderActive = false)}
                         >
