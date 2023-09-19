@@ -145,6 +145,9 @@
     }
 
     function forwardMouseClick(event) {
+        if ($config_settings.brightness == 0.0) {
+            return;
+        }
         const bounds = event.target.getBoundingClientRect();
         const mousePosX =
             Math.round(((event.clientX - bounds.left) / bounds.width) * 100) /
