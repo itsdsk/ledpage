@@ -216,31 +216,34 @@
             <div
                 class="preview__window"
                 style="--window-ratio: {windowDimensions.ratio}%"
-                on:click|preventDefault={forwardMouseClick}
             >
-                {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
-                    {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
-                        <input
-                            type="image"
-                            src={src != null
-                                ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
-                                : ""}
-                            alt="preview img"
-                            transition:fade={{ duration: 2500 }}
-                            class="preview__img"
-                        />
-                    {/each}
-                {:else if $livePlaybackStatus.nowPlaying}
-                    {#each [`screenshot_tmp.jpg?${screenshotIndex}`] as src (screenshotIndex)}
-                        <input
-                            type="image"
-                            src={src != null ? `/${src}` : ""}
-                            alt="preview img"
-                            transition:fade={{ duration: 2500 }}
-                            class="preview__img"
-                        />
-                    {/each}
-                {/if}
+                <span
+                    on:click|preventDefault={forwardMouseClick}
+                >
+                    {#if currentPlayingIndex >= 0 && $mediaFeedObjects[currentPlayingIndex].screenshots}
+                        {#each [$mediaFeedObjects[currentPlayingIndex].screenshots[screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length]] as src (screenshotIndex % $mediaFeedObjects[currentPlayingIndex].screenshots.length)}
+                            <input
+                                type="image"
+                                src={src != null
+                                    ? `/media/${$mediaFeedObjects[currentPlayingIndex].directory}/${src}`
+                                    : ""}
+                                alt="preview img"
+                                transition:fade={{ duration: 2500 }}
+                                class="preview__img"
+                            />
+                        {/each}
+                    {:else if $livePlaybackStatus.nowPlaying}
+                        {#each [`screenshot_tmp.jpg?${screenshotIndex}`] as src (screenshotIndex)}
+                            <input
+                                type="image"
+                                src={src != null ? `/${src}` : ""}
+                                alt="preview img"
+                                transition:fade={{ duration: 2500 }}
+                                class="preview__img"
+                            />
+                        {/each}
+                    {/if}
+                </span>
                 <span
                     class="preview__footer"
                     style="--window-ratio: {windowDimensions.ratio}%"
