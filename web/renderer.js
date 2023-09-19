@@ -270,11 +270,15 @@ class RenderWindow {
   }
   // print logs from website if they start with 'DISK' or are errors
   onConsoleOutput(event, level, message, line, sourceId) {
-    // check if log is error (levels 0 - 3 correspond with verbose, info, warning, and error)
-    if (level == 3) {
-      console.log(`${this.side} console error: ${message}`);
-    } else if (String(message).startsWith("DISK")) {
-      console.log(`${this.side} console: ${message.substring(5)}`)
+    // check if log contains muted substring
+    let mutedConsoleMessages = ["does not match the recipient window's origin ('https://editor.p5js.org')"];
+    if (!mutedConsoleMessages.some(v => message.includes(v))) {
+      // check if log is error (levels 0 - 3 correspond with verbose, info, warning, and error)
+      if (level == 3) {
+        console.log(`${this.side} console error: ${message}`);
+      } else if (String(message).startsWith("DISK")) {
+        console.log(`${this.side} console: ${message.substring(5)}`)
+      }
     }
   }
 
