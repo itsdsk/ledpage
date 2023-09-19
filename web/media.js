@@ -47,6 +47,11 @@ backendSocket.event.on('data', function (data) {
     console.log("backend socket got data in media: " + data.toString());
 });
 
+let gitHash;
+runCommand('git log -1 --format=\"%h\"', gitHashTemp => {
+    gitHash = gitHashTemp;
+});
+
 // prevent duplicate exit messages
 var playback = {
     currentURL: false,
@@ -798,7 +803,9 @@ module.exports = {
         }));
     },
     windowDimensions: function (callback) {
-        callback(JSON.stringify(windowDims));
+        callback(JSON.stringify(Object.assign(windowDims, {
+            hash: gitHash
+        })));
     },
     setStartupPlaylist: function (msg) {
         console.log(`USER INPUT::set startup playlist to ${msg}`);

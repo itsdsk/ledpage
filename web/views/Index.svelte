@@ -97,8 +97,11 @@
         height: 0,
         ratio: 100,
     };
+    let gitHash;
     window.socket.on("windowdims", function (windowDims) {
         var parsed = JSON.parse(windowDims);
+        gitHash = parsed.hash;
+        console.log(`commit ${gitHash}: https://github.com/itsdsk/disk-interaction-system/commit/${gitHash}`)
         // calc aspect ratio as percentage
         parsed.ratio = 100 * (parsed.height / parsed.width);
         windowDimensions = parsed;
