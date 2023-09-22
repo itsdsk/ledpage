@@ -14,9 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories(${BCM_INCLUDE_DIRS})
 include_directories("/opt/vc/include")
 
-# WEBSOCKET
-include_directories(thirdparty/websocketpp)
-
 # SERIAL
 include_directories(thirdparty/serial/include)
 set(serial_SOURCES thirdparty/serial/src/serial.cc thirdparty/serial/include/serial/serial.h thirdparty/serial/include/serial/v8stdint.h)

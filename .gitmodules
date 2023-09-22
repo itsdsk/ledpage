@@ -7,9 +7,6 @@
 [submodule "backend/thirdparty/cxxopts"]
 	path = cpp/thirdparty/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
-[submodule "backend/thirdparty/websocketpp"]
-	path = cpp/thirdparty/websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "backend/thirdparty/pigpio"]
 	path = cpp/thirdparty/pigpio
 	url = https://github.com/joan2937/pigpio.git
