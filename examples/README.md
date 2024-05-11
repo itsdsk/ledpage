@@ -1,26 +1,39 @@
 # Configuration
 
-```javascript
-{
-    "window": {
-        //
-    },
-    "outputs": []
-}
-```
+The main config contains an array for `outputs` and an object for `window` properties. It should be saved in `public/config.json`.
 
 ## Window
 
-Contains the dimensions in which the LED coordinates are mapped. Note that the coordinate system is mapped so that the top left corner is considered (0,0).
+The `window` object contains the `width` and `height` bounds in which LED coordinates are mapped. Values will be stetched to fit the browser window's dimensions if these don't match.
 
 ```javascript
-{
+"window": {
     "width": 640,
     "height": 480
 }
 ```
 
 ## Outputs
+
+The `outputs` array contains one or more objects, each defining an output `type`, it's `properties` and an array of `leds`. All the available output types are described below.
+
+2D coordinates, defined in the `leds` array for each output, are mapped such that the top left corner is (0,0). The value `r` is the radius in which pixels are sampled. Higher values of `r` typically improve colour reproduction on low-resoution displays. However, they also decrease FPS.
+
+```javascript
+"outputs": [
+    {
+        "type": "apa102_spi0",
+        "leds": [
+            {
+                "x": 108.9,
+                "y": 100.4,
+                "r": 1
+            },
+            /* ... */
+        ]
+    }
+]
+```
 
 ### APA102 on Pi GPIO #0
 
@@ -186,26 +199,7 @@ string
 ##### description
 MAC address of bluetooth server
 
-## Settings
-
-```javascript
-"settings": {
-    "brightness": 0.0125,
-    "desaturation": 0.0,
-    "gamma": 2.2,
-    "blur": 50,
-    "fade": 25000,
-    "autoplayDuration": {
-        "min": 30000,
-        "max": 60000
-    },
-    "startupPlaylist": "",
-    "autoClickPeriod": 0,
-    "title": "DISK"
-}
-```
-
-# Example
+## Example config
 
 ```javascript
 {
@@ -230,5 +224,28 @@ MAC address of bluetooth server
             ]
         }
     ]
+}
+```
+
+# Settings
+
+A second config contains settings for the display. This should be saved in `public/settings.json`.
+
+## Example settings
+
+```javascript
+{
+    "brightness": 0.0125,
+    "desaturation": 0.0,
+    "gamma": 2.2,
+    "blur": 50,
+    "fade": 25000,
+    "autoplayDuration": {
+        "min": 30000,
+        "max": 60000
+    },
+    "startupPlaylist": "",
+    "autoClickPeriod": 0,
+    "title": "DISK"
 }
 ```
