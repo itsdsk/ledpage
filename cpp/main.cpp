@@ -15,8 +15,6 @@
 #include <boost/thread/thread.hpp>
 #include <thirdparty/json/single_include/nlohmann/json.hpp>
 #include <thirdparty/cxxopts/include/cxxopts.hpp>
-#include <thirdparty/websocketpp/websocketpp/server.hpp>
-#include <websocketpp/config/asio_no_tls.hpp>
 
 #include <cstdio>
 #include <boost/array.hpp>
