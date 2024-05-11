@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# for raspbian 2018-11-13-raspbian-stretch-lite.zip image
+# for Raspberry Pi OS Lite (64-bit) - Bookworm 2024-03-15
 
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
 # dependencies
 sudo apt update
@@ -24,7 +24,12 @@ sudo apt install xserver-xorg-core \
   blueman \
   libbluetooth-dev \
   libxtst-dev \
-  xdotool
+  xdotool \
+  libgles2-mesa \
+  mesa-utils \
+  libsdl2-dev \
+  libraspberrypi-dev \
+  raspberrypi-kernel-headers
 
 # get absolute path to directory
 BASEDIR=$(dirname $(readlink -f $0))
@@ -66,6 +71,7 @@ After=disk-ui-daemon.service
 
 [Service]
 SyslogIdentifier=gfx
+Environment="XDG_RUNTIME_DIR=/run/user/1000"
 ExecStart=/usr/bin/startx $BASEDIR/web/node_modules/electron/dist/electron --no-sandbox $BASEDIR/web/renderer.js
 Restart=on-failure
 RestartSec=5s
@@ -116,6 +122,12 @@ Section \"ServerLayout\"
 EndSection
 EOT"
 
+# Optional: add to /boot/cmdline.txt:
+# https://github.com/hzeller/rpi-rgb-led-matrix#cpu-use
+
+# Optional: switch off on-board sound by adding dtparam=audio=off to /boot/config.txt
+
+# Optional: dtoverlay=vc4-fkms-v3d on pi 4
 
 # for UART output:
 # run `sudo raspi-config`
