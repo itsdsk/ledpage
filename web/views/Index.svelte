@@ -99,7 +99,7 @@
     };
     let gitHash;
     window.socket.on("windowdims", function (windowDims) {
-        var parsed = JSON.parse(windowDims);
+        let parsed = JSON.parse(windowDims);
         gitHash = parsed.hash;
         console.log(`commit ${gitHash}: https://github.com/itsdsk/disk-interaction-system/commit/${gitHash}`)
         // calc aspect ratio as percentage
@@ -110,10 +110,10 @@
     let playback_timer = 0;
     let playback_label = 0; // 0=PAUSED, 1=FADING, 2=PLAYING
     $: if ($config_settings.brightness > 0.0) {
-        var secs = Math.round(
+        let secs = Math.round(
             $livePlaybackStatus.nextPlaying.timeFromStart / 1000
         );
-        var absSecs = Math.abs(secs);
+        let absSecs = Math.abs(secs);
         playback_timer = `${Math.floor(absSecs / 60)}:${String(
             absSecs % 60
         ).padStart(2, "0")}`;
@@ -121,7 +121,7 @@
             playback_timer = "-" + playback_timer;
             if (playback_label != 2) playback_label = 2;
         } else {
-            var fadeDurationSeconds = Math.round(
+            let fadeDurationSeconds = Math.round(
                 $playbackStatus.playingFadeIn.fadeDuration / 1000
             );
             playback_timer += ` / ${Math.floor(fadeDurationSeconds / 60)}:${
