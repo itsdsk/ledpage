@@ -191,7 +191,7 @@ rendererSocket.event.on('data', (data) => {
                 });
             });
         } else {
-            //
+            // website isn't in library so do nothing and let web clients load screenshot from public/
             console.log(`not saving screenshot bc website isnt in library`);
         }
     }
@@ -469,6 +469,19 @@ module.exports = {
     },
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
+        /*
+        // workaround for issue where autoplay doesn't start properly, or starts twice, after screen is off
+        // check if turning off or on
+        if (config_settings.brightness == 0.0 && msg.brightness > 0.0) {
+            // turning on
+            // start autoplay
+            module.exports.startAutoplay(playback.channel);
+            // setTimeout(module.exports.startAutoplay, 500, config_settings.startupPlaylist);
+            //
+        } else if (msg.brightness == 0.0 && config_settings.brightness > 0.0) {
+            // turning off
+        }
+        */
         // round to 3 decimal places
         msg.brightness = Math.round(msg.brightness * 1000) / 1000;
         // update local config object
