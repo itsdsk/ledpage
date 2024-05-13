@@ -8,15 +8,15 @@
     "express": "^4.16.4",
     "rollup": "2.30",
     "rollup-plugin-css-only": "^3.1.0",
-    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.1",
-    "socket.io": "^3.1.2",
-    "sqlite3": "^4.2.0",
+    "socket.io": "^4.7.5",
+    "sqlite3": "^5.1.7",
     "svelte": "^3.38.2"
   },
   "optionalDependencies": {
-    "electron": "^13.6.6",
+    "electron": "^30.0.3",
     "electron-rebuild": "^3.2.5"
   },
   "scripts": {
