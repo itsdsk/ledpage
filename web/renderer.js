@@ -7,6 +7,9 @@ const {
 } = require("child_process");
 var sockets = require('./sockets.js');
 
+// todo: consider refactoring page saving feature to use singlefile instead of electron:
+// https://github.com/gildas-lormeau/SingleFile , https://www.electronjs.org/docs/latest/api/extensions#loading-extensions
+
 // constants
 const screenshotQuality = 70;
 const graphicsDriver = true ? 'VC4' : ''; // set to true if using `dtoverlay=vc4-fkms-v3d`
@@ -35,7 +38,8 @@ if (graphicsDriver != 'VC4') {
   console.log('Disabling hardware acceleration because graphics driver is not VC4 - this can be re-enabled in renderer.js');
   app.disableHardwareAcceleration();
 }
-app.commandLine.appendSwitch('ignore-gpu-blacklist');
+//app.commandLine.appendSwitch('use-gl', 'desktop'); // seems to make no difference, can also be 'egl' // sudo apt-get install libgles2-mesa mesa-utils libsdl2-dev
+//app.commandLine.appendSwitch('ignore-gpu-blacklist'); // might decrease performance
 app.commandLine.appendSwitch('enable-gpu-rasterization');
 app.commandLine.appendSwitch('enable-native-gpu-memory-buffers'); // makes no difference
 
