@@ -1,7 +1,7 @@
 {
-    "name": "Disk Interaction System",
-    "short_name": "DISK",
-    "description": "Work in progress...",
+    "name": "ledpage",
+    "short_name": "ledpage",
+    "description": "web to led mapper",
     "icons": [{
         "src": "/android-chrome-192x192.png",
         "sizes": "192x192",
