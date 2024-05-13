@@ -232,7 +232,12 @@ module.exports = {
                         // check folder is not hidden (unless media directory is unpopulated)
                         if (itemPath.includes('/.') == false || files.length == 1) {
                             // load media metadata
-                            var meta = require(path.join(itemPath, 'demo.json'));
+                            try {
+                                var meta = require(path.join(itemPath, 'demo.json'));
+                            } catch (e) {
+                                console.log(`Error loading demo.json for ${itemPath}`);
+                                console.log(e);
+                            }
                             if (meta) {
                                 // add to database
                                 parseMediaItemDirectory(file, meta);
