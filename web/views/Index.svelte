@@ -98,8 +98,8 @@
         ratio: 100,
     };
     let gitHash;
-    window.socket.on("windowdims", function (windowDims) {
-        let parsed = JSON.parse(windowDims);
+    window.socket.on("environmentvariables", function (environmentVariables) {
+        let parsed = JSON.parse(environmentVariables);
         gitHash = parsed.hash;
         console.log(`commit ${gitHash}: https://github.com/itsdsk/disk-interaction-system/commit/${gitHash}`)
         // calc aspect ratio as percentage

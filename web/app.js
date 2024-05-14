@@ -45,8 +45,8 @@ io.on('connection', function (socket) {
   media.nowPlaying(function (playbackStatus) {
     socket.emit('nowplaying', (playbackStatus));
   });
-  media.windowDimensions(function (windowDims) {
-    socket.emit('windowdims', windowDims);
+  media.getEnvironmentVariables(function (environmentVariables) {
+    socket.emit('environmentvariables', environmentVariables);
   });
   // upload config file
   socket.on('updateconfigfile', function (msg) {

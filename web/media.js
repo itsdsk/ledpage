@@ -761,7 +761,7 @@ module.exports = {
             command: 'takeScreenshot'
         }));
     },
-    windowDimensions: function (callback) {
+    getEnvironmentVariables: function (callback) {
         callback(JSON.stringify(Object.assign(windowDims, {
             hash: gitHash
         })));
