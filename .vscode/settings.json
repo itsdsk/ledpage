@@ -85,5 +85,6 @@
     "strstream": "cpp",
     "variant": "cpp",
     "bit": "cpp"
-  }
+  },
+  "cmake.configureOnOpen": false
 }

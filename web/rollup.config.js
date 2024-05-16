@@ -126,8 +126,9 @@ var to_export = process.env.INDEX ? indexconfig :
 
 export default to_export;
 
+let started = false;
+
 function serve() {
-	let started = false;
 
 	return {
 		writeBundle() {
