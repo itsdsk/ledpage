@@ -74,18 +74,22 @@
 
     function sortChannels() {
         if ($channelObjects && $channelObjects.length > 0) {
+            // get channel that is currently playing
+            let channelNowPlaying = $channelObjects.find(
+                (item) =>
+                    (item.channel_name || "all media") ===
+                    ($livePlaybackStatus.channel || "all media")
+            );
+            // get channels which are not playing
+            let channelsNotPlaying = $channelObjects.filter(
+                (item) =>
+                    (item.channel_name || "all media") !==
+                    ($livePlaybackStatus.channel || "all media")
+            );
             // move currently-playing-channel to front of array
             sortedChannels = [
-                $channelObjects.find(
-                    (item) =>
-                        (item.channel_name || "all media") ===
-                        ($livePlaybackStatus.channel || "all media")
-                ),
-                ...$channelObjects.filter(
-                    (item) =>
-                        (item.channel_name || "all media") !==
-                        ($livePlaybackStatus.channel || "all media")
-                ),
+                ... channelNowPlaying ? [channelNowPlaying] : [],
+                ... channelsNotPlaying,
             ];
         } else {
             sortedChannels = [];
@@ -449,7 +453,7 @@
                         : "button"}
                     class:playing={index == 0}
                 >
-                    {channelObject.channel_name || "all media"} ({channelObject.count})
+                    {channelObject.channel_name || "all media"} ({channelObject.count || 0})
                 </button>
             {/each}
         </div>
