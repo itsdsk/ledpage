@@ -4,7 +4,7 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 
 ## Supported outputs and inputs
 
-- UART <!-- (Neopixels/WS2812 [example](examples/UART_OUT/README.md)) -->
+- UART (Arduino [video](examples/media/uart_out.webp), [example](examples/UART_out))
 - SPI (DotStar/APA102 [video](exmples/media/square_two.mp4)<!-- , [example](examples/SPI_OUT/README.md) -->)
 - PWM (DC motor [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/PWM_OUT/README.md) -->)
 - I2C
