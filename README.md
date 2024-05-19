@@ -10,7 +10,7 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 - I2C
 - Bluetooth (BLE [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/BLE_OUT/README.md) -->)
 - WebAudio <!-- ([MIC example](examples/MIC_IN/README.md)) -->
-- WebBluetooth <!-- ([IMU example](examples/IMU_IN/README.md)) -->
+- WebBluetooth (IMU [video](examples/media/webbluetooth.gif), [example](examples/WebBluetooth_in))
 - WebRTC <!-- ([BLE example](examples/BLE_IN/README.md)) -->
 
 ## Compile and install
