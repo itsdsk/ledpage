@@ -6,9 +6,9 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 
 - UART (Arduino Uno [video](examples/media/uart_out.webp), [example](examples/UART_out))
 - SPI (DotStar/APA102 [image](examples/media/spi_out.jpg), [example](examples/SPI_out))
-- PWM (DC motor [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/PWM_OUT/README.md) -->)
+- PWM (DC motor [video](examples/media/ble_pwm_out.webp), [image](examples/media/ble_pwm_out.jpg), [example](examples/BLE_out))
 - I2C (Arduino Nano Every [video](examples/media/i2c_out.webp), [example](examples/I2C_out))
-- Bluetooth (BLE [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/BLE_OUT/README.md) -->)
+- Bluetooth (BLE [video](examples/media/ble_pwm_out.webp), [image](examples/media/ble_pwm_out.jpg), [example](examples/BLE_out))
 - WebAudio <!-- ([MIC example](examples/MIC_IN/README.md)) -->
 - WebBluetooth (IMU [video](examples/media/webbluetooth.gif), [example](examples/WebBluetooth_in))
 - WebRTC <!-- ([BLE example](examples/BLE_IN/README.md)) -->
