@@ -5,7 +5,7 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 ## Supported outputs and inputs
 
 - UART (Arduino [video](examples/media/uart_out.webp), [example](examples/UART_out))
-- SPI (DotStar/APA102 [video](exmples/media/square_two.mp4)<!-- , [example](examples/SPI_OUT/README.md) -->)
+- SPI (DotStar/APA102 [image](examples/media/square_two.mp4), [example](examples/SPI_out))
 - PWM (DC motor [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/PWM_OUT/README.md) -->)
 - I2C
 - Bluetooth (BLE [video](examples/media/corona_lamp.mp4)<!-- , [example](examples/BLE_OUT/README.md) -->)
