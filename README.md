@@ -11,7 +11,7 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 - Bluetooth (BLE [video](examples/media/ble_pwm_out.webp), [image](examples/media/ble_pwm_out.jpg), [example](examples/BLE_out))
 - WebAudio <!-- ([MIC example](examples/MIC_IN/README.md)) -->
 - WebBluetooth (IMU [video](examples/media/webbluetooth.gif), [example](examples/WebBluetooth_in))
-- WebRTC <!-- ([BLE example](examples/BLE_IN/README.md)) -->
+- WebRTC (Pose detection [video](examples/media/webrtc_in.webp), [example](examples/WebRTC_in))
 
 ## Compile and install
 
