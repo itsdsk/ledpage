@@ -246,6 +246,7 @@ A second config contains settings for the display. This should be saved in `publ
     },
     "startupPlaylist": "",
     "autoClickPeriod": 0,
+    "offlineMode": false,
     "title": "DISK"
 }
 ```

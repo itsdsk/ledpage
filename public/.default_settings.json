@@ -10,5 +10,6 @@
     },
     "startupPlaylist": "",
     "autoClickPeriod": 0,
+    "offlineMode": false,
     "title": "DISK"
 }

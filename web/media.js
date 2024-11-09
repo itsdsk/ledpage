@@ -409,10 +409,11 @@ module.exports = {
             if (err) console.log(`error updating playcount in database: ${err}`);
             // get media info from database
             module.exports.loadMediaItem(dirAndVersion.directory, row => {
-                // send play media command to renderer, preferring source URL over local file path (todo: add toggle to prefer local/remote path)
+                // send play media command to renderer, preferring source URL over local file path unless in offline mode
+                let pathToMedia = config_settings.offlineMode || row.source == 'about:none' ? ('file://' + filePath + '/index.html') : row.source;
                 rendererSocket.write(JSON.stringify({
                     command: 'loadURL',
-                    path: row.source != 'about:none' ? row.source : ('file://' + filePath + '/index.html'),
+                    path: pathToMedia,
                     fade: thisFadeDuration,
                     screenshots: row.screenshots,
                     directory: dirAndVersion.directory
