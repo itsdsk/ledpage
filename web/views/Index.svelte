@@ -397,6 +397,19 @@
                                         <button
                                             type="button"
                                             class="options--btn"
+                                            title="Refresh page"
+                                            on:click|preventDefault|stopPropagation={() => {
+                                                console.log(`sending command to reload page`);
+                                                window.socket.emit("reloadpage");
+                                            }}
+                                        >
+                                            Refresh
+                                        </button>
+                                    </li>
+                                    <li class="options__item">
+                                        <button
+                                            type="button"
+                                            class="options--btn"
                                             title="Take screenshot of URL"
                                             on:click|preventDefault|stopPropagation={() => {
                                                 window.socket.emit(

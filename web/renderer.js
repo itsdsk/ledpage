@@ -438,6 +438,16 @@ app.on('ready', () => {
       var _browserWindow = data.side == 'A' ? windowA.browserWindow : windowB.browserWindow;
       // load empty webpage
       _browserWindow.loadURL('about:blank');
+    } else if (data.command == 'reloadPage') {
+      // reload webpage
+      if (flipWindow) {
+        // trigger event
+        windowB.browserWindow.reload();
+      } else {
+        // trigger event
+        windowA.browserWindow.reload();
+      }
+      console.log(`reloading page`);
     } else if (data.command == 'fakeInput') {
       // send fake user gesture to trigger event in page
       console.log(`sending mouse click event ${data.position[0]},${data.position[1]} to window ${flipWindow ? 'B' : 'A'}`);

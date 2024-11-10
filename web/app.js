@@ -81,6 +81,10 @@ io.on('connection', function (socket) {
   socket.on('playnext', function (msg) {
     media.playNext();
   });
+  // reload page
+  socket.on('reloadpage', function () {
+    media.reloadPage();
+  });
   // set autoplay time range
   socket.on('setautoplaytimerange', function (msg) {
     media.setAutoplayTimeRange(msg);

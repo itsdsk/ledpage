@@ -471,6 +471,13 @@ module.exports = {
         // });
         console.log('USER INPUT::playing local media: ' + filePath + " version: " + (dirAndVersion.version ? dirAndVersion.version : 'latest') + ', fade: ' + thisFadeDuration);
     },
+    reloadPage: function () {
+        console.log(`reloading page`);
+        // send reload command to renderer
+        rendererSocket.write(JSON.stringify({
+            command: 'reloadPage'
+        }));
+    },
     setBrightness: function (msg) {
         console.log(`set brightness msg: ${JSON.stringify(msg)}`);
         /*
