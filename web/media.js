@@ -500,6 +500,16 @@ module.exports = {
         // update backend
         backendSocket.write(`{"window":{"brightness":${msg.brightness}}}`);
     },
+    resetBrightness: function (msg) {
+        console.log(`reset brightness msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.write(`{"window":{"resetBrightness":${msg.prevVal},"duration":${msg.duration}}}`);
+    },
+    resetGamma: function (msg) {
+        console.log(`reset gamma msg: ${JSON.stringify(msg)}`);
+        // update backend
+        backendSocket.write(`{"window":{"resetGamma":${msg.prevVal},"duration":${msg.duration}}}`);
+    },
     setBlur: function (msg) {
         //
         console.log(`set blur msg: ${JSON.stringify(msg)}`);

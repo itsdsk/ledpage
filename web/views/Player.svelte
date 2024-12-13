@@ -131,6 +131,57 @@
                         {/each}
                     </datalist>
                 </div>
+                <p class="label">Controls:</p>
+                <div class="buttons buttons__channels">
+                    <button
+                        type="button"
+                        class="connect"
+                        on:click|preventDefault|stopPropagation={() => {
+                            window.socket.emit("resetbrightness", {
+                                prevVal: 0.0,
+                                duration: 500
+                            });
+                        }}
+                    >
+                        Flash off 0.5s
+                    </button>
+                    <button
+                        type="button"
+                        class="connect"
+                        on:click|preventDefault|stopPropagation={() => {
+                            window.socket.emit("resetbrightness", {
+                                prevVal: 0.0,
+                                duration: 1500
+                            });
+                        }}
+                    >
+                        Flash off 1.5s
+                    </button>
+                    <button
+                        type="button"
+                        class="connect"
+                        on:click|preventDefault|stopPropagation={() => {
+                            window.socket.emit("resetgamma", {
+                                prevVal: 0.0,
+                                duration: 500
+                            });
+                        }}
+                    >
+                        Flash on 0.5s
+                    </button>
+                    <button
+                        type="button"
+                        class="connect"
+                        on:click|preventDefault|stopPropagation={() => {
+                            window.socket.emit("resetgamma", {
+                                prevVal: 0.0,
+                                duration: 1500
+                            });
+                        }}
+                    >
+                        Flash on 1.5s
+                    </button>
+                </div>
             {/if}
         {/if}
         <div class="toggle" on:click={() => (open = !open)}>
