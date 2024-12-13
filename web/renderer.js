@@ -252,7 +252,7 @@ class RenderWindow {
     //console.log(`${this.side} DOM ready`);
     // hide p5.js Editor header
     if (this.browserWindow.webContents.getURL().includes('editor.p5js.org')) {
-      await this.browserWindow.webContents.insertCSS('nav.nav.preview-nav {display: none !important;}', {
+      await this.browserWindow.webContents.insertCSS('nav.nav.preview-nav, #processing-banner {display: none !important;}', {
         cssOrigin: 'user'
       }).then(result => {
         console.log(`Added CSS to hide p5.js Editor header`);
