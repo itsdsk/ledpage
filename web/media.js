@@ -277,6 +277,7 @@ module.exports = {
         var settingsPath = path.join(__dirname, '../', 'public', 'settings.json');
         try {
             config_settings = require(settingsPath);
+            console.log("loaded settings")
         } catch (ex) {
             console.log("Error getting settings.json: " + ex);
             var pathToDefaultSettings = path.join(__dirname, '../', 'public', '.default_settings.json');
@@ -820,6 +821,7 @@ module.exports = {
 };
 
 function parseMediaItemDirectory(directory, meta, callback) {
+    console.log(`Loading directory ${directory}`);
     // add metadata to media table in database
     var insertQuery = "INSERT INTO media (directory, title, source, description, modified) VALUES (?, ?, ?, ?, ?)";
     db.run(insertQuery, [directory, meta.demo.title, meta.demo.source || 'about:none', meta.demo.description, meta.demo.modified], function () {

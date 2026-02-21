@@ -32,6 +32,7 @@ const {
 // enable content to use web bluetooth api
 app.commandLine.appendSwitch('enable-experimental-web-platform-features');
 app.commandLine.appendSwitch('enable-web-bluetooth', true);
+app.commandLine.appendSwitch('disable-site-isolation-trials');
 
 // graphics
 if (graphicsDriver != 'VC4') {
@@ -184,6 +185,7 @@ class RenderWindow {
       // report loaded to client
       if (this.client) {
         // check if media has screenshot
+        // todo: automatically take extra screenshots if not enough are counted
         var has_screenshot = (this.loadMessage.screenshots && this.loadMessage.screenshots.length > 0) ? true : false;
         // if playing remote media without screenshot
         if (!this.loadMessage.directory && !has_screenshot) {
@@ -259,6 +261,9 @@ class RenderWindow {
       }).catch(error => {
         console.log(`Error hiding p5.js Editor header: ${error}`);
       });
+      // todo: check BLE works, may need to disable security for p5js based on
+      // https://github.com/electron/electron/issues/19789#issuecomment-1175014095
+      // https://www.electronjs.org/docs/latest/api/protocol#protocolregisterschemesasprivilegedcustomschemes
     }
   }
   // bluetooth device request handler
@@ -303,7 +308,7 @@ app.on('ready', () => {
     windowDims.width = Math.floor(width / 2);
   }
   windowDims.height = height;
-  console.log(`Detected display size: ${JSON.stringify({width, height})}`);
+  console.log(`Detected display size: ${JSON.stringify({ width, height })}`);
   console.log(`Window dimensions: ${JSON.stringify(windowDims)} ${pixelDoubling ? ' (halving width to fix pixel doubling - can be disabled in renderer.js)' : ''}`);
   // window options (electronJS)
   const windowOpts = {
