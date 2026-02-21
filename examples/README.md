@@ -2,6 +2,8 @@
 
 The main config contains an array for `outputs` and an object for `window` properties. It should be saved in `public/config.json`.
 
+A basic example can be found in [/public/.default_config.json](/public/.default_config.json).
+
 ## Window
 
 The `window` object contains the `width` and `height` bounds in which LED coordinates are mapped. Values will be stetched to fit the browser window's dimensions if these don't match.
@@ -230,6 +232,8 @@ MAC address of bluetooth server
 # Settings
 
 A second config contains settings for the display. This should be saved in `public/settings.json`.
+
+A basic example can be found in [/public/.default_settings.json](/public/.default_settings.json).
 
 ## Example settings
 
