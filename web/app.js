@@ -218,6 +218,14 @@ io.on('connection', function (socket) {
   socket.on('screenshot', function () {
     media.takeScreenshot();
   });
+  // reset brightness
+  socket.on('resetbrightness', function (msg) {
+    media.resetBrightness(msg);
+  });
+  // reset gamma
+  socket.on('resetgamma', function (msg) {
+    media.resetGamma(msg);
+  });
   // get logs
   socket.on('getlogs', function () {
     media.getLogs(function (logs) {

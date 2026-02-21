@@ -36,10 +36,17 @@ struct animatedProperty {
     void setTarget(float newTargetValue, unsigned int newFadeDuration = 1000) {
         // record current time
         timeChanged = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-        // update values
+        // update values to start moving towards new target
         fadeDuration = newFadeDuration;
         initialValue = lastValue;
         targetValue = newTargetValue;
+    }
+    void resetTarget(float prevTargetValue, unsigned int newFadeDuration = 1000) {
+        // record current time
+        timeChanged = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        // update values to restart animation to target
+        fadeDuration = newFadeDuration;
+        initialValue = prevTargetValue;
     }
     float getUpdatedValue(unsigned int currentms){
         // check if finished transitioning
@@ -167,6 +174,24 @@ public:
                         // get gammaValue amt and update property
                         gammaValue.setTarget(element1.value()["gamma"].get<float>(), 1000);
                         // std::cout << "user changing gammaValue to: " << gammaValue.targetValue << std::endl;
+                    }
+                    if (element1.value().find("resetBrightness") != element1.value().end())
+                    {
+                        // get resetBrightness value and reset property
+                        brightness.resetTarget(
+                            element1.value()["resetBrightness"].get<float>(),
+                            element1.value()["duration"].get<int>()
+                        );
+                        std::cout << "user resetting brightness to: " << brightness.initialValue << std::endl;
+                    }
+                    if (element1.value().find("resetGamma") != element1.value().end())
+                    {
+                        // get resetGamma value and reset property
+                        gammaValue.resetTarget(
+                            element1.value()["resetGamma"].get<float>(),
+                            element1.value()["duration"].get<int>()
+                        );
+                        std::cout << "user resetting gammaValue to: " << gammaValue.initialValue << std::endl;
                     }
                 }
                 else if (key1 == "command")
