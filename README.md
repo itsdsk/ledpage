@@ -15,7 +15,7 @@ Web browser for the [Raspberry Pi](www.raspberrypi.com) that streams to addressa
 
 ## Compile and install
 
-- Connect a terminal to headless device running Raspberry Pi OS Lite: `ssh pi@<ip address>`.
+- Connect a terminal to headless device running Raspberry Pi OS Lite v5.4: `ssh pi@<ip address>`.
 
 - Run these commands to download the repository and dependencies, build, install and add to start up.
 

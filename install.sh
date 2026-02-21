@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# for Raspberry Pi OS Lite (64-bit) - Bookworm 2024-03-15
+# for Raspberry Pi OS Lite (64-bit) - Bookworm 2024-07-04
 
 curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
@@ -150,7 +150,9 @@ EOT"
 # hdmi_group=2
 # custom size:
 # hdmi_mode=87
+# 640x480:
 # hdmi_cvt=640 480 60 1 0 0 0
+# 800x267:
 # hdmi_cvt=800 267 60 1 0 0 0
 # 640 x 350 @ 85Hz:
 # hdmi_group=2
