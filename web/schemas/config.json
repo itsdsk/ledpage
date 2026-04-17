@@ -1,0 +1,391 @@
+{
+    "$id": "https://example.com/config.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "config",
+    "type": "object",
+    "definitions": {
+        "window": {
+            "description": "Area in which LED coordinates are mapped.",
+            "type": "object",
+            "properties": {
+                "width": {
+                    "description": "Width in which LED's X coordinates are mapped.",
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                },
+                "height": {
+                    "description": "Height in which LED's Y coordinates are mapped.",
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                }
+            },
+            "required": [
+                "width",
+                "height"
+            ],
+            "additionalProperties": false
+        },
+        "led": {
+            "type": "object",
+            "description": "Properties of a single LED.",
+            "properties": {
+                "x": {
+                    "type": "number",
+                    "description": "Horizontal position of LED.",
+                    "minimum": 0
+                },
+                "y": {
+                    "type": "number",
+                    "description": "Vertical position of LED.",
+                    "minimum": 0
+                },
+                "r": {
+                    "type": "integer",
+                    "description": "Blur radius of LED.",
+                    "minimum": 1
+                }
+            },
+            "required": [
+                "x",
+                "y"
+            ]
+        },
+        "base_output": {
+            "description": "Properties that apply to all output types.",
+            "type": "object",
+            "properties": {
+                "colorOrder": {
+                    "description": "The color order for this output.",
+                    "enum": [
+                        "rgb",
+                        "rbg",
+                        "grb",
+                        "gbr",
+                        "brg",
+                        "bgr"
+                    ],
+                    "default": "rgb"
+                }
+            },
+            "required": [
+                "colorOrder"
+            ]
+        },
+        "apa102_spi0": {
+            "title": "APA102 LEDs on Pi GPIO #0",
+            "description": "Dotstar/APA102 via Raspberry Pi GPIO pins `BCM 10` for data and `BCM 11` for clock (SPI0)",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "apa102_spi0"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "clockDivider": {
+                            "title": "SPI clock divider",
+                            "description": "SPI clock speed (via SPI clock divider [info](https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e))",
+                            "type": "integer",
+                            "default": 64
+                        }
+                    },
+                    "required": [
+                        "clockDivider"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "apa102_spi1": {
+            "title": "APA102 LEDs on Pi GPIO #1",
+            "description": "Dotstar/APA102 via Raspberry Pi GPIO pins `BCM 20` for data and `BCM 21` for clock (SPI1)",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "apa102_spi1"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "clockDivider": {
+                            "title": "SPI clock divider",
+                            "description": "SPI clock speed (via SPI clock divider [info](https://www.airspayce.com/mikem/bcm2835/group__constants.html#gaf2e0ca069b8caef24602a02e8a00884e))",
+                            "type": "integer",
+                            "default": 64
+                        }
+                    },
+                    "required": [
+                        "clockDivider"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "adalight_serial": {
+            "title": "Arduino on Pi USB port",
+            "description": "Neopixel/WS2812 via Arduino connected to Raspberry Pi via USB serial / RS232 [arduino sketch](https://pastebin.com/zhQCRFhd)",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "adalight_serial"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "port": {
+                            "title": "Serial port",
+                            "description": "Path to USB device e.g. /dev/ttyACM0",
+                            "type": "string",
+                            "default": "/dev/ttyACM0"
+                        },
+                        "rate": {
+                            "title": "Baud rate",
+                            "description": "Baud rate for serial communication",
+                            "type": "integer",
+                            "default": 460800
+                        }
+                    },
+                    "required": [
+                        "port",
+                        "rate"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "adalight_uart": {
+            "title": "Arduino on Pi USB port #2",
+            "description": "Arduino connected to Raspberry Pi GPIO pin `BCM 14` (UART), see details in cpp/device/OutputUART.h",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "adalight_uart"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {},
+                    "required": []
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "pwm_hw": {
+            "title": "PWM (using bcm2835 library)",
+            "description": "Device connected to Raspberry Pi via GPIO pin `BCM 18` (PWM0)",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "pwm_hw"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "clockDivider": {
+                            "title": "PWM clock divider",
+                            "description": "PWM clock speed (via divider [info](https://www.airspayce.com/mikem/bcm2835/group__pwm.html#ga4487f4e26e57ea3697a57cf52b8de35b))",
+                            "type": "integer",
+                            "default": 128
+                        }
+                    },
+                    "required": [
+                        "clockDivider"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "pwm_gpio": {
+            "title": "PWM (using pigpio library)",
+            "description": "Device connected to Raspberry Pi via PWM",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "pwm_gpio"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "pin": {
+                            "title": "GPIO pin number",
+                            "description": "GPIO pin number on Raspberry Pi in range 0-31 (more [info](http://abyz.me.uk/rpi/pigpio/cif.html))",
+                            "type": "integer",
+                            "default": 18
+                        },
+                        "frequency": {
+                            "title": "PWM frequency",
+                            "description": "PWM clock speed in Hz (more [info](http://abyz.me.uk/rpi/pigpio/cif.html))",
+                            "type": "integer",
+                            "default": 250
+                        }
+                    },
+                    "required": [
+                        "pin",
+                        "frequency"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "bluetooth_spp": {
+            "title": "Bluetooth Serial Port Profile",
+            "description": "Arduino with HC-05 module connected via Bluetooth. SPP must be enabled on the Raspberry Pi and the device should be trusted beforehand.",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "bluetooth_spp"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "MAC": {
+                            "title": "MAC address",
+                            "description": "MAC address of bluetooth server",
+                            "type": "string",
+                            "default": "00:00:00:00:00:00"
+                        }
+                    },
+                    "required": [
+                        "MAC"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        },
+        "disk1_serial": {
+            "title": "'Disk One' on Pi USB port",
+            "description": "Specific to 'disk one': Neopixel/WS2812 via Arduino connected to Raspberry Pi via USB serial / RS232",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "disk1_serial"
+                },
+                "properties": {
+                    "type": "object",
+                    "description": "Properties of this output.",
+                    "$ref": "#/definitions/base_output",
+                    "properties": {
+                        "port": {
+                            "title": "Serial port",
+                            "description": "Path to USB device e.g. /dev/ttyACM0",
+                            "type": "string",
+                            "default": "/dev/ttyACM0"
+                        },
+                        "rate": {
+                            "title": "Baud rate",
+                            "description": "Baud rate for serial communication",
+                            "type": "integer",
+                            "default": 460800
+                        }
+                    },
+                    "required": [
+                        "port",
+                        "rate"
+                    ]
+                }
+            },
+            "required": [
+                "properties"
+            ]
+        }
+    },
+    "properties": {
+        "window": {
+            "$ref": "#/definitions/window"
+        },
+        "outputs": {
+            "description": "Properties and LED array connected to an output.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "description": "Single output",
+                "properties": {
+                    "type": {
+                        "description": "The output type e.g. 'apa102_spi0'",
+                        "enum": [
+                            "apa102_spi0",
+                            "apa102_spi1",
+                            "adalight_serial",
+                            "adalight_uart",
+                            "pwm_hw",
+                            "pwm_gpio",
+                            "bluetooth_spp",
+                            "disk1_serial"
+                        ]
+                    },
+                    "leds": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "$ref": "#/definitions/led"
+                        }
+                    }
+                },
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/apa102_spi0"
+                    },
+                    {
+                        "$ref": "#/definitions/apa102_spi1"
+                    },
+                    {
+                        "$ref": "#/definitions/adalight_serial"
+                    },
+                    {
+                        "$ref": "#/definitions/adalight_uart"
+                    },
+                    {
+                        "$ref": "#/definitions/pwm_hw"
+                    },
+                    {
+                        "$ref": "#/definitions/pwm_gpio"
+                    },
+                    {
+                        "$ref": "#/definitions/bluetooth_spp"
+                    },
+                    {
+                        "$ref": "#/definitions/disk1_serial"
+                    }
+                ],
+                "required": [
+                    "type",
+                    "leds",
+                    "properties"
+                ]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "window",
+        "outputs"
+    ]
+}

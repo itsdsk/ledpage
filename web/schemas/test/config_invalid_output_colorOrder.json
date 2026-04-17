@@ -1,0 +1,58 @@
+{
+    "window": {
+        "width": 640,
+        "height": 480
+    },
+    "outputs": [
+        {
+            "type": "apa102_spi0",
+            "properties": {
+                "colorOrder": "rgdb",
+                "clockDivlider": 64
+            },
+            "leds": [
+                {
+                    "x": 160,
+                    "y": 120
+                },
+                {
+                    "x": 480,
+                    "y": 120
+                },
+                {
+                    "x": 480,
+                    "y": 360
+                },
+                {
+                    "x": 160,
+                    "y": 360
+                }
+            ]
+        },
+        {
+            "type": "apa102_spi0",
+            "properties": {
+                "colorOrder": "rgb",
+                "clockDivsider": 64
+            },
+            "leds": [
+                {
+                    "x": 320,
+                    "y": 60
+                },
+                {
+                    "x": 560,
+                    "y": 240
+                },
+                {
+                    "x": 320,
+                    "y": 420
+                },
+                {
+                    "x": 80,
+                    "y": 240
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,84 @@
+{
+    "$id": "https://example.com/person.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "settings",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "The display's name.",
+            "default": "ledpage"
+        },
+        "brightness": {
+            "type": "number",
+            "description": "The display's brightness.",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.0125
+        },
+        "desaturation": {
+            "type": "number",
+            "description": "The display's desaturation.",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.0
+        },
+        "gamma": {
+            "type": "number",
+            "description": "The display's gamma.",
+            "minimum": 0,
+            "default": 2.2
+        },
+        "blur": {
+            "description": "The blur radius in pixels.",
+            "type": "integer",
+            "minimum": 0,
+            "default": 50
+        },
+        "fade": {
+            "description": "The crossfade duration in ms.",
+            "type": "integer",
+            "minimum": 0,
+            "default": 25000
+        },
+        "autoplayDuration": {
+            "type": "object",
+            "description": "The time a page is shown for in autoplay mode.",
+            "properties": {
+                "min": {
+                    "description": "The min time to show a page during autoplay in ms.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 30000
+                },
+                "max": {
+                    "description": "The max time to show a page during autoplay in ms.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 60000
+                }
+            },
+            "required": [
+                "min",
+                "max"
+            ],
+            "additionalProperties": false
+        },
+        "startupPlaylist": {
+            "description": "The name of the playlist to start on launch.",
+            "type": "string"
+        },
+        "autoClickPeriod": {
+            "description": "The time between automatic clicks, 0=disabled.",
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+        },
+        "offlineMode": {
+            "description": "Prefer local copies of pages over remote.",
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "additionalProperties": false
+}
